@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Services — Silent Honor Foundation</title>
+<link rel="stylesheet" href="css/global.css">
+<style>
+.services-main { padding: 6rem 3.5rem; position: relative; z-index: 1; }
+
+.services-full-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: rgba(255,255,255,0.03);
+  margin-top: 3.5rem;
+}
+
+.svc-full-card {
+  background: var(--navy-mid);
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+  border-left: 4px solid transparent;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.svc-full-card:hover {
+  background: #151e30;
+  border-left-color: var(--red);
+}
+
+.svc-full-num {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+.svc-full-icon {
+  font-size: 2.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.svc-full-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.svc-full-desc {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: #8FA0BC;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.svc-bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.svc-bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.svc-bullets li::before {
+  content: '→';
+  color: var(--red-light);
+  flex-shrink: 0;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.8rem;
+  margin-top: 1px;
+}
+
+.svc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  padding: 4px 10px;
+  border-radius: 2px;
+}
+
+.svc-status.live {
+  background: rgba(185,28,28,0.12);
+  border: 1px solid rgba(185,28,28,0.25);
+  color: #FCA5A5;
+}
+
+.svc-status.live::before { content: '●'; font-size: 6px; color: var(--red-light); }
+
+.svc-status.soon {
+  background: rgba(201,149,42,0.1);
+  border: 1px solid rgba(201,149,42,0.22);
+  color: var(--gold-light);
+}
+
+.svc-status.soon::before { content: '◐'; font-size: 8px; }
+
+/* PROCESS SECTION */
+.process-section {
+  padding: 6rem 3.5rem;
+  background: var(--navy-mid);
+  position: relative; z-index: 1;
+}
+
+.process-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 3rem;
+  position: relative;
+}
+
+.process-steps::before {
+  content: '';
+  position: absolute;
+  top: 2.5rem;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: var(--border-red);
+}
+
+.process-step {
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.step-num {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.step-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 0.7rem;
+}
+
+.step-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ELIGIBILITY */
+.eligibility-section {
+  padding: 5rem 3.5rem;
+  position: relative; z-index: 1;
+}
+
+.elig-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+.elig-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+}
+
+.elig-item {
+  background: var(--navy-mid);
+  padding: 1.4rem 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  border-left: 3px solid var(--red);
+  transition: background 0.2s;
+}
+
+.elig-item:hover { background: #151e30; color: var(--white); }
+
+.elig-check { color: var(--red-light); font-size: 1rem; flex-shrink: 0; }
+
+@media (max-width: 1024px) {
+  .services-main, .process-section, .eligibility-section { padding: 4rem 2rem; }
+  .services-full-grid { grid-template-columns: 1fr; }
+  .process-steps { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .process-steps::before { display: none; }
+  .elig-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .services-main { padding: 3.5rem 1.5rem; }
+  .process-steps { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="page-content">
+
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-tag">What We Offer</div>
+      <h1 class="page-hero-title">Our <em>Services</em></h1>
+      <p class="page-hero-sub">Every service Silent Honor provides is free to eligible veterans and military families. No hidden fees, no upsells, no strings attached.</p>
+    </div>
+  </div>
+
+  <section class="services-main">
+    <div class="section-tag reveal">Free for All Veterans</div>
+    <h2 class="section-title reveal" data-delay="100">What We Do</h2>
+
+    <div class="services-full-grid">
+
+      <div class="svc-full-card reveal" data-delay="0">
+        <div class="svc-full-num">Service 01</div>
+        <div class="svc-full-icon">💳</div>
+        <div class="svc-status live">Available Now</div>
+        <h3 class="svc-full-title">Credit Review &amp; Education</h3>
+        <p class="svc-full-desc">Your credit report is often the biggest obstacle between where you are and where you're trying to go. We pull it apart, explain what's there, and give you an actionable plan.</p>
+        <ul class="svc-bullets">
+          <li>Full tri-bureau credit report review</li>
+          <li>Score factor analysis — what's hurting you and by how much</li>
+          <li>Dispute identification and guidance</li>
+          <li>Custom credit improvement roadmap</li>
+          <li>Military-specific credit protections (SCRA, MLA) explained</li>
+        </ul>
+        <a href="contact.html" class="btn-primary">Get Started →</a>
+      </div>
+
+      <div class="svc-full-card reveal" data-delay="100">
+        <div class="svc-full-num">Service 02</div>
+        <div class="svc-full-icon">📚</div>
+        <div class="svc-status live">Available Now</div>
+        <h3 class="svc-full-title">Financial Literacy Training</h3>
+        <p class="svc-full-desc">Self-paced courses built specifically for veterans — not generic financial advice recycled from civilian playbooks. Real content for real situations veterans face.</p>
+        <ul class="svc-bullets">
+          <li>Credit education course (7 lessons, fully live)</li>
+          <li>Financial literacy foundations course</li>
+          <li>Money Mission comprehensive course (in development)</li>
+          <li>All courses 100% free, self-paced, no registration required</li>
+          <li>Content designed by a CFEI with veteran-specific framing</li>
+        </ul>
+        <a href="courses.html" class="btn-primary">View Courses →</a>
+      </div>
+
+      <div class="svc-full-card reveal" data-delay="0">
+        <div class="svc-full-num">Service 03</div>
+        <div class="svc-full-icon">🎯</div>
+        <div class="svc-status live">Available Now</div>
+        <h3 class="svc-full-title">One-on-One Financial Coaching</h3>
+        <p class="svc-full-desc">Personalized coaching sessions with a Certified Financial Education Instructor and Certified Credit Counselor. No judgment. No scripts. Just real, actionable guidance for your situation.</p>
+        <ul class="svc-bullets">
+          <li>Budget creation and debt review</li>
+          <li>Debt payoff strategy (snowball, avalanche, hybrid)</li>
+          <li>Credit rebuilding plan with milestone tracking</li>
+          <li>Financial goal setting and 90-day action planning</li>
+          <li>Ongoing accountability check-ins</li>
+        </ul>
+        <a href="contact.html" class="btn-primary">Get Matched →</a>
+      </div>
+
+      <div class="svc-full-card reveal" data-delay="100">
+        <div class="svc-full-num">Service 04</div>
+        <div class="svc-full-icon">🏠</div>
+        <div class="svc-status live">Available Now</div>
+        <h3 class="svc-full-title">VA Loan Closing Cost Assistance</h3>
+        <p class="svc-full-desc">A VA loan eliminates the down payment — but closing costs can still run $5,000–$15,000+. Silent Honor provides direct assistance to veterans who qualify, bridging that final gap to homeownership.</p>
+        <ul class="svc-bullets">
+          <li>Direct closing cost assistance for qualifying veterans</li>
+          <li>VA loan eligibility review</li>
+          <li>Homeownership readiness assessment</li>
+          <li>Lender referrals with veteran-friendly track records</li>
+          <li>Pre-purchase financial coaching</li>
+        </ul>
+        <a href="contact.html" class="btn-primary">Get Started →</a>
+      </div>
+
+      <div class="svc-full-card reveal" data-delay="0">
+        <div class="svc-full-num">Service 05</div>
+        <div class="svc-full-icon">📊</div>
+        <div class="svc-status live">Available Now</div>
+        <h3 class="svc-full-title">Debt Management Planning</h3>
+        <p class="svc-full-desc">We help you build a realistic, strategic debt payoff plan based on your actual numbers — not a one-size-fits-all template.</p>
+        <ul class="svc-bullets">
+          <li>Full debt inventory review</li>
+          <li>Debt-to-income ratio analysis</li>
+          <li>Snowball vs. avalanche comparison for your specific debts</li>
+          <li>Consolidation and refinance evaluation</li>
+          <li>Creditor hardship program identification</li>
+        </ul>
+        <a href="contact.html" class="btn-primary">Get Started →</a>
+      </div>
+
+      <div class="svc-full-card reveal" data-delay="100">
+        <div class="svc-full-num">Service 06</div>
+        <div class="svc-full-icon">🛡️</div>
+        <div class="svc-status soon">Coming Soon</div>
+        <h3 class="svc-full-title">VA Disability Support</h3>
+        <p class="svc-full-desc">Getting the VA disability rating you've earned is a fight — and most veterans don't know their full options. We're building a dedicated support service to help with documentation, appeals, and benefits maximization.</p>
+        <ul class="svc-bullets">
+          <li>Disability claim documentation guidance</li>
+          <li>Appeal support and strategy</li>
+          <li>Benefits maximization review</li>
+          <li>Referrals to accredited VA claims agents</li>
+        </ul>
+        <a href="contact.html" class="btn-outline">Get Notified →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process-section">
+    <div class="section-tag reveal">How It Works</div>
+    <h2 class="section-title reveal" data-delay="100">Getting Started Is Simple</h2>
+    <div class="process-steps">
+      <div class="process-step reveal" data-delay="0">
+        <div class="step-num">01</div>
+        <div class="step-title">Reach Out</div>
+        <p class="step-desc">Fill out our contact form or send us a message. Tell us what you're dealing with — there's no wrong answer.</p>
+      </div>
+      <div class="process-step reveal" data-delay="100">
+        <div class="step-num">02</div>
+        <div class="step-title">Intake Review</div>
+        <p class="step-desc">We review your situation and connect you with the right service — coaching, credit review, or the appropriate course.</p>
+      </div>
+      <div class="process-step reveal" data-delay="200">
+        <div class="step-num">03</div>
+        <div class="step-title">Build Your Plan</div>
+        <p class="step-desc">Your coach works with you to build a concrete, realistic plan based on your actual numbers and goals.</p>
+      </div>
+      <div class="process-step reveal" data-delay="300">
+        <div class="step-num">04</div>
+        <div class="step-title">Execute &amp; Grow</div>
+        <p class="step-desc">You work the plan with ongoing support. We track progress and adjust as your situation changes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ELIGIBILITY -->
+  <section class="eligibility-section">
+    <div class="elig-grid">
+      <div class="reveal">
+        <div class="section-tag">Who Qualifies</div>
+        <h2 class="section-title">Who We Serve</h2>
+        <p class="section-body">If you served, you qualify. It's that simple. Silent Honor was built for the full spectrum of the military community — active, reserve, guard, retired, and veteran.</p>
+        <div style="margin-top: 2rem;">
+          <a href="contact.html" class="btn-primary">Apply for Services →</a>
+        </div>
+      </div>
+      <div class="reveal" data-delay="150">
+        <div class="elig-list">
+          <div class="elig-item"><span class="elig-check">✓</span> Veterans of all branches — Army, Navy, Air Force, Marines, Coast Guard, Space Force</div>
+          <div class="elig-item"><span class="elig-check">✓</span> Active duty service members</div>
+          <div class="elig-item"><span class="elig-check">✓</span> National Guard and Reserve members</div>
+          <div class="elig-item"><span class="elig-check">✓</span> Retired military of any era</div>
+          <div class="elig-item"><span class="elig-check">✓</span> Surviving spouses and immediate family members</div>
+          <div class="elig-item"><span class="elig-check">✓</span> Any credit score, any starting point — judgment-free</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

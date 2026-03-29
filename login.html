@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Login — Silent Honor Foundation</title>
+<link rel="stylesheet" href="css/global.css">
+<style>
+.login-wrapper {
+  min-height: 100vh;
+  padding-top: 76px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  z-index: 1;
+}
+
+/* LEFT — VISUAL */
+.login-left {
+  background: linear-gradient(145deg, var(--navy-mid), #0D1525);
+  padding: 4rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.login-left-glow {
+  position: absolute;
+  top: 30%; left: -10%;
+  width: 70%; height: 50%;
+  background: radial-gradient(ellipse at center, rgba(185,28,28,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.login-emblem {
+  width: 80px; height: 80px;
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.6s ease both;
+}
+
+.login-emblem svg { width: 100%; height: 100%; }
+
+.login-left-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1.8rem, 2.5vw, 2.8rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.0;
+  margin-bottom: 1.2rem;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+
+.login-left-title em {
+  color: var(--red-light);
+  font-style: normal;
+}
+
+.login-left-sub {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 3rem;
+  max-width: 380px;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+.member-perks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.perk-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.perk-row:hover { color: var(--white); }
+
+.perk-check {
+  width: 22px; height: 22px;
+  background: rgba(185,28,28,0.15);
+  border: 1px solid rgba(185,28,28,0.25);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--red-light);
+  flex-shrink: 0;
+}
+
+.login-left-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  margin: 2.5rem 0;
+}
+
+.login-stat-row {
+  display: flex;
+  gap: 2.5rem;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+
+.login-stat-num {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+
+.login-stat-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* RIGHT — FORM */
+.login-right {
+  background: var(--navy);
+  padding: 4rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-form-header { margin-bottom: 2.5rem; }
+
+.login-form-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.login-form-sub {
+  font-family: 'Lora', serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  max-width: 440px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.form-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.form-input {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  padding: 13px 16px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.form-input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+}
+
+.form-input::placeholder { color: #3D4F6B; }
+
+.password-wrap { position: relative; }
+
+.password-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.password-toggle:hover { color: var(--white); }
+
+.login-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+  accent-color: var(--red);
+  width: 14px; height: 14px;
+}
+
+.remember-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.forgot-link {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--red-light);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover { color: var(--white); }
+
+.login-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 15px;
+  font-size: 0.85rem;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+
+.login-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.login-divider-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #2D3A50;
+}
+
+.signup-prompt {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: 2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.signup-prompt-text {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+.error-msg {
+  display: none;
+  background: rgba(185,28,28,0.08);
+  border: 1px solid rgba(185,28,28,0.2);
+  color: #FCA5A5;
+  font-size: 0.8rem;
+  padding: 0.8rem 1rem;
+  border-radius: 2px;
+  font-family: 'Barlow', sans-serif;
+}
+
+.error-msg.show { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1024px) {
+  .login-wrapper { grid-template-columns: 1fr; }
+  .login-left { display: none; }
+  .login-right { padding: 3rem 2rem; justify-content: flex-start; padding-top: 4rem; }
+}
+
+@media (max-width: 640px) {
+  .login-right { padding: 2.5rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="login-wrapper page-content">
+
+  <!-- LEFT -->
+  <div class="login-left">
+    <div class="login-left-glow"></div>
+
+    <div class="login-emblem">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="40,4 76,22 76,58 40,76 4,58 4,22" fill="#B91C1C" opacity="0.85"/>
+        <polygon points="40,12 68,27 68,53 40,68 12,53 12,27" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+        <text x="40" y="50" text-anchor="middle" fill="white" font-size="26" font-family="Georgia" font-weight="bold">★</text>
+      </svg>
+    </div>
+
+    <h2 class="login-left-title">Welcome<br>Back,<br><em>Warrior.</em></h2>
+
+    <p class="login-left-sub">Your financial mission continues. Sign in to access your courses, resources, and coaching schedule.</p>
+
+    <div class="member-perks">
+      <div class="perk-row"><div class="perk-check">✓</div> All courses unlocked and saved</div>
+      <div class="perk-row"><div class="perk-check">✓</div> Member resource library</div>
+      <div class="perk-row"><div class="perk-check">✓</div> Priority coaching waitlist</div>
+      <div class="perk-row"><div class="perk-check">✓</div> Veteran community forum</div>
+      <div class="perk-row"><div class="perk-check">✓</div> Vet Life program access</div>
+    </div>
+
+    <div class="login-left-divider"></div>
+
+    <div class="login-stat-row">
+      <div>
+        <div class="login-stat-num">$0</div>
+        <div class="login-stat-label">Membership cost</div>
+      </div>
+      <div>
+        <div class="login-stat-num">100%</div>
+        <div class="login-stat-label">Free forever</div>
+      </div>
+      <div>
+        <div class="login-stat-num">All</div>
+        <div class="login-stat-label">Branches served</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="login-right">
+    <div class="login-form-header">
+      <h2 class="login-form-title">Sign In</h2>
+      <p class="login-form-sub">Enter your credentials to access your member dashboard.</p>
+    </div>
+
+    <div class="login-form">
+      <div class="error-msg" id="error-msg">
+        Incorrect email or password. Please try again or <a href="#" style="color: var(--red-light);">reset your password</a>.
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="login-email" placeholder="john.smith@email.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="password-wrap">
+          <input type="password" class="form-input" id="login-password" placeholder="Your password" style="padding-right: 80px;">
+          <button class="password-toggle" onclick="togglePassword()">Show</button>
+        </div>
+      </div>
+
+      <div class="login-meta">
+        <label class="remember-me">
+          <input type="checkbox">
+          <span class="remember-label">Remember me</span>
+        </label>
+        <a href="#" class="forgot-link">Forgot Password?</a>
+      </div>
+
+      <button class="btn-primary login-btn" onclick="handleLogin()">Sign In →</button>
+
+      <div class="login-divider">
+        <div class="login-divider-line"></div>
+        <span class="login-divider-text">New to Silent Honor?</span>
+        <div class="login-divider-line"></div>
+      </div>
+
+      <div class="signup-prompt">
+        <span class="signup-prompt-text">Create your free member account and get access to everything.</span>
+        <a href="signup.html" class="btn-outline" style="white-space: nowrap; padding: 10px 20px; font-size: 0.72rem;">Join Free →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script>
+function togglePassword() {
+  const input = document.getElementById('login-password');
+  const btn = document.querySelector('.password-toggle');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = 'Hide';
+  } else {
+    input.type = 'password';
+    btn.textContent = 'Show';
+  }
+}
+
+function handleLogin() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-password').value;
+  if (!email || !pass) {
+    document.getElementById('error-msg').classList.add('show');
+    return;
+  }
+  // Wire to backend auth / GHL here
+  window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donate — Silent Honor Foundation</title>
+<link rel="stylesheet" href="css/global.css">
+<style>
+.donate-main {
+  padding: 6rem 3.5rem;
+  position: relative; z-index: 1;
+}
+
+.donate-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+/* AMOUNT SELECTOR */
+.amount-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  margin-bottom: 1.5rem;
+}
+
+.amount-tile {
+  background: var(--navy-mid);
+  padding: 1.6rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  border-top: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.amount-tile:hover,
+.amount-tile.active {
+  background: #151e30;
+  border-top-color: var(--red);
+}
+
+.amount-tile.active .amt-dollar { color: var(--white); }
+
+.amt-dollar {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.amt-impact {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #3D4F6B;
+  margin-top: 4px;
+  line-height: 1.3;
+  font-family: 'Oswald', sans-serif;
+}
+
+.custom-amount {
+  width: 100%;
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 14px 16px;
+  border-radius: 2px;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+  margin-bottom: 1.5rem;
+}
+
+.custom-amount:focus { border-color: var(--red); }
+.custom-amount::placeholder { color: #3D4F6B; }
+
+.frequency-row {
+  display: flex;
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  margin-bottom: 2rem;
+}
+
+.freq-btn {
+  flex: 1;
+  background: var(--navy-mid);
+  border: none;
+  color: var(--muted);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.freq-btn:hover { background: #151e30; color: var(--white); }
+.freq-btn.active { color: var(--white); border-bottom-color: var(--red); background: #151e30; }
+
+.donate-form { display: flex; flex-direction: column; gap: 1.2rem; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.form-input {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  padding: 12px 16px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.form-input:focus { border-color: var(--red); }
+.form-input::placeholder { color: #3D4F6B; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.secure-note {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  color: #3D4F6B;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+}
+
+/* RIGHT SIDE */
+.donate-sidebar { display: flex; flex-direction: column; gap: 2rem; }
+
+.impact-card {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  padding: 2rem;
+}
+
+.impact-card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+.impact-rows { display: flex; flex-direction: column; gap: 1px; background: rgba(255,255,255,0.03); }
+
+.impact-row {
+  background: var(--navy-mid);
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: background 0.2s;
+}
+
+.impact-row:hover { background: #151e30; }
+
+.impact-row-amount {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--red-light);
+  min-width: 55px;
+  flex-shrink: 0;
+}
+
+.impact-row-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.transparency-card {
+  background: var(--red-dark);
+  padding: 2rem;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.quote-block {
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.75;
+  margin-bottom: 1.2rem;
+  border-left: 3px solid rgba(255,255,255,0.2);
+  padding-left: 1.2rem;
+}
+
+.legal-note {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  line-height: 1.7;
+  margin-top: 2rem;
+}
+
+/* OTHER WAYS TO GIVE */
+.other-ways {
+  padding: 5rem 3.5rem;
+  background: var(--navy-mid);
+  position: relative; z-index: 1;
+}
+
+.ways-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  margin-top: 3rem;
+}
+
+.way-card {
+  background: var(--navy-mid);
+  padding: 2.5rem 2rem;
+  border-top: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.way-card:hover { background: #161f31; border-top-color: var(--gold); }
+
+.way-icon { font-size: 2rem; margin-bottom: 1rem; }
+
+.way-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  margin-bottom: 0.7rem;
+}
+
+.way-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+
+@media (max-width: 1024px) {
+  .donate-main, .other-ways { padding: 4rem 2rem; }
+  .donate-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .ways-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .donate-main { padding: 3.5rem 1.5rem; }
+  .amount-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-row { grid-template-columns: 1fr; }
+  .ways-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="page-content">
+
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-tag">Support the Mission</div>
+      <h1 class="page-hero-title"><em>Donate</em> to Silent Honor</h1>
+      <p class="page-hero-sub">Every dollar goes directly to empowering veterans with financial education and coaching. Tax-deductible. 501(c)(3). No overhead fluff.</p>
+    </div>
+  </div>
+
+  <section class="donate-main">
+    <div class="donate-grid">
+
+      <!-- FORM LEFT -->
+      <div class="reveal">
+        <div class="section-tag">Make Your Gift</div>
+        <h2 class="section-title" style="margin-bottom: 2rem;">Choose Your Amount</h2>
+
+        <div class="frequency-row">
+          <button class="freq-btn active" onclick="setFreq(this)">One-Time</button>
+          <button class="freq-btn" onclick="setFreq(this)">Monthly</button>
+          <button class="freq-btn" onclick="setFreq(this)">Annual</button>
+        </div>
+
+        <div class="amount-grid">
+          <div class="amount-tile active" onclick="selectAmt(this)">
+            <div class="amt-dollar">$25</div>
+            <div class="amt-impact">One veteran coached</div>
+          </div>
+          <div class="amount-tile" onclick="selectAmt(this)">
+            <div class="amt-dollar">$50</div>
+            <div class="amt-impact">Course materials</div>
+          </div>
+          <div class="amount-tile" onclick="selectAmt(this)">
+            <div class="amt-dollar">$100</div>
+            <div class="amt-impact">Full program access</div>
+          </div>
+          <div class="amount-tile" onclick="selectAmt(this)">
+            <div class="amt-dollar">$250</div>
+            <div class="amt-impact">Sponsor a veteran</div>
+          </div>
+          <div class="amount-tile" onclick="selectAmt(this)">
+            <div class="amt-dollar">$500</div>
+            <div class="amt-impact">Fund a cohort</div>
+          </div>
+          <div class="amount-tile" onclick="selectAmt(this)">
+            <div class="amt-dollar">Other</div>
+            <div class="amt-impact">Your choice</div>
+          </div>
+        </div>
+
+        <input type="text" class="custom-amount" placeholder="Or enter a custom amount: $___">
+
+        <div class="donate-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" placeholder="First name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" placeholder="Last name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" placeholder="email@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Card Number</label>
+            <input type="text" class="form-input" placeholder="•••• •••• •••• ••••">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Expiry</label>
+              <input type="text" class="form-input" placeholder="MM / YY">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVV</label>
+              <input type="text" class="form-input" placeholder="•••">
+            </div>
+          </div>
+          <button class="btn-gold" style="width: 100%; justify-content: center; padding: 16px;">Complete Donation →</button>
+          <div class="secure-note">🔒 Secure · Tax-deductible · EIN 99-3172064</div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR RIGHT -->
+      <div class="donate-sidebar reveal" data-delay="150">
+        <div class="impact-card">
+          <div class="impact-card-title">Where Your Money Goes</div>
+          <div class="impact-rows">
+            <div class="impact-row">
+              <div class="impact-row-amount">$25</div>
+              <div class="impact-row-desc">Covers one veteran's initial coaching session and credit review</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-row-amount">$50</div>
+              <div class="impact-row-desc">Funds the production of course materials for one lesson</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-row-amount">$100</div>
+              <div class="impact-row-desc">Provides full program access and ongoing support for one veteran</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-row-amount">$250</div>
+              <div class="impact-row-desc">Sponsors a veteran through a full coaching engagement</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-row-amount">$500</div>
+              <div class="impact-row-desc">Funds an entire cohort of veterans through core coursework</div>
+            </div>
+            <div class="impact-row">
+              <div class="impact-row-amount">$1,000+</div>
+              <div class="impact-row-desc">Major gift — contact us to discuss named giving opportunities</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="transparency-card">
+          <p class="quote-block">Those who served this country deserve more than gratitude. They deserve the tools to build the futures they fought for.</p>
+          <p style="font-family: 'Oswald', sans-serif; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.35);">— Silent Honor Foundation</p>
+          <p class="legal-note">Silent Honor Foundation Inc. is a registered 501(c)(3) nonprofit organization (EIN: 99-3172064). All contributions are tax-deductible to the extent allowed by law. No goods or services were provided in exchange for your gift. You will receive a donation confirmation for your records.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- OTHER WAYS TO GIVE -->
+  <section class="other-ways">
+    <div class="section-tag reveal">More Ways to Give</div>
+    <h2 class="section-title reveal" data-delay="100">Other Ways to Support</h2>
+    <div class="ways-grid">
+      <div class="way-card reveal" data-delay="0">
+        <div class="way-icon">🔄</div>
+        <div class="way-title">Monthly Giving</div>
+        <p class="way-desc">Set up a recurring monthly gift and become a sustained supporter of the mission. Even $10/month adds up to meaningful impact over a year.</p>
+      </div>
+      <div class="way-card reveal" data-delay="80">
+        <div class="way-icon">🏢</div>
+        <div class="way-title">Corporate Matching</div>
+        <p class="way-desc">Many employers match charitable contributions dollar-for-dollar. Check with your HR department — your gift could automatically double.</p>
+      </div>
+      <div class="way-card reveal" data-delay="160">
+        <div class="way-icon">📣</div>
+        <div class="way-title">Spread the Word</div>
+        <p class="way-desc">Share Silent Honor with one veteran who could benefit. The most powerful referral costs nothing — and it changes a life.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script>
+  function selectAmt(tile) {
+    document.querySelectorAll('.amount-tile').forEach(t => t.classList.remove('active'));
+    tile.classList.add('active');
+  }
+  function setFreq(btn) {
+    document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

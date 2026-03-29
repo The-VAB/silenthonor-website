@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Dashboard — Silent Honor Member Portal</title>
+<link rel="stylesheet" href="css/global.css">
+<style>
+/* ── DASHBOARD LAYOUT ── */
+.dashboard-wrapper {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  padding-top: 76px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SIDEBAR ── */
+.dash-sidebar {
+  background: #070C16;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 76px;
+  height: calc(100vh - 76px);
+  overflow-y: auto;
+}
+
+.sidebar-member {
+  padding: 1.8rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.member-avatar {
+  width: 52px; height: 52px;
+  background: var(--red);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.8rem;
+}
+
+.member-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 0.2rem;
+}
+
+.member-rank {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red-light);
+  margin-bottom: 0.6rem;
+}
+
+.member-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #4ade80;
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.2);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.member-verified::before { content: '●'; font-size: 6px; }
+
+/* SIDEBAR NAV */
+.sidebar-nav {
+  flex: 1;
+  padding: 1.2rem 0;
+}
+
+.sidebar-nav-section {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #2D3A50;
+  padding: 0.8rem 1.5rem 0.4rem;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.sidebar-nav-item:hover {
+  color: var(--white);
+  background: rgba(255,255,255,0.02);
+}
+
+.sidebar-nav-item.active {
+  color: var(--white);
+  background: rgba(185,28,28,0.08);
+  border-left-color: var(--red);
+}
+
+.sidebar-nav-item .nav-icon { font-size: 1rem; flex-shrink: 0; }
+
+.sidebar-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: var(--white);
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-family: 'Barlow', sans-serif;
+  letter-spacing: 0;
+}
+
+.sidebar-badge.gold {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+.sidebar-footer {
+  padding: 1.2rem 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-signout {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #3D4F6B;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.sidebar-signout:hover { color: var(--red-light); }
+
+/* ── MAIN CONTENT ── */
+.dash-main {
+  background: var(--navy);
+  overflow-y: auto;
+}
+
+/* TAB PANELS */
+.dash-panel {
+  display: none;
+  padding: 2.5rem 3rem;
+  animation: fadeUp 0.35s ease both;
+}
+
+.dash-panel.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* PANEL HEADER */
+.panel-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.panel-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.panel-sub {
+  font-family: 'Lora', serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+/* OVERVIEW STATS */
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  margin-bottom: 2.5rem;
+}
+
+.overview-stat {
+  background: var(--navy-mid);
+  padding: 1.5rem;
+  border-top: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.overview-stat:hover { border-top-color: var(--red); }
+
+.overview-stat-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+
+.overview-stat-value {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+
+.overview-stat-change {
+  font-size: 0.7rem;
+  color: #4ade80;
+  margin-top: 0.3rem;
+  font-family: 'Barlow', sans-serif;
+}
+
+/* COURSES IN PROGRESS */
+.courses-in-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  margin-bottom: 2.5rem;
+}
+
+.course-progress-card {
+  background: var(--navy-mid);
+  padding: 1.5rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2rem;
+  transition: background 0.2s;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.course-progress-card:hover {
+  background: #151e30;
+  border-left-color: var(--red);
+}
+
+.cp-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  margin-bottom: 0.3rem;
+}
+
+.cp-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: 'Barlow', sans-serif;
+  margin-bottom: 0.8rem;
+}
+
+.cp-bar-wrap {
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  max-width: 400px;
+}
+
+.cp-bar-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.cp-percent {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--white);
+  text-align: right;
+}
+
+.cp-status {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* QUICK ACTIONS */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+}
+
+.quick-action {
+  background: var(--navy-mid);
+  padding: 1.8rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  border-top: 2px solid transparent;
+  transition: all 0.25s;
+  text-decoration: none;
+  display: block;
+}
+
+.quick-action:hover {
+  background: #151e30;
+  border-top-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.qa-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+
+.qa-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 0.3rem;
+}
+
+.qa-desc {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* COURSE LIBRARY */
+.course-library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+}
+
+.library-card {
+  background: var(--navy-mid);
+  padding: 2rem;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.library-card:hover {
+  background: #151e30;
+  border-left-color: var(--red);
+}
+
+.library-card.locked { opacity: 0.5; cursor: default; }
+.library-card.locked:hover { border-left-color: transparent; background: var(--navy-mid); transform: none; }
+
+.lib-badge {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+  margin-bottom: 0.8rem;
+  display: inline-block;
+}
+
+.lib-badge.live { background: rgba(185,28,28,0.12); border: 1px solid rgba(185,28,28,0.25); color: #FCA5A5; }
+.lib-badge.coming { background: rgba(201,149,42,0.1); border: 1px solid rgba(201,149,42,0.25); color: var(--gold-light); }
+
+.lib-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.lib-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+}
+
+.lib-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.lib-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.lib-bar-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 2px;
+}
+
+.lib-pct {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* RESOURCES */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+}
+
+.resource-card {
+  background: var(--navy-mid);
+  padding: 1.8rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border-top: 2px solid transparent;
+}
+
+.resource-card:hover {
+  background: #151e30;
+  border-top-color: var(--red);
+}
+
+.res-icon { font-size: 1.5rem; margin-bottom: 0.8rem; }
+
+.res-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 0.4rem;
+}
+
+.res-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.res-tag {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #3D4F6B;
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* COACHING */
+.coaching-status {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  border-left: 4px solid var(--gold);
+}
+
+.coaching-pos-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.3rem;
+}
+
+.coaching-pos-value {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+
+.coaching-pos-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+/* VET LIFE */
+.vetlife-banner {
+  background: linear-gradient(135deg, var(--red-dark), #3D0A0A);
+  border: 1px solid rgba(185,28,28,0.3);
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.vetlife-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.vetlife-tag {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 0.8rem;
+  position: relative;
+}
+
+.vetlife-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.vetlife-desc {
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.7;
+  max-width: 560px;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.vetlife-disclaimer {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+  line-height: 1.6;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+}
+
+/* PROFILE */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  margin-bottom: 2rem;
+}
+
+.profile-section {
+  background: var(--navy-mid);
+  padding: 2rem;
+}
+
+.profile-section-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red-light);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-field {
+  margin-bottom: 1.2rem;
+}
+
+.profile-field-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.profile-field-value {
+  font-size: 0.88rem;
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+}
+
+.profile-field-input {
+  background: var(--navy);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.88rem;
+  padding: 9px 12px;
+  border-radius: 2px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.profile-field-input:focus { border-color: var(--red); }
+
+/* NOTIFICATION TOAST */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  border-left: 3px solid #4ade80;
+  padding: 1rem 1.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+  border-radius: 2px;
+  z-index: 999;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+
+@media (max-width: 1100px) {
+  .dashboard-wrapper { grid-template-columns: 220px 1fr; }
+  .overview-stats { grid-template-columns: 1fr 1fr; }
+  .quick-actions { grid-template-columns: 1fr 1fr; }
+  .dash-panel { padding: 2rem 1.5rem; }
+}
+
+@media (max-width: 768px) {
+  .dashboard-wrapper { grid-template-columns: 1fr; }
+  .dash-sidebar { position: fixed; left: -260px; height: calc(100vh - 76px); width: 260px; z-index: 150; transition: left 0.3s; }
+  .dash-sidebar.open { left: 0; }
+  .overview-stats { grid-template-columns: 1fr 1fr; }
+  .course-library-grid, .resources-grid { grid-template-columns: 1fr; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .quick-actions { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="dashboard-wrapper page-content">
+
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <div class="sidebar-member">
+      <div class="member-avatar">JL</div>
+      <div class="member-name">John Lugenbell</div>
+      <div class="member-rank">U.S. Army · Veteran</div>
+      <div class="member-verified">Verified Member</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">Main</div>
+      <div class="sidebar-nav-item active" onclick="showPanel('overview')">
+        <span class="nav-icon">🏠</span> Overview
+      </div>
+      <div class="sidebar-nav-item" onclick="showPanel('courses')">
+        <span class="nav-icon">📚</span> My Courses
+        <span class="sidebar-badge">2</span>
+      </div>
+      <div class="sidebar-nav-item" onclick="showPanel('resources')">
+        <span class="nav-icon">🗂️</span> Resources
+      </div>
+
+      <div class="sidebar-nav-section">Services</div>
+      <div class="sidebar-nav-item" onclick="showPanel('coaching')">
+        <span class="nav-icon">🎯</span> Coaching
+        <span class="sidebar-badge gold">3rd</span>
+      </div>
+      <div class="sidebar-nav-item" onclick="showPanel('vetlife')">
+        <span class="nav-icon">🛡️</span> Vet Life
+        <span class="sidebar-badge">New</span>
+      </div>
+      <div class="sidebar-nav-item" onclick="showPanel('forum')">
+        <span class="nav-icon">🤝</span> Community
+      </div>
+
+      <div class="sidebar-nav-section">Account</div>
+      <div class="sidebar-nav-item" onclick="showPanel('profile')">
+        <span class="nav-icon">👤</span> My Profile
+      </div>
+      <div class="sidebar-nav-item" onclick="showPanel('profile')">
+        <span class="nav-icon">📬</span> Notifications
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="sidebar-signout" onclick="window.location.href='login.html'">
+        ← Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+
+    <!-- OVERVIEW -->
+    <div class="dash-panel active" id="panel-overview">
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">Welcome Back, John</h1>
+          <p class="panel-sub">Here's where your financial mission stands today.</p>
+        </div>
+        <a href="#" class="btn-outline" onclick="showPanel('courses'); return false;" style="font-size: 0.72rem; padding: 10px 18px;">Continue Learning →</a>
+      </div>
+
+      <div class="overview-stats">
+        <div class="overview-stat">
+          <div class="overview-stat-label">Courses In Progress</div>
+          <div class="overview-stat-value">2</div>
+          <div class="overview-stat-change">↑ Started this month</div>
+        </div>
+        <div class="overview-stat">
+          <div class="overview-stat-label">Lessons Completed</div>
+          <div class="overview-stat-value">9</div>
+          <div class="overview-stat-change">↑ 3 this week</div>
+        </div>
+        <div class="overview-stat">
+          <div class="overview-stat-label">Coaching Queue</div>
+          <div class="overview-stat-value">#3</div>
+          <div class="overview-stat-change">Priority waitlist</div>
+        </div>
+        <div class="overview-stat">
+          <div class="overview-stat-label">Member Since</div>
+          <div class="overview-stat-value">2025</div>
+          <div class="overview-stat-change">Verified veteran</div>
+        </div>
+      </div>
+
+      <div class="section-tag" style="margin-bottom: 1rem;">Continue Where You Left Off</div>
+      <div class="courses-in-progress">
+        <div class="course-progress-card" onclick="showPanel('courses')">
+          <div>
+            <div class="cp-title">Credit Education for Veterans</div>
+            <div class="cp-meta">Lesson 4 of 7 · Rebuilding Damaged Credit</div>
+            <div class="cp-bar-wrap"><div class="cp-bar-fill" style="width: 57%"></div></div>
+          </div>
+          <div>
+            <div class="cp-percent">57%</div>
+            <div class="cp-status">In Progress</div>
+          </div>
+        </div>
+        <div class="course-progress-card" onclick="showPanel('courses')">
+          <div>
+            <div class="cp-title">Financial Literacy Foundations</div>
+            <div class="cp-meta">Lesson 2 of 6 · Understanding Debt</div>
+            <div class="cp-bar-wrap"><div class="cp-bar-fill" style="width: 17%"></div></div>
+          </div>
+          <div>
+            <div class="cp-percent">17%</div>
+            <div class="cp-status">In Progress</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-tag" style="margin: 2rem 0 1rem;">Quick Actions</div>
+      <div class="quick-actions">
+        <div class="quick-action" onclick="showPanel('courses')">
+          <div class="qa-icon">▶️</div>
+          <div class="qa-title">Resume Course</div>
+          <div class="qa-desc">Pick up where you left off</div>
+        </div>
+        <div class="quick-action" onclick="showPanel('coaching')">
+          <div class="qa-icon">🎯</div>
+          <div class="qa-title">Coaching Waitlist</div>
+          <div class="qa-desc">You're #3 in line</div>
+        </div>
+        <div class="quick-action" onclick="showPanel('resources')">
+          <div class="qa-icon">📥</div>
+          <div class="qa-title">Download Resources</div>
+          <div class="qa-desc">Worksheets and calculators</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COURSES -->
+    <div class="dash-panel" id="panel-courses">
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">My Courses</h1>
+          <p class="panel-sub">All Silent Honor courses are unlocked for you as a member.</p>
+        </div>
+      </div>
+      <div class="course-library-grid">
+        <div class="library-card">
+          <div class="lib-badge live">In Progress</div>
+          <div class="lib-title">Credit Education for Veterans</div>
+          <div class="lib-desc">Everything you need to understand, build, protect, and repair your credit — structured for the veteran experience.</div>
+          <div class="lib-progress">
+            <div class="lib-bar"><div class="lib-bar-fill" style="width: 57%"></div></div>
+            <span class="lib-pct">57%</span>
+          </div>
+          <a href="#" class="btn-primary" style="font-size: 0.72rem; padding: 10px 18px;">Continue →</a>
+        </div>
+        <div class="library-card">
+          <div class="lib-badge live">In Progress</div>
+          <div class="lib-title">Financial Literacy Foundations</div>
+          <div class="lib-desc">The financial fundamentals most people learn the hard way — built for veterans navigating civilian financial life.</div>
+          <div class="lib-progress">
+            <div class="lib-bar"><div class="lib-bar-fill" style="width: 17%"></div></div>
+            <span class="lib-pct">17%</span>
+          </div>
+          <a href="#" class="btn-primary" style="font-size: 0.72rem; padding: 10px 18px;">Continue →</a>
+        </div>
+        <div class="library-card locked">
+          <div class="lib-badge coming">Coming Soon</div>
+          <div class="lib-title">Money Mission: Complete Financial Literacy</div>
+          <div class="lib-desc">9 modules, 34 lessons — the comprehensive course covering everything from mindset to wealth building. In development.</div>
+          <div class="lib-progress">
+            <div class="lib-bar"><div class="lib-bar-fill" style="width: 0%"></div></div>
+            <span class="lib-pct">—</span>
+          </div>
+          <span style="font-family: 'Oswald', sans-serif; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);">You'll be notified when this launches</span>
+        </div>
+        <div class="library-card locked">
+          <div class="lib-badge coming">Coming Soon</div>
+          <div class="lib-title">VA Loan &amp; Homeownership Prep</div>
+          <div class="lib-desc">Everything a veteran needs to use the VA loan benefit effectively — eligibility, process, lender criteria, and closing.</div>
+          <div class="lib-progress">
+            <div class="lib-bar"><div class="lib-bar-fill" style="width: 0%"></div></div>
+            <span class="lib-pct">—</span>
+          </div>
+          <span style="font-family: 'Oswald', sans-serif; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);">You'll be notified when this launches</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="dash-panel" id="panel-resources">
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">Resource Library</h1>
+          <p class="panel-sub">Member-only worksheets, calculators, and financial tools.</p>
+        </div>
+      </div>
+      <div class="resources-grid">
+        <div class="resource-card" onclick="showToast('Downloading Budget Worksheet...')">
+          <div class="res-icon">📊</div>
+          <div class="res-title">Monthly Budget Worksheet</div>
+          <div class="res-desc">Build your first zero-based budget with this step-by-step worksheet. Includes fixed, variable, and periodic expense categories.</div>
+          <span class="res-tag">PDF · Free Download</span>
+        </div>
+        <div class="resource-card" onclick="showToast('Downloading Debt Inventory...')">
+          <div class="res-icon">📋</div>
+          <div class="res-title">Debt Inventory Tracker</div>
+          <div class="res-desc">List every debt you have — balance, rate, minimum, lender — and calculate your debt-to-income ratio automatically.</div>
+          <span class="res-tag">Excel · Free Download</span>
+        </div>
+        <div class="resource-card" onclick="showToast('Downloading Snowball vs Avalanche...')">
+          <div class="res-icon">🧮</div>
+          <div class="res-title">Snowball vs. Avalanche Calculator</div>
+          <div class="res-desc">Enter your debts and see exactly how much each method saves — total interest paid and months to payoff side by side.</div>
+          <span class="res-tag">Excel · Free Download</span>
+        </div>
+        <div class="resource-card" onclick="showToast('Downloading Credit Dispute Letter...')">
+          <div class="res-icon">✉️</div>
+          <div class="res-title">Credit Dispute Letter Templates</div>
+          <div class="res-desc">Pre-written, legally compliant dispute letters for bureau disputes and furnisher disputes. Fill in and mail.</div>
+          <span class="res-tag">Word · Free Download</span>
+        </div>
+        <div class="resource-card" onclick="showToast('Downloading Emergency Fund Tracker...')">
+          <div class="res-icon">🛡️</div>
+          <div class="res-title">Emergency Fund Tracker</div>
+          <div class="res-desc">Track your emergency fund progress from $0 to your 3–6 month goal. Includes milestone markers and savings rate calculator.</div>
+          <span class="res-tag">PDF · Free Download</span>
+        </div>
+        <div class="resource-card" onclick="showToast('Downloading 90-Day Action Plan...')">
+          <div class="res-icon">🎯</div>
+          <div class="res-title">90-Day Financial Action Plan</div>
+          <div class="res-desc">A structured template to set 3 financial goals and build a day-by-day action plan. Used in coaching sessions.</div>
+          <span class="res-tag">PDF · Free Download</span>
+        </div>
+        <div class="resource-card" onclick="showToast('Downloading VA Benefits Checklist...')">
+          <div class="res-icon">🎖️</div>
+          <div class="res-title">VA Benefits Checklist</div>
+          <div class="res-desc">A comprehensive checklist of VA benefits, eligibility criteria, and how to claim each. Don't leave anything on the table.</div>
+          <span class="res-tag">PDF · Free Download</span>
+        </div>
+        <div class="resource-card" onclick="showToast('Downloading SCRA/MLA Guide...')">
+          <div class="res-icon">⚖️</div>
+          <div class="res-title">SCRA &amp; MLA Rights Guide</div>
+          <div class="res-desc">Your legal financial protections as a service member — the Servicemembers Civil Relief Act and Military Lending Act explained in plain English.</div>
+          <span class="res-tag">PDF · Free Download</span>
+        </div>
+        <div class="resource-card" onclick="showToast('Downloading Net Worth Tracker...')">
+          <div class="res-icon">📈</div>
+          <div class="res-title">Net Worth Tracker</div>
+          <div class="res-desc">Track assets and liabilities monthly to see your true financial picture moving in the right direction over time.</div>
+          <span class="res-tag">Excel · Free Download</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- COACHING -->
+    <div class="dash-panel" id="panel-coaching">
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">Financial Coaching</h1>
+          <p class="panel-sub">One-on-one sessions with a Certified Financial Education Instructor.</p>
+        </div>
+      </div>
+
+      <div class="coaching-status">
+        <div>
+          <div class="coaching-pos-label">Your Position on the Waitlist</div>
+          <div class="coaching-pos-value">#3</div>
+          <div class="coaching-pos-sub">Priority member — estimated wait: 1–2 weeks</div>
+        </div>
+        <div>
+          <button class="btn-gold" onclick="showToast('Coaching request updated!')">Update My Availability →</button>
+        </div>
+      </div>
+
+      <div class="section-tag" style="margin-bottom: 1rem;">What to Expect</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.03); margin-bottom: 2rem;">
+        <div style="background: var(--navy-mid); padding: 1.8rem;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.8rem;">📞</div>
+          <div style="font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--white); margin-bottom: 0.5rem;">Initial Session</div>
+          <div style="font-size: 0.82rem; color: var(--muted); line-height: 1.6;">60 minutes. We review your full financial picture — budget, debt, credit, goals. Zero judgment.</div>
+        </div>
+        <div style="background: var(--navy-mid); padding: 1.8rem;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.8rem;">📋</div>
+          <div style="font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--white); margin-bottom: 0.5rem;">Build Your Plan</div>
+          <div style="font-size: 0.82rem; color: var(--muted); line-height: 1.6;">Your coach builds a custom action plan based on your actual situation — not a template.</div>
+        </div>
+        <div style="background: var(--navy-mid); padding: 1.8rem;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.8rem;">🔄</div>
+          <div style="font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--white); margin-bottom: 0.5rem;">Ongoing Support</div>
+          <div style="font-size: 0.82rem; color: var(--muted); line-height: 1.6;">Follow-up check-ins to track progress and adjust as your life changes.</div>
+        </div>
+      </div>
+
+      <div class="section-tag" style="margin-bottom: 1rem;">Prepare for Your Session</div>
+      <div style="background: var(--navy-mid); border: 1px solid var(--border); padding: 1.8rem; border-left: 3px solid var(--red);">
+        <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.75; margin-bottom: 1rem;">Before your first session, it helps to have the following ready:</p>
+        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+          <div style="display: flex; gap: 0.8rem; font-size: 0.83rem; color: var(--muted);">
+            <span style="color: var(--red-light);">→</span> Recent pay stubs or income statements
+          </div>
+          <div style="display: flex; gap: 0.8rem; font-size: 0.83rem; color: var(--muted);">
+            <span style="color: var(--red-light);">→</span> List of all debts (credit cards, loans, etc.)
+          </div>
+          <div style="display: flex; gap: 0.8rem; font-size: 0.83rem; color: var(--muted);">
+            <span style="color: var(--red-light);">→</span> Your current monthly expenses (rough estimate is fine)
+          </div>
+          <div style="display: flex; gap: 0.8rem; font-size: 0.83rem; color: var(--muted);">
+            <span style="color: var(--red-light);">→</span> Your 3 biggest financial goals
+          </div>
+          <div style="display: flex; gap: 0.8rem; font-size: 0.83rem; color: var(--muted);">
+            <span style="color: var(--red-light);">→</span> A free copy of your credit report from AnnualCreditReport.com
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VET LIFE -->
+    <div class="dash-panel" id="panel-vetlife">
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">Vet Life Program</h1>
+          <p class="panel-sub">A benefit program being developed exclusively for Silent Honor members.</p>
+        </div>
+      </div>
+
+      <div class="vetlife-banner">
+        <div class="vetlife-tag">★ Coming Soon — Member Exclusive</div>
+        <h2 class="vetlife-title">Vet Life Through Silent Honor</h2>
+        <p class="vetlife-desc">Silent Honor Foundation is developing the Vet Life program — a group benefit designed to provide eligible veteran members with access to a Group Indexed Universal Life (IUL) insurance product at no cost to join. This program will be offered through Silent Honor as an additional layer of financial protection for the veterans we serve.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.08); position: relative; margin-bottom: 1.5rem;">
+          <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; text-align: center;">
+            <div style="font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--white); line-height: 1; margin-bottom: 0.3rem;">Group</div>
+            <div style="font-family: 'Oswald', sans-serif; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4);">Program Type</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; text-align: center;">
+            <div style="font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--white); line-height: 1; margin-bottom: 0.3rem;">IUL</div>
+            <div style="font-family: 'Oswald', sans-serif; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4);">Product Type</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; text-align: center;">
+            <div style="font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--white); line-height: 1; margin-bottom: 0.3rem;">Members</div>
+            <div style="font-family: 'Oswald', sans-serif; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4);">Who Qualifies</div>
+          </div>
+        </div>
+
+        <a href="#" class="btn-gold" onclick="showToast('We will notify you when Vet Life launches!'); return false;">Notify Me When This Launches →</a>
+
+        <p class="vetlife-disclaimer">
+          <strong style="color: rgba(255,255,255,0.5);">Important:</strong> The Vet Life program is a separate benefit offering and is not a program of Silent Honor Foundation's 501(c)(3) nonprofit operations. Insurance products are licensed, regulated, and subject to state insurance law. Silent Honor Foundation does not provide insurance advice. Participation details, licensing disclosures, and eligibility requirements will be provided when the program launches. Silent Honor's role is to facilitate access — not to act as an insurance company or licensed advisor.
+        </p>
+      </div>
+    </div>
+
+    <!-- COMMUNITY -->
+    <div class="dash-panel" id="panel-forum">
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">Veteran Community</h1>
+          <p class="panel-sub">Connect with fellow veterans working toward financial stability.</p>
+        </div>
+      </div>
+      <div style="background: var(--navy-mid); border: 1px solid var(--border); padding: 3rem; text-align: center; border-top: 3px solid var(--red);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🤝</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--white); margin-bottom: 0.8rem;">Community Forum — Coming Soon</div>
+        <p style="font-family: 'Lora', serif; font-size: 0.9rem; font-style: italic; color: var(--muted); max-width: 480px; margin: 0 auto 2rem; line-height: 1.7;">The Silent Honor community forum is being built. As a member, you'll have access when it launches — no additional signup required.</p>
+        <button class="btn-primary" onclick="showToast('You\'re on the community launch list!')">Notify Me When It\'s Live →</button>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="dash-panel" id="panel-profile">
+      <div class="panel-header">
+        <div>
+          <h1 class="panel-title">My Profile</h1>
+          <p class="panel-sub">Manage your account details and preferences.</p>
+        </div>
+        <button class="btn-primary" onclick="showToast('Profile saved!')" style="font-size: 0.72rem; padding: 10px 18px;">Save Changes →</button>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-section">
+          <div class="profile-section-title">Personal Information</div>
+          <div class="profile-field">
+            <div class="profile-field-label">First Name</div>
+            <input class="profile-field-input" type="text" value="John">
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Last Name</div>
+            <input class="profile-field-input" type="text" value="Lugenbell">
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Email Address</div>
+            <input class="profile-field-input" type="email" value="john@email.com">
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Phone</div>
+            <input class="profile-field-input" type="tel" value="(555) 000-0000">
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">State</div>
+            <input class="profile-field-input" type="text" value="Missouri">
+          </div>
+        </div>
+        <div class="profile-section">
+          <div class="profile-section-title">Military Information</div>
+          <div class="profile-field">
+            <div class="profile-field-label">Branch of Service</div>
+            <div class="profile-field-value">U.S. Army</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Service Status</div>
+            <div class="profile-field-value">Veteran</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Years of Service</div>
+            <div class="profile-field-value">8–12 years</div>
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Verification Status</div>
+            <div class="member-verified" style="font-size: 0.62rem; padding: 4px 10px;">Verified — DD-214 on file</div>
+          </div>
+          <div class="profile-field" style="margin-top: 1.5rem;">
+            <div class="profile-field-label">Update Military Documents</div>
+            <button class="btn-outline" style="font-size: 0.68rem; padding: 8px 14px; margin-top: 0.4rem;" onclick="showToast('Document upload portal opening...')">Upload New Document →</button>
+          </div>
+        </div>
+        <div class="profile-section">
+          <div class="profile-section-title">Email Preferences</div>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+            <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; font-size: 0.84rem; color: var(--muted);">
+              <input type="checkbox" checked style="accent-color: var(--red);"> Monthly newsletter &amp; financial tips
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; font-size: 0.84rem; color: var(--muted);">
+              <input type="checkbox" checked style="accent-color: var(--red);"> New course announcements
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; font-size: 0.84rem; color: var(--muted);">
+              <input type="checkbox" checked style="accent-color: var(--red);"> Coaching session reminders
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; font-size: 0.84rem; color: var(--muted);">
+              <input type="checkbox" style="accent-color: var(--red);"> Community forum updates
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer; font-size: 0.84rem; color: var(--muted);">
+              <input type="checkbox" checked style="accent-color: var(--red);"> Vet Life program updates
+            </label>
+          </div>
+        </div>
+        <div class="profile-section">
+          <div class="profile-section-title">Account Security</div>
+          <div class="profile-field">
+            <div class="profile-field-label">Current Password</div>
+            <input class="profile-field-input" type="password" placeholder="Enter current password">
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">New Password</div>
+            <input class="profile-field-input" type="password" placeholder="New password">
+          </div>
+          <div class="profile-field">
+            <div class="profile-field-label">Confirm New Password</div>
+            <input class="profile-field-input" type="password" placeholder="Repeat new password">
+          </div>
+          <button class="btn-outline" style="font-size: 0.68rem; padding: 8px 14px; margin-top: 0.5rem;" onclick="showToast('Password updated!')">Update Password →</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ <span id="toast-msg"></span></div>
+
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script>
+function showPanel(name) {
+  document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  event?.currentTarget?.classList.add('active');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

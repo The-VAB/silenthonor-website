@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join Silent Honor — Free Membership</title>
+<link rel="stylesheet" href="css/global.css">
+<style>
+.signup-wrapper {
+  min-height: 100vh;
+  padding-top: 76px;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  position: relative;
+  z-index: 1;
+}
+
+/* LEFT PANEL */
+.signup-left {
+  background: var(--red-dark);
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.signup-left-topo {
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.signup-left-topo svg { width: 100%; height: 100%; }
+
+.membership-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 2px;
+  margin-bottom: 2rem;
+  width: fit-content;
+  animation: fadeUp 0.6s ease both;
+}
+
+.membership-badge::before {
+  content: '★';
+  color: var(--gold-light);
+  font-size: 10px;
+}
+
+.signup-left-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 0.95;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+
+.signup-left-sub {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.75;
+  margin-bottom: 3rem;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+.benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-left: 3px solid rgba(255,255,255,0.2);
+  transition: border-left-color 0.2s;
+}
+
+.benefit-item:hover { border-left-color: var(--gold); }
+
+.benefit-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+
+.benefit-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 2px;
+}
+
+.benefit-desc {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.4;
+}
+
+.always-free {
+  margin-top: 2.5rem;
+  padding: 1rem 1.2rem;
+  background: rgba(201,149,42,0.12);
+  border: 1px solid rgba(201,149,42,0.25);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+
+.always-free-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+/* RIGHT PANEL — FORM */
+.signup-right {
+  background: var(--navy);
+  padding: 4rem 3.5rem;
+  overflow-y: auto;
+}
+
+.signup-right-header {
+  margin-bottom: 2.5rem;
+}
+
+.signup-right-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.signup-right-sub {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+/* STEP INDICATOR */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 2.5rem;
+}
+
+.step-dot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.3s;
+}
+
+.step-dot.active { color: var(--white); }
+.step-dot.done { color: var(--red-light); }
+
+.step-circle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.step-dot.active .step-circle {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+}
+
+.step-dot.done .step-circle {
+  background: transparent;
+  border-color: var(--red-light);
+  color: var(--red-light);
+}
+
+.step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin: 0 0.8rem;
+  max-width: 40px;
+}
+
+/* FORM SECTIONS */
+.form-section {
+  display: none;
+  flex-direction: column;
+  gap: 1.3rem;
+  animation: fadeUp 0.4s ease both;
+}
+
+.form-section.active { display: flex; }
+
+.form-section-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--red-light);
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-section-title::before {
+  content: '';
+  width: 20px; height: 2px;
+  background: var(--red-light);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.form-group.full { grid-column: 1 / -1; }
+
+.form-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required-star { color: var(--red-light); }
+
+.form-input,
+.form-select,
+.form-textarea {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.88rem;
+  padding: 11px 14px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder { color: #3D4F6B; }
+
+.form-select option { background: var(--navy-mid); }
+.form-textarea { resize: vertical; min-height: 100px; }
+
+/* FILE UPLOAD */
+.file-upload-zone {
+  border: 2px dashed rgba(255,255,255,0.12);
+  background: var(--navy-mid);
+  border-radius: 2px;
+  padding: 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.file-upload-zone:hover,
+.file-upload-zone.dragover {
+  border-color: var(--red);
+  background: rgba(185,28,28,0.04);
+}
+
+.file-upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+
+.upload-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 0.4rem;
+}
+
+.upload-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.upload-formats {
+  margin-top: 0.8rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #3D4F6B;
+}
+
+.upload-selected {
+  display: none;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem 1rem;
+  background: rgba(185,28,28,0.08);
+  border: 1px solid rgba(185,28,28,0.2);
+  border-radius: 2px;
+  margin-top: 0.8rem;
+}
+
+.upload-selected.show { display: flex; }
+
+.upload-filename {
+  font-size: 0.82rem;
+  color: var(--white);
+  flex: 1;
+  font-family: 'Barlow', sans-serif;
+}
+
+.upload-remove {
+  font-size: 0.7rem;
+  color: var(--red-light);
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+/* SECURITY NOTE */
+.security-banner {
+  background: rgba(201,149,42,0.06);
+  border: 1px solid rgba(201,149,42,0.18);
+  padding: 1rem 1.2rem;
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  border-radius: 2px;
+}
+
+.security-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+.security-text {
+  font-size: 0.78rem;
+  color: #8FA0BC;
+  line-height: 1.6;
+}
+
+.security-text strong { color: var(--gold-light); }
+
+/* CHALLENGE SELECTOR */
+.challenge-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.challenge-option {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  border-radius: 2px;
+}
+
+.challenge-option:hover { border-color: rgba(185,28,28,0.3); background: #151e30; }
+.challenge-option.selected { border-color: var(--red); background: rgba(185,28,28,0.06); }
+
+.challenge-option input[type="checkbox"] {
+  accent-color: var(--red);
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+}
+
+.challenge-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.3;
+  transition: color 0.2s;
+}
+
+.challenge-option.selected .challenge-label { color: var(--white); }
+
+/* CONSENT */
+.consent-block {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: 2px;
+}
+
+.consent-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+.consent-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.consent-item:last-child { margin-bottom: 0; }
+
+.consent-item input[type="checkbox"] {
+  accent-color: var(--red);
+  width: 15px; height: 15px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.consent-text {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.consent-text a { color: var(--red-light); text-decoration: none; }
+
+/* NAV BUTTONS */
+.form-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.step-back {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.step-back:hover { color: var(--white); }
+.step-back:disabled { opacity: 0; pointer-events: none; }
+
+.progress-bar-wrap {
+  flex: 1;
+  margin: 0 1.5rem;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  width: 33%;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.login-link a {
+  color: var(--red-light);
+  text-decoration: none;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1024px) {
+  .signup-wrapper { grid-template-columns: 1fr; }
+  .signup-left { padding: 3rem 2rem; }
+  .signup-right { padding: 3rem 2rem; }
+  .benefits-list { display: none; }
+}
+
+@media (max-width: 640px) {
+  .signup-left { padding: 2.5rem 1.5rem; }
+  .signup-right { padding: 2.5rem 1.5rem; }
+  .form-row { grid-template-columns: 1fr; }
+  .challenge-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="signup-wrapper page-content">
+
+  <!-- LEFT -->
+  <div class="signup-left">
+    <div class="signup-left-topo"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+
+    <div class="membership-badge">Free Membership</div>
+
+    <h2 class="signup-left-title">Join the<br>Silent Honor<br>Community</h2>
+
+    <p class="signup-left-sub">Free access to every course, resource, and coaching opportunity we offer — built specifically for veterans and military families.</p>
+
+    <div class="benefits-list">
+      <div class="benefit-item">
+        <div class="benefit-icon">📚</div>
+        <div>
+          <div class="benefit-title">All Courses Unlocked</div>
+          <div class="benefit-desc">Credit education, financial literacy, Money Mission — all free, all yours</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🗂️</div>
+        <div>
+          <div class="benefit-title">Member Resource Library</div>
+          <div class="benefit-desc">Worksheets, templates, calculators, and financial tools</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🎯</div>
+        <div>
+          <div class="benefit-title">Priority Coaching Waitlist</div>
+          <div class="benefit-desc">Members get first access to one-on-one coaching sessions</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🤝</div>
+        <div>
+          <div class="benefit-title">Veteran Community Forum</div>
+          <div class="benefit-desc">Connect with fellow veterans navigating the same financial journey</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">📬</div>
+        <div>
+          <div class="benefit-title">Monthly Financial Intel</div>
+          <div class="benefit-desc">Tips, strategies, and veteran-specific financial news</div>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🛡️</div>
+        <div>
+          <div class="benefit-title">Vet Life Program Access</div>
+          <div class="benefit-desc">Early access to Silent Honor's group IUL benefit program — coming soon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="always-free">
+      <span style="font-size: 1rem;">★</span>
+      <span class="always-free-text">Always free · No credit card · No hidden fees · Ever</span>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="signup-right">
+    <div class="signup-right-header">
+      <h2 class="signup-right-title">Create Your Account</h2>
+      <p class="signup-right-sub">Takes about 5 minutes. Your information is kept confidential and secure.</p>
+    </div>
+
+    <!-- STEP INDICATOR -->
+    <div class="step-indicator">
+      <div class="step-dot active" id="step-dot-1">
+        <div class="step-circle">1</div>
+        <span>Personal</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step-dot-2">
+        <div class="step-circle">2</div>
+        <span>Service</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step-dot-3">
+        <div class="step-circle">3</div>
+        <span>Verify</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: PERSONAL INFO -->
+    <div class="form-section active" id="step-1">
+      <div class="form-section-title">Personal Information</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name <span class="required-star">*</span></label>
+          <input type="text" class="form-input" placeholder="John">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name <span class="required-star">*</span></label>
+          <input type="text" class="form-input" placeholder="Smith">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address <span class="required-star">*</span></label>
+        <input type="email" class="form-input" placeholder="john.smith@email.com">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Password <span class="required-star">*</span></label>
+          <input type="password" class="form-input" placeholder="Min. 8 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password <span class="required-star">*</span></label>
+          <input type="password" class="form-input" placeholder="Repeat password">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" placeholder="(555) 000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State of Residence</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select state</option>
+            <option>Alabama</option><option>Alaska</option><option>Arizona</option>
+            <option>Arkansas</option><option>California</option><option>Colorado</option>
+            <option>Connecticut</option><option>Delaware</option><option>Florida</option>
+            <option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+            <option>Illinois</option><option>Indiana</option><option>Iowa</option>
+            <option>Kansas</option><option>Kentucky</option><option>Louisiana</option>
+            <option>Maine</option><option>Maryland</option><option>Massachusetts</option>
+            <option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+            <option>Missouri</option><option>Montana</option><option>Nebraska</option>
+            <option>Nevada</option><option>New Hampshire</option><option>New Jersey</option>
+            <option>New Mexico</option><option>New York</option><option>North Carolina</option>
+            <option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+            <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option>
+            <option>South Carolina</option><option>South Dakota</option><option>Tennessee</option>
+            <option>Texas</option><option>Utah</option><option>Vermont</option>
+            <option>Virginia</option><option>Washington</option><option>West Virginia</option>
+            <option>Wisconsin</option><option>Wyoming</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-nav">
+        <button class="step-back" disabled>← Back</button>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:33%"></div></div>
+        <button class="btn-primary" onclick="goToStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: SERVICE INFO -->
+    <div class="form-section" id="step-2">
+      <div class="form-section-title">Military Service Information</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Branch of Service <span class="required-star">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select branch</option>
+            <option>Army</option>
+            <option>Navy</option>
+            <option>Air Force</option>
+            <option>Marine Corps</option>
+            <option>Coast Guard</option>
+            <option>Space Force</option>
+            <option>National Guard</option>
+            <option>Reserve</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Service Status <span class="required-star">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select status</option>
+            <option>Veteran</option>
+            <option>Active Duty</option>
+            <option>Reserve / Guard Member</option>
+            <option>Retired Military</option>
+            <option>Surviving Spouse</option>
+            <option>Dependent Family Member</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Years of Service</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select range</option>
+            <option>Less than 2 years</option>
+            <option>2–4 years</option>
+            <option>4–8 years</option>
+            <option>8–12 years</option>
+            <option>12–20 years</option>
+            <option>20+ years</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Separation / ETS Year</label>
+          <input type="text" class="form-input" placeholder="e.g. 2019 (or 'Active')">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Biggest Financial Challenge Right Now <span class="required-star">*</span></label>
+        <div class="challenge-grid" id="challenge-grid">
+          <div class="challenge-option" onclick="toggleChallenge(this)">
+            <input type="checkbox"><span class="challenge-label">Low or damaged credit score</span>
+          </div>
+          <div class="challenge-option" onclick="toggleChallenge(this)">
+            <input type="checkbox"><span class="challenge-label">Too much debt / can't keep up</span>
+          </div>
+          <div class="challenge-option" onclick="toggleChallenge(this)">
+            <input type="checkbox"><span class="challenge-label">No budget / living paycheck to paycheck</span>
+          </div>
+          <div class="challenge-option" onclick="toggleChallenge(this)">
+            <input type="checkbox"><span class="challenge-label">Trying to buy a home</span>
+          </div>
+          <div class="challenge-option" onclick="toggleChallenge(this)">
+            <input type="checkbox"><span class="challenge-label">No savings / emergency fund</span>
+          </div>
+          <div class="challenge-option" onclick="toggleChallenge(this)">
+            <input type="checkbox"><span class="challenge-label">Don't know where to start</span>
+          </div>
+          <div class="challenge-option" onclick="toggleChallenge(this)">
+            <input type="checkbox"><span class="challenge-label">Identity theft / fraud</span>
+          </div>
+          <div class="challenge-option" onclick="toggleChallenge(this)">
+            <input type="checkbox"><span class="challenge-label">Want to invest / build wealth</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Anything else you want us to know?</label>
+        <textarea class="form-textarea" placeholder="Tell us about your situation — the more context you share, the better we can match you with the right resources and coach. No judgment here."></textarea>
+      </div>
+
+      <div class="form-nav">
+        <button class="step-back" onclick="goToStep(1)">← Back</button>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:66%"></div></div>
+        <button class="btn-primary" onclick="goToStep(3)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: VERIFY + CONSENT -->
+    <div class="form-section" id="step-3">
+      <div class="form-section-title">Military Verification &amp; Agreements</div>
+
+      <div class="security-banner">
+        <span class="security-icon">🔒</span>
+        <p class="security-text"><strong>Your documents are encrypted and stored securely.</strong> Military records are used solely for service verification. They are never shared, sold, or used for any purpose other than confirming your eligibility for Silent Honor programs. Documents are stored with AES-256 encryption and accessible only to authorized staff.</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Upload DD-214 or Military Service Records <span class="required-star">*</span></label>
+        <div class="file-upload-zone" id="upload-zone">
+          <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFile(this)">
+          <div class="upload-icon">📄</div>
+          <div class="upload-title">Drop your file here or click to browse</div>
+          <div class="upload-sub">DD-214 (veterans) or current military ID / orders (active duty)<br>Surviving spouses may upload VA documentation</div>
+          <div class="upload-formats">Accepted: PDF, JPG, PNG · Max size: 10MB</div>
+        </div>
+        <div class="upload-selected" id="upload-selected">
+          <span class="upload-filename" id="upload-filename"></span>
+          <button class="upload-remove" onclick="removeFile()">Remove</button>
+        </div>
+      </div>
+
+      <div class="consent-block">
+        <div class="consent-title">Required Agreements</div>
+        <div class="consent-item">
+          <input type="checkbox" id="c1">
+          <label class="consent-text" for="c1">I confirm that I am a veteran, active duty service member, or eligible military family member and that the documents I have provided are accurate.</label>
+        </div>
+        <div class="consent-item">
+          <input type="checkbox" id="c2">
+          <label class="consent-text" for="c2">I understand that Silent Honor Foundation is a nonprofit financial education organization, not a financial advisor, credit repair company, or government agency. Services are educational in nature.</label>
+        </div>
+        <div class="consent-item">
+          <input type="checkbox" id="c3">
+          <label class="consent-text" for="c3">I agree to the <a href="#">Privacy Policy</a> and <a href="#">Terms of Use</a>, including how my military documents are stored and protected.</label>
+        </div>
+        <div class="consent-item">
+          <input type="checkbox" id="c4">
+          <label class="consent-text" for="c4">I consent to receive email communications from Silent Honor Foundation, including course updates, financial tips, and program announcements. I can unsubscribe at any time.</label>
+        </div>
+      </div>
+
+      <div class="form-nav">
+        <button class="step-back" onclick="goToStep(2)">← Back</button>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%"></div></div>
+        <button class="btn-gold" onclick="submitSignup()">Create Account →</button>
+      </div>
+
+      <p class="login-link">Already a member? <a href="login.html">Sign In →</a></p>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script>
+let currentStep = 1;
+
+function goToStep(step) {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  document.getElementById(`step-dot-${currentStep}`).classList.remove('active');
+  document.getElementById(`step-dot-${currentStep}`).classList.add('done');
+
+  currentStep = step;
+
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  document.getElementById(`step-dot-${currentStep}`).classList.remove('done');
+  document.getElementById(`step-dot-${currentStep}`).classList.add('active');
+
+  document.querySelector('.signup-right').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleChallenge(el) {
+  el.classList.toggle('selected');
+  el.querySelector('input[type="checkbox"]').checked = el.classList.contains('selected');
+}
+
+function handleFile(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    document.getElementById('upload-filename').textContent = file.name;
+    document.getElementById('upload-selected').classList.add('show');
+    document.getElementById('upload-zone').style.borderColor = 'var(--red)';
+  }
+}
+
+function removeFile() {
+  document.getElementById('file-input').value = '';
+  document.getElementById('upload-selected').classList.remove('show');
+  document.getElementById('upload-zone').style.borderColor = '';
+}
+
+function submitSignup() {
+  // Wire to backend / GHL here
+  alert('Account creation — wire to backend or GHL API here.');
+}
+
+// Drag and drop
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    document.getElementById('upload-filename').textContent = file.name;
+    document.getElementById('upload-selected').classList.add('show');
+    zone.style.borderColor = 'var(--red)';
+  }
+});
+
+// Build topo for left panel too
+document.addEventListener('DOMContentLoaded', () => {
+  const leftSvg = document.querySelector('.signup-left-topo svg');
+  if (leftSvg) {
+    const lines = [];
+    for (let i = 0; i < 20; i++) {
+      const baseY = i * 60 + 30;
+      let d = `M 0 ${baseY + Math.sin(i * 0.5) * 30}`;
+      for (let j = 1; j <= 10; j++) {
+        const x = j * 40;
+        const y = baseY + Math.sin(j * 0.6 + i * 0.4) * 35 + Math.cos(j * 1.1 + i * 0.7) * 15;
+        d += ` L ${x} ${y}`;
+      }
+      lines.push(`<path d="${d}" fill="none" stroke="white" stroke-width="0.6" opacity="${0.3 + Math.random() * 0.4}"/>`);
+    }
+    leftSvg.innerHTML = lines.join('');
+  }
+});
+</script>
+</body>
+</html>

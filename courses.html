@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Courses — Silent Honor Foundation</title>
+<link rel="stylesheet" href="css/global.css">
+<style>
+.courses-main { padding: 6rem 3.5rem; position: relative; z-index: 1; }
+
+.course-full-card {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  margin-bottom: 2px;
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.course-full-card:hover { border-color: rgba(185,28,28,0.35); }
+
+.course-full-card.gold:hover { border-color: rgba(201,149,42,0.35); }
+
+.course-sidebar {
+  background: var(--navy-light);
+  padding: 3rem 2rem;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.course-num {
+  font-family: 'Oswald', sans-serif;
+  font-size: 4rem;
+  font-weight: 700;
+  color: rgba(185,28,28,0.15);
+  line-height: 1;
+  margin-bottom: auto;
+}
+
+.course-body { padding: 3rem; }
+
+.course-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.c-badge {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 2px;
+}
+
+.c-badge.live {
+  background: rgba(185,28,28,0.12);
+  border: 1px solid rgba(185,28,28,0.25);
+  color: #FCA5A5;
+}
+
+.c-badge.coming {
+  background: rgba(201,149,42,0.1);
+  border: 1px solid rgba(201,149,42,0.25);
+  color: var(--gold-light);
+}
+
+.c-badge.free {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.course-main-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+
+.course-main-desc {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: #8FA0BC;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+  max-width: 580px;
+}
+
+.course-modules {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.module-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.module-item::before {
+  content: '→';
+  color: var(--red-light);
+  flex-shrink: 0;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  margin-top: 1px;
+}
+
+.course-meta-row {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #4A5A73;
+  flex-wrap: wrap;
+}
+
+.course-meta-row span { color: var(--muted); }
+
+/* COMING SOON MODULE PREVIEW */
+.module-preview-section {
+  padding: 6rem 3.5rem;
+  background: var(--navy-mid);
+  position: relative; z-index: 1;
+}
+
+.module-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  margin-top: 3rem;
+}
+
+.module-card {
+  background: var(--navy-mid);
+  padding: 2rem;
+  border-top: 3px solid transparent;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.module-card:hover {
+  border-top-color: var(--red);
+  background: #161f31;
+}
+
+.mod-num {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red-light);
+  margin-bottom: 0.6rem;
+}
+
+.mod-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  margin-bottom: 0.6rem;
+}
+
+.mod-lessons {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 1024px) {
+  .courses-main, .module-preview-section { padding: 4rem 2rem; }
+  .course-full-card { grid-template-columns: 1fr; }
+  .course-sidebar { padding: 2rem; flex-direction: row; align-items: center; border-right: none; border-bottom: 1px solid var(--border); }
+  .course-num { font-size: 2.5rem; margin-bottom: 0; margin-right: auto; }
+  .module-list { grid-template-columns: 1fr 1fr; }
+  .course-modules { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .courses-main { padding: 3.5rem 1.5rem; }
+  .module-list { grid-template-columns: 1fr; }
+  .course-body { padding: 2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="page-content">
+
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-tag">Free Education</div>
+      <h1 class="page-hero-title">Self-Paced <em>Courses</em></h1>
+      <p class="page-hero-sub">Built by a Certified Financial Education Instructor with veteran-specific context throughout. Free, always. No registration walls, no upsells.</p>
+    </div>
+  </div>
+
+  <section class="courses-main">
+    <div class="section-tag reveal">Available Now &amp; Coming Soon</div>
+    <h2 class="section-title reveal" data-delay="100">All Courses</h2>
+
+    <!-- Course 1 -->
+    <div class="course-full-card reveal" data-delay="0" style="margin-top: 3rem;">
+      <div class="course-sidebar">
+        <div class="course-num">01</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">7 Lessons</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge-row">
+          <span class="c-badge live">● Available Now</span>
+          <span class="c-badge free">Free</span>
+          <span class="c-badge free">Self-Paced</span>
+        </div>
+        <h3 class="course-main-title">Credit Education for Veterans</h3>
+        <p class="course-main-desc">Everything you need to understand, build, protect, and repair your credit — structured specifically for the veteran experience. From the ground up: what credit is, how it's calculated, how to read your report, how to dispute errors, and how to rebuild.</p>
+        <div class="course-modules">
+          <div class="module-item">Introduction to Credit</div>
+          <div class="module-item">How Credit Scores Are Calculated</div>
+          <div class="module-item">Reading Your Credit Report</div>
+          <div class="module-item">Building Credit from Scratch</div>
+          <div class="module-item">Rebuilding Damaged Credit</div>
+          <div class="module-item">Disputing Errors</div>
+          <div class="module-item">Protecting Your Credit</div>
+        </div>
+        <div class="course-meta-row">
+          <span>Format: <span>Video + slides</span></span>
+          <span>Length: <span>~3 hours</span></span>
+          <span>Level: <span>All levels</span></span>
+          <span>Cost: <span>Free</span></span>
+        </div>
+        <a href="#" class="btn-primary">Start Course →</a>
+      </div>
+    </div>
+
+    <!-- Course 2 -->
+    <div class="course-full-card reveal" data-delay="100">
+      <div class="course-sidebar">
+        <div class="course-num">02</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">Multiple Modules</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge-row">
+          <span class="c-badge live">● Available Now</span>
+          <span class="c-badge free">Free</span>
+          <span class="c-badge free">Self-Paced</span>
+        </div>
+        <h3 class="course-main-title">Financial Literacy Foundations</h3>
+        <p class="course-main-desc">The financial fundamentals that most people learn the hard way — budgeting, debt, savings, income. Built for veterans navigating the civilian financial world without a roadmap.</p>
+        <div class="course-modules">
+          <div class="module-item">Budgeting Basics</div>
+          <div class="module-item">Understanding Debt</div>
+          <div class="module-item">Building an Emergency Fund</div>
+          <div class="module-item">Income &amp; Benefits</div>
+          <div class="module-item">Setting Financial Goals</div>
+          <div class="module-item">Getting Started</div>
+        </div>
+        <div class="course-meta-row">
+          <span>Format: <span>Video + slides</span></span>
+          <span>Length: <span>Self-paced</span></span>
+          <span>Level: <span>Beginner</span></span>
+          <span>Cost: <span>Free</span></span>
+        </div>
+        <a href="#" class="btn-primary">Start Course →</a>
+      </div>
+    </div>
+
+    <!-- Course 3 — Coming Soon -->
+    <div class="course-full-card gold reveal" data-delay="200">
+      <div class="course-sidebar" style="background: rgba(201,149,42,0.05); border-right-color: rgba(201,149,42,0.15);">
+        <div class="course-num" style="color: rgba(201,149,42,0.15);">03</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">34 Lessons · 9 Modules</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge-row">
+          <span class="c-badge coming">◐ Coming Soon</span>
+          <span class="c-badge free">Free</span>
+          <span class="c-badge free">Self-Paced</span>
+        </div>
+        <h3 class="course-main-title">Money Mission: Complete Financial Literacy</h3>
+        <p class="course-main-desc">The comprehensive course Silent Honor is building — 9 modules, 34 lessons, and approximately 170 micro-segments covering everything a veteran needs to know about personal finance. From mindset and budgeting through investing and wealth building. This is the course that doesn't exist anywhere else for the military community.</p>
+        <div class="course-modules">
+          <div class="module-item">Financial Foundations &amp; Mindset</div>
+          <div class="module-item">Budgeting (4 lessons)</div>
+          <div class="module-item">Understanding Debt (4 lessons)</div>
+          <div class="module-item">Debt Payoff Strategies (4 lessons)</div>
+          <div class="module-item">Credit — Full Depth (7 lessons)</div>
+          <div class="module-item">Savings &amp; Emergency Funds</div>
+          <div class="module-item">Income Maximization &amp; Benefits</div>
+          <div class="module-item">Investing &amp; Wealth Building</div>
+          <div class="module-item">Your Personal Financial Plan</div>
+        </div>
+        <div class="course-meta-row">
+          <span>Format: <span>Video + slides + worksheets</span></span>
+          <span>Est. Length: <span>12–15 hours</span></span>
+          <span>Level: <span>All levels</span></span>
+          <span>Cost: <span>Free</span></span>
+        </div>
+        <a href="contact.html" class="btn-gold">Get Notified When Live →</a>
+      </div>
+    </div>
+
+    <!-- Course 4 — Coming Soon -->
+    <div class="course-full-card reveal" data-delay="300">
+      <div class="course-sidebar">
+        <div class="course-num">04</div>
+        <div style="font-family: 'Oswald', sans-serif; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);">In Development</div>
+      </div>
+      <div class="course-body">
+        <div class="course-badge-row">
+          <span class="c-badge coming">◐ Coming Soon</span>
+          <span class="c-badge free">Free</span>
+          <span class="c-badge free">Self-Paced</span>
+        </div>
+        <h3 class="course-main-title">VA Loan &amp; Homeownership Prep</h3>
+        <p class="course-main-desc">Everything a veteran needs to know to use the VA loan benefit effectively — eligibility, entitlement, the full process, what lenders look for, and how to set yourself up for a smooth closing.</p>
+        <div class="course-modules">
+          <div class="module-item">VA Loan Eligibility &amp; Entitlement</div>
+          <div class="module-item">The VA Loan Process</div>
+          <div class="module-item">What Lenders Look For</div>
+          <div class="module-item">Closing Costs Explained</div>
+          <div class="module-item">Homeownership Readiness</div>
+          <div class="module-item">After You Close</div>
+        </div>
+        <div class="course-meta-row">
+          <span>Format: <span>Video + slides</span></span>
+          <span>Level: <span>All levels</span></span>
+          <span>Cost: <span>Free</span></span>
+        </div>
+        <a href="contact.html" class="btn-outline">Get Notified →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE PREVIEW FOR MONEY MISSION -->
+  <section class="module-preview-section">
+    <div class="section-tag reveal">Money Mission Preview</div>
+    <h2 class="section-title reveal" data-delay="100">What's Inside the<br>Complete Course</h2>
+    <p class="section-body reveal" data-delay="150" style="max-width: 560px;">Nine full modules covering every area of personal finance a veteran needs to master — built with CFEI frameworks and veteran-specific context throughout.</p>
+    <div class="module-list">
+      <div class="module-card reveal" data-delay="0">
+        <div class="mod-num">Module 01</div>
+        <div class="mod-title">Financial Foundations</div>
+        <p class="mod-lessons">3 lessons · Money mindset, your money story, the full financial picture — net worth, income, benefits</p>
+      </div>
+      <div class="module-card reveal" data-delay="60">
+        <div class="mod-num">Module 02</div>
+        <div class="mod-title">Budgeting</div>
+        <p class="mod-lessons">4 lessons · What a budget is, methods (50/30/20, zero-based, envelope), building from scratch, making it stick</p>
+      </div>
+      <div class="module-card reveal" data-delay="120">
+        <div class="mod-num">Module 03</div>
+        <div class="mod-title">Understanding Debt</div>
+        <p class="mod-lessons">4 lessons · How debt works, the true cost of debt, debt inventory, military-specific debt situations (SCRA, MLA, predatory lenders)</p>
+      </div>
+      <div class="module-card reveal" data-delay="0">
+        <div class="mod-num">Module 04</div>
+        <div class="mod-title">Debt Payoff Strategies</div>
+        <p class="mod-lessons">4 lessons · Snowball method, avalanche method, side-by-side comparison, negotiating and managing debt</p>
+      </div>
+      <div class="module-card reveal" data-delay="60">
+        <div class="mod-num">Module 05</div>
+        <div class="mod-title">Credit — Full Depth</div>
+        <p class="mod-lessons">7 lessons · Credit basics, score calculation, reading reports, building credit, rebuilding credit, disputing errors, identity protection</p>
+      </div>
+      <div class="module-card reveal" data-delay="120">
+        <div class="mod-num">Module 06</div>
+        <div class="mod-title">Savings &amp; Emergency Funds</div>
+        <p class="mod-lessons">3 lessons · Why savings comes first, building your emergency fund, savings goals beyond the emergency fund</p>
+      </div>
+      <div class="module-card reveal" data-delay="0">
+        <div class="mod-num">Module 07</div>
+        <div class="mod-title">Income &amp; Benefits</div>
+        <p class="mod-lessons">3 lessons · Your full income picture (VA disability, GI Bill, SSDI), employer benefits you're leaving behind, increasing your income</p>
+      </div>
+      <div class="module-card reveal" data-delay="60">
+        <div class="mod-num">Module 08</div>
+        <div class="mod-title">Investing &amp; Wealth Building</div>
+        <p class="mod-lessons">3 lessons · Investing basics, retirement accounts (TSP, BRS, IRA, 401k), building long-term wealth and breaking the cycle</p>
+      </div>
+      <div class="module-card reveal" data-delay="120">
+        <div class="mod-num">Module 09</div>
+        <div class="mod-title">Your Financial Plan</div>
+        <p class="mod-lessons">3 lessons · Building your personal plan, handling setbacks, resources and next steps — what comes after the course</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

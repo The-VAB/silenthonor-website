@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us — Silent Honor Foundation</title>
+<link rel="stylesheet" href="css/global.css">
+<style>
+.contact-main {
+  padding: 6rem 3.5rem;
+  position: relative; z-index: 1;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+/* FORM */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  padding: 12px 16px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--red);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #3D4F6B;
+}
+
+.form-select option {
+  background: var(--navy-mid);
+  color: var(--white);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 130px;
+}
+
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.form-check input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--red);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.form-check-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* CONTACT INFO */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.info-block {
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  border-left: 3px solid var(--red);
+}
+
+.info-block-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--red-light);
+  margin-bottom: 0.8rem;
+}
+
+.info-block-content {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.info-block-content a {
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.info-block-content a:hover { color: var(--red-light); }
+
+.info-block-content strong {
+  color: var(--white);
+  font-weight: 500;
+}
+
+/* FAQ */
+.faq-section {
+  padding: 6rem 3.5rem;
+  background: var(--navy-mid);
+  position: relative; z-index: 1;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+  margin-top: 3rem;
+  max-width: 800px;
+}
+
+.faq-item {
+  background: var(--navy-mid);
+  border-left: 3px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.faq-item.open {
+  border-left-color: var(--red);
+  background: #151e30;
+}
+
+.faq-question {
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.faq-question-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.faq-arrow {
+  color: var(--muted);
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.faq-item.open .faq-arrow { transform: rotate(180deg); color: var(--red-light); }
+
+.faq-answer {
+  display: none;
+  padding: 0 2rem 1.5rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.75;
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+.faq-item.open .faq-answer { display: block; }
+
+@media (max-width: 1024px) {
+  .contact-main, .faq-section { padding: 4rem 2rem; }
+  .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .contact-main { padding: 3.5rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="page-content">
+
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-tag">Reach Out</div>
+      <h1 class="page-hero-title"><em>Contact</em> Silent Honor</h1>
+      <p class="page-hero-sub">There's no wrong reason to reach out. Whether you need help with credit, a budget, a VA loan question, or just don't know where to start — we're here.</p>
+    </div>
+  </div>
+
+  <section class="contact-main">
+    <div class="contact-grid">
+
+      <!-- FORM -->
+      <div class="reveal">
+        <div class="section-tag">Send a Message</div>
+        <h2 class="section-title" style="margin-bottom: 2rem;">Get in Touch</h2>
+        <form class="contact-form" onsubmit="return false;">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-input" placeholder="John">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" placeholder="Smith">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" placeholder="john@email.com">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Branch of Service</label>
+              <select class="form-select">
+                <option value="" disabled selected>Select branch</option>
+                <option>Army</option>
+                <option>Navy</option>
+                <option>Air Force</option>
+                <option>Marine Corps</option>
+                <option>Coast Guard</option>
+                <option>Space Force</option>
+                <option>National Guard</option>
+                <option>Reserve</option>
+                <option>Family Member / Spouse</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-select">
+                <option value="" disabled selected>Select status</option>
+                <option>Veteran</option>
+                <option>Active Duty</option>
+                <option>Reserve / Guard</option>
+                <option>Retired</option>
+                <option>Surviving Spouse</option>
+                <option>Family Member</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">I'm Reaching Out About</label>
+            <select class="form-select">
+              <option value="" disabled selected>Select a topic</option>
+              <option>Credit Review &amp; Education</option>
+              <option>Financial Coaching</option>
+              <option>Debt Management</option>
+              <option>VA Loan / Closing Cost Assistance</option>
+              <option>VA Disability Support</option>
+              <option>Course Question</option>
+              <option>Partnership / Collaboration</option>
+              <option>Donation / Giving</option>
+              <option>Board / Volunteer Inquiry</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tell Us What's Going On</label>
+            <textarea class="form-textarea" placeholder="Give us a quick rundown of your situation — the more context you share, the better we can help. There's no judgment here."></textarea>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="consent">
+            <label class="form-check-label" for="consent">I understand that Silent Honor Foundation is a nonprofit organization providing financial education and coaching services. All information shared is kept confidential and used solely to provide assistance.</label>
+          </div>
+          <button type="submit" class="btn-primary" style="width: fit-content;">Send Message →</button>
+        </form>
+      </div>
+
+      <!-- CONTACT INFO -->
+      <div class="contact-info reveal" data-delay="150">
+        <div class="info-block">
+          <div class="info-block-title">Organization</div>
+          <div class="info-block-content">
+            <strong>Silent Honor Foundation Inc.</strong><br>
+            501(c)(3) Nonprofit Organization<br>
+            EIN: 99-3172064<br>
+            Headquartered in Missouri<br>
+            Serving veterans nationally
+          </div>
+        </div>
+
+        <div class="info-block">
+          <div class="info-block-title">Website</div>
+          <div class="info-block-content">
+            <a href="https://silenthonor.org" target="_blank">silenthonor.org</a>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <div class="info-block-title">Social Media</div>
+          <div class="info-block-content">
+            <a href="https://www.facebook.com/silenthonor.NPO" target="_blank">Facebook — @silenthonor.NPO</a><br>
+            <a href="https://www.linkedin.com/company/silent-honor-foundation" target="_blank">LinkedIn — Silent Honor Foundation</a>
+          </div>
+        </div>
+
+        <div class="info-block" style="border-left-color: var(--gold);">
+          <div class="info-block-title" style="color: var(--gold-light);">Response Time</div>
+          <div class="info-block-content">We aim to respond to all inquiries within 2–3 business days. If your situation is urgent, please note that in your message.</div>
+        </div>
+
+        <div class="info-block" style="border-left-color: rgba(255,255,255,0.15);">
+          <div class="info-block-title">Confidentiality</div>
+          <div class="info-block-content">Everything you share with Silent Honor stays with Silent Honor. We do not sell, share, or disclose your information. Our coaches operate under professional ethical standards.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="section-tag reveal">Common Questions</div>
+    <h2 class="section-title reveal" data-delay="100">FAQ</h2>
+    <div class="faq-list">
+      <div class="faq-item reveal" data-delay="0">
+        <div class="faq-question">
+          <span class="faq-question-text">Is everything really free?</span>
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">Yes. Every course, every coaching session, every credit review — 100% free to eligible veterans and military families. Silent Honor is funded by donors, not the veterans we serve. There are no hidden fees, no upsells, and no subscription required.</div>
+      </div>
+      <div class="faq-item reveal" data-delay="60">
+        <div class="faq-question">
+          <span class="faq-question-text">Do I need a good credit score to work with you?</span>
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">Absolutely not. Most of the people we serve have credit challenges — that's exactly why we exist. We work with veterans at every starting point. The lower your score, the more we can help. Zero judgment, ever.</div>
+      </div>
+      <div class="faq-item reveal" data-delay="120">
+        <div class="faq-question">
+          <span class="faq-question-text">What branches of service do you serve?</span>
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">All of them. Army, Navy, Air Force, Marine Corps, Coast Guard, Space Force, National Guard, and Reserve — plus surviving spouses and immediate family members. Every era of service is welcome.</div>
+      </div>
+      <div class="faq-item reveal" data-delay="0">
+        <div class="faq-question">
+          <span class="faq-question-text">Are you a credit repair company?</span>
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">No. We are a nonprofit financial education and coaching organization. We don't charge for credit services and we don't make promises we can't keep. We teach veterans how to understand and improve their own credit, and we coach them through the process — but we are educators and counselors, not a credit repair service.</div>
+      </div>
+      <div class="faq-item reveal" data-delay="60">
+        <div class="faq-question">
+          <span class="faq-question-text">Who does the coaching?</span>
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">Coaching is led by Michael Lugenbell, a Certified Financial Education Instructor (CFEI) and Certified Credit Counselor with 7+ years of experience working with veterans and families. As we scale, all coaches added to the team will hold equivalent professional credentials.</div>
+      </div>
+      <div class="faq-item reveal" data-delay="120">
+        <div class="faq-question">
+          <span class="faq-question-text">Can I donate to support the mission?</span>
+          <span class="faq-arrow">↓</span>
+        </div>
+        <div class="faq-answer">Yes — and we're deeply grateful for it. Donations are what make free programs possible. Silent Honor Foundation is a registered 501(c)(3) and all contributions are tax-deductible. Visit our donate page or reach out directly.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script>
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-question').addEventListener('click', () => {
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+</script>
+</body>
+</html>
