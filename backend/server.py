@@ -85,6 +85,27 @@ class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
 
+class CourseRequest(BaseModel):
+    title: str
+    description: str
+    status: str = "draft"
+    total_lessons: int = 0
+    category: Optional[str] = None
+    thumbnail: Optional[str] = None
+
+class LessonRequest(BaseModel):
+    course_id: str
+    title: str
+    content: str
+    order: int = 0
+    video_url: Optional[str] = None
+    duration: Optional[str] = None
+
+class ContentUpdateRequest(BaseModel):
+    page: str
+    section: str
+    content: dict
+
 # Initialize FastAPI
 app = FastAPI(title="Silent Honor Foundation API")
 
@@ -630,13 +651,244 @@ async def get_admin_stats(request: Request):
     verified_members = await db.users.count_documents({"role": "member", "verified": True})
     pending_verification = await db.users.count_documents({"role": "member", "dd214_status": "pending_review"})
     total_contacts = await db.contacts.count_documents({})
+    total_courses = await db.courses.count_documents({})
     
     return {
         "total_members": total_members,
         "verified_members": verified_members,
         "pending_verification": pending_verification,
-        "total_contacts": total_contacts
+        "total_contacts": total_contacts,
+        "total_courses": total_courses
     }
+
+# ═══════════════════════════════════════════════════════════════════════════
+# COURSE MANAGEMENT (Admin CMS)
+# ═══════════════════════════════════════════════════════════════════════════
+
+@app.get("/api/admin/courses")
+async def get_admin_courses(request: Request):
+    await get_current_admin(request)
+    courses = await db.courses.find().sort("created_at", -1).to_list(100)
+    result = []
+    for c in courses:
+        lesson_count = await db.lessons.count_documents({"course_id": str(c["_id"])})
+        result.append({
+            "id": str(c["_id"]),
+            "title": c.get("title", ""),
+            "description": c.get("description", ""),
+            "status": c.get("status", "draft"),
+            "total_lessons": lesson_count,
+            "category": c.get("category"),
+            "thumbnail": c.get("thumbnail"),
+            "created_at": c.get("created_at").isoformat() if c.get("created_at") else None
+        })
+    return result
+
+@app.post("/api/admin/courses")
+async def create_course(request: Request, data: CourseRequest):
+    await get_current_admin(request)
+    course_doc = {
+        "title": data.title,
+        "description": data.description,
+        "status": data.status,
+        "category": data.category,
+        "thumbnail": data.thumbnail,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
+    }
+    result = await db.courses.insert_one(course_doc)
+    return {"id": str(result.inserted_id), "message": "Course created successfully"}
+
+@app.get("/api/admin/courses/{course_id}")
+async def get_course(request: Request, course_id: str):
+    await get_current_admin(request)
+    course = await db.courses.find_one({"_id": ObjectId(course_id)})
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    
+    lessons = await db.lessons.find({"course_id": course_id}).sort("order", 1).to_list(100)
+    
+    return {
+        "id": str(course["_id"]),
+        "title": course.get("title", ""),
+        "description": course.get("description", ""),
+        "status": course.get("status", "draft"),
+        "category": course.get("category"),
+        "thumbnail": course.get("thumbnail"),
+        "lessons": [{
+            "id": str(l["_id"]),
+            "title": l.get("title", ""),
+            "content": l.get("content", ""),
+            "order": l.get("order", 0),
+            "video_url": l.get("video_url"),
+            "duration": l.get("duration")
+        } for l in lessons]
+    }
+
+@app.put("/api/admin/courses/{course_id}")
+async def update_course(request: Request, course_id: str, data: CourseRequest):
+    await get_current_admin(request)
+    await db.courses.update_one(
+        {"_id": ObjectId(course_id)},
+        {"$set": {
+            "title": data.title,
+            "description": data.description,
+            "status": data.status,
+            "category": data.category,
+            "thumbnail": data.thumbnail,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    return {"message": "Course updated successfully"}
+
+@app.delete("/api/admin/courses/{course_id}")
+async def delete_course(request: Request, course_id: str):
+    await get_current_admin(request)
+    await db.courses.delete_one({"_id": ObjectId(course_id)})
+    await db.lessons.delete_many({"course_id": course_id})
+    return {"message": "Course and lessons deleted"}
+
+# Lesson Management
+@app.post("/api/admin/lessons")
+async def create_lesson(request: Request, data: LessonRequest):
+    await get_current_admin(request)
+    lesson_doc = {
+        "course_id": data.course_id,
+        "title": data.title,
+        "content": data.content,
+        "order": data.order,
+        "video_url": data.video_url,
+        "duration": data.duration,
+        "created_at": datetime.now(timezone.utc)
+    }
+    result = await db.lessons.insert_one(lesson_doc)
+    return {"id": str(result.inserted_id), "message": "Lesson created successfully"}
+
+@app.put("/api/admin/lessons/{lesson_id}")
+async def update_lesson(request: Request, lesson_id: str, data: LessonRequest):
+    await get_current_admin(request)
+    await db.lessons.update_one(
+        {"_id": ObjectId(lesson_id)},
+        {"$set": {
+            "title": data.title,
+            "content": data.content,
+            "order": data.order,
+            "video_url": data.video_url,
+            "duration": data.duration,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    return {"message": "Lesson updated successfully"}
+
+@app.delete("/api/admin/lessons/{lesson_id}")
+async def delete_lesson(request: Request, lesson_id: str):
+    await get_current_admin(request)
+    await db.lessons.delete_one({"_id": ObjectId(lesson_id)})
+    return {"message": "Lesson deleted"}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SITE CONTENT MANAGEMENT (CMS)
+# ═══════════════════════════════════════════════════════════════════════════
+
+@app.get("/api/admin/content")
+async def get_all_content(request: Request):
+    await get_current_admin(request)
+    content = await db.site_content.find().to_list(100)
+    result = {}
+    for c in content:
+        page = c.get("page", "unknown")
+        if page not in result:
+            result[page] = {}
+        result[page][c.get("section", "unknown")] = c.get("content", {})
+    return result
+
+@app.get("/api/admin/content/{page}")
+async def get_page_content(request: Request, page: str):
+    await get_current_admin(request)
+    content = await db.site_content.find({"page": page}).to_list(50)
+    result = {}
+    for c in content:
+        result[c.get("section", "unknown")] = c.get("content", {})
+    return result
+
+@app.put("/api/admin/content")
+async def update_content(request: Request, data: ContentUpdateRequest):
+    await get_current_admin(request)
+    await db.site_content.update_one(
+        {"page": data.page, "section": data.section},
+        {"$set": {
+            "content": data.content,
+            "updated_at": datetime.now(timezone.utc)
+        }},
+        upsert=True
+    )
+    return {"message": "Content updated successfully"}
+
+@app.get("/api/content/{page}/{section}")
+async def get_public_content(page: str, section: str):
+    """Public endpoint to fetch content for frontend pages"""
+    content = await db.site_content.find_one({"page": page, "section": section})
+    if content:
+        return content.get("content", {})
+    return {}
+
+# Team Member Management
+@app.get("/api/admin/team")
+async def get_team_members(request: Request):
+    await get_current_admin(request)
+    members = await db.team_members.find().sort("order", 1).to_list(50)
+    return [{
+        "id": str(m["_id"]),
+        "name": m.get("name", ""),
+        "role": m.get("role", ""),
+        "bio": m.get("bio", ""),
+        "tags": m.get("tags", []),
+        "photo": m.get("photo"),
+        "order": m.get("order", 0),
+        "is_board": m.get("is_board", False)
+    } for m in members]
+
+@app.post("/api/admin/team")
+async def create_team_member(request: Request):
+    await get_current_admin(request)
+    data = await request.json()
+    member_doc = {
+        "name": data.get("name", ""),
+        "role": data.get("role", ""),
+        "bio": data.get("bio", ""),
+        "tags": data.get("tags", []),
+        "photo": data.get("photo"),
+        "order": data.get("order", 0),
+        "is_board": data.get("is_board", False),
+        "created_at": datetime.now(timezone.utc)
+    }
+    result = await db.team_members.insert_one(member_doc)
+    return {"id": str(result.inserted_id), "message": "Team member added"}
+
+@app.put("/api/admin/team/{member_id}")
+async def update_team_member(request: Request, member_id: str):
+    await get_current_admin(request)
+    data = await request.json()
+    await db.team_members.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {
+            "name": data.get("name"),
+            "role": data.get("role"),
+            "bio": data.get("bio"),
+            "tags": data.get("tags", []),
+            "photo": data.get("photo"),
+            "order": data.get("order", 0),
+            "is_board": data.get("is_board", False),
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    return {"message": "Team member updated"}
+
+@app.delete("/api/admin/team/{member_id}")
+async def delete_team_member(request: Request, member_id: str):
+    await get_current_admin(request)
+    await db.team_members.delete_one({"_id": ObjectId(member_id)})
+    return {"message": "Team member deleted"}
 
 # Serve HTML pages
 @app.get("/{page}.html")
