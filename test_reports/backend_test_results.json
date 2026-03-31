@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-31T00:43:20.573760",
+  "timestamp": "2026-03-31T00:57:24.683766",
   "total_tests": 10,
   "passed_tests": 10,
   "success_rate": 100.0,
@@ -48,8 +48,8 @@
       "success": true,
       "details": "Status: 200",
       "response_data": {
-        "id": "69cb18a705c4084897704606",
-        "email": "test_member_1774917799@test.com",
+        "id": "69cb1bf3a04671e109ba8a98",
+        "email": "test_member_1774918643@test.com",
         "first_name": "Test",
         "last_name": "Member",
         "role": "member",
@@ -61,8 +61,8 @@
       "success": true,
       "details": "Status: 200",
       "response_data": {
-        "id": "69cb18a705c4084897704607",
-        "email": "test_login_1774917799@test.com",
+        "id": "69cb1bf4a04671e109ba8a99",
+        "email": "test_login_1774918643@test.com",
         "first_name": "Login",
         "last_name": "Test",
         "role": "member",
@@ -84,26 +84,26 @@
       "success": true,
       "details": "All required fields present",
       "response_data": {
-        "total_members": 8,
+        "total_members": 10,
         "verified_members": 0,
         "pending_verification": 0,
-        "total_contacts": 4
+        "total_contacts": 5
       }
     },
     {
       "test": "Admin Members",
       "success": true,
-      "details": "Returned 8 members",
+      "details": "Returned 10 members",
       "response_data": {
-        "count": 8
+        "count": 10
       }
     },
     {
       "test": "Admin Contacts",
       "success": true,
-      "details": "Returned 4 contacts",
+      "details": "Returned 5 contacts",
       "response_data": {
-        "count": 4
+        "count": 5
       }
     },
     {
