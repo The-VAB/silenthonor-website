@@ -2,7 +2,7 @@
   "name": "silenthonor-frontend",
   "version": "1.0.0",
   "scripts": {
-    "start": "serve .. -l 3000 --no-clipboard --no-request-logging"
+    "start": "serve /app -l 3000 --no-clipboard --no-request-logging"
   },
   "dependencies": {
     "serve": "^14.2.0"

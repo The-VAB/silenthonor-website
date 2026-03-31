@@ -474,7 +474,10 @@ async def update_profile(request: Request):
 async def get_courses(request: Request):
     user = await get_current_user(request)
     
-    progress = await db.course_progress.find({"user_id": ObjectId(user["_id"])}).to_list(100)
+    progress = await db.course_progress.find(
+        {"user_id": ObjectId(user["_id"])},
+        {"course_id": 1, "completed_lessons": 1, "updated_at": 1}
+    ).to_list(100)
     
     courses = [
         {
@@ -533,7 +536,11 @@ async def update_course_progress(request: Request, course_id: str):
 async def get_members(request: Request):
     await get_current_admin(request)
     
-    members = await db.users.find({"role": "member"}).to_list(1000)
+    members = await db.users.find(
+        {"role": "member"},
+        {"_id": 1, "email": 1, "first_name": 1, "last_name": 1, "branch": 1, 
+         "service_status": 1, "verified": 1, "dd214_status": 1, "dd214_file": 1, "created_at": 1}
+    ).to_list(1000)
     result = []
     for m in members:
         result.append({
@@ -595,7 +602,11 @@ async def verify_member(request: Request, member_id: str):
 async def get_contacts(request: Request):
     await get_current_admin(request)
     
-    contacts = await db.contacts.find().sort("created_at", -1).to_list(500)
+    contacts = await db.contacts.find(
+        {},
+        {"_id": 1, "first_name": 1, "last_name": 1, "email": 1, "topic": 1, 
+         "message": 1, "created_at": 1, "responded": 1}
+    ).sort("created_at", -1).to_list(500)
     result = []
     for c in contacts:
         result.append({
