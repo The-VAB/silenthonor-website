@@ -440,6 +440,8 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
+const API_BASE = window.location.origin;
+
 function togglePassword() {
   const input = document.getElementById('login-password');
   const btn = document.querySelector('.password-toggle');
@@ -452,16 +454,76 @@ function togglePassword() {
   }
 }
 
-function handleLogin() {
+async function handleLogin() {
   const email = document.getElementById('login-email').value;
   const pass = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('error-msg');
+  
   if (!email || !pass) {
-    document.getElementById('error-msg').classList.add('show');
+    errorEl.textContent = 'Please enter both email and password.';
+    errorEl.classList.add('show');
     return;
   }
-  // Wire to backend auth / GHL here
-  window.location.href = 'dashboard.html';
+
+  const loginBtn = document.querySelector('.login-btn');
+  loginBtn.textContent = 'Signing In...';
+  loginBtn.disabled = true;
+
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password: pass })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Store user info in localStorage for quick access
+      localStorage.setItem('sh_user', JSON.stringify(data));
+      
+      // Redirect based on role
+      if (data.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    } else {
+      errorEl.textContent = data.detail || 'Invalid email or password. Please try again.';
+      errorEl.classList.add('show');
+      loginBtn.textContent = 'Sign In →';
+      loginBtn.disabled = false;
+    }
+  } catch (err) {
+    errorEl.textContent = 'Connection error. Please try again.';
+    errorEl.classList.add('show');
+    loginBtn.textContent = 'Sign In →';
+    loginBtn.disabled = false;
+  }
 }
+
+// Check if already logged in
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/me`, {
+      credentials: 'include'
+    });
+    if (response.ok) {
+      const user = await response.json();
+      if (user.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    }
+  } catch (e) {}
+});
+
+// Allow Enter key to submit
+document.getElementById('login-password').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') handleLogin();
+});
 </script>
 </body>
 </html>

@@ -412,12 +412,61 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
+  const API_BASE = window.location.origin;
+
   document.querySelectorAll('.faq-item').forEach(item => {
     item.querySelector('.faq-question').addEventListener('click', () => {
       const wasOpen = item.classList.contains('open');
       document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
       if (!wasOpen) item.classList.add('open');
     });
+  });
+
+  document.querySelector('.contact-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    const formData = {
+      first_name: form.querySelectorAll('.form-input')[0]?.value || '',
+      last_name: form.querySelectorAll('.form-input')[1]?.value || '',
+      email: form.querySelectorAll('.form-input')[2]?.value || '',
+      branch: form.querySelectorAll('.form-select')[0]?.value || '',
+      status: form.querySelectorAll('.form-select')[1]?.value || '',
+      topic: form.querySelectorAll('.form-select')[2]?.value || '',
+      message: form.querySelector('.form-textarea')?.value || ''
+    };
+
+    if (!formData.first_name || !formData.email || !formData.message) {
+      window.SilentHonorUtils?.showToast('Please fill in required fields.', 'error');
+      return;
+    }
+
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+
+    try {
+      const response = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        window.SilentHonorUtils?.showToast('Message sent! We\'ll be in touch within 2-3 business days.', 'success');
+        form.reset();
+      } else {
+        const data = await response.json();
+        window.SilentHonorUtils?.showToast(data.detail || 'Failed to send. Please try again.', 'error');
+      }
+    } catch (err) {
+      window.SilentHonorUtils?.showToast('Connection error. Please try again.', 'error');
+    }
+
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
   });
 </script>
 </body>

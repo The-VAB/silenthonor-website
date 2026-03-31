@@ -777,7 +777,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <button class="sidebar-signout" onclick="window.location.href='login.html'">
+      <button class="sidebar-signout" onclick="handleSignOut()">
         ← Sign Out
       </button>
     </div>
@@ -1105,7 +1105,7 @@
           <h1 class="panel-title">My Profile</h1>
           <p class="panel-sub">Manage your account details and preferences.</p>
         </div>
-        <button class="btn-primary" onclick="showToast('Profile saved!')" style="font-size: 0.72rem; padding: 10px 18px;">Save Changes →</button>
+        <button class="btn-primary" onclick="saveProfile()" style="font-size: 0.72rem; padding: 10px 18px;">Save Changes →</button>
       </div>
       <div class="profile-grid">
         <div class="profile-section">
@@ -1202,6 +1202,104 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
+const API_BASE = window.location.origin;
+
+let currentUser = null;
+
+// Check authentication on load
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/me`, {
+      credentials: 'include'
+    });
+    
+    if (!response.ok) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    currentUser = await response.json();
+    updateDashboardWithUserData();
+    loadCourseProgress();
+  } catch (err) {
+    window.location.href = 'login.html';
+  }
+});
+
+function updateDashboardWithUserData() {
+  if (!currentUser) return;
+
+  // Update member info in sidebar
+  const initials = (currentUser.first_name?.[0] || '') + (currentUser.last_name?.[0] || '');
+  document.querySelector('.member-avatar').textContent = initials.toUpperCase() || 'U';
+  document.querySelector('.member-name').textContent = `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || 'Member';
+  
+  const branchText = currentUser.branch ? `${currentUser.branch}` : '';
+  const statusText = currentUser.service_status ? ` · ${currentUser.service_status}` : '';
+  document.querySelector('.member-rank').textContent = branchText + statusText || 'Veteran';
+
+  // Update verification status
+  const verifiedEl = document.querySelector('.member-verified');
+  if (currentUser.verified) {
+    verifiedEl.textContent = 'Verified Member';
+    verifiedEl.style.color = '#4ade80';
+  } else if (currentUser.dd214_status === 'pending_review') {
+    verifiedEl.textContent = 'Pending Verification';
+    verifiedEl.style.color = '#F0B429';
+    verifiedEl.style.background = 'rgba(240, 180, 41, 0.08)';
+    verifiedEl.style.borderColor = 'rgba(240, 180, 41, 0.2)';
+  } else {
+    verifiedEl.textContent = 'Upload DD-214 to Verify';
+    verifiedEl.style.color = '#EF4444';
+    verifiedEl.style.background = 'rgba(239, 68, 68, 0.08)';
+    verifiedEl.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+  }
+
+  // Update welcome message
+  document.querySelector('.panel-title').textContent = `Welcome Back, ${currentUser.first_name || 'Member'}`;
+
+  // Update profile fields
+  const profileFields = document.querySelectorAll('.profile-field-input');
+  if (profileFields.length >= 5) {
+    profileFields[0].value = currentUser.first_name || '';
+    profileFields[1].value = currentUser.last_name || '';
+    profileFields[2].value = currentUser.email || '';
+    profileFields[3].value = currentUser.phone || '';
+    profileFields[4].value = currentUser.state || '';
+  }
+
+  // Update military info
+  const branchDisplay = document.querySelector('.profile-section:nth-child(2) .profile-field-value');
+  if (branchDisplay) branchDisplay.textContent = currentUser.branch || 'Not specified';
+}
+
+async function loadCourseProgress() {
+  try {
+    const response = await fetch(`${API_BASE}/api/member/courses`, {
+      credentials: 'include'
+    });
+    
+    if (response.ok) {
+      const courses = await response.json();
+      updateCourseDisplay(courses);
+    }
+  } catch (err) {
+    console.log('Could not load course progress');
+  }
+}
+
+function updateCourseDisplay(courses) {
+  // Update overview stats
+  const inProgress = courses.filter(c => c.progress > 0 && c.progress < 100).length;
+  const completedLessons = courses.reduce((sum, c) => sum + c.completed_lessons, 0);
+  
+  const statValues = document.querySelectorAll('.overview-stat-value');
+  if (statValues.length >= 2) {
+    statValues[0].textContent = inProgress;
+    statValues[1].textContent = completedLessons;
+  }
+}
+
 function showPanel(name) {
   document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
@@ -1214,6 +1312,47 @@ function showToast(msg) {
   document.getElementById('toast-msg').textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+async function handleSignOut() {
+  try {
+    await fetch(`${API_BASE}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (e) {}
+  
+  localStorage.removeItem('sh_user');
+  window.location.href = 'login.html';
+}
+
+async function saveProfile() {
+  const profileFields = document.querySelectorAll('.profile-field-input');
+  const data = {
+    first_name: profileFields[0]?.value || '',
+    last_name: profileFields[1]?.value || '',
+    phone: profileFields[3]?.value || '',
+    state: profileFields[4]?.value || ''
+  };
+
+  try {
+    const response = await fetch(`${API_BASE}/api/member/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+      showToast('Profile saved!');
+      currentUser = { ...currentUser, ...data };
+      updateDashboardWithUserData();
+    } else {
+      showToast('Failed to save profile');
+    }
+  } catch (err) {
+    showToast('Connection error');
+  }
 }
 </script>
 </body>

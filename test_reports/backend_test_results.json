@@ -1,0 +1,118 @@
+{
+  "timestamp": "2026-03-31T00:43:20.573760",
+  "total_tests": 10,
+  "passed_tests": 10,
+  "success_rate": 100.0,
+  "failed_tests": [],
+  "detailed_results": [
+    {
+      "test": "Health Check",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "status": "healthy",
+        "service": "Silent Honor Foundation API"
+      }
+    },
+    {
+      "test": "Admin Login",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "id": "69cb174142600191ad9599ea",
+        "email": "admin@silenthonor.org",
+        "first_name": "Admin",
+        "last_name": "User",
+        "role": "admin",
+        "verified": true,
+        "branch": null,
+        "service_status": null
+      }
+    },
+    {
+      "test": "Admin Me",
+      "success": true,
+      "details": "Role: admin",
+      "response_data": {
+        "_id": "69cb174142600191ad9599ea",
+        "email": "admin@silenthonor.org",
+        "first_name": "Admin",
+        "last_name": "User",
+        "role": "admin",
+        "verified": true,
+        "created_at": "2026-03-31T00:37:21.197000"
+      }
+    },
+    {
+      "test": "Member Registration",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "id": "69cb18a705c4084897704606",
+        "email": "test_member_1774917799@test.com",
+        "first_name": "Test",
+        "last_name": "Member",
+        "role": "member",
+        "verified": false
+      }
+    },
+    {
+      "test": "Member Login",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "id": "69cb18a705c4084897704607",
+        "email": "test_login_1774917799@test.com",
+        "first_name": "Login",
+        "last_name": "Test",
+        "role": "member",
+        "verified": false,
+        "branch": "Navy",
+        "service_status": "Veteran"
+      }
+    },
+    {
+      "test": "Contact Form",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "message": "Message received. We'll be in touch within 2-3 business days."
+      }
+    },
+    {
+      "test": "Admin Stats",
+      "success": true,
+      "details": "All required fields present",
+      "response_data": {
+        "total_members": 8,
+        "verified_members": 0,
+        "pending_verification": 0,
+        "total_contacts": 4
+      }
+    },
+    {
+      "test": "Admin Members",
+      "success": true,
+      "details": "Returned 8 members",
+      "response_data": {
+        "count": 8
+      }
+    },
+    {
+      "test": "Admin Contacts",
+      "success": true,
+      "details": "Returned 4 contacts",
+      "response_data": {
+        "count": 4
+      }
+    },
+    {
+      "test": "Logout",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "message": "Logged out successfully"
+      }
+    }
+  ]
+}

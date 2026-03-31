@@ -924,9 +924,86 @@ function removeFile() {
   document.getElementById('upload-zone').style.borderColor = '';
 }
 
-function submitSignup() {
-  // Wire to backend / GHL here
-  alert('Account creation — wire to backend or GHL API here.');
+async function submitSignup() {
+  const API_BASE = window.location.origin;
+
+  // Gather all form data
+  const formData = {
+    first_name: document.querySelector('#step-1 input[placeholder="John"]')?.value || '',
+    last_name: document.querySelector('#step-1 input[placeholder="Smith"]')?.value || '',
+    email: document.querySelector('#step-1 input[type="email"]')?.value || '',
+    password: document.querySelector('#step-1 input[placeholder="Min. 8 characters"]')?.value || '',
+    phone: document.querySelector('#step-1 input[type="tel"]')?.value || '',
+    state: document.querySelector('#step-1 select')?.value || '',
+    branch: document.querySelector('#step-2 select:first-of-type')?.value || '',
+    service_status: document.querySelectorAll('#step-2 select')[1]?.value || '',
+    years_of_service: document.querySelectorAll('#step-2 select')[2]?.value || '',
+    separation_year: document.querySelector('#step-2 input[placeholder*="2019"]')?.value || '',
+    challenges: Array.from(document.querySelectorAll('.challenge-option.selected'))
+                     .map(el => el.querySelector('.challenge-label')?.textContent || ''),
+    notes: document.querySelector('#step-2 textarea')?.value || ''
+  };
+
+  // Validate required consents
+  const consent1 = document.getElementById('c1')?.checked;
+  const consent2 = document.getElementById('c2')?.checked;
+  const consent3 = document.getElementById('c3')?.checked;
+
+  if (!consent1 || !consent2 || !consent3) {
+    window.SilentHonorUtils?.showToast('Please agree to all required terms.', 'error');
+    return;
+  }
+
+  // Validate required fields
+  if (!formData.first_name || !formData.last_name || !formData.email || !formData.password) {
+    window.SilentHonorUtils?.showToast('Please fill in all required fields.', 'error');
+    return;
+  }
+
+  const submitBtn = document.querySelector('#step-3 .btn-gold');
+  submitBtn.textContent = 'Creating Account...';
+  submitBtn.disabled = true;
+
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(formData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Check for file upload
+      const fileInput = document.getElementById('file-input');
+      if (fileInput?.files?.[0]) {
+        const formDataFile = new FormData();
+        formDataFile.append('file', fileInput.files[0]);
+        
+        await fetch(`${API_BASE}/api/upload/dd214`, {
+          method: 'POST',
+          credentials: 'include',
+          body: formDataFile
+        });
+      }
+
+      localStorage.setItem('sh_user', JSON.stringify(data));
+      window.SilentHonorUtils?.showToast('Account created successfully!', 'success');
+      
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    } else {
+      window.SilentHonorUtils?.showToast(data.detail || 'Registration failed. Please try again.', 'error');
+      submitBtn.textContent = 'Create Account →';
+      submitBtn.disabled = false;
+    }
+  } catch (err) {
+    window.SilentHonorUtils?.showToast('Connection error. Please try again.', 'error');
+    submitBtn.textContent = 'Create Account →';
+    submitBtn.disabled = false;
+  }
 }
 
 // Drag and drop
