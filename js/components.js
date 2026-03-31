@@ -5,8 +5,8 @@
 // Zeffy donation link
 const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1';
 
-// API Base URL
-const API_BASE = window.location.origin;
+// API Base URL - Use window variable to avoid conflicts
+window.API_BASE = window.location.origin;
 
 // Current page detection
 function getCurrentPage() {
@@ -18,7 +18,7 @@ function getCurrentPage() {
 // Check if user is logged in
 async function checkAuth() {
   try {
-    const response = await fetch(`${API_BASE}/api/auth/me`, {
+    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
       credentials: 'include'
     });
     if (response.ok) {

@@ -1202,14 +1202,13 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-const API_BASE = window.location.origin;
 
 let currentUser = null;
 
 // Check authentication on load
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const response = await fetch(`${API_BASE}/api/auth/me`, {
+    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
       credentials: 'include'
     });
     
@@ -1275,7 +1274,7 @@ function updateDashboardWithUserData() {
 
 async function loadCourseProgress() {
   try {
-    const response = await fetch(`${API_BASE}/api/member/courses`, {
+    const response = await fetch(`${window.API_BASE}/api/member/courses`, {
       credentials: 'include'
     });
     
@@ -1316,7 +1315,7 @@ function showToast(msg) {
 
 async function handleSignOut() {
   try {
-    await fetch(`${API_BASE}/api/auth/logout`, {
+    await fetch(`${window.API_BASE}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include'
     });
@@ -1336,7 +1335,7 @@ async function saveProfile() {
   };
 
   try {
-    const response = await fetch(`${API_BASE}/api/member/profile`, {
+    const response = await fetch(`${window.API_BASE}/api/member/profile`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

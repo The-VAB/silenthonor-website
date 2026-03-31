@@ -412,7 +412,6 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-  const API_BASE = window.location.origin;
 
   document.querySelectorAll('.faq-item').forEach(item => {
     item.querySelector('.faq-question').addEventListener('click', () => {
@@ -448,7 +447,7 @@
     submitBtn.disabled = true;
 
     try {
-      const response = await fetch(`${API_BASE}/api/contact`, {
+      const response = await fetch(`${window.API_BASE}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

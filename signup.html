@@ -925,7 +925,6 @@ function removeFile() {
 }
 
 async function submitSignup() {
-  const API_BASE = window.location.origin;
 
   // Gather all form data
   const formData = {
@@ -965,7 +964,7 @@ async function submitSignup() {
   submitBtn.disabled = true;
 
   try {
-    const response = await fetch(`${API_BASE}/api/auth/register`, {
+    const response = await fetch(`${window.API_BASE}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -981,7 +980,7 @@ async function submitSignup() {
         const formDataFile = new FormData();
         formDataFile.append('file', fileInput.files[0]);
         
-        await fetch(`${API_BASE}/api/upload/dd214`, {
+        await fetch(`${window.API_BASE}/api/upload/dd214`, {
           method: 'POST',
           credentials: 'include',
           body: formDataFile

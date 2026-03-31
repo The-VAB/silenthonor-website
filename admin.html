@@ -804,7 +804,6 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-const API_BASE = window.location.origin;
 
 let currentAdmin = null;
 let allMembers = [];
@@ -812,7 +811,7 @@ let allMembers = [];
 // Check admin authentication
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const response = await fetch(`${API_BASE}/api/auth/me`, {
+    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
       credentials: 'include'
     });
     
@@ -840,7 +839,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadStats() {
   try {
-    const response = await fetch(`${API_BASE}/api/admin/stats`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/stats`, {
       credentials: 'include'
     });
     
@@ -859,7 +858,7 @@ async function loadStats() {
 
 async function loadMembers() {
   try {
-    const response = await fetch(`${API_BASE}/api/admin/members`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/members`, {
       credentials: 'include'
     });
     
@@ -927,7 +926,7 @@ function renderVerificationTable() {
 
 async function loadContacts() {
   try {
-    const response = await fetch(`${API_BASE}/api/admin/contacts`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/contacts`, {
       credentials: 'include'
     });
     
@@ -963,7 +962,7 @@ function renderContactsTable(contacts) {
 
 async function viewMember(memberId, showDD214 = false) {
   try {
-    const response = await fetch(`${API_BASE}/api/admin/members/${memberId}`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/members/${memberId}`, {
       credentials: 'include'
     });
     
@@ -982,7 +981,7 @@ function showMemberModal(member, showDD214 = false) {
 
   let dd214Section = '';
   if (member.dd214_file) {
-    const fileUrl = `${API_BASE}/api/admin/dd214/${member.dd214_file}`;
+    const fileUrl = `${window.API_BASE}/api/admin/dd214/${member.dd214_file}`;
     const ext = member.dd214_file.split('.').pop().toLowerCase();
     
     if (ext === 'pdf') {
@@ -1083,7 +1082,7 @@ function viewContact(contactId, encodedMessage) {
 
 async function verifyMember(memberId, status) {
   try {
-    const response = await fetch(`${API_BASE}/api/admin/members/${memberId}/verify`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/members/${memberId}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -1118,7 +1117,7 @@ function showAdminPanel(name) {
 
 async function handleAdminSignOut() {
   try {
-    await fetch(`${API_BASE}/api/auth/logout`, {
+    await fetch(`${window.API_BASE}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include'
     });
@@ -1136,7 +1135,7 @@ let allCourses = [];
 
 async function loadCourses() {
   try {
-    const response = await fetch(`${API_BASE}/api/admin/courses`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/courses`, {
       credentials: 'include'
     });
     
@@ -1209,7 +1208,7 @@ async function saveCourse() {
   }
   
   try {
-    const url = id ? `${API_BASE}/api/admin/courses/${id}` : `${API_BASE}/api/admin/courses`;
+    const url = id ? `${window.API_BASE}/api/admin/courses/${id}` : `${window.API_BASE}/api/admin/courses`;
     const method = id ? 'PUT' : 'POST';
     
     const response = await fetch(url, {
@@ -1233,7 +1232,7 @@ async function saveCourse() {
 
 async function editCourse(courseId) {
   try {
-    const response = await fetch(`${API_BASE}/api/admin/courses/${courseId}`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/courses/${courseId}`, {
       credentials: 'include'
     });
     
@@ -1250,7 +1249,7 @@ async function deleteCourse(courseId) {
   if (!confirm('Delete this course and all its lessons? This cannot be undone.')) return;
   
   try {
-    const response = await fetch(`${API_BASE}/api/admin/courses/${courseId}`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/courses/${courseId}`, {
       method: 'DELETE',
       credentials: 'include'
     });
@@ -1271,7 +1270,7 @@ let currentCourseForLessons = null;
 
 async function manageLessons(courseId) {
   try {
-    const response = await fetch(`${API_BASE}/api/admin/courses/${courseId}`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/courses/${courseId}`, {
       credentials: 'include'
     });
     
@@ -1355,7 +1354,7 @@ async function saveLesson() {
   }
   
   try {
-    const url = id ? `${API_BASE}/api/admin/lessons/${id}` : `${API_BASE}/api/admin/lessons`;
+    const url = id ? `${window.API_BASE}/api/admin/lessons/${id}` : `${window.API_BASE}/api/admin/lessons`;
     const method = id ? 'PUT' : 'POST';
     
     const response = await fetch(url, {
@@ -1386,7 +1385,7 @@ async function deleteLesson(lessonId) {
   if (!confirm('Delete this lesson?')) return;
   
   try {
-    const response = await fetch(`${API_BASE}/api/admin/lessons/${lessonId}`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/lessons/${lessonId}`, {
       method: 'DELETE',
       credentials: 'include'
     });
@@ -1511,7 +1510,7 @@ async function loadTeamEditor() {
   `;
   
   try {
-    const response = await fetch(`${API_BASE}/api/admin/team`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/team`, {
       credentials: 'include'
     });
     
@@ -1610,7 +1609,7 @@ async function saveTeamMember() {
   }
   
   try {
-    const url = id ? `${API_BASE}/api/admin/team/${id}` : `${API_BASE}/api/admin/team`;
+    const url = id ? `${window.API_BASE}/api/admin/team/${id}` : `${window.API_BASE}/api/admin/team`;
     const method = id ? 'PUT' : 'POST';
     
     const response = await fetch(url, {
@@ -1635,7 +1634,7 @@ async function deleteTeamMember(memberId) {
   if (!confirm('Delete this team member?')) return;
   
   try {
-    const response = await fetch(`${API_BASE}/api/admin/team/${memberId}`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/team/${memberId}`, {
       method: 'DELETE',
       credentials: 'include'
     });
@@ -1678,7 +1677,7 @@ async function saveContent(section) {
   }
   
   try {
-    const response = await fetch(`${API_BASE}/api/admin/content`, {
+    const response = await fetch(`${window.API_BASE}/api/admin/content`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
