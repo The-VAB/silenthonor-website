@@ -1,5 +1,8 @@
 {
   "cleanUrls": false,
   "trailingSlash": false,
-  "directoryListing": false
+  "directoryListing": false,
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" }
+  ]
 }
