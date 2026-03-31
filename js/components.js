@@ -41,17 +41,7 @@ async function injectNav() {
   const navHTML = `
     <nav class="nav">
       <a href="index.html" class="nav-logo">
-        <div class="nav-logo-icon">
-          <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="19,2 36,11 36,27 19,36 2,27 2,11" fill="#B91C1C" opacity="0.9"/>
-            <polygon points="19,6 32,13 32,25 19,32 6,25 6,13" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-            <text x="19" y="24" text-anchor="middle" fill="white" font-size="14" font-family="Georgia" font-weight="bold">★</text>
-          </svg>
-        </div>
-        <div class="nav-logo-text">
-          <span class="nav-logo-name">Silent Honor</span>
-          <span class="nav-logo-tag">Foundation</span>
-        </div>
+        <img src="https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/2vfeeiof_image.png" alt="Silent Honor Foundation" class="nav-logo-img">
       </a>
 
       <div class="nav-links" id="nav-links">
@@ -95,13 +85,7 @@ function injectFooter() {
       <div class="footer-inner">
         <div class="footer-brand">
           <div class="footer-logo">
-            <div class="footer-logo-icon">
-              <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" fill="#B91C1C" opacity="0.9"/>
-                <text x="16" y="20" text-anchor="middle" fill="white" font-size="12" font-family="Georgia" font-weight="bold">★</text>
-              </svg>
-            </div>
-            <span class="footer-logo-text">Silent Honor</span>
+            <img src="https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/2vfeeiof_image.png" alt="Silent Honor Foundation" class="footer-logo-img">
           </div>
           <p class="footer-mission">Empowering veterans with the financial education, credit counseling, and tools needed to build strong, self-sufficient futures.</p>
           <span class="footer-ein">501(c)(3) · EIN 99-3172064</span>
