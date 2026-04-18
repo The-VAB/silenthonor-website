@@ -9,7 +9,7 @@ const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7
 const GHL_PORTAL_URL = 'https://app.clientclub.net/login/1536RWoNvoGBX0aNtJE8';
 
 // Logo URL
-const LOGO_URL = 'https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/wdtk8u6d_Silent_Honor_Logo_16x9_transparent.png';
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/ejw735ko_a597f541-5826-493e-8e3d-af5702609fa5.tmp';
 
 // API Base URL - Use window variable to avoid conflicts
 window.API_BASE = window.location.origin;
