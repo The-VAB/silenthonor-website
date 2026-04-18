@@ -5,6 +5,9 @@
 // Zeffy donation link
 const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1';
 
+// GHL Member Portal URL
+const GHL_PORTAL_URL = 'https://app.clientclub.net/login/1536RWoNvoGBX0aNtJE8';
+
 // API Base URL - Use window variable to avoid conflicts
 window.API_BASE = window.location.origin;
 
@@ -15,28 +18,12 @@ function getCurrentPage() {
   return page;
 }
 
-// Check if user is logged in
-async function checkAuth() {
-  try {
-    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
-      credentials: 'include'
-    });
-    if (response.ok) {
-      return await response.json();
-    }
-    return null;
-  } catch (e) {
-    return null;
-  }
-}
-
 // Inject Navigation
 async function injectNav() {
   const placeholder = document.getElementById('nav-placeholder');
   if (!placeholder) return;
 
   const currentPage = getCurrentPage();
-  const user = await checkAuth();
 
   const navHTML = `
     <nav class="nav">
@@ -54,11 +41,7 @@ async function injectNav() {
 
       <div class="nav-actions">
         <a href="${ZEFFY_DONATION_URL}" target="_blank" class="nav-donate">Donate</a>
-        ${user ? `
-          <a href="dashboard.html" class="btn-primary" style="padding: 10px 20px; font-size: 0.68rem;">Dashboard</a>
-        ` : `
-          <a href="login.html" class="btn-outline" style="padding: 10px 20px; font-size: 0.68rem;">Member Login</a>
-        `}
+        <a href="${GHL_PORTAL_URL}" target="_blank" class="btn-outline" style="padding: 10px 20px; font-size: 0.68rem;">Member Portal</a>
         <button class="nav-mobile-toggle" onclick="toggleMobileNav()">☰</button>
       </div>
     </nav>
@@ -114,9 +97,8 @@ function injectFooter() {
         <div class="footer-col">
           <h4 class="footer-col-title">Members</h4>
           <div class="footer-links">
-            <a href="login.html" class="footer-link">Member Login</a>
-            <a href="signup.html" class="footer-link">Join Free</a>
-            <a href="dashboard.html" class="footer-link">Dashboard</a>
+            <a href="${GHL_PORTAL_URL}" target="_blank" class="footer-link">Member Portal</a>
+            <a href="${GHL_PORTAL_URL}" target="_blank" class="footer-link">Access Courses</a>
           </div>
         </div>
       </div>

@@ -242,76 +242,29 @@
       <div class="reveal">
         <div class="section-tag">Send a Message</div>
         <h2 class="section-title" style="margin-bottom: 2rem;">Get in Touch</h2>
-        <form class="contact-form" onsubmit="return false;">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">First Name</label>
-              <input type="text" class="form-input" placeholder="John">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Last Name</label>
-              <input type="text" class="form-input" placeholder="Smith">
-            </div>
+        
+        <!-- GHL Contact Form Embed -->
+        <div class="ghl-form-container" style="background: var(--navy-mid); border: 1px solid var(--border); padding: 2rem; min-height: 500px;">
+          <!-- 
+          TO EMBED YOUR GHL CONTACT FORM:
+          1. Go to your GHL account > Sites > Forms
+          2. Create or select your contact form
+          3. Click "Integrate" and copy the embed code
+          4. Replace this placeholder with your embed code
+          
+          Example:
+          <iframe src="https://api.leadconnectorhq.com/widget/form/YOUR_FORM_ID" style="width:100%;height:700px;border:none;"></iframe>
+          -->
+          
+          <div style="text-align: center; padding: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">📬</div>
+            <div style="font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem;">Contact Form</div>
+            <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+              Our contact form is being set up. In the meantime, please reach out to us directly.
+            </p>
+            <a href="mailto:info@silenthonor.org" class="btn-primary" data-testid="contact-email-btn">Email Us Directly →</a>
           </div>
-          <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" class="form-input" placeholder="john@email.com">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Branch of Service</label>
-              <select class="form-select">
-                <option value="" disabled selected>Select branch</option>
-                <option>Army</option>
-                <option>Navy</option>
-                <option>Air Force</option>
-                <option>Marine Corps</option>
-                <option>Coast Guard</option>
-                <option>Space Force</option>
-                <option>National Guard</option>
-                <option>Reserve</option>
-                <option>Family Member / Spouse</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Status</label>
-              <select class="form-select">
-                <option value="" disabled selected>Select status</option>
-                <option>Veteran</option>
-                <option>Active Duty</option>
-                <option>Reserve / Guard</option>
-                <option>Retired</option>
-                <option>Surviving Spouse</option>
-                <option>Family Member</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">I'm Reaching Out About</label>
-            <select class="form-select">
-              <option value="" disabled selected>Select a topic</option>
-              <option>Credit Review &amp; Education</option>
-              <option>Financial Coaching</option>
-              <option>Debt Management</option>
-              <option>VA Loan / Closing Cost Assistance</option>
-              <option>VA Disability Support</option>
-              <option>Course Question</option>
-              <option>Partnership / Collaboration</option>
-              <option>Donation / Giving</option>
-              <option>Board / Volunteer Inquiry</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tell Us What's Going On</label>
-            <textarea class="form-textarea" placeholder="Give us a quick rundown of your situation — the more context you share, the better we can help. There's no judgment here."></textarea>
-          </div>
-          <div class="form-check">
-            <input type="checkbox" id="consent">
-            <label class="form-check-label" for="consent">I understand that Silent Honor Foundation is a nonprofit organization providing financial education and coaching services. All information shared is kept confidential and used solely to provide assistance.</label>
-          </div>
-          <button type="submit" class="btn-primary" style="width: fit-content;">Send Message →</button>
-        </form>
+        </div>
       </div>
 
       <!-- CONTACT INFO -->
