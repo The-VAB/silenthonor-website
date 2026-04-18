@@ -21,7 +21,7 @@
   background: rgba(17, 24, 39, 0.95);
   border: 1px solid rgba(255,255,255,0.06);
   padding: 3rem;
-  max-width: 480px;
+  max-width: 420px;
   width: 100%;
 }
 
@@ -38,7 +38,7 @@
 
 .login-title {
   font-family: 'Oswald', sans-serif;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 700;
   text-transform: uppercase;
   text-align: center;
@@ -47,96 +47,104 @@
 
 .login-subtitle {
   font-family: 'Lora', serif;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-style: italic;
   color: var(--muted);
   text-align: center;
   margin-bottom: 2rem;
-  line-height: 1.6;
 }
 
-.login-divider {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 1.5rem 0;
+.form-group {
+  margin-bottom: 1.25rem;
 }
 
-.login-divider::before,
-.login-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-.login-divider span {
+.form-label {
+  display: block;
   font-family: 'Oswald', sans-serif;
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
+  margin-bottom: 0.5rem;
 }
 
-.ghl-login-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+.form-input {
+  width: 100%;
+  background: var(--navy);
+  border: 1px solid var(--border);
+  color: var(--white);
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--red);
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.login-btn {
   width: 100%;
   background: var(--red);
   color: var(--white);
   font-family: 'Oswald', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  padding: 18px 28px;
+  padding: 1rem;
   border: none;
-  border-radius: 2px;
   cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
+  transition: background 0.2s;
+  margin-top: 0.5rem;
 }
 
-.ghl-login-btn:hover {
+.login-btn:hover {
   background: var(--red-light);
-  transform: translateY(-1px);
 }
 
-.ghl-login-btn svg {
-  width: 20px;
-  height: 20px;
+.login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
-.login-info {
-  background: rgba(185, 28, 28, 0.08);
-  border: 1px solid rgba(185, 28, 28, 0.2);
-  border-left: 3px solid var(--red);
-  padding: 1rem 1.2rem;
-  margin-top: 1.5rem;
-}
-
-.login-info-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+.error-msg {
+  background: rgba(185, 28, 28, 0.1);
+  border: 1px solid rgba(185, 28, 28, 0.3);
   color: var(--red-light);
-  margin-bottom: 0.4rem;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  display: none;
 }
 
-.login-info-text {
-  font-size: 0.85rem;
-  color: var(--muted);
-  line-height: 1.5;
+.error-msg.show {
+  display: block;
 }
 
 .login-footer {
   text-align: center;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
 }
@@ -149,17 +157,22 @@
 .login-footer-link {
   color: var(--red-light);
   text-decoration: none;
-  font-weight: 500;
 }
 
 .login-footer-link:hover {
   text-decoration: underline;
 }
 
-@media (max-width: 640px) {
-  .login-card {
-    padding: 2rem 1.5rem;
-  }
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+.forgot-link:hover {
+  color: var(--white);
 }
 </style>
 </head>
@@ -173,26 +186,30 @@
       <img src="https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/ejw735ko_a597f541-5826-493e-8e3d-af5702609fa5.tmp" alt="Silent Honor Foundation">
     </div>
     
-    <h1 class="login-title">Member Portal</h1>
-    <p class="login-subtitle">Access your courses, track your progress, and connect with the Silent Honor community.</p>
+    <h1 class="login-title">Member Login</h1>
+    <p class="login-subtitle">Access your dashboard, courses, and resources.</p>
 
-    <a href="https://app.clientclub.net/login/1536RWoNvoGBX0aNtJE8" target="_blank" class="ghl-login-btn" data-testid="member-login-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-        <polyline points="10 17 15 12 10 7"/>
-        <line x1="15" y1="12" x2="3" y2="12"/>
-      </svg>
-      Access Member Portal
-    </a>
+    <div class="error-msg" id="error-msg"></div>
 
-    <div class="login-info">
-      <div class="login-info-title">First Time Here?</div>
-      <div class="login-info-text">If you haven't created an account yet, you'll be able to sign up through the member portal. It's free for all verified veterans.</div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" id="login-email" class="form-input" placeholder="you@email.com" data-testid="login-email">
     </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="login-password" class="form-input" placeholder="Your password" data-testid="login-password">
+        <button class="password-toggle" onclick="togglePassword()">Show</button>
+      </div>
+      <a href="#" class="forgot-link">Forgot password?</a>
+    </div>
+
+    <button class="login-btn" onclick="handleLogin()" data-testid="login-submit-btn">Sign In →</button>
 
     <div class="login-footer">
       <p class="login-footer-text">
-        Need help? <a href="contact.html" class="login-footer-link">Contact Support</a>
+        Don't have an account? <a href="signup.html" class="login-footer-link">Join free</a>
       </p>
     </div>
   </div>
@@ -202,5 +219,86 @@
 
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
+<script>
+function togglePassword() {
+  const input = document.getElementById('login-password');
+  const btn = document.querySelector('.password-toggle');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = 'Hide';
+  } else {
+    input.type = 'password';
+    btn.textContent = 'Show';
+  }
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-password').value;
+  const errorEl = document.getElementById('error-msg');
+  
+  if (!email || !pass) {
+    errorEl.textContent = 'Please enter both email and password.';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  const loginBtn = document.querySelector('.login-btn');
+  loginBtn.textContent = 'Signing In...';
+  loginBtn.disabled = true;
+
+  try {
+    const response = await fetch(`${window.API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, password: pass })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem('sh_user', JSON.stringify(data));
+      
+      if (data.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    } else {
+      errorEl.textContent = data.detail || 'Invalid email or password.';
+      errorEl.classList.add('show');
+      loginBtn.textContent = 'Sign In →';
+      loginBtn.disabled = false;
+    }
+  } catch (err) {
+    errorEl.textContent = 'Connection error. Please try again.';
+    errorEl.classList.add('show');
+    loginBtn.textContent = 'Sign In →';
+    loginBtn.disabled = false;
+  }
+}
+
+// Check if already logged in
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
+      credentials: 'include'
+    });
+    if (response.ok) {
+      const user = await response.json();
+      if (user.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    }
+  } catch (e) {}
+});
+
+document.getElementById('login-password').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') handleLogin();
+});
+</script>
 </body>
 </html>
