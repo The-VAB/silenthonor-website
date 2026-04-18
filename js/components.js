@@ -8,6 +8,9 @@ const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7
 // GHL Member Portal URL
 const GHL_PORTAL_URL = 'https://app.clientclub.net/login/1536RWoNvoGBX0aNtJE8';
 
+// Logo URL
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/wdtk8u6d_Silent_Honor_Logo_16x9_transparent.png';
+
 // API Base URL - Use window variable to avoid conflicts
 window.API_BASE = window.location.origin;
 
@@ -28,7 +31,7 @@ async function injectNav() {
   const navHTML = `
     <nav class="nav">
       <a href="index.html" class="nav-logo">
-        <img src="https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/2vfeeiof_image.png" alt="Silent Honor Foundation" class="nav-logo-img">
+        <img src="${LOGO_URL}" alt="Silent Honor Foundation" class="nav-logo-img">
       </a>
 
       <div class="nav-links" id="nav-links">
@@ -68,7 +71,7 @@ function injectFooter() {
       <div class="footer-inner">
         <div class="footer-brand">
           <div class="footer-logo">
-            <img src="https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/2vfeeiof_image.png" alt="Silent Honor Foundation" class="footer-logo-img">
+            <img src="${LOGO_URL}" alt="Silent Honor Foundation" class="footer-logo-img">
           </div>
           <p class="footer-mission">Empowering veterans with the financial education, credit counseling, and tools needed to build strong, self-sufficient futures.</p>
           <span class="footer-ein">501(c)(3) · EIN 99-3172064</span>
