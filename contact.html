@@ -243,28 +243,55 @@
         <div class="section-tag">Send a Message</div>
         <h2 class="section-title" style="margin-bottom: 2rem;">Get in Touch</h2>
         
-        <!-- GHL Contact Form Embed -->
-        <div class="ghl-form-container" style="background: var(--navy-mid); border: 1px solid var(--border); padding: 2rem; min-height: 500px;">
-          <!-- 
-          TO EMBED YOUR GHL CONTACT FORM:
-          1. Go to your GHL account > Sites > Forms
-          2. Create or select your contact form
-          3. Click "Integrate" and copy the embed code
-          4. Replace this placeholder with your embed code
-          
-          Example:
-          <iframe src="https://api.leadconnectorhq.com/widget/form/YOUR_FORM_ID" style="width:100%;height:700px;border:none;"></iframe>
-          -->
-          
-          <div style="text-align: center; padding: 2rem;">
-            <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">📬</div>
-            <div style="font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem;">Contact Form</div>
-            <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1.5rem; max-width: 400px; margin-left: auto; margin-right: auto;">
-              Our contact form is being set up. In the meantime, please reach out to us directly.
-            </p>
-            <a href="mailto:info@silenthonor.org" class="btn-primary" data-testid="contact-email-btn">Email Us Directly →</a>
+        <form class="contact-form" id="contactForm" data-testid="contact-form">
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">First Name *</label>
+              <input type="text" class="form-input" required data-testid="contact-first-name" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Last Name</label>
+              <input type="text" class="form-input" data-testid="contact-last-name" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+            </div>
           </div>
-        </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Email *</label>
+            <input type="email" class="form-input" required data-testid="contact-email" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+          </div>
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+            <div class="form-group">
+              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Branch</label>
+              <select class="form-select" data-testid="contact-branch" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+                <option value="">Select</option>
+                <option>Army</option><option>Navy</option><option>Air Force</option>
+                <option>Marine Corps</option><option>Coast Guard</option><option>Space Force</option>
+                <option>National Guard</option><option>Reserve</option><option>Family Member</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Status</label>
+              <select class="form-select" data-testid="contact-status" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+                <option value="">Select</option>
+                <option>Active Duty</option><option>Veteran</option>
+                <option>Retired</option><option>Family</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Topic</label>
+              <select class="form-select" data-testid="contact-topic" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+                <option value="">Select</option>
+                <option>General Question</option><option>Credit Help</option>
+                <option>Financial Coaching</option><option>VA Loan</option>
+                <option>Courses</option><option>Partnership / Donation</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Message *</label>
+            <textarea class="form-textarea" required data-testid="contact-message" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem; min-height: 140px; font-family: inherit; resize: vertical;"></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="margin-top: 1.5rem; width: 100%;" data-testid="contact-submit-btn">Send Message →</button>
+        </form>
       </div>
 
       <!-- CONTACT INFO -->
@@ -374,25 +401,25 @@
     });
   });
 
-  document.querySelector('.contact-form').addEventListener('submit', async (e) => {
+  document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    
+
     const formData = {
-      first_name: form.querySelectorAll('.form-input')[0]?.value || '',
-      last_name: form.querySelectorAll('.form-input')[1]?.value || '',
-      email: form.querySelectorAll('.form-input')[2]?.value || '',
-      branch: form.querySelectorAll('.form-select')[0]?.value || '',
-      status: form.querySelectorAll('.form-select')[1]?.value || '',
-      topic: form.querySelectorAll('.form-select')[2]?.value || '',
-      message: form.querySelector('.form-textarea')?.value || ''
+      first_name: form.querySelector('[data-testid="contact-first-name"]').value,
+      last_name: form.querySelector('[data-testid="contact-last-name"]').value,
+      email: form.querySelector('[data-testid="contact-email"]').value,
+      branch: form.querySelector('[data-testid="contact-branch"]').value,
+      status: form.querySelector('[data-testid="contact-status"]').value,
+      topic: form.querySelector('[data-testid="contact-topic"]').value,
+      message: form.querySelector('[data-testid="contact-message"]').value
     };
 
     if (!formData.first_name || !formData.email || !formData.message) {
-      window.SilentHonorUtils?.showToast('Please fill in required fields.', 'error');
+      alert('Please fill in required fields (First Name, Email, Message).');
       return;
     }
 
@@ -407,14 +434,14 @@
       });
 
       if (response.ok) {
-        window.SilentHonorUtils?.showToast('Message sent! We\'ll be in touch within 2-3 business days.', 'success');
+        alert("Message sent! We'll be in touch within 2-3 business days.");
         form.reset();
       } else {
         const data = await response.json();
-        window.SilentHonorUtils?.showToast(data.detail || 'Failed to send. Please try again.', 'error');
+        alert(data.detail || 'Failed to send. Please try again.');
       }
     } catch (err) {
-      window.SilentHonorUtils?.showToast('Connection error. Please try again.', 'error');
+      alert('Connection error. Please try again.');
     }
 
     submitBtn.textContent = originalText;

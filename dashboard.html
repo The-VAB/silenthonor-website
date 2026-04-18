@@ -6,106 +6,419 @@
 <title>Member Dashboard — Silent Honor Foundation</title>
 <link rel="stylesheet" href="css/global.css">
 <style>
-.redirect-wrapper {
+.dash-wrapper {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  padding: 120px 3.5rem 4rem;
   position: relative;
   z-index: 1;
+  max-width: 1300px;
+  margin: 0 auto;
 }
 
-.redirect-card {
-  background: rgba(17, 24, 39, 0.95);
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 3rem;
-  max-width: 500px;
-  width: 100%;
-  text-align: center;
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.redirect-logo {
-  margin-bottom: 2rem;
-}
-
-.redirect-logo img {
-  height: 80px;
-  width: auto;
-}
-
-.redirect-title {
+.dash-greeting {
   font-family: 'Oswald', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
 }
 
-.redirect-text {
+.dash-greeting em {
+  font-style: normal;
+  color: var(--red-light);
+}
+
+.dash-sub {
   font-family: 'Lora', serif;
-  font-size: 0.95rem;
+  font-style: italic;
   color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 2rem;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
 }
 
-.redirect-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--border);
-  border-top-color: var(--red);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 1.5rem;
+.logout-btn {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 0.55rem 1.2rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.logout-btn:hover {
+  color: var(--white);
+  border-color: var(--red);
 }
 
-.redirect-manual {
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .dash-grid { grid-template-columns: 1fr; }
+  .dash-wrapper { padding: 100px 1.5rem 3rem; }
+}
+
+.dash-card {
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 2rem;
+}
+
+.dash-card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Profile block */
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem 0;
+  font-size: 0.9rem;
+  border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+
+.profile-row:last-child { border-bottom: none; }
+
+.profile-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.profile-value { color: var(--white); font-weight: 500; }
+
+/* Status */
+.status-badge {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.8rem;
+  font-weight: 600;
+}
+
+.status-verified { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+.status-pending { background: rgba(201, 149, 42, 0.12); color: var(--gold-light); border: 1px solid rgba(201, 149, 42, 0.3); }
+.status-rejected { background: rgba(185, 28, 28, 0.12); color: var(--red-light); border: 1px solid rgba(185, 28, 28, 0.3); }
+
+/* DD-214 Upload */
+.upload-zone {
+  border: 2px dashed var(--border);
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.upload-zone:hover { border-color: var(--red); background: rgba(185, 28, 28, 0.04); }
+.upload-zone.dragging { border-color: var(--red); background: rgba(185, 28, 28, 0.08); }
+
+.upload-icon {
+  font-size: 1.8rem;
+  opacity: 0.5;
+  margin-bottom: 0.75rem;
+}
+
+.upload-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.upload-hint { font-size: 0.75rem; color: var(--muted); }
+
+/* Courses */
+.course-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.05);
+}
+
+.course-item:last-child { border-bottom: none; }
+
+.course-name { font-family: 'Oswald', sans-serif; font-size: 0.88rem; font-weight: 500; }
+.course-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+.progress-bar {
+  width: 100px;
+  height: 4px;
+  background: var(--border);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--red);
+  transition: width 0.3s;
+}
+
+.alert-box {
+  background: rgba(201, 149, 42, 0.08);
+  border-left: 3px solid var(--gold);
+  padding: 1rem 1.25rem;
   font-size: 0.85rem;
   color: var(--muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
 }
 
-.redirect-manual a {
-  color: var(--red-light);
-  text-decoration: none;
-}
-
-.redirect-manual a:hover {
-  text-decoration: underline;
-}
+.alert-box strong { color: var(--white); }
 </style>
 </head>
 <body>
 <div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
 
-<div class="redirect-wrapper">
-  <div class="redirect-card">
-    <div class="redirect-logo">
-      <img src="https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/ejw735ko_a597f541-5826-493e-8e3d-af5702609fa5.tmp" alt="Silent Honor Foundation">
+<div class="dash-wrapper page-content">
+  <div class="dash-header">
+    <div>
+      <div class="dash-greeting">Welcome, <em id="user-name">Member</em></div>
+      <div class="dash-sub" id="user-email">Loading...</div>
     </div>
-    
-    <div class="redirect-spinner"></div>
-    
-    <h1 class="redirect-title">Redirecting to Member Portal</h1>
-    <p class="redirect-text">Taking you to your member dashboard where you can access courses, track progress, and connect with the community.</p>
-    
-    <p class="redirect-manual">
-      Not redirecting? <a href="https://app.clientclub.net/login/1536RWoNvoGBX0aNtJE8" target="_blank" id="manual-link">Click here to go manually</a>
-    </p>
+    <button class="logout-btn" onclick="handleLogout()" data-testid="logout-btn">Sign Out</button>
+  </div>
+
+  <div id="verification-alert" class="alert-box" style="display:none;" data-testid="verification-alert">
+    <strong>Verification pending.</strong> Upload your DD-214 below to complete membership verification and unlock full course access.
+  </div>
+
+  <div class="dash-grid">
+    <!-- LEFT: Profile + DD-214 -->
+    <div>
+      <div class="dash-card" style="margin-bottom: 2rem;" data-testid="profile-card">
+        <div class="dash-card-title">Your Profile</div>
+        <div class="profile-row"><span class="profile-label">Name</span><span class="profile-value" id="p-name">—</span></div>
+        <div class="profile-row"><span class="profile-label">Email</span><span class="profile-value" id="p-email">—</span></div>
+        <div class="profile-row"><span class="profile-label">Branch</span><span class="profile-value" id="p-branch">—</span></div>
+        <div class="profile-row"><span class="profile-label">Status</span><span class="profile-value" id="p-status">—</span></div>
+        <div class="profile-row"><span class="profile-label">Verification</span><span class="profile-value"><span id="p-verified" class="status-badge status-pending">Pending</span></span></div>
+      </div>
+
+      <div class="dash-card" data-testid="dd214-card">
+        <div class="dash-card-title">DD-214 Verification</div>
+        <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem;">
+          Upload your DD-214 (member copy) to verify veteran status. Accepted: PDF, JPG, PNG (max 10MB).
+        </p>
+        <div id="dd214-status-display" style="margin-top: 1rem;"></div>
+
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('dd214-file').click()" data-testid="dd214-upload-zone">
+          <div class="upload-icon">↑</div>
+          <div class="upload-text">Click or drop DD-214</div>
+          <div class="upload-hint">PDF, JPG, PNG · 10MB max</div>
+        </div>
+        <input type="file" id="dd214-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="handleFileSelect(event)" data-testid="dd214-file-input">
+        <div id="upload-progress" style="display:none; margin-top: 1rem; font-size: 0.85rem; color: var(--gold-light);">Uploading...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Courses -->
+    <div>
+      <div class="dash-card" data-testid="courses-card">
+        <div class="dash-card-title">Your Courses</div>
+        <div id="courses-list">
+          <div style="padding: 1rem 0; font-size: 0.85rem; color: var(--muted);">Loading courses...</div>
+        </div>
+      </div>
+
+      <div class="dash-card" style="margin-top: 2rem;">
+        <div class="dash-card-title">Quick Links</div>
+        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+          <a href="courses.html" style="color: var(--red-light); text-decoration: none; font-size: 0.9rem;" data-testid="link-courses">→ Browse all courses</a>
+          <a href="services.html" style="color: var(--red-light); text-decoration: none; font-size: 0.9rem;" data-testid="link-services">→ Services and coaching</a>
+          <a href="contact.html" style="color: var(--red-light); text-decoration: none; font-size: 0.9rem;" data-testid="link-contact">→ Contact support</a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+<div id="footer-placeholder"></div>
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-// Redirect to GHL member portal after short delay
-setTimeout(function() {
-  window.location.href = 'https://app.clientclub.net/login/1536RWoNvoGBX0aNtJE8';
-}, 2000);
+let currentUser = null;
+
+async function loadUser() {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/auth/me`, { credentials: 'include' });
+    if (!res.ok) {
+      window.location.href = 'login.html';
+      return;
+    }
+    currentUser = await res.json();
+
+    if (currentUser.role === 'admin') {
+      window.location.href = 'admin.html';
+      return;
+    }
+
+    // Populate profile
+    const fullName = `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || 'Member';
+    document.getElementById('user-name').textContent = fullName;
+    document.getElementById('user-email').textContent = currentUser.email;
+    document.getElementById('p-name').textContent = fullName;
+    document.getElementById('p-email').textContent = currentUser.email;
+    document.getElementById('p-branch').textContent = currentUser.branch || '—';
+    document.getElementById('p-status').textContent = currentUser.service_status || '—';
+
+    const verifiedEl = document.getElementById('p-verified');
+    if (currentUser.verified) {
+      verifiedEl.textContent = 'Verified';
+      verifiedEl.className = 'status-badge status-verified';
+    } else {
+      verifiedEl.textContent = currentUser.dd214_status === 'pending_review' ? 'In Review' : 'Pending';
+      verifiedEl.className = 'status-badge status-pending';
+      document.getElementById('verification-alert').style.display = 'block';
+    }
+
+    // DD-214 status
+    const dd214Status = document.getElementById('dd214-status-display');
+    if (currentUser.dd214_file) {
+      const labelMap = {
+        'pending_review': { text: 'Under Review', cls: 'status-pending' },
+        'verified': { text: 'Verified', cls: 'status-verified' },
+        'rejected': { text: 'Rejected — please re-upload', cls: 'status-rejected' }
+      };
+      const info = labelMap[currentUser.dd214_status] || { text: 'Submitted', cls: 'status-pending' };
+      dd214Status.innerHTML = `<span class="status-badge ${info.cls}">${info.text}</span>`;
+    } else {
+      dd214Status.innerHTML = `<span class="status-badge status-pending">Not uploaded</span>`;
+    }
+
+    loadCourses();
+  } catch (err) {
+    window.location.href = 'login.html';
+  }
+}
+
+async function loadCourses() {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/member/courses`, { credentials: 'include' });
+    const courses = await res.json();
+    const list = document.getElementById('courses-list');
+    if (!courses.length) {
+      list.innerHTML = '<div style="padding: 1rem 0; font-size: 0.85rem; color: var(--muted);">No courses available yet.</div>';
+      return;
+    }
+    list.innerHTML = courses.map(c => `
+      <div class="course-item" data-testid="course-${c.id}">
+        <div style="flex: 1;">
+          <div class="course-name">${c.title}</div>
+          <div class="course-meta">${c.total_lessons} lessons · ${c.status === 'live' ? 'Available' : 'Coming soon'}</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="progress-bar"><div class="progress-fill" style="width: ${c.progress}%;"></div></div>
+          <span style="font-size: 0.75rem; color: var(--muted); min-width: 40px; text-align: right;">${c.progress}%</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    document.getElementById('courses-list').innerHTML = '<div style="padding: 1rem 0; font-size: 0.85rem; color: var(--red-light);">Failed to load courses.</div>';
+  }
+}
+
+async function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 10 * 1024 * 1024) {
+    alert('File too large. Maximum 10MB.');
+    return;
+  }
+
+  const progress = document.getElementById('upload-progress');
+  progress.style.display = 'block';
+  progress.textContent = 'Uploading...';
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch(`${window.API_BASE}/api/upload/dd214`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    });
+
+    if (res.ok) {
+      progress.style.color = '#4ade80';
+      progress.textContent = 'Upload successful. Your DD-214 is now under review.';
+      setTimeout(() => loadUser(), 1500);
+    } else {
+      const data = await res.json();
+      progress.style.color = 'var(--red-light)';
+      progress.textContent = data.detail || 'Upload failed.';
+    }
+  } catch (err) {
+    progress.style.color = 'var(--red-light)';
+    progress.textContent = 'Connection error. Please try again.';
+  }
+}
+
+async function handleLogout() {
+  try {
+    await fetch(`${window.API_BASE}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (e) {}
+  localStorage.removeItem('sh_user');
+  window.location.href = 'index.html';
+}
+
+// Drag and drop
+document.addEventListener('DOMContentLoaded', () => {
+  loadUser();
+
+  const zone = document.getElementById('upload-zone');
+  if (zone) {
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragging'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('dragging');
+      if (e.dataTransfer.files.length) {
+        document.getElementById('dd214-file').files = e.dataTransfer.files;
+        handleFileSelect({ target: { files: e.dataTransfer.files } });
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>

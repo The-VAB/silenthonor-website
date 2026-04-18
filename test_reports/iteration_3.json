@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-01-18T21:20:00Z",
+  "summary": "Post-GHL revert verification: 26/26 backend pytest tests and all key frontend UI flows pass. Admin login→admin.html, signup→dashboard.html, DD-214 upload, admin CRUD, contact form, and GHL cleanup all verified.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "GET /api/health",
+    "POST /api/auth/login (admin) — 200, cookie set, role=admin",
+    "POST /api/auth/login (invalid) — 401",
+    "POST /api/auth/register — 200, access_token cookie set, role=member",
+    "POST /api/auth/login (member) — 200",
+    "POST /api/auth/logout — 200, /api/auth/me then 401",
+    "POST /api/contact — 200",
+    "GET /api/admin/stats — 200 with total_members/verified_members/pending_verification/total_contacts/total_courses",
+    "GET /api/admin/members — 200, no _id leak, id present",
+    "GET /api/admin/contacts — 200",
+    "Admin-only guards: anon→401, member→403",
+    "POST/GET/PUT/DELETE /api/admin/courses — full CRUD",
+    "POST /api/upload/dd214 (PDF) — 200, member dd214_status=pending_review after upload",
+    "POST /api/upload/dd214 (text/plain) — 400",
+    "POST /api/admin/members/{id}/verify — 200, persists verified=true & dd214_status=verified",
+    "GET /api/member/courses — 200 with 4 courses and progress fields",
+    "Static HTML: /index.html /login.html /signup.html /dashboard.html /admin.html /contact.html /courses.html — all 200",
+    "UI: admin login at /login.html redirects to /admin.html; nav shows 'ADMIN' button",
+    "UI: Admin portal renders 5 stat cards (12/1/0/1/6) and 5 tabs (Overview, Members, DD-214 Review, Courses, Contacts)",
+    "UI: Signup at /signup.html redirects to /dashboard.html with profile (name, email, branch Army, status Veteran, verification Pending)",
+    "UI: Dashboard shows DD-214 upload zone + 4 courses with progress bars",
+    "UI: Logout from dashboard redirects to /index.html",
+    "UI: Contact form submits successfully, shows success toast ('we'll be in touch...'), email field cleared (form reset)",
+    "UI: /courses.html contains zero gohighlevel/clientclub/leadconnector references; Sign In buttons link to /login.html",
+    "GHL cleanup: grep across /app/*.html and /app/js/*.js returns no matches for gohighlevel|clientclub|leadconnector|ghl"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_silent_honor.py",
+    "/app/test_reports/pytest/silent_honor_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py: CORS allow_origins=['*'] combined with allow_credentials=True is not spec-compliant and browsers will reject credentialed requests from cross-origin callers. Works here only because frontend and API share origin via ingress. Consider restricting to FRONTEND_URL.",
+    "server.py (seed_admin): writes plaintext admin password to /app/memory/test_credentials.md on every startup — fine for preview, but DO NOT ship to production.",
+    "server.py: cookies set with secure=False. Acceptable for preview (ingress handles TLS), but production should use secure=True + samesite='none' if cross-site.",
+    "server.py: JWT_SECRET has a fallback 'default_secret_change_me' — ensure .env provides JWT_SECRET in production.",
+    "server.py (/{page}.html catch-all): can expose arbitrary .html files in /app. Low risk but worth whitelisting.",
+    "server.py is ~930 lines in one file — exceeds the 700-line guideline. Split into routers (auth, admin, member, cms)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_silent_honor.py (new)",
+    "/app/test_reports/pytest/silent_honor_results.xml (generated)",
+    "/app/test_reports/iteration_3.json (new)"
+  ],
+  "success_rate": {"backend": "100% (26/26)", "frontend": "100% (all critical flows)"},
+  "test_credentials": "Admin admin@silenthonor.org / SilentHonor2024! (verified). Member accounts created dynamically in tests with TEST_ui_<hex>@example.com / UiTest!2345 and TEST_member_<hex>@example.com / MemberPass!234.",
+  "seed_data_creation": "Tests create ephemeral TEST_-prefixed members, contact submissions, and a TEST_PytestCourse that is deleted at end. One UI-signup member remains per run with verification=pending; safe to purge.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run `pytest backend/tests/test_silent_honor.py` from /app for regression. Note pydantic EmailStr rejects .test/.local TLDs — always use example.com. Browser automation occasionally retries navigation on first load; the actual login.html selectors are data-testid='login-email', 'login-password', 'login-submit-btn'. The non-API frontend is reached at the same preview host (ingress routes /api → 8001, everything else → 3000 or backend static-file handler; both serve /app/*.html identically).",
+  "rca of the issue": "N/A — no bugs found. All flows listed in the review request work end-to-end after the GHL→custom-backend revert."
+}

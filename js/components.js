@@ -5,13 +5,10 @@
 // Zeffy donation link
 const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1';
 
-// GHL Member Portal URL
-const GHL_PORTAL_URL = 'https://app.clientclub.net/login/1536RWoNvoGBX0aNtJE8';
-
 // Logo URL
 const LOGO_URL = 'https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/ejw735ko_a597f541-5826-493e-8e3d-af5702609fa5.tmp';
 
-// API Base URL - Use window variable to avoid conflicts
+// API Base URL
 window.API_BASE = window.location.origin;
 
 // Current page detection
@@ -21,6 +18,19 @@ function getCurrentPage() {
   return page;
 }
 
+// Check auth state (used by protected pages)
+async function checkAuth() {
+  try {
+    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
+      credentials: 'include'
+    });
+    if (response.ok) return await response.json();
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
 // Inject Navigation
 async function injectNav() {
   const placeholder = document.getElementById('nav-placeholder');
@@ -28,24 +38,33 @@ async function injectNav() {
 
   const currentPage = getCurrentPage();
 
+  // Determine member link based on auth state
+  const user = await checkAuth();
+  let memberLinkHref = 'login.html';
+  let memberLinkText = 'Member Login';
+  if (user) {
+    memberLinkHref = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+    memberLinkText = user.role === 'admin' ? 'Admin' : 'Dashboard';
+  }
+
   const navHTML = `
     <nav class="nav">
-      <a href="index.html" class="nav-logo">
+      <a href="index.html" class="nav-logo" data-testid="nav-logo">
         <img src="${LOGO_URL}" alt="Silent Honor Foundation" class="nav-logo-img">
       </a>
 
       <div class="nav-links" id="nav-links">
-        <a href="index.html" class="nav-link ${currentPage === 'index' ? 'active' : ''}">Home</a>
-        <a href="about.html" class="nav-link ${currentPage === 'about' ? 'active' : ''}">About</a>
-        <a href="services.html" class="nav-link ${currentPage === 'services' ? 'active' : ''}">Services</a>
-        <a href="courses.html" class="nav-link ${currentPage === 'courses' ? 'active' : ''}">Courses</a>
-        <a href="contact.html" class="nav-link ${currentPage === 'contact' ? 'active' : ''}">Contact</a>
+        <a href="index.html" class="nav-link ${currentPage === 'index' ? 'active' : ''}" data-testid="nav-home">Home</a>
+        <a href="about.html" class="nav-link ${currentPage === 'about' ? 'active' : ''}" data-testid="nav-about">About</a>
+        <a href="services.html" class="nav-link ${currentPage === 'services' ? 'active' : ''}" data-testid="nav-services">Services</a>
+        <a href="courses.html" class="nav-link ${currentPage === 'courses' ? 'active' : ''}" data-testid="nav-courses">Courses</a>
+        <a href="contact.html" class="nav-link ${currentPage === 'contact' ? 'active' : ''}" data-testid="nav-contact">Contact</a>
       </div>
 
       <div class="nav-actions">
-        <a href="${ZEFFY_DONATION_URL}" target="_blank" class="nav-donate">Donate</a>
-        <a href="${GHL_PORTAL_URL}" target="_blank" class="btn-outline" style="padding: 10px 20px; font-size: 0.68rem;">Member Portal</a>
-        <button class="nav-mobile-toggle" onclick="toggleMobileNav()">☰</button>
+        <a href="${ZEFFY_DONATION_URL}" target="_blank" class="nav-donate" data-testid="nav-donate-btn">Donate</a>
+        <a href="${memberLinkHref}" class="btn-outline" style="padding: 10px 20px; font-size: 0.68rem;" data-testid="nav-member-btn">${memberLinkText}</a>
+        <button class="nav-mobile-toggle" onclick="toggleMobileNav()" data-testid="nav-mobile-toggle">☰</button>
       </div>
     </nav>
   `;
@@ -100,8 +119,9 @@ function injectFooter() {
         <div class="footer-col">
           <h4 class="footer-col-title">Members</h4>
           <div class="footer-links">
-            <a href="${GHL_PORTAL_URL}" target="_blank" class="footer-link">Member Portal</a>
-            <a href="${GHL_PORTAL_URL}" target="_blank" class="footer-link">Access Courses</a>
+            <a href="login.html" class="footer-link">Member Login</a>
+            <a href="signup.html" class="footer-link">Become a Member</a>
+            <a href="dashboard.html" class="footer-link">Dashboard</a>
           </div>
         </div>
       </div>
@@ -127,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for use in other scripts
 window.SilentHonor = {
-  API_BASE,
+  get API_BASE() { return window.API_BASE; },
   ZEFFY_DONATION_URL,
   checkAuth,
   getCurrentPage
