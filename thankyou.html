@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Application Received — Silent Honor Foundation</title>
+<link rel="stylesheet" href="css/global.css">
+<style>
+.thankyou-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  padding-top: 100px;
+  position: relative;
+  z-index: 1;
+}
+
+.thankyou-card {
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 3.5rem;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.thankyou-logo {
+  margin-bottom: 2rem;
+}
+
+.thankyou-logo img {
+  height: 90px;
+  width: auto;
+}
+
+.thankyou-icon {
+  width: 80px;
+  height: 80px;
+  background: rgba(74, 222, 128, 0.1);
+  border: 2px solid rgba(74, 222, 128, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 2.5rem;
+}
+
+.thankyou-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  color: #4ade80;
+}
+
+.thankyou-subtitle {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--white);
+  margin-bottom: 1.5rem;
+}
+
+.thankyou-message {
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.thankyou-notice {
+  background: rgba(201, 149, 42, 0.08);
+  border: 1px solid rgba(201, 149, 42, 0.2);
+  border-left: 3px solid var(--gold);
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.thankyou-notice-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 0.4rem;
+}
+
+.thankyou-notice-text {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.thankyou-steps {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.thankyou-steps-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+.thankyou-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.thankyou-step:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.thankyou-step-num {
+  width: 28px;
+  height: 28px;
+  background: rgba(185, 28, 28, 0.15);
+  border: 1px solid rgba(185, 28, 28, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--red-light);
+  flex-shrink: 0;
+}
+
+.thankyou-step-text {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.thankyou-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.thankyou-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.thankyou-btn-primary {
+  background: var(--red);
+  color: var(--white);
+  border: none;
+}
+
+.thankyou-btn-primary:hover {
+  background: var(--red-light);
+}
+
+.thankyou-btn-outline {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.thankyou-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+@media (max-width: 640px) {
+  .thankyou-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .thankyou-actions {
+    flex-direction: column;
+  }
+  
+  .thankyou-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="thankyou-wrapper page-content">
+  <div class="thankyou-card">
+    <div class="thankyou-logo">
+      <img src="https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/2vfeeiof_image.png" alt="Silent Honor Foundation">
+    </div>
+    
+    <div class="thankyou-icon">✓</div>
+    
+    <h1 class="thankyou-title">Application Received</h1>
+    <p class="thankyou-subtitle">Thank You for Joining Silent Honor</p>
+    
+    <p class="thankyou-message">
+      We've received your membership application and are honored that you've chosen to be part of the Silent Honor community. Our team will review your application and be in touch soon.
+    </p>
+
+    <div class="thankyou-notice">
+      <div class="thankyou-notice-title">Please Note</div>
+      <div class="thankyou-notice-text">
+        Silent Honor Foundation is a 100% volunteer-run nonprofit organization. While we work hard to review every application as quickly as possible, please allow some time for our team to process your submission. We appreciate your patience and understanding.
+      </div>
+    </div>
+
+    <div class="thankyou-steps">
+      <div class="thankyou-steps-title">What Happens Next</div>
+      
+      <div class="thankyou-step">
+        <div class="thankyou-step-num">1</div>
+        <div class="thankyou-step-text">Our volunteer team will review your application and any documentation provided.</div>
+      </div>
+      
+      <div class="thankyou-step">
+        <div class="thankyou-step-num">2</div>
+        <div class="thankyou-step-text">You'll receive an email confirmation once your membership is approved.</div>
+      </div>
+      
+      <div class="thankyou-step">
+        <div class="thankyou-step-num">3</div>
+        <div class="thankyou-step-text">Once approved, you'll get full access to all courses, resources, and member benefits.</div>
+      </div>
+    </div>
+
+    <div class="thankyou-actions">
+      <a href="index.html" class="thankyou-btn thankyou-btn-primary">Return to Homepage</a>
+      <a href="courses.html" class="thankyou-btn thankyou-btn-outline">Browse Courses</a>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
