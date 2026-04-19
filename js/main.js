@@ -176,6 +176,15 @@ function animateCounters() {
   counters.forEach(el => observer.observe(el));
 }
 
+// ── INITIALIZE EVERYTHING ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildTopo();
+  initScrollReveal();
+  initNavScroll();
+  initSmoothScroll();
+  animateCounters();
+});
+
 // Rebuild topo on resize (debounced)
 let resizeTimer;
 window.addEventListener('resize', () => {

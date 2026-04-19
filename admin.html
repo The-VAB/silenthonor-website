@@ -497,9 +497,9 @@ async function loadMembers() {
           <td>${esc(m.email)}</td>
           <td>${esc(m.branch) || '—'}</td>
           <td><span class="status-badge ${m.verified ? 'status-verified' : m.dd214_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${esc(m.dd214_status) || 'pending'}</span></td>
-          <td><a href="${window.API_BASE}/api/admin/dd214/${encodeURIComponent(m.dd214_file)}" target="_blank" style="color: var(--red-light); font-size: 0.8rem;" data-testid="view-dd214-${esc(m.id)}">View</a></td>
+          <td><a href="${window.API_BASE}/api/admin/dd214/${encodeURIComponent(m.dd214_file)}" target="_blank" style="color: var(--red-light); font-size: 0.8rem;" data-testid="view-dd214-${m.id}">View</a></td>
           <td>
-            <button class="action-btn primary" onclick="openVerifyModal('${esc(m.id)}', '${esc(m.first_name)} ${esc(m.last_name)}', '${esc(m.email)}', '${encodeURIComponent(m.dd214_file)}')" data-testid="review-${esc(m.id)}">Review</button>
+            <button class="action-btn primary" onclick="openVerifyModal('${m.id}', '${esc(m.first_name)} ${esc(m.last_name)}', '${esc(m.email)}', '${encodeURIComponent(m.dd214_file)}')" data-testid="review-${m.id}">Review</button>
           </td>
         </tr>
       `).join('');
@@ -523,8 +523,8 @@ async function loadCourses() {
         <td><span class="status-badge ${c.status === 'live' ? 'status-verified' : 'status-pending'}">${esc(c.status)}</span></td>
         <td>${c.total_lessons}</td>
         <td>
-          <button class="action-btn" onclick='editCourse(${JSON.stringify(c).replace(/'/g, "&#39;")})' data-testid="edit-course-${esc(c.id)}">Edit</button>
-          <button class="action-btn danger" onclick="deleteCourse('${esc(c.id)}')" data-testid="delete-course-${esc(c.id)}">Delete</button>
+          <button class="action-btn" onclick='editCourse(${JSON.stringify(c).replace(/'/g, "&#39;")})' data-testid="edit-course-${c.id}">Edit</button>
+          <button class="action-btn danger" onclick="deleteCourse('${c.id}')" data-testid="delete-course-${c.id}">Delete</button>
         </td>
       </tr>
     `).join('');

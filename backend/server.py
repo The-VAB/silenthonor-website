@@ -207,20 +207,6 @@ async def seed_admin():
             {"$set": {"password_hash": hash_password(admin_password)}}
         )
         print(f"Admin password updated: {admin_email}")
-    
-    # Write credentials to test file
-    os.makedirs("/app/memory", exist_ok=True)
-    with open("/app/memory/test_credentials.md", "w") as f:
-        f.write("# Test Credentials\n\n")
-        f.write("## Admin Account\n")
-        f.write(f"- Email: {admin_email}\n")
-        f.write(f"- Password: {admin_password}\n")
-        f.write("- Role: admin\n\n")
-        f.write("## Auth Endpoints\n")
-        f.write("- POST /api/auth/register\n")
-        f.write("- POST /api/auth/login\n")
-        f.write("- POST /api/auth/logout\n")
-        f.write("- GET /api/auth/me\n")
 
 # Auth helper
 async def get_current_user(request: Request) -> dict:
@@ -637,7 +623,7 @@ async def get_dd214_file(request: Request, filename: str):
     
     # Sanitize filename to prevent path traversal
     safe_filename = os.path.basename(filename)
-    if safe_filename != filename or ".." in filename:
+    if ".." in filename or "/" in filename or "\\" in filename:
         raise HTTPException(status_code=400, detail="Invalid filename")
     
     filepath = os.path.join("/app/uploads/dd214", safe_filename)
