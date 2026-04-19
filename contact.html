@@ -246,22 +246,22 @@
         <form class="contact-form" id="contactForm" data-testid="contact-form">
           <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">First Name *</label>
-              <input type="text" class="form-input" required data-testid="contact-first-name" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+              <label class="form-label">First Name *</label>
+              <input type="text" class="form-input" required data-testid="contact-first-name">
             </div>
             <div class="form-group">
-              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Last Name</label>
-              <input type="text" class="form-input" data-testid="contact-last-name" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-input" data-testid="contact-last-name">
             </div>
           </div>
           <div class="form-group" style="margin-top: 1rem;">
-            <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Email *</label>
-            <input type="email" class="form-input" required data-testid="contact-email" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-input" required data-testid="contact-email">
           </div>
           <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
             <div class="form-group">
-              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Branch</label>
-              <select class="form-select" data-testid="contact-branch" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+              <label class="form-label">Branch</label>
+              <select class="form-select" data-testid="contact-branch">
                 <option value="">Select</option>
                 <option>Army</option><option>Navy</option><option>Air Force</option>
                 <option>Marine Corps</option><option>Coast Guard</option><option>Space Force</option>
@@ -269,16 +269,16 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Status</label>
-              <select class="form-select" data-testid="contact-status" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+              <label class="form-label">Status</label>
+              <select class="form-select" data-testid="contact-status">
                 <option value="">Select</option>
                 <option>Active Duty</option><option>Veteran</option>
                 <option>Retired</option><option>Family</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Topic</label>
-              <select class="form-select" data-testid="contact-topic" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem;">
+              <label class="form-label">Topic</label>
+              <select class="form-select" data-testid="contact-topic">
                 <option value="">Select</option>
                 <option>General Question</option><option>Credit Help</option>
                 <option>Financial Coaching</option><option>VA Loan</option>
@@ -287,8 +287,8 @@
             </div>
           </div>
           <div class="form-group" style="margin-top: 1rem;">
-            <label class="form-label" style="display:block; font-family:'Oswald', sans-serif; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem;">Message *</label>
-            <textarea class="form-textarea" required data-testid="contact-message" style="width:100%; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:0.8rem; font-size:0.9rem; min-height: 140px; font-family: inherit; resize: vertical;"></textarea>
+            <label class="form-label">Message *</label>
+            <textarea class="form-textarea" required data-testid="contact-message"></textarea>
           </div>
           <button type="submit" class="btn-primary" style="margin-top: 1.5rem; width: 100%;" data-testid="contact-submit-btn">Send Message →</button>
         </form>

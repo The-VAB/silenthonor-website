@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
+import re
 import secrets
 import bcrypt
 import jwt
@@ -31,6 +32,23 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+
+def validate_password(password: str) -> str | None:
+    """Returns an error message if password is weak, or None if valid."""
+    if len(password) < 8:
+        return "Password must be at least 8 characters."
+    if not re.search(r'[A-Z]', password):
+        return "Password must contain at least one uppercase letter."
+    if not re.search(r'[a-z]', password):
+        return "Password must contain at least one lowercase letter."
+    if not re.search(r'[0-9]', password):
+        return "Password must contain at least one number."
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return "Password must contain at least one special character."
+    return None
+
+# Cookie security: use secure cookies when not in local development
+SECURE_COOKIES = os.environ.get("SECURE_COOKIES", "false").lower() == "true"
 
 # JWT utilities
 def create_access_token(user_id: str, email: str) -> str:
@@ -111,12 +129,20 @@ app = FastAPI(title="Silent Honor Foundation API")
 
 # CORS
 frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+allowed_origins = [
+    origin.strip()
+    for origin in os.environ.get(
+        "ALLOWED_ORIGINS",
+        frontend_url
+    ).split(",")
+    if origin.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Serve static files
@@ -156,7 +182,11 @@ async def shutdown_db():
 
 async def seed_admin():
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@silenthonor.org")
-    admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+    
+    if not admin_password:
+        print("WARNING: ADMIN_PASSWORD environment variable not set. Skipping admin seed.")
+        return
     
     existing = await db.users.find_one({"email": admin_email})
     if existing is None:
@@ -257,6 +287,11 @@ async def health_check():
 async def register(request: Request, response: Response, data: RegisterRequest):
     email = data.email.lower()
     
+    # Validate password strength
+    password_error = validate_password(data.password)
+    if password_error:
+        raise HTTPException(status_code=400, detail=password_error)
+    
     # Check if email exists
     existing = await db.users.find_one({"email": email})
     if existing:
@@ -291,8 +326,8 @@ async def register(request: Request, response: Response, data: RegisterRequest):
     refresh_token = create_refresh_token(user_id)
     
     # Set cookies
-    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=3600, path="/")
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=False, samesite="lax", max_age=604800, path="/")
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=SECURE_COOKIES, samesite="lax", max_age=3600, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=SECURE_COOKIES, samesite="lax", max_age=604800, path="/")
     
     return {
         "id": user_id,
@@ -326,8 +361,8 @@ async def login(request: Request, response: Response, data: LoginRequest):
     access_token = create_access_token(user_id, email)
     refresh_token = create_refresh_token(user_id)
     
-    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=3600, path="/")
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=False, samesite="lax", max_age=604800, path="/")
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=SECURE_COOKIES, samesite="lax", max_age=3600, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=SECURE_COOKIES, samesite="lax", max_age=604800, path="/")
     
     return {
         "id": user_id,
@@ -369,7 +404,7 @@ async def refresh_token(request: Request, response: Response):
         user_id = str(user["_id"])
         access_token = create_access_token(user_id, user["email"])
         
-        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=3600, path="/")
+        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=SECURE_COOKIES, samesite="lax", max_age=3600, path="/")
         
         return {"message": "Token refreshed"}
     except jwt.ExpiredSignatureError:
@@ -398,6 +433,11 @@ async def forgot_password(data: ForgotPasswordRequest):
 
 @app.post("/api/auth/reset-password")
 async def reset_password(data: ResetPasswordRequest):
+    # Validate new password strength
+    password_error = validate_password(data.new_password)
+    if password_error:
+        raise HTTPException(status_code=400, detail=password_error)
+    
     reset_doc = await db.password_reset_tokens.find_one({
         "token": data.token,
         "used": False,
@@ -595,7 +635,12 @@ async def get_member(request: Request, member_id: str):
 async def get_dd214_file(request: Request, filename: str):
     await get_current_admin(request)
     
-    filepath = f"/app/uploads/dd214/{filename}"
+    # Sanitize filename to prevent path traversal
+    safe_filename = os.path.basename(filename)
+    if safe_filename != filename or ".." in filename:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+    
+    filepath = os.path.join("/app/uploads/dd214", safe_filename)
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="File not found")
     

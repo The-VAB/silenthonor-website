@@ -414,6 +414,14 @@
 let currentAdmin = null;
 let currentVerifyMemberId = null;
 
+// Escape user-supplied strings before inserting into HTML
+function esc(str) {
+  if (str == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+
 async function loadAdmin() {
   try {
     const res = await fetch(`${window.API_BASE}/api/auth/me`, { credentials: 'include' });
@@ -470,10 +478,10 @@ async function loadMembers() {
 
     tbody.innerHTML = members.map(m => `
       <tr>
-        <td>${m.first_name} ${m.last_name}</td>
-        <td>${m.email}</td>
-        <td>${m.branch || '—'}</td>
-        <td>${m.service_status || '—'}</td>
+        <td>${esc(m.first_name)} ${esc(m.last_name)}</td>
+        <td>${esc(m.email)}</td>
+        <td>${esc(m.branch) || '—'}</td>
+        <td>${esc(m.service_status) || '—'}</td>
         <td><span class="status-badge ${m.verified ? 'status-verified' : 'status-pending'}">${m.verified ? 'Verified' : 'Pending'}</span></td>
         <td>${m.created_at ? new Date(m.created_at).toLocaleDateString() : '—'}</td>
       </tr>
@@ -485,13 +493,13 @@ async function loadMembers() {
     } else {
       dd214Tbody.innerHTML = pending.map(m => `
         <tr>
-          <td>${m.first_name} ${m.last_name}</td>
-          <td>${m.email}</td>
-          <td>${m.branch || '—'}</td>
-          <td><span class="status-badge ${m.verified ? 'status-verified' : m.dd214_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${m.dd214_status || 'pending'}</span></td>
-          <td><a href="${window.API_BASE}/api/admin/dd214/${m.dd214_file}" target="_blank" style="color: var(--red-light); font-size: 0.8rem;" data-testid="view-dd214-${m.id}">View</a></td>
+          <td>${esc(m.first_name)} ${esc(m.last_name)}</td>
+          <td>${esc(m.email)}</td>
+          <td>${esc(m.branch) || '—'}</td>
+          <td><span class="status-badge ${m.verified ? 'status-verified' : m.dd214_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${esc(m.dd214_status) || 'pending'}</span></td>
+          <td><a href="${window.API_BASE}/api/admin/dd214/${encodeURIComponent(m.dd214_file)}" target="_blank" style="color: var(--red-light); font-size: 0.8rem;" data-testid="view-dd214-${esc(m.id)}">View</a></td>
           <td>
-            <button class="action-btn primary" onclick="openVerifyModal('${m.id}', '${m.first_name} ${m.last_name}', '${m.email}', '${m.dd214_file}')" data-testid="review-${m.id}">Review</button>
+            <button class="action-btn primary" onclick="openVerifyModal('${esc(m.id)}', '${esc(m.first_name)} ${esc(m.last_name)}', '${esc(m.email)}', '${encodeURIComponent(m.dd214_file)}')" data-testid="review-${esc(m.id)}">Review</button>
           </td>
         </tr>
       `).join('');
@@ -510,13 +518,13 @@ async function loadCourses() {
     }
     tbody.innerHTML = courses.map(c => `
       <tr>
-        <td><strong>${c.title}</strong><div style="font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem;">${c.description ? c.description.slice(0, 80) + (c.description.length > 80 ? '...' : '') : ''}</div></td>
-        <td>${c.category || '—'}</td>
-        <td><span class="status-badge ${c.status === 'live' ? 'status-verified' : 'status-pending'}">${c.status}</span></td>
+        <td><strong>${esc(c.title)}</strong><div style="font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem;">${c.description ? esc(c.description.slice(0, 80) + (c.description.length > 80 ? '...' : '')) : ''}</div></td>
+        <td>${esc(c.category) || '—'}</td>
+        <td><span class="status-badge ${c.status === 'live' ? 'status-verified' : 'status-pending'}">${esc(c.status)}</span></td>
         <td>${c.total_lessons}</td>
         <td>
-          <button class="action-btn" onclick='editCourse(${JSON.stringify(c).replace(/'/g, "&#39;")})' data-testid="edit-course-${c.id}">Edit</button>
-          <button class="action-btn danger" onclick="deleteCourse('${c.id}')" data-testid="delete-course-${c.id}">Delete</button>
+          <button class="action-btn" onclick='editCourse(${JSON.stringify(c).replace(/'/g, "&#39;")})' data-testid="edit-course-${esc(c.id)}">Edit</button>
+          <button class="action-btn danger" onclick="deleteCourse('${esc(c.id)}')" data-testid="delete-course-${esc(c.id)}">Delete</button>
         </td>
       </tr>
     `).join('');
@@ -534,10 +542,10 @@ async function loadContacts() {
     }
     tbody.innerHTML = contacts.map(c => `
       <tr>
-        <td>${c.first_name} ${c.last_name}</td>
-        <td><a href="mailto:${c.email}" style="color: var(--red-light);">${c.email}</a></td>
-        <td>${c.topic || '—'}</td>
-        <td style="max-width: 300px; white-space: normal;">${(c.message || '').slice(0, 200)}${(c.message || '').length > 200 ? '...' : ''}</td>
+        <td>${esc(c.first_name)} ${esc(c.last_name)}</td>
+        <td><a href="mailto:${encodeURIComponent(c.email)}" style="color: var(--red-light);">${esc(c.email)}</a></td>
+        <td>${esc(c.topic) || '—'}</td>
+        <td style="max-width: 300px; white-space: normal;">${esc((c.message || '').slice(0, 200))}${(c.message || '').length > 200 ? '...' : ''}</td>
         <td>${c.created_at ? new Date(c.created_at).toLocaleString() : '—'}</td>
       </tr>
     `).join('');
@@ -615,13 +623,27 @@ async function deleteCourse(id) {
 // DD-214 Verification
 function openVerifyModal(memberId, name, email, file) {
   currentVerifyMemberId = memberId;
-  document.getElementById('verify-member-info').innerHTML = `
-    <strong>${name}</strong><br>
-    <span style="color: var(--muted); font-size: 0.85rem;">${email}</span>
-  `;
-  document.getElementById('dd214-preview').innerHTML = `
-    <a href="${window.API_BASE}/api/admin/dd214/${file}" target="_blank" class="action-btn primary">Open DD-214 Document</a>
-  `;
+  const infoEl = document.getElementById('verify-member-info');
+  infoEl.textContent = '';
+  const strong = document.createElement('strong');
+  strong.textContent = name;
+  const br = document.createElement('br');
+  const span = document.createElement('span');
+  span.style.cssText = 'color: var(--muted); font-size: 0.85rem;';
+  span.textContent = email;
+  infoEl.appendChild(strong);
+  infoEl.appendChild(br);
+  infoEl.appendChild(span);
+  
+  const previewEl = document.getElementById('dd214-preview');
+  previewEl.innerHTML = '';
+  const link = document.createElement('a');
+  link.href = `${window.API_BASE}/api/admin/dd214/${encodeURIComponent(file)}`;
+  link.target = '_blank';
+  link.className = 'action-btn primary';
+  link.textContent = 'Open DD-214 Document';
+  previewEl.appendChild(link);
+  
   document.getElementById('verify-modal').classList.add('open');
 }
 

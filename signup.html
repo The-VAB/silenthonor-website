@@ -394,6 +394,13 @@ async function handleSignup() {
     return;
   }
 
+  if (!/[A-Z]/.test(formData.password) || !/[a-z]/.test(formData.password) ||
+      !/[0-9]/.test(formData.password) || !/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+    errorEl.textContent = 'Password must include uppercase, lowercase, number, and special character.';
+    errorEl.classList.add('show');
+    return;
+  }
+
   const submitBtn = document.querySelector('.submit-btn');
   submitBtn.textContent = 'Creating Account...';
   submitBtn.disabled = true;
