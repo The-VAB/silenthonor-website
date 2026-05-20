@@ -20,6 +20,10 @@ Build a full non-profit site for **Silent Honor Foundation** using HTML/CSS/JS f
 - Deployment: Emergent Kubernetes pod (ingress routes `/api/*` → 8001, everything else → 3000)
 
 ## What's Been Implemented (Feb 2026)
+- [Feb 20] Services "Getting Started" step 3 reworded — intake now clearly happens after applying for a service, not at signup
+- [Feb 20] Removed all 6 service-card CTAs from home "How We Help" (Learn More / View Courses / etc.) — services info lives in member portal
+- [Feb 20] Home "Free Courses" preview: stripped Available Now / Coming Soon badges, added a 4th "More on the Way" tile for ongoing/educational continuity
+- [Feb 20] Donate page completely refactored — removed redundant credit-card form, now a clean redirect-to-Zeffy with 3 quick-amount shortcuts (all linking directly to Zeffy)
 - [Feb 18] Core FastAPI backend with auth, member, admin, courses, lessons, team, site_content endpoints
 - [Feb 18] Static frontend pages with transparent logo, topographic background, Oswald/Lora typography
 - [Feb 18] Zeffy donation button wired site-wide via `components.js`

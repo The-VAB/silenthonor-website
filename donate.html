@@ -294,77 +294,37 @@
   <section class="donate-main">
     <div class="donate-grid">
 
-      <!-- FORM LEFT -->
+      <!-- DONATE LEFT -->
       <div class="reveal">
         <div class="section-tag">Make Your Gift</div>
-        <h2 class="section-title" style="margin-bottom: 2rem;">Choose Your Amount</h2>
+        <h2 class="section-title" style="margin-bottom: 1.25rem;">Give Securely<br>Through Zeffy</h2>
+        <p class="section-body" style="margin-bottom: 2rem; max-width: 520px;">
+          We use <strong>Zeffy</strong> — a 100% free fundraising platform for nonprofits. There are no platform fees, no processing fees, and no service charges. Every single dollar you give reaches the veterans we serve.
+        </p>
 
-        <div class="frequency-row">
-          <button class="freq-btn active" onclick="setFreq(this)">One-Time</button>
-          <button class="freq-btn" onclick="setFreq(this)">Monthly</button>
-          <button class="freq-btn" onclick="setFreq(this)">Annual</button>
+        <div class="zeffy-cta-card" style="background: var(--navy-mid); border: 1px solid var(--border); border-left: 3px solid var(--gold); padding: 2.25rem; margin-bottom: 2rem;">
+          <div style="font-family: 'Oswald', sans-serif; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 0.75rem;">100% to the mission</div>
+          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; line-height: 1.1; margin-bottom: 1rem;">Donate Now</h3>
+          <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.75rem;">
+            Choose your amount, frequency, and payment method on Zeffy's secure form. One step. Takes 30 seconds. You'll receive an instant tax-deductible receipt.
+          </p>
+          <a href="https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1" target="_blank" rel="noopener" class="btn-gold" style="width: 100%; justify-content: center; padding: 18px; font-size: 0.85rem;" data-testid="donate-zeffy-btn">Continue to Zeffy →</a>
+          <div class="secure-note" style="margin-top: 1.25rem; text-align: center;">🔒 Secure · Tax-deductible · EIN 99-3172064 · Powered by Zeffy</div>
         </div>
 
-        <div class="amount-grid">
-          <div class="amount-tile active" onclick="selectAmt(this)">
-            <div class="amt-dollar">$25</div>
-            <div class="amt-impact">One veteran coached</div>
-          </div>
-          <div class="amount-tile" onclick="selectAmt(this)">
-            <div class="amt-dollar">$50</div>
-            <div class="amt-impact">Course materials</div>
-          </div>
-          <div class="amount-tile" onclick="selectAmt(this)">
-            <div class="amt-dollar">$100</div>
-            <div class="amt-impact">Full program access</div>
-          </div>
-          <div class="amount-tile" onclick="selectAmt(this)">
-            <div class="amt-dollar">$250</div>
-            <div class="amt-impact">Sponsor a veteran</div>
-          </div>
-          <div class="amount-tile" onclick="selectAmt(this)">
-            <div class="amt-dollar">$500</div>
-            <div class="amt-impact">Fund a cohort</div>
-          </div>
-          <div class="amount-tile" onclick="selectAmt(this)">
-            <div class="amt-dollar">Other</div>
-            <div class="amt-impact">Your choice</div>
-          </div>
-        </div>
-
-        <input type="text" class="custom-amount" placeholder="Or enter a custom amount: $___">
-
-        <div class="donate-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">First Name</label>
-              <input type="text" class="form-input" placeholder="First name">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Last Name</label>
-              <input type="text" class="form-input" placeholder="Last name">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" class="form-input" placeholder="email@example.com">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Card Number</label>
-            <input type="text" class="form-input" placeholder="•••• •••• •••• ••••">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Expiry</label>
-              <input type="text" class="form-input" placeholder="MM / YY">
-            </div>
-            <div class="form-group">
-              <label class="form-label">CVV</label>
-              <input type="text" class="form-input" placeholder="•••">
-            </div>
-          </div>
-          <a href="https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1" target="_blank" class="btn-gold" style="width: 100%; justify-content: center; padding: 16px;">Complete Donation via Zeffy →</a>
-          <div class="secure-note">🔒 Secure · Tax-deductible · EIN 99-3172064 · Powered by Zeffy</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2rem;">
+          <a href="https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1" target="_blank" rel="noopener" class="quick-amount" data-testid="donate-25-btn" style="display:block; text-align:center; padding:1.1rem 0.5rem; background:var(--navy-mid); border:1px solid var(--border); color:var(--white); text-decoration:none; font-family:'Oswald', sans-serif; font-weight:700; transition: all 0.2s;">
+            <div style="font-size:1.4rem;">$25</div>
+            <div style="font-size:0.62rem; letter-spacing:0.18em; color:var(--muted); margin-top:0.25rem;">ONE VETERAN</div>
+          </a>
+          <a href="https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1" target="_blank" rel="noopener" class="quick-amount" data-testid="donate-100-btn" style="display:block; text-align:center; padding:1.1rem 0.5rem; background:var(--navy-mid); border:1px solid var(--border); color:var(--white); text-decoration:none; font-family:'Oswald', sans-serif; font-weight:700; transition: all 0.2s;">
+            <div style="font-size:1.4rem;">$100</div>
+            <div style="font-size:0.62rem; letter-spacing:0.18em; color:var(--muted); margin-top:0.25rem;">FULL PROGRAM</div>
+          </a>
+          <a href="https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1" target="_blank" rel="noopener" class="quick-amount" data-testid="donate-500-btn" style="display:block; text-align:center; padding:1.1rem 0.5rem; background:var(--navy-mid); border:1px solid var(--border); color:var(--white); text-decoration:none; font-family:'Oswald', sans-serif; font-weight:700; transition: all 0.2s;">
+            <div style="font-size:1.4rem;">$500</div>
+            <div style="font-size:0.62rem; letter-spacing:0.18em; color:var(--muted); margin-top:0.25rem;">A COHORT</div>
+          </a>
         </div>
       </div>
 
@@ -439,14 +399,17 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-  function selectAmt(tile) {
-    document.querySelectorAll('.amount-tile').forEach(t => t.classList.remove('active'));
-    tile.classList.add('active');
-  }
-  function setFreq(btn) {
-    document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+  // Quick-amount hover effect
+  document.querySelectorAll('.quick-amount').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      el.style.borderColor = 'var(--gold)';
+      el.style.background = 'rgba(201,149,42,0.06)';
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.borderColor = 'var(--border)';
+      el.style.background = 'var(--navy-mid)';
+    });
+  });
 </script>
 </body>
 </html>
