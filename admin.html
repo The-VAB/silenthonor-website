@@ -311,7 +311,10 @@
 
   <!-- MEMBERS -->
   <div id="tab-members" class="tab-content">
-    <div class="section-title">All Members</div>
+    <div class="section-title">
+      <span>All Members</span>
+      <a href="" id="export-members-link" class="action-btn primary" data-testid="export-members-btn">⤓ Download as CSV</a>
+    </div>
     <div style="overflow-x: auto;">
       <table class="data-table" data-testid="members-table">
         <thead>
@@ -357,7 +360,10 @@
 
   <!-- CONTACTS -->
   <div id="tab-contacts" class="tab-content">
-    <div class="section-title">Contact Submissions</div>
+    <div class="section-title">
+      <span>Contact Submissions</span>
+      <a href="" id="export-contacts-link" class="action-btn primary" data-testid="export-contacts-btn">⤓ Download as CSV</a>
+    </div>
     <div style="overflow-x: auto;">
       <table class="data-table" data-testid="contacts-table">
         <thead>
@@ -427,6 +433,9 @@ async function loadAdmin() {
       return;
     }
     document.getElementById('admin-email').textContent = currentAdmin.email;
+    // Wire CSV export links
+    document.getElementById('export-members-link').href = `${window.API_BASE}/api/admin/export/members.csv`;
+    document.getElementById('export-contacts-link').href = `${window.API_BASE}/api/admin/export/contacts.csv`;
     loadStats();
     loadMembers();
     loadCourses();

@@ -5,6 +5,35 @@
 // Zeffy donation link
 const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1';
 
+// ───────────────────────────────────────────────────────────────────────────
+//  SUITEDASH MEMBER PORTAL — SWAP-IN POINT
+// ───────────────────────────────────────────────────────────────────────────
+//  When your SuiteDash portal is live, replace the URL below with your real
+//  SuiteDash login URL (e.g. 'https://silenthonor.suitedash.com/login').
+//  As soon as MEMBER_PORTAL_URL is set to anything other than 'CHANGE-ME',
+//  every "Member Login", "Sign Up", "Become a Member", and "Join Free" button
+//  across the site will automatically redirect there. The local login.html /
+//  signup.html pages stay in place as a fallback / for admin access.
+//
+//  To re-enable the local backend later, simply set this back to 'CHANGE-ME'.
+// ───────────────────────────────────────────────────────────────────────────
+const MEMBER_PORTAL_URL = 'https://CHANGE-ME.suitedash.com';
+
+// Helper — returns true when a real SuiteDash URL is configured
+function isSuiteDashLive() {
+  return MEMBER_PORTAL_URL && !MEMBER_PORTAL_URL.includes('CHANGE-ME');
+}
+
+// Helper — returns the URL where a "Member Login" button should send users
+function getMemberLoginUrl() {
+  return isSuiteDashLive() ? MEMBER_PORTAL_URL : 'login.html';
+}
+
+// Helper — returns the URL where a "Sign Up / Become a Member" button should go
+function getSignupUrl() {
+  return isSuiteDashLive() ? MEMBER_PORTAL_URL : 'signup.html';
+}
+
 // Logo URL
 const LOGO_URL = 'https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/ejw735ko_a597f541-5826-493e-8e3d-af5702609fa5.tmp';
 
@@ -38,13 +67,26 @@ async function injectNav() {
 
   const currentPage = getCurrentPage();
 
-  // Determine member link based on auth state
-  const user = await checkAuth();
-  let memberLinkHref = 'login.html';
-  let memberLinkText = 'Member Login';
-  if (user) {
-    memberLinkHref = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
-    memberLinkText = user.role === 'admin' ? 'Admin' : 'Dashboard';
+  // Determine member link based on auth state + SuiteDash status
+  let memberLinkHref;
+  let memberLinkText;
+  let memberLinkTarget = '';
+
+  if (isSuiteDashLive()) {
+    // SuiteDash is configured — send everyone there
+    memberLinkHref = MEMBER_PORTAL_URL;
+    memberLinkText = 'Member Portal';
+    memberLinkTarget = ' target="_blank" rel="noopener"';
+  } else {
+    // Local fallback — use the FastAPI backend
+    const user = await checkAuth();
+    if (user) {
+      memberLinkHref = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+      memberLinkText = user.role === 'admin' ? 'Admin' : 'Dashboard';
+    } else {
+      memberLinkHref = 'login.html';
+      memberLinkText = 'Member Login';
+    }
   }
 
   const navHTML = `
@@ -63,7 +105,7 @@ async function injectNav() {
 
       <div class="nav-actions">
         <a href="${ZEFFY_DONATION_URL}" target="_blank" class="nav-donate" data-testid="nav-donate-btn">Donate</a>
-        <a href="${memberLinkHref}" class="btn-outline" style="padding: 10px 20px; font-size: 0.68rem;" data-testid="nav-member-btn">${memberLinkText}</a>
+        <a href="${memberLinkHref}"${memberLinkTarget} class="btn-outline" style="padding: 10px 20px; font-size: 0.68rem;" data-testid="nav-member-btn">${memberLinkText}</a>
         <button class="nav-mobile-toggle" onclick="toggleMobileNav()" data-testid="nav-mobile-toggle">☰</button>
       </div>
     </nav>
@@ -149,6 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
 window.SilentHonor = {
   get API_BASE() { return window.API_BASE; },
   ZEFFY_DONATION_URL,
+  MEMBER_PORTAL_URL,
+  isSuiteDashLive,
+  getMemberLoginUrl,
+  getSignupUrl,
   checkAuth,
   getCurrentPage
 };

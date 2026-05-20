@@ -20,10 +20,13 @@ Build a full non-profit site for **Silent Honor Foundation** using HTML/CSS/JS f
 - Deployment: Emergent Kubernetes pod (ingress routes `/api/*` → 8001, everything else → 3000)
 
 ## What's Been Implemented (Feb 2026)
-- [Feb 20] Services "Getting Started" step 3 reworded — intake now clearly happens after applying for a service, not at signup
-- [Feb 20] Removed all 6 service-card CTAs from home "How We Help" (Learn More / View Courses / etc.) — services info lives in member portal
-- [Feb 20] Home "Free Courses" preview: stripped Available Now / Coming Soon badges, added a 4th "More on the Way" tile for ongoing/educational continuity
-- [Feb 20] Donate page completely refactored — removed redundant credit-card form, now a clean redirect-to-Zeffy with 3 quick-amount shortcuts (all linking directly to Zeffy)
+- [Feb 20 — Pivot to SuiteDash] Dashboard.html replaced with a clean **"Membership Coming Soon"** screen (welcomes member by name, shows checklist, sign-out works). FastAPI signup still persists every member to MongoDB as the interim ledger.
+- [Feb 20] Added admin **CSV exports** — `GET /api/admin/export/members.csv` and `/api/admin/export/contacts.csv`. New "↓ Download as CSV" buttons on Members and Contacts tabs in the admin portal. This is the user's "membership spreadsheet."
+- [Feb 20] `js/components.js` now has a single **`MEMBER_PORTAL_URL`** placeholder constant (`https://CHANGE-ME.suitedash.com`). When swapped for a real SuiteDash URL, every Member Login button across the site auto-routes to SuiteDash; local FastAPI flow remains as fallback / admin access.
+- [Feb 20] Services "Getting Started" step 3 reworded — intake now clearly happens after applying for a service
+- [Feb 20] Removed all 6 service-card CTAs from home "How We Help"
+- [Feb 20] Home "Free Courses" preview: stripped Available Now / Coming Soon badges, added a 4th "More on the Way" tile
+- [Feb 20] Donate page refactored — removed redundant credit-card form, clean redirect-to-Zeffy with 3 quick-amount shortcuts
 - [Feb 18] Core FastAPI backend with auth, member, admin, courses, lessons, team, site_content endpoints
 - [Feb 18] Static frontend pages with transparent logo, topographic background, Oswald/Lora typography
 - [Feb 18] Zeffy donation button wired site-wide via `components.js`

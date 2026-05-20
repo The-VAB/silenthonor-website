@@ -11,7 +11,9 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException, Request, Response, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+import io
+import csv
+from fastapi.responses import FileResponse, StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from pydantic import BaseModel, EmailStr
@@ -642,6 +644,85 @@ async def get_contacts(request: Request):
         })
     
     return result
+
+@app.get("/api/admin/export/members.csv")
+async def export_members_csv(request: Request):
+    """Download all members as a CSV spreadsheet (interim membership ledger)."""
+    await get_current_admin(request)
+
+    members = await db.users.find(
+        {"role": "member"},
+        {"password_hash": 0}
+    ).sort("created_at", -1).to_list(5000)
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow([
+        "Joined (UTC)", "First Name", "Last Name", "Email", "Phone", "State",
+        "Branch", "Service Status", "Years of Service", "Separation Year",
+        "Challenges", "Notes", "Verified", "DD-214 Status"
+    ])
+    for m in members:
+        writer.writerow([
+            m.get("created_at").strftime("%Y-%m-%d %H:%M") if m.get("created_at") else "",
+            m.get("first_name", ""),
+            m.get("last_name", ""),
+            m.get("email", ""),
+            m.get("phone", "") or "",
+            m.get("state", "") or "",
+            m.get("branch", "") or "",
+            m.get("service_status", "") or "",
+            m.get("years_of_service", "") or "",
+            m.get("separation_year", "") or "",
+            ", ".join(m.get("challenges") or []) if isinstance(m.get("challenges"), list) else (m.get("challenges") or ""),
+            (m.get("notes") or "").replace("\n", " "),
+            "Yes" if m.get("verified") else "No",
+            m.get("dd214_status", "pending"),
+        ])
+
+    buffer.seek(0)
+    filename = f"silenthonor_members_{datetime.now(timezone.utc).strftime('%Y%m%d')}.csv"
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )
+
+
+@app.get("/api/admin/export/contacts.csv")
+async def export_contacts_csv(request: Request):
+    """Download all contact submissions as CSV."""
+    await get_current_admin(request)
+
+    contacts = await db.contacts.find({}).sort("created_at", -1).to_list(5000)
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow([
+        "Received (UTC)", "First Name", "Last Name", "Email",
+        "Branch", "Status", "Topic", "Message", "Responded"
+    ])
+    for c in contacts:
+        writer.writerow([
+            c.get("created_at").strftime("%Y-%m-%d %H:%M") if c.get("created_at") else "",
+            c.get("first_name", ""),
+            c.get("last_name", ""),
+            c.get("email", ""),
+            c.get("branch", "") or "",
+            c.get("status", "") or "",
+            c.get("topic", "") or "",
+            (c.get("message") or "").replace("\n", " "),
+            "Yes" if c.get("responded") else "No",
+        ])
+
+    buffer.seek(0)
+    filename = f"silenthonor_contacts_{datetime.now(timezone.utc).strftime('%Y%m%d')}.csv"
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )
+
 
 @app.get("/api/admin/stats")
 async def get_admin_stats(request: Request):

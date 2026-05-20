@@ -3,266 +3,183 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Member Dashboard — Silent Honor Foundation</title>
+<title>Membership Dashboard — Coming Soon · Silent Honor Foundation</title>
 <link rel="stylesheet" href="css/global.css">
 <style>
-.dash-wrapper {
+.cs-wrapper {
   min-height: 100vh;
-  padding: 120px 3.5rem 4rem;
+  padding: 140px 2rem 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   z-index: 1;
-  max-width: 1300px;
-  margin: 0 auto;
 }
 
-.dash-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.dash-greeting {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.dash-greeting em {
-  font-style: normal;
-  color: var(--red-light);
-}
-
-.dash-sub {
-  font-family: 'Lora', serif;
-  font-style: italic;
-  color: var(--muted);
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
-}
-
-.logout-btn {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border);
-  padding: 0.55rem 1.2rem;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.logout-btn:hover {
-  color: var(--white);
-  border-color: var(--red);
-}
-
-.dash-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 2rem;
-}
-
-@media (max-width: 900px) {
-  .dash-grid { grid-template-columns: 1fr; }
-  .dash-wrapper { padding: 100px 1.5rem 3rem; }
-}
-
-.dash-card {
-  background: rgba(17, 24, 39, 0.85);
+.cs-card {
+  background: rgba(17, 24, 39, 0.92);
   border: 1px solid rgba(255,255,255,0.06);
-  padding: 2rem;
+  border-top: 3px solid var(--red);
+  padding: 3.5rem 3rem;
+  max-width: 620px;
+  width: 100%;
+  text-align: center;
 }
 
-.dash-card-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border);
-}
-
-/* Profile block */
-.profile-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.7rem 0;
-  font-size: 0.9rem;
-  border-bottom: 1px dashed rgba(255,255,255,0.05);
-}
-
-.profile-row:last-child { border-bottom: none; }
-
-.profile-label {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.7rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.profile-value { color: var(--white); font-weight: 500; }
-
-/* Status */
-.status-badge {
-  display: inline-block;
+.cs-tag {
   font-family: 'Oswald', sans-serif;
   font-size: 0.65rem;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  padding: 0.35rem 0.8rem;
-  font-weight: 600;
+  color: var(--red-light);
+  margin-bottom: 1.25rem;
 }
 
-.status-verified { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-.status-pending { background: rgba(201, 149, 42, 0.12); color: var(--gold-light); border: 1px solid rgba(201, 149, 42, 0.3); }
-.status-rejected { background: rgba(185, 28, 28, 0.12); color: var(--red-light); border: 1px solid rgba(185, 28, 28, 0.3); }
-
-/* DD-214 Upload */
-.upload-zone {
-  border: 2px dashed var(--border);
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 1rem;
-}
-
-.upload-zone:hover { border-color: var(--red); background: rgba(185, 28, 28, 0.04); }
-.upload-zone.dragging { border-color: var(--red); background: rgba(185, 28, 28, 0.08); }
-
-.upload-icon {
-  font-size: 1.8rem;
-  opacity: 0.5;
-  margin-bottom: 0.75rem;
-}
-
-.upload-text {
+.cs-title {
   font-family: 'Oswald', sans-serif;
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 0.4rem;
+  line-height: 1.05;
+  margin-bottom: 1.25rem;
 }
 
-.upload-hint { font-size: 0.75rem; color: var(--muted); }
+.cs-title em { font-style: normal; color: var(--red-light); }
 
-/* Courses */
-.course-item {
+.cs-greeting {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--white);
+  margin-bottom: 1.75rem;
+  line-height: 1.5;
+}
+
+.cs-greeting strong { color: var(--red-light); font-style: normal; font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 0.02em; }
+
+.cs-body {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+
+.cs-divider {
+  width: 60px;
+  height: 2px;
+  background: var(--red);
+  margin: 0 auto 2rem;
+}
+
+.cs-checklist {
+  display: grid;
+  gap: 0.85rem;
+  text-align: left;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.cs-check-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.cs-check-item .icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 1rem 0;
-  border-bottom: 1px dashed rgba(255,255,255,0.05);
-}
-
-.course-item:last-child { border-bottom: none; }
-
-.course-name { font-family: 'Oswald', sans-serif; font-size: 0.88rem; font-weight: 500; }
-.course-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
-
-.progress-bar {
-  width: 100px;
-  height: 4px;
-  background: var(--border);
-  overflow: hidden;
-  position: relative;
-}
-
-.progress-fill {
-  height: 100%;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
   background: var(--red);
-  transition: width 0.3s;
+  color: var(--white);
+  border-radius: 50%;
+  margin-top: 2px;
 }
 
-.alert-box {
-  background: rgba(201, 149, 42, 0.08);
-  border-left: 3px solid var(--gold);
-  padding: 1rem 1.25rem;
-  font-size: 0.85rem;
+.cs-check-item.done .icon { background: #22c55e; }
+
+.cs-check-item strong { color: var(--white); font-weight: 600; font-family: 'Oswald', sans-serif; letter-spacing: 0.02em; }
+
+.cs-actions {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cs-meta {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
 }
 
-.alert-box strong { color: var(--white); }
+.cs-meta a { color: var(--red-light); text-decoration: none; margin-left: 0.5rem; }
+.cs-meta a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .cs-card { padding: 2.5rem 1.5rem; }
+}
 </style>
 </head>
 <body>
 <div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
 <div id="nav-placeholder"></div>
 
-<div class="dash-wrapper page-content">
-  <div class="dash-header">
-    <div>
-      <div class="dash-greeting">Welcome, <em id="user-name">Member</em></div>
-      <div class="dash-sub" id="user-email">Loading...</div>
-    </div>
-    <button class="logout-btn" onclick="handleLogout()" data-testid="logout-btn">Sign Out</button>
-  </div>
+<div class="cs-wrapper">
+  <div class="cs-card" data-testid="coming-soon-card">
+    <div class="cs-tag">Member Status</div>
+    <h1 class="cs-title">Your Membership<br><em>is Active</em></h1>
 
-  <div id="verification-alert" class="alert-box" style="display:none;" data-testid="verification-alert">
-    <strong>Verification pending.</strong> Upload your DD-214 below to complete membership verification and unlock full course access.
-  </div>
+    <p class="cs-greeting" data-testid="cs-greeting">
+      Welcome, <strong id="cs-name">Member</strong>. Thanks for joining the mission.
+    </p>
 
-  <div class="dash-grid">
-    <!-- LEFT: Profile + DD-214 -->
-    <div>
-      <div class="dash-card" style="margin-bottom: 2rem;" data-testid="profile-card">
-        <div class="dash-card-title">Your Profile</div>
-        <div class="profile-row"><span class="profile-label">Name</span><span class="profile-value" id="p-name">—</span></div>
-        <div class="profile-row"><span class="profile-label">Email</span><span class="profile-value" id="p-email">—</span></div>
-        <div class="profile-row"><span class="profile-label">Branch</span><span class="profile-value" id="p-branch">—</span></div>
-        <div class="profile-row"><span class="profile-label">Status</span><span class="profile-value" id="p-status">—</span></div>
-        <div class="profile-row"><span class="profile-label">Verification</span><span class="profile-value"><span id="p-verified" class="status-badge status-pending">Pending</span></span></div>
+    <div class="cs-divider"></div>
+
+    <p class="cs-body">
+      The full <strong style="color: var(--white);">Member Dashboard</strong> — with courses, coaching booking, DD-214 verification, and resource library — is launching soon.
+      We're finishing the build now. You'll get an email at <strong id="cs-email" style="color: var(--white);">your email</strong> the moment it goes live.
+    </p>
+
+    <div class="cs-checklist" data-testid="cs-checklist">
+      <div class="cs-check-item done">
+        <div class="icon">✓</div>
+        <div><strong>Membership received</strong> — Your information is on file with the foundation.</div>
       </div>
-
-      <div class="dash-card" data-testid="dd214-card">
-        <div class="dash-card-title">DD-214 Verification</div>
-        <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem;">
-          Upload your DD-214 (member copy) to verify veteran status. Accepted: PDF, JPG, PNG (max 10MB).
-        </p>
-        <div id="dd214-status-display" style="margin-top: 1rem;"></div>
-
-        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('dd214-file').click()" data-testid="dd214-upload-zone">
-          <div class="upload-icon">↑</div>
-          <div class="upload-text">Click or drop DD-214</div>
-          <div class="upload-hint">PDF, JPG, PNG · 10MB max</div>
-        </div>
-        <input type="file" id="dd214-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="handleFileSelect(event)" data-testid="dd214-file-input">
-        <div id="upload-progress" style="display:none; margin-top: 1rem; font-size: 0.85rem; color: var(--gold-light);">Uploading...</div>
+      <div class="cs-check-item">
+        <div class="icon">2</div>
+        <div><strong>Dashboard launch</strong> — Coming soon. We'll email you the access link.</div>
+      </div>
+      <div class="cs-check-item">
+        <div class="icon">3</div>
+        <div><strong>Free courses + 1-on-1 coaching</strong> — Unlocked once the dashboard is live.</div>
       </div>
     </div>
 
-    <!-- RIGHT: Courses -->
-    <div>
-      <div class="dash-card" data-testid="courses-card">
-        <div class="dash-card-title">Your Courses</div>
-        <div id="courses-list">
-          <div style="padding: 1rem 0; font-size: 0.85rem; color: var(--muted);">Loading courses...</div>
-        </div>
-      </div>
+    <div class="cs-actions">
+      <a href="courses.html" class="btn-outline" data-testid="cs-courses-btn">Preview Courses</a>
+      <a href="contact.html" class="btn-outline" data-testid="cs-contact-btn">Contact Us</a>
+      <button class="btn-primary" onclick="handleLogout()" data-testid="logout-btn">Sign Out</button>
+    </div>
 
-      <div class="dash-card" style="margin-top: 2rem;">
-        <div class="dash-card-title">Quick Links</div>
-        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-          <a href="courses.html" style="color: var(--red-light); text-decoration: none; font-size: 0.9rem;" data-testid="link-courses">→ Browse all courses</a>
-          <a href="services.html" style="color: var(--red-light); text-decoration: none; font-size: 0.9rem;" data-testid="link-services">→ Services and coaching</a>
-          <a href="contact.html" style="color: var(--red-light); text-decoration: none; font-size: 0.9rem;" data-testid="link-contact">→ Contact support</a>
-        </div>
-      </div>
+    <div class="cs-meta">
+      Joined as <span id="cs-email-meta" style="color: var(--white);">—</span>
+      <a href="#" onclick="event.preventDefault(); handleLogout();">Sign out</a>
     </div>
   </div>
 </div>
@@ -271,8 +188,6 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-let currentUser = null;
-
 async function loadUser() {
   try {
     const res = await fetch(`${window.API_BASE}/api/auth/me`, { credentials: 'include' });
@@ -280,113 +195,20 @@ async function loadUser() {
       window.location.href = 'login.html';
       return;
     }
-    currentUser = await res.json();
+    const user = await res.json();
 
-    if (currentUser.role === 'admin') {
+    // If admin, send them to the admin portal instead
+    if (user.role === 'admin') {
       window.location.href = 'admin.html';
       return;
     }
 
-    // Populate profile
-    const fullName = `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || 'Member';
-    document.getElementById('user-name').textContent = fullName;
-    document.getElementById('user-email').textContent = currentUser.email;
-    document.getElementById('p-name').textContent = fullName;
-    document.getElementById('p-email').textContent = currentUser.email;
-    document.getElementById('p-branch').textContent = currentUser.branch || '—';
-    document.getElementById('p-status').textContent = currentUser.service_status || '—';
-
-    const verifiedEl = document.getElementById('p-verified');
-    if (currentUser.verified) {
-      verifiedEl.textContent = 'Verified';
-      verifiedEl.className = 'status-badge status-verified';
-    } else {
-      verifiedEl.textContent = currentUser.dd214_status === 'pending_review' ? 'In Review' : 'Pending';
-      verifiedEl.className = 'status-badge status-pending';
-      document.getElementById('verification-alert').style.display = 'block';
-    }
-
-    // DD-214 status
-    const dd214Status = document.getElementById('dd214-status-display');
-    if (currentUser.dd214_file) {
-      const labelMap = {
-        'pending_review': { text: 'Under Review', cls: 'status-pending' },
-        'verified': { text: 'Verified', cls: 'status-verified' },
-        'rejected': { text: 'Rejected — please re-upload', cls: 'status-rejected' }
-      };
-      const info = labelMap[currentUser.dd214_status] || { text: 'Submitted', cls: 'status-pending' };
-      dd214Status.innerHTML = `<span class="status-badge ${info.cls}">${info.text}</span>`;
-    } else {
-      dd214Status.innerHTML = `<span class="status-badge status-pending">Not uploaded</span>`;
-    }
-
-    loadCourses();
+    const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Member';
+    document.getElementById('cs-name').textContent = fullName;
+    document.getElementById('cs-email').textContent = user.email;
+    document.getElementById('cs-email-meta').textContent = user.email;
   } catch (err) {
     window.location.href = 'login.html';
-  }
-}
-
-async function loadCourses() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/member/courses`, { credentials: 'include' });
-    const courses = await res.json();
-    const list = document.getElementById('courses-list');
-    if (!courses.length) {
-      list.innerHTML = '<div style="padding: 1rem 0; font-size: 0.85rem; color: var(--muted);">No courses available yet.</div>';
-      return;
-    }
-    list.innerHTML = courses.map(c => `
-      <div class="course-item" data-testid="course-${c.id}">
-        <div style="flex: 1;">
-          <div class="course-name">${c.title}</div>
-          <div class="course-meta">${c.total_lessons} lessons · ${c.status === 'live' ? 'Available' : 'Coming soon'}</div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <div class="progress-bar"><div class="progress-fill" style="width: ${c.progress}%;"></div></div>
-          <span style="font-size: 0.75rem; color: var(--muted); min-width: 40px; text-align: right;">${c.progress}%</span>
-        </div>
-      </div>
-    `).join('');
-  } catch (err) {
-    document.getElementById('courses-list').innerHTML = '<div style="padding: 1rem 0; font-size: 0.85rem; color: var(--red-light);">Failed to load courses.</div>';
-  }
-}
-
-async function handleFileSelect(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  if (file.size > 10 * 1024 * 1024) {
-    alert('File too large. Maximum 10MB.');
-    return;
-  }
-
-  const progress = document.getElementById('upload-progress');
-  progress.style.display = 'block';
-  progress.textContent = 'Uploading...';
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  try {
-    const res = await fetch(`${window.API_BASE}/api/upload/dd214`, {
-      method: 'POST',
-      credentials: 'include',
-      body: formData
-    });
-
-    if (res.ok) {
-      progress.style.color = '#4ade80';
-      progress.textContent = 'Upload successful. Your DD-214 is now under review.';
-      setTimeout(() => loadUser(), 1500);
-    } else {
-      const data = await res.json();
-      progress.style.color = 'var(--red-light)';
-      progress.textContent = data.detail || 'Upload failed.';
-    }
-  } catch (err) {
-    progress.style.color = 'var(--red-light)';
-    progress.textContent = 'Connection error. Please try again.';
   }
 }
 
@@ -401,24 +223,7 @@ async function handleLogout() {
   window.location.href = 'index.html';
 }
 
-// Drag and drop
-document.addEventListener('DOMContentLoaded', () => {
-  loadUser();
-
-  const zone = document.getElementById('upload-zone');
-  if (zone) {
-    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragging'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
-    zone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      zone.classList.remove('dragging');
-      if (e.dataTransfer.files.length) {
-        document.getElementById('dd214-file').files = e.dataTransfer.files;
-        handleFileSelect({ target: { files: e.dataTransfer.files } });
-      }
-    });
-  }
-});
+document.addEventListener('DOMContentLoaded', loadUser);
 </script>
 </body>
 </html>
