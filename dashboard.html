@@ -190,8 +190,9 @@
 <script>
 async function loadUser() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/auth/me`, { credentials: 'include' });
+    const res = await window.authFetch(`${window.API_BASE}/api/auth/me`);
     if (!res.ok) {
+      window.clearAuth();
       window.location.href = 'login.html';
       return;
     }
@@ -214,12 +215,9 @@ async function loadUser() {
 
 async function handleLogout() {
   try {
-    await fetch(`${window.API_BASE}/api/auth/logout`, {
-      method: 'POST',
-      credentials: 'include'
-    });
+    await window.authFetch(`${window.API_BASE}/api/auth/logout`, { method: 'POST' });
   } catch (e) {}
-  localStorage.removeItem('sh_user');
+  window.clearAuth();
   window.location.href = 'index.html';
 }
 

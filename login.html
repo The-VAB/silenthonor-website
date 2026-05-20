@@ -258,8 +258,11 @@ async function handleLogin() {
     const data = await response.json();
 
     if (response.ok) {
+      // Store tokens in localStorage as fallback for browsers blocking cookies
+      if (data.access_token) localStorage.setItem('sh_access_token', data.access_token);
+      if (data.refresh_token) localStorage.setItem('sh_refresh_token', data.refresh_token);
       localStorage.setItem('sh_user', JSON.stringify(data));
-      
+
       if (data.role === 'admin') {
         window.location.href = 'admin.html';
       } else {
@@ -282,9 +285,7 @@ async function handleLogin() {
 // Check if already logged in
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
-      credentials: 'include'
-    });
+    const response = await window.authFetch(`${window.API_BASE}/api/auth/me`);
     if (response.ok) {
       const user = await response.json();
       if (user.role === 'admin') {

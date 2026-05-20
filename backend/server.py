@@ -292,17 +292,19 @@ async def register(request: Request, response: Response, data: RegisterRequest):
     access_token = create_access_token(user_id, email)
     refresh_token = create_refresh_token(user_id)
     
-    # Set cookies
-    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=3600, path="/")
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=False, samesite="lax", max_age=604800, path="/")
-    
+    # Set cookies (secure=True for HTTPS; works alongside Bearer token fallback)
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="lax", max_age=3600, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="lax", max_age=604800, path="/")
+
     return {
         "id": user_id,
         "email": email,
         "first_name": data.first_name,
         "last_name": data.last_name,
         "role": "member",
-        "verified": False
+        "verified": False,
+        "access_token": access_token,
+        "refresh_token": refresh_token
     }
 
 @app.post("/api/auth/login")
@@ -328,9 +330,9 @@ async def login(request: Request, response: Response, data: LoginRequest):
     access_token = create_access_token(user_id, email)
     refresh_token = create_refresh_token(user_id)
     
-    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=3600, path="/")
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=False, samesite="lax", max_age=604800, path="/")
-    
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="lax", max_age=3600, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="lax", max_age=604800, path="/")
+
     return {
         "id": user_id,
         "email": user["email"],
@@ -339,7 +341,9 @@ async def login(request: Request, response: Response, data: LoginRequest):
         "role": user.get("role", "member"),
         "verified": user.get("verified", False),
         "branch": user.get("branch"),
-        "service_status": user.get("service_status")
+        "service_status": user.get("service_status"),
+        "access_token": access_token,
+        "refresh_token": refresh_token
     }
 
 @app.post("/api/auth/logout")
@@ -371,9 +375,9 @@ async def refresh_token(request: Request, response: Response):
         user_id = str(user["_id"])
         access_token = create_access_token(user_id, user["email"])
         
-        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=3600, path="/")
+        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="lax", max_age=3600, path="/")
         
-        return {"message": "Token refreshed"}
+        return {"message": "Token refreshed", "access_token": access_token}
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Refresh token expired")
     except jwt.InvalidTokenError:

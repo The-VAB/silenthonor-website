@@ -313,7 +313,7 @@
   <div id="tab-members" class="tab-content">
     <div class="section-title">
       <span>All Members</span>
-      <a href="" id="export-members-link" class="action-btn primary" data-testid="export-members-btn">⤓ Download as CSV</a>
+      <a href="#" onclick="event.preventDefault(); downloadCsv('members');" id="export-members-link" class="action-btn primary" data-testid="export-members-btn">⤓ Download as CSV</a>
     </div>
     <div style="overflow-x: auto;">
       <table class="data-table" data-testid="members-table">
@@ -362,7 +362,7 @@
   <div id="tab-contacts" class="tab-content">
     <div class="section-title">
       <span>Contact Submissions</span>
-      <a href="" id="export-contacts-link" class="action-btn primary" data-testid="export-contacts-btn">⤓ Download as CSV</a>
+      <a href="#" onclick="event.preventDefault(); downloadCsv('contacts');" id="export-contacts-link" class="action-btn primary" data-testid="export-contacts-btn">⤓ Download as CSV</a>
     </div>
     <div style="overflow-x: auto;">
       <table class="data-table" data-testid="contacts-table">
@@ -422,8 +422,9 @@ let currentVerifyMemberId = null;
 
 async function loadAdmin() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/auth/me`, { credentials: 'include' });
+    const res = await window.authFetch(`${window.API_BASE}/api/auth/me`);
     if (!res.ok) {
+      window.clearAuth();
       window.location.href = 'login.html';
       return;
     }
@@ -433,9 +434,6 @@ async function loadAdmin() {
       return;
     }
     document.getElementById('admin-email').textContent = currentAdmin.email;
-    // Wire CSV export links
-    document.getElementById('export-members-link').href = `${window.API_BASE}/api/admin/export/members.csv`;
-    document.getElementById('export-contacts-link').href = `${window.API_BASE}/api/admin/export/contacts.csv`;
     loadStats();
     loadMembers();
     loadCourses();
@@ -454,7 +452,7 @@ function switchTab(tab) {
 
 async function loadStats() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/stats`, { credentials: 'include' });
+    const res = await window.authFetch(`${window.API_BASE}/api/admin/stats`);
     const data = await res.json();
     document.getElementById('stat-members').textContent = data.total_members;
     document.getElementById('stat-verified').textContent = data.verified_members;
@@ -466,7 +464,7 @@ async function loadStats() {
 
 async function loadMembers() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members`, { credentials: 'include' });
+    const res = await window.authFetch(`${window.API_BASE}/api/admin/members`);
     const members = await res.json();
     const tbody = document.getElementById('members-tbody');
     const dd214Tbody = document.getElementById('dd214-tbody');
@@ -498,7 +496,7 @@ async function loadMembers() {
           <td>${m.email}</td>
           <td>${m.branch || '—'}</td>
           <td><span class="status-badge ${m.verified ? 'status-verified' : m.dd214_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${m.dd214_status || 'pending'}</span></td>
-          <td><a href="${window.API_BASE}/api/admin/dd214/${m.dd214_file}" target="_blank" style="color: var(--red-light); font-size: 0.8rem;" data-testid="view-dd214-${m.id}">View</a></td>
+          <td><a href="#" onclick="event.preventDefault(); openDd214('${m.dd214_file}');" style="color: var(--red-light); font-size: 0.8rem;" data-testid="view-dd214-${m.id}">View</a></td>
           <td>
             <button class="action-btn primary" onclick="openVerifyModal('${m.id}', '${m.first_name} ${m.last_name}', '${m.email}', '${m.dd214_file}')" data-testid="review-${m.id}">Review</button>
           </td>
@@ -510,7 +508,7 @@ async function loadMembers() {
 
 async function loadCourses() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/courses`, { credentials: 'include' });
+    const res = await window.authFetch(`${window.API_BASE}/api/admin/courses`);
     const courses = await res.json();
     const tbody = document.getElementById('courses-tbody');
     if (!courses.length) {
@@ -534,7 +532,7 @@ async function loadCourses() {
 
 async function loadContacts() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/contacts`, { credentials: 'include' });
+    const res = await window.authFetch(`${window.API_BASE}/api/admin/contacts`);
     const contacts = await res.json();
     const tbody = document.getElementById('contacts-tbody');
     if (!contacts.length) {
@@ -590,9 +588,8 @@ async function saveCourse() {
   const method = id ? 'PUT' : 'POST';
 
   try {
-    const res = await fetch(url, {
+    const res = await window.authFetch(url, {
       method,
-      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
@@ -612,9 +609,8 @@ async function saveCourse() {
 async function deleteCourse(id) {
   if (!confirm('Delete this course and all its lessons?')) return;
   try {
-    await fetch(`${window.API_BASE}/api/admin/courses/${id}`, {
-      method: 'DELETE',
-      credentials: 'include'
+    await window.authFetch(`${window.API_BASE}/api/admin/courses/${id}`, {
+      method: 'DELETE'
     });
     loadCourses();
     loadStats();
@@ -629,9 +625,23 @@ function openVerifyModal(memberId, name, email, file) {
     <span style="color: var(--muted); font-size: 0.85rem;">${email}</span>
   `;
   document.getElementById('dd214-preview').innerHTML = `
-    <a href="${window.API_BASE}/api/admin/dd214/${file}" target="_blank" class="action-btn primary">Open DD-214 Document</a>
+    <a href="#" onclick="event.preventDefault(); openDd214('${file}');" class="action-btn primary">Open DD-214 Document</a>
   `;
   document.getElementById('verify-modal').classList.add('open');
+}
+
+// Open DD-214 in new tab — uses authFetch then blob URL (so Bearer token works)
+async function openDd214(filename) {
+  try {
+    const res = await window.authFetch(`${window.API_BASE}/api/admin/dd214/${filename}`);
+    if (!res.ok) { alert('Could not load file.'); return; }
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+  } catch (e) {
+    alert('Connection error.');
+  }
 }
 
 function closeVerifyModal() {
@@ -642,9 +652,8 @@ function closeVerifyModal() {
 async function verifyMember(status) {
   if (!currentVerifyMemberId) return;
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members/${currentVerifyMemberId}/verify`, {
+    const res = await window.authFetch(`${window.API_BASE}/api/admin/members/${currentVerifyMemberId}/verify`, {
       method: 'POST',
-      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
     });
@@ -662,13 +671,30 @@ async function verifyMember(status) {
 
 async function handleLogout() {
   try {
-    await fetch(`${window.API_BASE}/api/auth/logout`, {
-      method: 'POST',
-      credentials: 'include'
-    });
+    await window.authFetch(`${window.API_BASE}/api/auth/logout`, { method: 'POST' });
   } catch (e) {}
-  localStorage.removeItem('sh_user');
+  window.clearAuth();
   window.location.href = 'index.html';
+}
+
+// CSV download — uses authFetch so Bearer token is sent, then triggers a browser download
+async function downloadCsv(kind) {
+  const url = `${window.API_BASE}/api/admin/export/${kind}.csv`;
+  try {
+    const res = await window.authFetch(url);
+    if (!res.ok) { alert('Failed to download CSV.'); return; }
+    const blob = await res.blob();
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `silenthonor_${kind}_${today}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  } catch (e) {
+    alert('Connection error.');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', loadAdmin);

@@ -40,6 +40,30 @@ const LOGO_URL = 'https://customer-assets.emergentagent.com/job_build-launch-21/
 // API Base URL
 window.API_BASE = window.location.origin;
 
+// ───────────────────────────────────────────────────────────────────────────
+//  AUTH HELPER — works across all browsers (incl. Safari/Brave with cookie blocking)
+//  We use BOTH httpOnly cookies AND a localStorage token as fallback.
+//  authFetch() automatically attaches the bearer token if one is stored.
+// ───────────────────────────────────────────────────────────────────────────
+window.authFetch = function (url, options = {}) {
+  const token = localStorage.getItem('sh_access_token');
+  const headers = { ...(options.headers || {}) };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return fetch(url, {
+    ...options,
+    credentials: 'include',
+    headers
+  });
+};
+
+window.clearAuth = function () {
+  localStorage.removeItem('sh_access_token');
+  localStorage.removeItem('sh_refresh_token');
+  localStorage.removeItem('sh_user');
+};
+
 // Current page detection
 function getCurrentPage() {
   const path = window.location.pathname;
@@ -50,9 +74,7 @@ function getCurrentPage() {
 // Check auth state (used by protected pages)
 async function checkAuth() {
   try {
-    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
-      credentials: 'include'
-    });
+    const response = await window.authFetch(`${window.API_BASE}/api/auth/me`);
     if (response.ok) return await response.json();
     return null;
   } catch (e) {

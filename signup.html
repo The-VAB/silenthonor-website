@@ -409,6 +409,9 @@ async function handleSignup() {
     const data = await response.json();
 
     if (response.ok) {
+      // Store tokens in localStorage as fallback for browsers blocking cookies
+      if (data.access_token) localStorage.setItem('sh_access_token', data.access_token);
+      if (data.refresh_token) localStorage.setItem('sh_refresh_token', data.refresh_token);
       localStorage.setItem('sh_user', JSON.stringify(data));
       window.location.href = 'dashboard.html';
     } else {
