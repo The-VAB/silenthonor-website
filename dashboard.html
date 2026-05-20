@@ -117,20 +117,6 @@
   flex-wrap: wrap;
 }
 
-.cs-meta {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.cs-meta a { color: var(--red-light); text-decoration: none; margin-left: 0.5rem; }
-.cs-meta a:hover { text-decoration: underline; }
-
 @media (max-width: 640px) {
   .cs-card { padding: 2.5rem 1.5rem; }
 }
@@ -142,24 +128,24 @@
 
 <div class="cs-wrapper">
   <div class="cs-card" data-testid="coming-soon-card">
-    <div class="cs-tag">Member Status</div>
-    <h1 class="cs-title">Your Membership<br><em>is Active</em></h1>
+    <div class="cs-tag">Membership Status</div>
+    <h1 class="cs-title">Your Dashboard is<br><em>Coming Soon</em></h1>
 
     <p class="cs-greeting" data-testid="cs-greeting">
-      Welcome, <strong id="cs-name">Member</strong>. Thanks for joining the mission.
+      <span id="cs-welcome-line">Welcome to the mission. Thanks for joining Silent Honor.</span>
     </p>
 
     <div class="cs-divider"></div>
 
     <p class="cs-body">
-      The full <strong style="color: var(--white);">Member Dashboard</strong> — with courses, coaching booking, DD-214 verification, and resource library — is launching soon.
-      We're finishing the build now. You'll get an email at <strong id="cs-email" style="color: var(--white);">your email</strong> the moment it goes live.
+      The full <strong style="color: var(--white);">Member Dashboard</strong> — with courses, coaching booking, and resource library — is launching soon.
+      We're finishing the build now. You'll receive an email at the address you provided the moment it goes live.
     </p>
 
     <div class="cs-checklist" data-testid="cs-checklist">
       <div class="cs-check-item done">
         <div class="icon">✓</div>
-        <div><strong>Membership received</strong> — Your information is on file with the foundation.</div>
+        <div><strong>Application received</strong> — Your information is on file with the foundation.</div>
       </div>
       <div class="cs-check-item">
         <div class="icon">2</div>
@@ -173,13 +159,8 @@
 
     <div class="cs-actions">
       <a href="courses.html" class="btn-outline" data-testid="cs-courses-btn">Preview Courses</a>
-      <a href="contact.html" class="btn-outline" data-testid="cs-contact-btn">Contact Us</a>
-      <button class="btn-primary" onclick="handleLogout()" data-testid="logout-btn">Sign Out</button>
-    </div>
-
-    <div class="cs-meta">
-      Joined as <span id="cs-email-meta" style="color: var(--white);">—</span>
-      <a href="#" onclick="event.preventDefault(); handleLogout();">Sign out</a>
+      <a href="services.html" class="btn-outline" data-testid="cs-services-btn">View Services</a>
+      <a href="contact.html" class="btn-primary" data-testid="cs-contact-btn">Contact Us</a>
     </div>
   </div>
 </div>
@@ -188,40 +169,19 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-async function loadUser() {
+// Personalize greeting if a name was passed via sessionStorage from signup.html
+(function personalize() {
   try {
-    const res = await window.authFetch(`${window.API_BASE}/api/auth/me`);
-    if (!res.ok) {
-      window.clearAuth();
-      window.location.href = 'login.html';
-      return;
+    const name = sessionStorage.getItem('sh_member_name');
+    if (name && name.trim()) {
+      const firstName = name.trim().split(/\s+/)[0];
+      const line = document.getElementById('cs-welcome-line');
+      line.innerHTML = `Welcome, <strong>${firstName}</strong>. Thanks for joining the mission.`;
+      // One-time use — clear so reloads don't keep showing it
+      sessionStorage.removeItem('sh_member_name');
     }
-    const user = await res.json();
-
-    // If admin, send them to the admin portal instead
-    if (user.role === 'admin') {
-      window.location.href = 'admin.html';
-      return;
-    }
-
-    const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Member';
-    document.getElementById('cs-name').textContent = fullName;
-    document.getElementById('cs-email').textContent = user.email;
-    document.getElementById('cs-email-meta').textContent = user.email;
-  } catch (err) {
-    window.location.href = 'login.html';
-  }
-}
-
-async function handleLogout() {
-  try {
-    await window.authFetch(`${window.API_BASE}/api/auth/logout`, { method: 'POST' });
   } catch (e) {}
-  window.clearAuth();
-  window.location.href = 'index.html';
-}
-
-document.addEventListener('DOMContentLoaded', loadUser);
+})();
 </script>
 </body>
 </html>

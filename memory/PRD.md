@@ -20,7 +20,12 @@ Build a full non-profit site for **Silent Honor Foundation** using HTML/CSS/JS f
 - Deployment: Emergent Kubernetes pod (ingress routes `/api/*` → 8001, everything else → 3000)
 
 ## What's Been Implemented (Feb 2026)
-- [Feb 20 — Pivot to SuiteDash] Dashboard.html replaced with a clean **"Membership Coming Soon"** screen (welcomes member by name, shows checklist, sign-out works). FastAPI signup still persists every member to MongoDB as the interim ledger.
+- [Feb 20 — Signup → Google Sheets] Completely rebuilt `/signup.html` with the new field set (Full Name, Email, Phone, Branch [12 options], Status [4 options], Years of Service, State [all 50], Services Interested In [6 checkboxes], Heard About Us [10 options], Challenge textarea). NO MongoDB dependency — submits as JSON to a `GOOGLE_SCRIPT_URL` constant (`mode: 'no-cors'`, `Content-Type: text/plain` to avoid preflight). Placeholder URL at top of file: `PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE`.
+- [Feb 20] After signup success: green ✓ overlay → 3-second countdown → auto-redirect to `/dashboard.html`. Submitter's first name is stashed in `sessionStorage` so dashboard greets them personally.
+- [Feb 20] `/dashboard.html` rebuilt as a pure-static "Membership Dashboard Coming Soon" page — no auth check, no backend dependency. Welcomes the signed-up member by first name if available.
+- [Feb 20] Removed all "Available Now" / "Coming Soon" badges from `/courses.html` and `/services.html` (4 + 6 badges + section subtitle)
+- [Feb 20 — Auth bug fix] Bearer-token + secure cookie auth — solved Safari/Brave bounce issue
+- [Feb 20 — Pivot to SuiteDash] Dashboard.html replaced with a clean **"Membership Coming Soon"** screen
 - [Feb 20] Added admin **CSV exports** — `GET /api/admin/export/members.csv` and `/api/admin/export/contacts.csv`. New "↓ Download as CSV" buttons on Members and Contacts tabs in the admin portal. This is the user's "membership spreadsheet."
 - [Feb 20] `js/components.js` now has a single **`MEMBER_PORTAL_URL`** placeholder constant (`https://CHANGE-ME.suitedash.com`). When swapped for a real SuiteDash URL, every Member Login button across the site auto-routes to SuiteDash; local FastAPI flow remains as fallback / admin access.
 - [Feb 20] Services "Getting Started" step 3 reworded — intake now clearly happens after applying for a service

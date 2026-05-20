@@ -15,7 +15,7 @@
 
 .signup-header {
   text-align: center;
-  max-width: 700px;
+  max-width: 720px;
   margin: 0 auto 3rem;
 }
 
@@ -38,10 +38,7 @@
   margin-bottom: 1rem;
 }
 
-.signup-title em {
-  font-style: normal;
-  color: var(--red-light);
-}
+.signup-title em { font-style: normal; color: var(--red-light); }
 
 .signup-subtitle {
   font-family: 'Lora', serif;
@@ -53,15 +50,13 @@
 
 .signup-content {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  grid-template-columns: 1fr 1.3fr;
   gap: 4rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.signup-benefits {
-  padding: 2rem 0;
-}
+.signup-benefits { padding: 2rem 0; }
 
 .benefit-card {
   background: rgba(17, 24, 39, 0.6);
@@ -80,16 +75,8 @@
   margin-bottom: 0.5rem;
 }
 
-.benefit-desc {
-  font-size: 0.88rem;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.benefit-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.8rem;
-}
+.benefit-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+.benefit-icon { font-size: 1.5rem; margin-bottom: 0.8rem; }
 
 .signup-form-container {
   background: rgba(17, 24, 39, 0.95);
@@ -112,14 +99,9 @@
   margin-bottom: 0.3rem;
 }
 
-.form-header-sub {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
+.form-header-sub { font-size: 0.85rem; color: var(--muted); }
 
-.form-group {
-  margin-bottom: 1.25rem;
-}
+.form-group { margin-bottom: 1.25rem; }
 
 .form-label {
   display: block;
@@ -132,16 +114,22 @@
   margin-bottom: 0.5rem;
 }
 
-.form-input, .form-select {
+.form-label .req { color: var(--red-light); margin-left: 4px; }
+
+.form-input, .form-select, .form-textarea {
   width: 100%;
   background: var(--navy);
   border: 1px solid var(--border);
   color: var(--white);
   padding: 0.9rem 1rem;
   font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
 }
 
-.form-input:focus, .form-select:focus {
+.form-textarea { min-height: 110px; resize: vertical; }
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
   outline: none;
   border-color: var(--red);
 }
@@ -151,6 +139,29 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
+
+/* Checkbox group */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--navy);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checkbox-item:hover { border-color: rgba(185, 28, 28, 0.5); }
+.checkbox-item input { accent-color: var(--red); width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+.checkbox-item span { font-size: 0.85rem; color: var(--white); }
+.checkbox-item input:checked + span { color: var(--red-light); font-weight: 500; }
 
 .error-msg {
   background: rgba(185, 28, 28, 0.1);
@@ -162,8 +173,70 @@
   display: none;
 }
 
-.error-msg.show {
-  display: block;
+.error-msg.show { display: block; }
+
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 19, 32, 0.97);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.success-overlay.show { display: flex; }
+
+.success-card {
+  background: rgba(17, 24, 39, 0.98);
+  border: 1px solid var(--border);
+  border-top: 3px solid #22c55e;
+  padding: 3rem;
+  max-width: 540px;
+  width: 100%;
+  text-align: center;
+}
+
+.success-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1.5rem;
+  background: rgba(34, 197, 94, 0.12);
+  border: 2px solid #22c55e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  color: #22c55e;
+}
+
+.success-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.success-title em { font-style: normal; color: #4ade80; }
+
+.success-body {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+}
+
+.redirect-note {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-light);
 }
 
 .submit-btn {
@@ -175,21 +248,15 @@
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  padding: 1rem;
+  padding: 1.1rem;
   border: none;
   cursor: pointer;
   transition: background 0.2s;
   margin-top: 1rem;
 }
 
-.submit-btn:hover {
-  background: var(--red-light);
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+.submit-btn:hover { background: var(--red-light); }
+.submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
 .already-member {
   text-align: center;
@@ -200,25 +267,26 @@
   color: var(--muted);
 }
 
-.already-member a {
-  color: var(--red-light);
-  text-decoration: none;
+.already-member a { color: var(--red-light); text-decoration: none; }
+
+.privacy-note {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 1rem;
+  text-align: center;
+  line-height: 1.6;
 }
 
 @media (max-width: 1024px) {
-  .signup-wrapper {
-    padding: 100px 2rem 3rem;
-  }
-  .signup-content {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-  .signup-benefits {
-    order: 2;
-  }
-  .form-row {
-    grid-template-columns: 1fr;
-  }
+  .signup-wrapper { padding: 100px 2rem 3rem; }
+  .signup-content { grid-template-columns: 1fr; gap: 2rem; }
+  .signup-benefits { order: 2; }
+  .form-row, .checkbox-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .signup-wrapper { padding: 90px 1.25rem 2.5rem; }
+  .signup-form-container { padding: 1.75rem; }
 }
 </style>
 </head>
@@ -226,207 +294,289 @@
 <div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
 <div id="nav-placeholder"></div>
 
-<div class="signup-wrapper page-content">
-  
+<div class="signup-wrapper">
   <div class="signup-header">
-    <div class="signup-tag">Free for All Veterans</div>
-    <h1 class="signup-title">Join the <em>Silent Honor</em> Community</h1>
-    <p class="signup-subtitle">Get access to free financial education courses, credit counseling resources, and a supportive community of fellow veterans.</p>
+    <div class="signup-tag">Free Membership</div>
+    <h1 class="signup-title">Become a <em>Silent Honor</em> Member</h1>
+    <p class="signup-subtitle">Join the community and lock in free access to courses, coaching, and resources designed specifically for veterans. Takes about 3 minutes.</p>
   </div>
 
   <div class="signup-content">
-    
+    <!-- LEFT: Benefits -->
     <div class="signup-benefits">
       <div class="benefit-card">
         <div class="benefit-icon">📚</div>
         <div class="benefit-title">Free Financial Courses</div>
-        <div class="benefit-desc">Access our complete library of credit education and financial literacy courses designed specifically for veterans.</div>
+        <div class="benefit-desc">Self-paced courses on credit, debt, budgeting, and VA loans — built for the veteran experience.</div>
       </div>
-
       <div class="benefit-card">
         <div class="benefit-icon">🎯</div>
-        <div class="benefit-title">Personalized Guidance</div>
-        <div class="benefit-desc">Get one-on-one support from certified counselors who understand the unique challenges veterans face.</div>
+        <div class="benefit-title">1-on-1 Coaching</div>
+        <div class="benefit-desc">Personalized sessions with a Certified Financial Education Instructor. No judgment. No scripts.</div>
       </div>
-
       <div class="benefit-card">
-        <div class="benefit-icon">🏠</div>
-        <div class="benefit-title">VA Loan Resources</div>
-        <div class="benefit-desc">Learn how to leverage your VA loan benefits and prepare for homeownership with our specialized programs.</div>
+        <div class="benefit-icon">💳</div>
+        <div class="benefit-title">Credit Review &amp; Repair</div>
+        <div class="benefit-desc">Full report review with a roadmap to improve your score and protect your credit long-term.</div>
       </div>
-
       <div class="benefit-card">
-        <div class="benefit-icon">👥</div>
-        <div class="benefit-title">Veteran Community</div>
-        <div class="benefit-desc">Connect with fellow veterans who are on the same journey toward financial stability and independence.</div>
-      </div>
-
-      <div class="benefit-card">
-        <div class="benefit-icon">✓</div>
-        <div class="benefit-title">100% Free</div>
-        <div class="benefit-desc">All programs and resources are completely free for verified veterans. No hidden fees, ever.</div>
+        <div class="benefit-icon">🤝</div>
+        <div class="benefit-title">Community of Veterans</div>
+        <div class="benefit-desc">Connect with veterans who've been where you are and are committed to helping each other build.</div>
       </div>
     </div>
 
+    <!-- RIGHT: Form -->
     <div class="signup-form-container">
       <div class="form-header">
-        <div class="form-header-title">Create Your Free Account</div>
-        <div class="form-header-sub">Join thousands of veterans building stronger financial futures.</div>
+        <div class="form-header-title">Membership Application</div>
+        <div class="form-header-sub">100% free for eligible veterans. We'll be in touch within 2–3 business days.</div>
       </div>
 
-      <div class="error-msg" id="error-msg"></div>
+      <div class="error-msg" id="error-msg" data-testid="signup-error"></div>
 
-      <form id="signup-form" onsubmit="return false;">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">First Name *</label>
-            <input type="text" id="first_name" class="form-input" placeholder="John" required data-testid="signup-firstname">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Last Name *</label>
-            <input type="text" id="last_name" class="form-input" placeholder="Smith" required data-testid="signup-lastname">
-          </div>
-        </div>
-
+      <form id="signup-form" data-testid="signup-form" novalidate>
+        <!-- Full Name -->
         <div class="form-group">
-          <label class="form-label">Email Address *</label>
-          <input type="email" id="email" class="form-input" placeholder="you@email.com" required data-testid="signup-email">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Password *</label>
-          <input type="password" id="password" class="form-input" placeholder="Min. 8 characters" required data-testid="signup-password">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Phone Number</label>
-          <input type="tel" id="phone" class="form-input" placeholder="(555) 555-5555">
+          <label class="form-label" for="full_name">Full Name<span class="req">*</span></label>
+          <input type="text" id="full_name" name="full_name" class="form-input" required data-testid="signup-full-name">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">State</label>
-            <select id="state" class="form-select">
-              <option value="">Select state</option>
-              <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option>
-              <option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option>
-              <option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option>
-              <option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option>
-              <option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option>
-              <option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
-              <option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option>
-              <option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option>
-              <option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
-              <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option>
-              <option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option>
-              <option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option>
-              <option>Wisconsin</option><option>Wyoming</option>
-            </select>
+            <label class="form-label" for="email">Email<span class="req">*</span></label>
+            <input type="email" id="email" name="email" class="form-input" required data-testid="signup-email">
           </div>
           <div class="form-group">
-            <label class="form-label">Branch of Service</label>
-            <select id="branch" class="form-select">
+            <label class="form-label" for="phone">Phone<span class="req">*</span></label>
+            <input type="tel" id="phone" name="phone" class="form-input" placeholder="(555) 123-4567" required data-testid="signup-phone">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="branch">Branch of Service<span class="req">*</span></label>
+            <select id="branch" name="branch" class="form-select" required data-testid="signup-branch">
               <option value="">Select branch</option>
               <option>Army</option>
               <option>Navy</option>
-              <option>Air Force</option>
               <option>Marine Corps</option>
-              <option>Coast Guard</option>
+              <option>Air Force</option>
               <option>Space Force</option>
+              <option>Coast Guard</option>
               <option>National Guard</option>
+              <option>Army Reserve</option>
+              <option>Navy Reserve</option>
+              <option>Marine Corps Reserve</option>
+              <option>Air Force Reserve</option>
+              <option>Coast Guard Reserve</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="status">Current Status<span class="req">*</span></label>
+            <select id="status" name="status" class="form-select" required data-testid="signup-status">
+              <option value="">Select status</option>
+              <option>Active Duty</option>
+              <option>Veteran</option>
               <option>Reserve</option>
+              <option>National Guard</option>
             </select>
           </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="years_of_service">Years of Service<span class="req">*</span></label>
+            <input type="number" id="years_of_service" name="years_of_service" class="form-input" min="0" max="60" required data-testid="signup-years">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="state">State of Residence<span class="req">*</span></label>
+            <select id="state" name="state" class="form-select" required data-testid="signup-state">
+              <option value="">Select state</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Services Interested In -->
         <div class="form-group">
-          <label class="form-label">Service Status</label>
-          <select id="service_status" class="form-select">
-            <option value="">Select status</option>
-            <option>Veteran</option>
-            <option>Active Duty</option>
-            <option>Reserve / Guard</option>
-            <option>Retired</option>
+          <label class="form-label">Services Interested In <span style="text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 0.7rem; font-weight: 400;">(select all that apply)</span></label>
+          <div class="checkbox-grid" data-testid="signup-services">
+            <label class="checkbox-item"><input type="checkbox" name="services" value="Credit Review and Education"><span>Credit Review and Education</span></label>
+            <label class="checkbox-item"><input type="checkbox" name="services" value="Financial Literacy Training"><span>Financial Literacy Training</span></label>
+            <label class="checkbox-item"><input type="checkbox" name="services" value="VA Loan Closing Cost Assistance"><span>VA Loan Closing Cost Assistance</span></label>
+            <label class="checkbox-item"><input type="checkbox" name="services" value="Financial Coaching"><span>Financial Coaching</span></label>
+            <label class="checkbox-item"><input type="checkbox" name="services" value="Debt Management Planning"><span>Debt Management Planning</span></label>
+            <label class="checkbox-item"><input type="checkbox" name="services" value="VA Disability Support"><span>VA Disability Support</span></label>
+          </div>
+        </div>
+
+        <!-- How heard about us -->
+        <div class="form-group">
+          <label class="form-label" for="heard_about">How Did You Hear About Us?</label>
+          <select id="heard_about" name="heard_about" class="form-select" data-testid="signup-heard-about">
+            <option value="">Select one</option>
+            <option>Facebook</option>
+            <option>Instagram</option>
+            <option>LinkedIn</option>
+            <option>Google Search</option>
+            <option>Word of Mouth</option>
+            <option>VFW/Post</option>
+            <option>VA Office</option>
+            <option>Referred by a Veteran</option>
+            <option>Email Newsletter</option>
+            <option>Other</option>
           </select>
         </div>
 
-        <button type="submit" class="submit-btn" onclick="handleSignup()" data-testid="signup-submit-btn">Create Account →</button>
+        <!-- Challenge textarea -->
+        <div class="form-group">
+          <label class="form-label" for="challenge">What financial challenge can we help you with? <span style="text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 0.7rem; font-weight: 400;">(optional)</span></label>
+          <textarea id="challenge" name="challenge" class="form-textarea" placeholder="Tell us a bit about your situation — we'll match you with the right resources." data-testid="signup-challenge"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" data-testid="signup-submit-btn">Submit Application →</button>
+
+        <p class="privacy-note">By submitting, you agree to be contacted by Silent Honor Foundation. We never share your information.</p>
+
+        <div class="already-member">
+          Already a member? <a href="login.html">Sign in</a>
+        </div>
       </form>
-
-      <div class="already-member">
-        Already have an account? <a href="login.html">Sign in here</a>
-      </div>
     </div>
-
   </div>
+</div>
 
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="success-overlay" data-testid="signup-success">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <h2 class="success-title">Welcome to <em>Silent Honor</em></h2>
+    <p class="success-body">
+      Your membership application has been received. We'll review it and follow up within 2–3 business days at the email you provided.
+    </p>
+    <p class="redirect-note" id="redirect-note">Redirecting you in <span id="redirect-countdown">3</span>…</p>
+  </div>
 </div>
 
 <div id="footer-placeholder"></div>
-
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-async function handleSignup() {
-  const errorEl = document.getElementById('error-msg');
-  errorEl.classList.remove('show');
+// ═══════════════════════════════════════════════════════════════════════════
+//  GOOGLE APPS SCRIPT WEB APP URL
+//  Paste the URL of your published Google Apps Script web app here.
+//  The form will POST a JSON payload to this URL.
+// ═══════════════════════════════════════════════════════════════════════════
+const GOOGLE_SCRIPT_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
 
-  const formData = {
-    first_name: document.getElementById('first_name').value,
-    last_name: document.getElementById('last_name').value,
-    email: document.getElementById('email').value,
-    password: document.getElementById('password').value,
-    phone: document.getElementById('phone').value || null,
-    state: document.getElementById('state').value || null,
-    branch: document.getElementById('branch').value || null,
-    service_status: document.getElementById('service_status').value || null
+const US_STATES = [
+  'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
+  'Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa',
+  'Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan',
+  'Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire',
+  'New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio',
+  'Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota',
+  'Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia',
+  'Wisconsin','Wyoming'
+];
+
+// Populate state dropdown
+(function populateStates() {
+  const sel = document.getElementById('state');
+  US_STATES.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s;
+    sel.appendChild(opt);
+  });
+})();
+
+function showError(message) {
+  const el = document.getElementById('error-msg');
+  el.textContent = message;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearError() {
+  const el = document.getElementById('error-msg');
+  el.textContent = '';
+  el.classList.remove('show');
+}
+
+document.getElementById('signup-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError();
+
+  // Collect form data
+  const form = e.target;
+  const services = Array.from(form.querySelectorAll('input[name="services"]:checked')).map(c => c.value);
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    full_name: form.full_name.value.trim(),
+    email: form.email.value.trim(),
+    phone: form.phone.value.trim(),
+    branch: form.branch.value,
+    status: form.status.value,
+    years_of_service: form.years_of_service.value,
+    state: form.state.value,
+    services_interested_in: services.join(', '),
+    heard_about: form.heard_about.value,
+    challenge: form.challenge.value.trim()
   };
 
-  if (!formData.first_name || !formData.last_name || !formData.email || !formData.password) {
-    errorEl.textContent = 'Please fill in all required fields.';
-    errorEl.classList.add('show');
-    return;
-  }
+  // Client-side validation
+  if (!payload.full_name) return showError('Please enter your full name.');
+  if (!payload.email) return showError('Please enter your email address.');
+  if (!payload.phone) return showError('Please enter your phone number.');
+  if (!payload.branch) return showError('Please select your branch of service.');
+  if (!payload.status) return showError('Please select your current status.');
+  if (!payload.years_of_service) return showError('Please enter your years of service.');
+  if (!payload.state) return showError('Please select your state of residence.');
 
-  if (formData.password.length < 8) {
-    errorEl.textContent = 'Password must be at least 8 characters.';
-    errorEl.classList.add('show');
-    return;
-  }
-
-  const submitBtn = document.querySelector('.submit-btn');
-  submitBtn.textContent = 'Creating Account...';
-  submitBtn.disabled = true;
+  // Disable button
+  const btn = form.querySelector('.submit-btn');
+  const originalText = btn.textContent;
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
 
   try {
-    const response = await fetch(`${window.API_BASE}/api/auth/register`, {
+    // POST to Google Apps Script
+    // Note: Google Apps Script web apps return CORS-restricted responses, so we use
+    // mode: 'no-cors' and send the body as text/plain to avoid the preflight request.
+    // The browser cannot read the response, but the data still reaches the script
+    // and gets written to your Google Sheet successfully.
+    await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(formData)
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
     });
 
-    const data = await response.json();
+    // Show success overlay
+    document.getElementById('success-overlay').classList.add('show');
 
-    if (response.ok) {
-      // Store tokens in localStorage as fallback for browsers blocking cookies
-      if (data.access_token) localStorage.setItem('sh_access_token', data.access_token);
-      if (data.refresh_token) localStorage.setItem('sh_refresh_token', data.refresh_token);
-      localStorage.setItem('sh_user', JSON.stringify(data));
-      window.location.href = 'dashboard.html';
-    } else {
-      errorEl.textContent = data.detail || 'Registration failed. Please try again.';
-      errorEl.classList.add('show');
-      submitBtn.textContent = 'Create Account →';
-      submitBtn.disabled = false;
-    }
+    // Stash name so dashboard.html can personalize the greeting
+    try { sessionStorage.setItem('sh_member_name', payload.full_name); } catch (e) {}
+
+    // Countdown + redirect to coming-soon dashboard
+    let seconds = 3;
+    const countdownEl = document.getElementById('redirect-countdown');
+    const interval = setInterval(() => {
+      seconds -= 1;
+      if (countdownEl) countdownEl.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        window.location.href = 'dashboard.html';
+      }
+    }, 1000);
   } catch (err) {
-    errorEl.textContent = 'Connection error. Please try again.';
-    errorEl.classList.add('show');
-    submitBtn.textContent = 'Create Account →';
-    submitBtn.disabled = false;
+    btn.textContent = originalText;
+    btn.disabled = false;
+    showError('Connection error. Please check your internet and try again.');
   }
-}
+});
 </script>
 </body>
 </html>
