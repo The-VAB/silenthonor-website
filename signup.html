@@ -367,6 +367,8 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
+// Google Apps Script Web App URL
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxBsNJh9eYp14Nete0JqoshWdSGWaMhGZuZe-s6rNmh8ofiSQEuftXusinczNm6hpUsaQ/exec';
 async function handleSignup() {
   const errorEl = document.getElementById('error-msg');
   errorEl.classList.remove('show');
@@ -376,10 +378,11 @@ async function handleSignup() {
     last_name: document.getElementById('last_name').value,
     email: document.getElementById('email').value,
     password: document.getElementById('password').value,
-    phone: document.getElementById('phone').value || null,
-    state: document.getElementById('state').value || null,
-    branch: document.getElementById('branch').value || null,
-    service_status: document.getElementById('service_status').value || null
+    phone: document.getElementById('phone').value.trim() || '',
+    state: document.getElementById('state').value || '',
+    branch: document.getElementById('branch').value || '',
+    service_status: document.getElementById('service_status').value || '',
+    timestamp: new Date().toISOString()
   };
 
   if (!formData.first_name || !formData.last_name || !formData.email || !formData.password) {
@@ -399,28 +402,24 @@ async function handleSignup() {
   submitBtn.disabled = true;
 
   try {
-    const response = await fetch(`${window.API_BASE}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+    const response = await fetch(GOOGLE_SHEET_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
       body: JSON.stringify(formData)
     });
-
     const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem('sh_user', JSON.stringify(data));
-      window.location.href = 'dashboard.html';
+    if (data.ok === true) {
+      window.location.href = "dashboard.html";
     } else {
-      errorEl.textContent = data.detail || 'Registration failed. Please try again.';
-      errorEl.classList.add('show');
-      submitBtn.textContent = 'Create Account →';
+      errorEl.textContent = "Registration failed. Please try again.";
+      errorEl.classList.add("show");
+      submitBtn.textContent = "Create Account →";
       submitBtn.disabled = false;
     }
   } catch (err) {
-    errorEl.textContent = 'Connection error. Please try again.';
-    errorEl.classList.add('show');
-    submitBtn.textContent = 'Create Account →';
+    errorEl.textContent = "Connection error. Please try again.";
+    errorEl.classList.add("show");
+    submitBtn.textContent = "Create Account →";
     submitBtn.disabled = false;
   }
 }
