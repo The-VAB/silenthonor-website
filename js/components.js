@@ -9,7 +9,7 @@ const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7
 const LOGO_URL = 'https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/ejw735ko_a597f541-5826-493e-8e3d-af5702609fa5.tmp';
 
 // API Base URL
-window.API_BASE = window.location.origin;
+window.API_BASE = "http://72.60.175.115:8001";
 
 // Current page detection
 function getCurrentPage() {
