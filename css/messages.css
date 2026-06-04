@@ -1,0 +1,36 @@
+.messages-container{display:grid;grid-template-columns:300px 1fr;gap:0;background:rgba(17,24,39,0.6);border:1px solid var(--border);min-height:calc(100vh - 200px)}
+.messages-sidebar{border-right:1px solid var(--border)}
+.conversations-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+.conversations-header h3{font-family:Oswald,sans-serif;font-size:0.85rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin:0}
+.conversations-list{max-height:calc(100vh - 300px);overflow-y:auto}
+.conversation-item{padding:1rem 1.5rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.2s}
+.conversation-item:hover{background:rgba(255,255,255,0.03)}
+.conversation-item.active{background:rgba(185,28,28,0.1);border-left:3px solid var(--red)}
+.conversation-avatar{width:40px;height:40px;background:var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;margin-right:1rem;float:left}
+.conversation-info{overflow:hidden}
+.conversation-name{font-family:Oswald,sans-serif;font-size:0.9rem;font-weight:600;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conversation-preview{font-size:0.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conversation-time{font-size:0.7rem;color:var(--muted);float:right}
+.conversation-unread .conversation-name{color:var(--red-light)}
+.messages-main{display:flex;flex-direction:column}
+.messages-header{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.chat-recipient{display:flex;align-items:center;gap:1rem}
+.recipient-avatar{width:45px;height:45px;background:var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.recipient-info h4{font-family:Oswald,sans-serif;font-size:1rem;font-weight:600;margin:0 0 0.2rem 0}
+.recipient-status{font-size:0.75rem;color:#10B981}
+.messages-thread{flex:1;padding:1.5rem;overflow-y:auto;max-height:calc(100vh - 400px);min-height:300px}
+.message-bubble{max-width:70%;margin-bottom:1rem;clear:both}
+.message-bubble.sent{float:right;text-align:right}
+.message-bubble.received{float:left}
+.message-content{padding:0.8rem 1rem;border-radius:8px;font-size:0.9rem;line-height:1.5}
+.message-bubble.sent .message-content{background:var(--red);color:var(--white);border-bottom-right-radius:2px}
+.message-bubble.received .message-content{background:rgba(255,255,255,0.08);border-bottom-left-radius:2px}
+.message-timestamp{font-size:0.7rem;color:var(--muted);margin-top:0.3rem}
+.messages-compose{padding:1rem 1.5rem;border-top:1px solid var(--border);background:rgba(11,18,32,0.5)}
+.compose-input{width:100%;background:var(--navy);border:1px solid var(--border);color:var(--white);padding:0.75rem 1rem;font-size:0.9rem;resize:none;font-family:inherit}
+.compose-input:focus{outline:none;border-color:var(--red)}
+.compose-actions{display:flex;justify-content:flex-end;margin-top:0.75rem}
+.compose-send{font-family:Oswald,sans-serif;font-size:0.75rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;background:var(--red);color:var(--white);border:none;padding:0.7rem 1.5rem;cursor:pointer;transition:background 0.2s}
+.compose-send:hover{background:var(--red-light)}
+.compose-send:disabled{opacity:0.5;cursor:not-allowed}
+@media(max-width:900px){.messages-container{grid-template-columns:1fr}.messages-sidebar{display:none}}

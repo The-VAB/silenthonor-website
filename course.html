@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course - Silent Honor Foundation</title>
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/course.css">
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div class="dash-wrapper">
+<nav class="dash-nav">
+<div class="dash-nav-logo"><img src="images/logo.png" alt="Silent Honor" onerror="this.style.display='none'"><span>Silent Honor</span></div>
+<div class="dash-nav-links">
+<a href="dashboard.html" class="dash-nav-link">Dashboard</a>
+<a href="messages.html" class="dash-nav-link">Messages</a>
+<a href="dispute-tracker.html" class="dash-nav-link">Disputes</a>
+<a href="credit-tracker.html" class="dash-nav-link">Credit</a>
+</div>
+<div class="dash-nav-user">
+<div class="user-avatar" id="user-avatar">--</div>
+<span class="user-name" id="user-name">Loading...</span>
+<button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+</div>
+</nav>
+<div class="dash-content">
+<div class="loading-state" id="loading-state"><div class="loading-spinner"></div><p style="color:var(--muted);">Loading course...</p></div>
+<div id="course-content" style="display:none;">
+<div class="course-layout">
+<div class="course-sidebar">
+<div class="course-nav-header">
+<a href="dashboard.html" class="back-link">&#8592; Back to Dashboard</a>
+<h2 class="course-nav-title" id="course-title">Course Title</h2>
+<div class="course-nav-progress">
+<div class="progress-bar"><div class="progress-fill" id="course-progress-bar" style="width:0%"></div></div>
+<span class="progress-label" id="course-progress-text">0% Complete</span>
+</div>
+</div>
+<div class="lessons-list" id="lessons-list">
+</div>
+</div>
+<div class="course-main">
+<div class="video-container" id="video-container">
+<div class="video-placeholder"><div class="video-icon">&#9654;</div><p>Select a lesson to begin</p></div>
+</div>
+<div class="lesson-content" id="lesson-content">
+<h1 class="lesson-title" id="lesson-title">Welcome to the Course</h1>
+<div class="lesson-body" id="lesson-body">
+<p>Select a lesson from the sidebar to get started.</p>
+</div>
+<div class="lesson-actions" id="lesson-actions" style="display:none;">
+<button class="lesson-btn secondary" id="prev-lesson">&#8592; Previous</button>
+<button class="lesson-btn primary" id="complete-lesson">Mark Complete & Continue</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script src="js/course.js"></script>
+</body>
+</html>

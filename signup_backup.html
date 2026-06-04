@@ -126,40 +126,6 @@
   outline: none;
   border-color: var(--red);
 }
-.form-input.error {
-  border-color: var(--red-light);
-}
-.field-error {
-  color: var(--red-light);
-  font-size: 0.8rem;
-  margin-top: 0.3rem;
-  display: none;
-}
-.field-error.show {
-  display: block;
-}
-.password-wrapper {
-  position: relative;
-}
-.password-toggle {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 0.7rem;
-  font-family: 'Oswald', sans-serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-.password-hint {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-top: 0.4rem;
-}
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -297,7 +263,7 @@
 
       <div class="error-msg" id="error-msg"></div>
 
-      <form id="signup-form">
+      <form id="signup-form" onsubmit="return false;">
 
         <div class="form-row">
           <div class="form-group">
@@ -313,17 +279,6 @@
         <div class="form-group">
           <label class="form-label">Email Address *</label>
           <input type="email" id="email" class="form-input" placeholder="you@email.com" required>
-          <div class="field-error" id="email-error"></div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Create Password *</label>
-          <div class="password-wrapper">
-            <input type="password" id="password" class="form-input" placeholder="Create a secure password" required minlength="8">
-            <button type="button" class="password-toggle" onclick="togglePassword()">Show</button>
-          </div>
-          <div class="password-hint">Minimum 8 characters</div>
-          <div class="field-error" id="password-error"></div>
         </div>
 
         <div class="form-group">
@@ -423,11 +378,11 @@
           <textarea id="financial_challenge" class="form-input" rows="3" placeholder="Briefly describe your situation..."></textarea>
         </div>
 
-        <button type="submit" class="submit-btn" id="submit-btn">Request Membership</button>
+        <button type="submit" class="submit-btn" onclick="handleSignup()">Request Membership →</button>
       </form>
 
       <div class="already-member">
-        Already a member? <a href="login.html">Sign in here</a>
+        Already a member? <a href="dashboard.html">Access your dashboard</a>
       </div>
     </div>
 
@@ -439,6 +394,60 @@
 
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
-<script>function togglePassword() {  var input = document.getElementById("password");  var btn = document.querySelector(".password-toggle");  if (input.type === "password") {    input.type = "text";    btn.textContent = "Hide";  } else {    input.type = "password";    btn.textContent = "Show";  }}function clearFieldErrors() {  document.querySelectorAll(".field-error").forEach(function(el) {    el.classList.remove("show");    el.textContent = "";  });  document.querySelectorAll(".form-input.error").forEach(function(el) {    el.classList.remove("error");  });}function showFieldError(fieldId, message) {  var errorEl = document.getElementById(fieldId + "-error");  var inputEl = document.getElementById(fieldId);  if (errorEl) {    errorEl.textContent = message;    errorEl.classList.add("show");  }  if (inputEl) {    inputEl.classList.add("error");  }}document.getElementById("signup-form").addEventListener("submit", async function(e) {  e.preventDefault();  var errorEl = document.getElementById("error-msg");  errorEl.classList.remove("show");  clearFieldErrors();  var formData = {    first_name: document.getElementById("first_name").value.trim(),    last_name: document.getElementById("last_name").value.trim(),    email: document.getElementById("email").value.trim(),    password: document.getElementById("password").value,    phone: document.getElementById("phone").value.trim() || null,    state: document.getElementById("state").value || null,    branch: document.getElementById("branch").value || null,    service_status: document.getElementById("service_status").value || null,    years_of_service: document.getElementById("years_of_service").value || null,    challenges: Array.from(document.querySelectorAll("input[type=checkbox]:checked")).map(function(cb) { return cb.value; }),    notes: document.getElementById("financial_challenge").value.trim() || null  };  if (!formData.first_name || !formData.last_name || !formData.email || !formData.password || !formData.state || !formData.branch || !formData.service_status) {    errorEl.textContent = "Please fill in all required fields.";    errorEl.classList.add("show");    return;  }  if (formData.password.length < 8) {    showFieldError("password", "Password must be at least 8 characters.");    return;  }  var emailRegex = /^[^s@]+@[^s@]+.[^s@]+$/;  if (!emailRegex.test(formData.email)) {    showFieldError("email", "Please enter a valid email address.");    return;  }  var submitBtn = document.getElementById("submit-btn");  if (!submitBtn) submitBtn = document.querySelector(".submit-btn");  var originalText = submitBtn.textContent;  submitBtn.textContent = "Creating Account...";  submitBtn.disabled = true;  try {    var response = await fetch(window.API_BASE + "/api/auth/register", {      method: "POST",      headers: { "Content-Type": "application/json" },      credentials: "include",      body: JSON.stringify(formData)    });    var data = await response.json();    if (response.ok) {      localStorage.setItem("sh_user", JSON.stringify(data));      window.location.href = "thankyou.html";    } else {      if (response.status === 400 && data.detail) {        if (data.detail.toLowerCase().indexOf("email") !== -1) {          showFieldError("email", data.detail);        } else {          errorEl.textContent = data.detail;          errorEl.classList.add("show");        }      } else {        errorEl.textContent = data.detail || "Registration failed. Please try again.";        errorEl.classList.add("show");      }      submitBtn.textContent = originalText;      submitBtn.disabled = false;    }  } catch (err) {    console.error("Registration error:", err);    errorEl.textContent = "Connection error. Please check your internet and try again.";    errorEl.classList.add("show");    submitBtn.textContent = originalText;    submitBtn.disabled = false;  }});document.addEventListener("DOMContentLoaded", async function() {  try {    var response = await fetch(window.API_BASE + "/api/auth/me", {      credentials: "include"    });    if (response.ok) {      var user = await response.json();      if (user.role === "admin") {        window.location.href = "admin.html";      } else {        window.location.href = "dashboard.html";      }    }  } catch (e) {}});</script>
+<script>
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzDbTrgvyjBbGmi9YHom8TR50-VLG5nDJS-QLxahhm7HW9PyPCv3e0_IiR9u7jKUoTMMg/exec';
+
+async function handleSignup() {
+  const errorEl = document.getElementById('error-msg');
+  errorEl.classList.remove('show');
+
+  const formData = {
+    timestamp: new Date().toISOString(),
+    first_name: document.getElementById('first_name').value.trim(),
+    last_name: document.getElementById('last_name').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim() || '',
+    state: document.getElementById('state').value || '',
+    branch: document.getElementById('branch').value || '',
+    service_status: document.getElementById('service_status').value || '',
+    years_of_service: document.getElementById('years_of_service').value || '',
+    services_interested: Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value).join(', '),
+    how_heard: document.getElementById('how_heard').value || '',
+    financial_challenge: document.getElementById('financial_challenge').value.trim() || ''
+  };
+
+  if (!formData.first_name || !formData.last_name || !formData.email || !formData.state || !formData.branch || !formData.service_status) {
+    errorEl.textContent = 'Please fill in all required fields.';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  const submitBtn = document.querySelector('.submit-btn');
+  submitBtn.textContent = 'Submitting...';
+  submitBtn.disabled = true;
+
+  try {
+    const response = await fetch(GOOGLE_SHEET_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(formData)
+    });
+    const data = await response.json();
+    if (data.ok === true) {
+      window.location.href = 'dashboard.html';
+    } else {
+      errorEl.textContent = 'Submission failed. Please try again.';
+      errorEl.classList.add('show');
+      submitBtn.textContent = 'Request Membership →';
+      submitBtn.disabled = false;
+    }
+  } catch (err) {
+    errorEl.textContent = 'Connection error. Please try again.';
+    errorEl.classList.add('show');
+    submitBtn.textContent = 'Request Membership →';
+    submitBtn.disabled = false;
+  }
+}
+</script>
 </body>
 </html>
