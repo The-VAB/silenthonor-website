@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages - Silent Honor Foundation</title>
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/messages.css">
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div class="dash-wrapper">
+<nav class="dash-nav">
+<div class="dash-nav-logo"><img src="images/logo.png" alt="Silent Honor" onerror="this.style.display='none'"><span>Silent Honor</span></div>
+<div class="dash-nav-links">
+<a href="dashboard.html" class="dash-nav-link">Dashboard</a>
+<a href="messages.html" class="dash-nav-link active">Messages</a>
+<a href="dispute-tracker.html" class="dash-nav-link">Disputes</a>
+<a href="credit-tracker.html" class="dash-nav-link">Credit</a>
+</div>
+<div class="dash-nav-user">
+<div class="user-avatar" id="user-avatar">--</div>
+<span class="user-name" id="user-name">Loading...</span>
+<button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+</div>
+</nav>
+<div class="dash-content">
+<div class="loading-state" id="loading-state"><div class="loading-spinner"></div><p style="color:var(--muted);">Loading messages...</p></div>
+<div id="messages-content" style="display:none;">
+<div class="dash-header">
+<h1 class="dash-welcome">Messages</h1>
+<p class="dash-subtitle">Communicate securely with your counselor.</p>
+</div>
+<div class="messages-container">
+<div class="messages-sidebar">
+<div class="conversations-header">
+<h3>Conversations</h3>
+</div>
+<div class="conversations-list" id="conversations-list">
+<div class="empty-state"><div class="empty-state-icon">&#128172;</div><div class="empty-state-text">No conversations yet</div></div>
+</div>
+</div>
+<div class="messages-main">
+<div class="messages-header" id="messages-header">
+<div class="chat-recipient">
+<div class="recipient-avatar" id="recipient-avatar">&#128100;</div>
+<div class="recipient-info">
+<h4 id="recipient-name">Select a conversation</h4>
+<span class="recipient-status" id="recipient-status"></span>
+</div>
+</div>
+</div>
+<div class="messages-thread" id="messages-thread">
+<div class="empty-state" style="margin-top:3rem;"><div class="empty-state-icon">&#128172;</div><div class="empty-state-text">Select a conversation to view messages</div></div>
+</div>
+<div class="messages-compose" id="messages-compose" style="display:none;">
+<textarea class="compose-input" id="compose-input" placeholder="Type your message..." rows="3"></textarea>
+<div class="compose-actions">
+<button class="compose-send" id="compose-send">Send Message</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script src="js/messages.js"></script>
+</body>
+</html>

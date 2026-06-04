@@ -1,95 +1,85 @@
-<!DOCTYPE html>
+<\!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Member Dashboard — Silent Honor Foundation</title>
+<title>Member Dashboard - Silent Honor Foundation</title>
 <link rel="stylesheet" href="css/global.css">
-<style>
-.coming-soon-wrapper {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2rem;
-}
-.coming-soon-logo {
-  width: 120px;
-  margin-bottom: 2rem;
-}
-.coming-soon-tag {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--red-light);
-  margin-bottom: 1rem;
-}
-.coming-soon-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  line-height: 1;
-  margin-bottom: 1.5rem;
-}
-.coming-soon-title em {
-  font-style: normal;
-  color: var(--red-light);
-}
-.coming-soon-text {
-  font-family: 'Lora', serif;
-  font-size: 1rem;
-  font-style: italic;
-  color: var(--muted);
-  line-height: 1.8;
-  max-width: 560px;
-  margin-bottom: 2.5rem;
-}
-.coming-soon-btn {
-  display: inline-block;
-  background: var(--red);
-  color: var(--white);
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  padding: 1rem 2rem;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-.coming-soon-btn:hover {
-  background: var(--red-light);
-}
-.success-badge {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #10b981;
-  padding: 0.8rem 1.5rem;
-  font-size: 0.88rem;
-  margin-bottom: 2rem;
-  font-family: 'Oswald', sans-serif;
-  letter-spacing: 0.05em;
-}
-</style>
+<link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
 <div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
-
-<div class="coming-soon-wrapper">
-  <img src="images/silent-honor-logo.png" alt="Silent Honor Foundation" class="coming-soon-logo">
-  <div class="success-badge">✓ You're In — Application Received</div>
-  <div class="coming-soon-tag">Member Portal</div>
-  <h1 class="coming-soon-title">Your Dashboard Is <em>Coming Soon</em></h1>
-  <p class="coming-soon-text">
-    We're building your member portal now. Once it's live you'll be able to track your progress, access your courses, connect with your counselor, and manage your profile all in one place. A Silent Honor counselor will reach out within 2 business days.
-  </p>
-  <a href="index.html" class="coming-soon-btn">Back to Home →</a>
+<div class="dash-wrapper">
+<nav class="dash-nav">
+<div class="dash-nav-logo"><img src="images/logo.png" alt="Silent Honor" onerror="this.style.display='none'"><span>Silent Honor</span></div>
+<div class="dash-nav-links">
+<a href="dashboard.html" class="dash-nav-link active">Dashboard</a>
+<a href="messages.html" class="dash-nav-link">Messages</a>
+<a href="dispute-tracker.html" class="dash-nav-link">Disputes</a>
+<a href="credit-tracker.html" class="dash-nav-link">Credit</a>
 </div>
-
+<div class="dash-nav-user">
+<div class="user-avatar" id="user-avatar">--</div>
+<span class="user-name" id="user-name">Loading...</span>
+<button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+</div>
+</nav>
+<div class="dash-content">
+<div class="loading-state" id="loading-state"><div class="loading-spinner"></div><p style="color:var(--muted);">Loading your dashboard...</p></div>
+<div id="dashboard-content" style="display:none;">
+<div class="dash-header"><h1 class="dash-welcome">Welcome back, <em id="welcome-name">Member</em></h1><p class="dash-subtitle">Your path to financial freedom continues here.</p></div>
+<div class="stats-row">
+<div class="stat-card"><div class="stat-label">Courses Active</div><div class="stat-value" id="stat-courses">0</div></div>
+<div class="stat-card"><div class="stat-label">Disputes Filed</div><div class="stat-value" id="stat-disputes">0</div></div>
+<div class="stat-card"><div class="stat-label">Credit Score Change</div><div class="stat-value positive" id="stat-credit">--</div></div>
+<div class="stat-card"><div class="stat-label">Member Since</div><div class="stat-value" id="stat-member-since">--</div></div>
+</div>
+<div class="dd214-alert" id="dd214-alert">
+<div class="dd214-alert-title">DD-214 Verification Required</div>
+<div class="dd214-alert-text">Upload your DD-214 to unlock all member benefits. Your document is encrypted and stored securely.</div>
+<div class="dd214-upload-area" id="dd214-upload">
+<div class="dd214-upload-icon">&#128196;</div>
+<div class="dd214-upload-text">Click to upload or drag and drop</div>
+<div class="dd214-upload-hint">PDF, JPG, or PNG up to 10MB</div>
+</div>
+<input type="file" id="dd214-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
+<div class="dd214-status" id="dd214-status"><span style="color:#10B981;font-size:1.2rem">&#10003;</span><span class="dd214-status-text">DD-214 uploaded. Verification in progress.</span></div>
+</div>
+<div class="dash-grid">
+<div class="dash-main">
+<div class="dash-panel">
+<div class="panel-header"><h3 class="panel-title">Your Courses</h3><a href="#" class="panel-action">View All</a></div>
+<div class="panel-body" id="courses-list">
+<div class="course-item"><div class="course-icon">&#128218;</div><div class="course-info"><div class="course-title">Credit Fundamentals 101</div><div class="course-meta">8 Lessons - 2hr 15min</div></div><div class="course-progress"><div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div><div class="progress-text">65% Complete</div></div><a href="course.html?id=credit-101" class="course-btn continue">Continue</a></div>
+<div class="course-item"><div class="course-icon">&#127968;</div><div class="course-info"><div class="course-title">VA Loan Mastery</div><div class="course-meta">12 Lessons - 4hr 30min</div></div><div class="course-progress"><div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div><div class="progress-text">20% Complete</div></div><a href="course.html?id=va-loan" class="course-btn continue">Continue</a></div>
+<div class="course-item"><div class="course-icon">&#128176;</div><div class="course-info"><div class="course-title">Debt Freedom Blueprint</div><div class="course-meta">10 Lessons - 3hr 45min</div></div><div class="course-progress"><div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div><div class="progress-text">Not Started</div></div><button class="course-btn waitlist" id="waitlist-debt">Join Waitlist</button></div>
+</div>
+</div>
+<div class="dash-panel">
+<div class="panel-header"><h3 class="panel-title">Dispute Tracker</h3><a href="dispute-tracker.html" class="panel-action">Manage Disputes</a></div>
+<div class="panel-body" id="disputes-list"><div class="empty-state"><div class="empty-state-icon">&#128203;</div><div class="empty-state-text">No active disputes. Work with your counselor to file disputes via certified mail.</div></div></div>
+</div>
+</div>
+<div class="dash-sidebar">
+<div class="dash-panel">
+<div class="panel-header"><h3 class="panel-title">Your Counselor</h3></div>
+<div class="panel-body" id="counselor-section">
+<div class="counselor-card"><div class="counselor-photo">&#128100;</div><div class="counselor-info"><h4 id="counselor-name">Counselor Pending</h4><div class="counselor-title" id="counselor-title">Assignment in progress</div><div class="counselor-status"><span class="counselor-status-dot"></span><span>Available</span></div></div></div>
+<div class="counselor-actions"><a href="messages.html" class="counselor-btn primary">Send Message</a><a href="#" class="counselor-btn secondary" id="schedule-btn">Schedule Call</a></div>
+</div>
+</div>
+<div class="dash-panel">
+<div class="panel-header"><h3 class="panel-title">Recent Messages</h3><a href="messages.html" class="panel-action">View All</a></div>
+<div class="panel-body" id="messages-list"><div class="empty-state"><div class="empty-state-icon">&#128172;</div><div class="empty-state-text">No messages yet. Send a message to your counselor to get started.</div></div></div>
+<div class="message-input-area"><input type="text" class="message-input" id="quick-message" placeholder="Quick message..."><button class="message-send" id="send-quick-msg">Send</button></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script src="js/dashboard.js"></script>
 </body>
 </html>
