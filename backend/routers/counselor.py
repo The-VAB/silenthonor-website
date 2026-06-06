@@ -1,0 +1,348 @@
+# Counselor router for Silent Honor Foundation
+from datetime import datetime, timezone
+from fastapi import APIRouter, HTTPException, Request
+from bson import ObjectId
+
+from middleware.auth_middleware import get_current_counselor, get_current_admin
+from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
+from utils.auth import hash_password
+from utils.validators import CounselorRequest
+
+router = APIRouter(prefix="/api", tags=["Counselor"])
+
+# Database reference
+db = None
+
+def set_db(database):
+    global db
+    db = database
+
+# Member-facing endpoints
+@router.get("/counselor/assigned")
+async def get_assigned_counselor(request: Request):
+    """Get member's assigned counselor (deprecated - use /api/member/counselor)"""
+    from middleware.auth_middleware import get_current_user
+    user = await get_current_user(request)
+
+    member = await db.users.find_one({"_id": ObjectId(user["_id"])})
+    counselor_id = member.get("assigned_counselor_id")
+
+    if not counselor_id:
+        return {"id": None, "name": None, "message": "No counselor assigned yet"}
+
+    counselor = await db.users.find_one({"_id": ObjectId(counselor_id)})
+    if not counselor:
+        return {"id": None, "name": None, "message": "Counselor not found"}
+
+    return {
+        "id": str(counselor["_id"]),
+        "name": f"{counselor.get('first_name', '')} {counselor.get('last_name', '')}".strip(),
+        "email": counselor.get("email"),
+        "title": counselor.get("title", "Certified Financial Counselor"),
+        "bio": counselor.get("bio", ""),
+        "specialties": counselor.get("specialties", [])
+    }
+
+# Counselor portal endpoints
+@router.get("/counselor/members")
+async def get_counselor_members(request: Request):
+    """Get all members assigned to this counselor"""
+    counselor = await get_current_counselor(request)
+
+    members = await db.users.find(
+        {"assigned_counselor_id": ObjectId(counselor["_id"])},
+        {"_id": 1, "email": 1, "first_name": 1, "last_name": 1, "branch": 1,
+         "pipeline_stage": 1, "created_at": 1}
+    ).sort("created_at", -1).to_list(100)
+
+    return [{
+        "id": str(m["_id"]),
+        "email": m["email"],
+        "name": f"{m.get('first_name', '')} {m.get('last_name', '')}".strip(),
+        "branch": m.get("branch"),
+        "pipeline_stage": m.get("pipeline_stage", "active"),
+        "created_at": m.get("created_at").isoformat() if m.get("created_at") else None
+    } for m in members]
+
+@router.get("/counselor/members/{member_id}")
+async def get_counselor_member_detail(request: Request, member_id: str):
+    """Get detailed info about assigned member"""
+    counselor = await get_current_counselor(request)
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    })
+
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    member["_id"] = str(member["_id"])
+    member.pop("password_hash", None)
+
+    # Get credit scores
+    credit_scores = await db.credit_scores.find(
+        {"user_id": ObjectId(member_id)}
+    ).sort("date", -1).to_list(10)
+
+    # Get disputes
+    disputes = await db.disputes.find(
+        {"user_id": ObjectId(member_id)}
+    ).sort("created_at", -1).to_list(50)
+
+    # Get notes
+    notes = await db.intake_notes.find(
+        {"member_id": ObjectId(member_id)}
+    ).sort("created_at", -1).to_list(50)
+
+    return {
+        "member": member,
+        "credit_scores": [{
+            "id": str(s["_id"]),
+            "date": s.get("date").isoformat() if s.get("date") else None,
+            "equifax": s.get("equifax"),
+            "experian": s.get("experian"),
+            "transunion": s.get("transunion")
+        } for s in credit_scores],
+        "disputes": [{
+            "id": str(d["_id"]),
+            "bureau": d.get("bureau"),
+            "account_name": d.get("account_name"),
+            "status": d.get("status"),
+            "created_at": d.get("created_at").isoformat() if d.get("created_at") else None
+        } for d in disputes],
+        "notes": [{
+            "id": str(n["_id"]),
+            "content": n.get("content"),
+            "note_type": n.get("note_type"),
+            "created_by": n.get("created_by_name"),
+            "created_at": n.get("created_at").isoformat() if n.get("created_at") else None
+        } for n in notes]
+    }
+
+@router.post("/counselor/members/{member_id}/notes")
+async def add_counselor_note(request: Request, member_id: str):
+    """Add note to assigned member"""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    # Verify member is assigned to this counselor
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    })
+
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    note_doc = {
+        "member_id": ObjectId(member_id),
+        "content": data.get("content", ""),
+        "note_type": data.get("note_type", "counselor"),
+        "created_by": ObjectId(counselor["_id"]),
+        "created_by_name": f"{counselor.get('first_name', '')} {counselor.get('last_name', '')}".strip(),
+        "created_at": datetime.now(timezone.utc)
+    }
+
+    result = await db.intake_notes.insert_one(note_doc)
+    return {"id": str(result.inserted_id), "message": "Note added"}
+
+@router.get("/counselor/stats")
+async def get_counselor_stats(request: Request):
+    """Get statistics for counselor dashboard"""
+    counselor = await get_current_counselor(request)
+
+    assigned_count = await db.users.count_documents({"assigned_counselor_id": ObjectId(counselor["_id"])})
+
+    # Get members in different stages
+    intake_count = await db.users.count_documents({
+        "assigned_counselor_id": ObjectId(counselor["_id"]),
+        "pipeline_stage": "intake_complete"
+    })
+
+    active_count = await db.users.count_documents({
+        "assigned_counselor_id": ObjectId(counselor["_id"]),
+        "pipeline_stage": "active"
+    })
+
+    # Get unread messages
+    unread = await db.messages.count_documents({
+        "to_user_id": ObjectId(counselor["_id"]),
+        "read": False
+    })
+
+    return {
+        "assigned_members": assigned_count,
+        "intake_pending": intake_count,
+        "active_members": active_count,
+        "unread_messages": unread
+    }
+
+# Admin counselor management
+@router.get("/admin/counselors")
+async def get_counselors(request: Request):
+    """Get all counselors (admin only)"""
+    await get_current_admin(request)
+    counselors = await db.users.find({"role": "counselor"}).to_list(100)
+
+    result = []
+    for c in counselors:
+        assigned_count = await db.users.count_documents({"assigned_counselor_id": c["_id"]})
+        result.append({
+            "id": str(c["_id"]),
+            "name": f"{c.get('first_name', '')} {c.get('last_name', '')}".strip(),
+            "email": c.get("email"),
+            "title": c.get("title", ""),
+            "specialties": c.get("specialties", []),
+            "bio": c.get("bio", ""),
+            "assigned_members": assigned_count,
+            "active": c.get("active", True)
+        })
+
+    return result
+
+@router.post("/admin/counselors")
+async def create_counselor(request: Request):
+    """Create new counselor (admin only)"""
+    admin = await get_current_admin(request)
+    data = await request.json()
+
+    email = data.get("email", "").lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email required")
+
+    existing = await db.users.find_one({"email": email})
+    if existing:
+        # Upgrade existing user to counselor
+        await db.users.update_one(
+            {"_id": existing["_id"]},
+            {"$set": {
+                "role": "counselor",
+                "title": data.get("title", ""),
+                "bio": data.get("bio", ""),
+                "specialties": data.get("specialties", []),
+                "active": True
+            }}
+        )
+
+        await log_audit_event(
+            action=AUDIT_ACTIONS["COUNSELOR_CREATED"],
+            entity_type="user",
+            entity_id=str(existing["_id"]),
+            user_id=admin["_id"],
+            user_email=admin.get("email"),
+            details={"upgraded_from_existing": True},
+            ip_address=request.client.host if request.client else None
+        )
+
+        return {"id": str(existing["_id"]), "message": "User upgraded to counselor"}
+
+    counselor_doc = {
+        "email": email,
+        "password_hash": hash_password(data.get("password", "TempPass123!")),
+        "first_name": data.get("first_name", ""),
+        "last_name": data.get("last_name", ""),
+        "role": "counselor",
+        "title": data.get("title", ""),
+        "bio": data.get("bio", ""),
+        "specialties": data.get("specialties", []),
+        "active": True,
+        "verified": True,
+        "created_at": datetime.now(timezone.utc)
+    }
+
+    result = await db.users.insert_one(counselor_doc)
+
+    await log_audit_event(
+        action=AUDIT_ACTIONS["COUNSELOR_CREATED"],
+        entity_type="user",
+        entity_id=str(result.inserted_id),
+        user_id=admin["_id"],
+        user_email=admin.get("email"),
+        ip_address=request.client.host if request.client else None
+    )
+
+    return {"id": str(result.inserted_id), "message": "Counselor created"}
+
+@router.put("/admin/counselors/{counselor_id}")
+async def update_counselor(request: Request, counselor_id: str):
+    """Update counselor (admin only)"""
+    await get_current_admin(request)
+    data = await request.json()
+
+    update_fields = {}
+    for field in ["first_name", "last_name", "title", "bio", "specialties", "active"]:
+        if field in data:
+            update_fields[field] = data[field]
+
+    if update_fields:
+        await db.users.update_one(
+            {"_id": ObjectId(counselor_id)},
+            {"$set": update_fields}
+        )
+
+    return {"message": "Counselor updated"}
+
+@router.delete("/admin/counselors/{counselor_id}")
+async def delete_counselor(request: Request, counselor_id: str):
+    """Deactivate counselor (admin only)"""
+    await get_current_admin(request)
+
+    # Don't delete, just deactivate
+    await db.users.update_one(
+        {"_id": ObjectId(counselor_id)},
+        {"$set": {"active": False}}
+    )
+
+    return {"message": "Counselor deactivated"}
+
+@router.post("/admin/counselors/{counselor_id}/assign/{member_id}")
+async def assign_counselor(request: Request, counselor_id: str, member_id: str):
+    """Assign counselor to member"""
+    admin = await get_current_admin(request)
+
+    counselor = await db.users.find_one({"_id": ObjectId(counselor_id), "role": "counselor"})
+    if not counselor:
+        raise HTTPException(status_code=404, detail="Counselor not found")
+
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {
+            "assigned_counselor_id": ObjectId(counselor_id),
+            "pipeline_stage": "counselor_assigned"
+        }}
+    )
+
+    await log_audit_event(
+        action=AUDIT_ACTIONS["COUNSELOR_ASSIGNED"],
+        entity_type="user",
+        entity_id=member_id,
+        user_id=admin["_id"],
+        user_email=admin.get("email"),
+        details={"counselor_id": counselor_id},
+        ip_address=request.client.host if request.client else None
+    )
+
+    return {"message": "Counselor assigned to member"}
+
+@router.delete("/admin/counselors/{counselor_id}/unassign/{member_id}")
+async def unassign_counselor(request: Request, counselor_id: str, member_id: str):
+    """Unassign counselor from member"""
+    admin = await get_current_admin(request)
+
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$unset": {"assigned_counselor_id": ""}}
+    )
+
+    await log_audit_event(
+        action=AUDIT_ACTIONS["COUNSELOR_UNASSIGNED"],
+        entity_type="user",
+        entity_id=member_id,
+        user_id=admin["_id"],
+        user_email=admin.get("email"),
+        details={"counselor_id": counselor_id},
+        ip_address=request.client.host if request.client else None
+    )
+
+    return {"message": "Counselor unassigned"}
