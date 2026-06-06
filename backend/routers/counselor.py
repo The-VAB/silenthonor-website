@@ -1,4 +1,5 @@
 # Counselor router for Silent Honor Foundation
+import asyncio
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Request
 from bson import ObjectId
@@ -7,6 +8,7 @@ from middleware.auth_middleware import get_current_counselor, get_current_admin
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
 from utils.auth import hash_password
 from utils.validators import CounselorRequest
+from utils.email import send_counselor_assigned_email
 
 router = APIRouter(prefix="/api", tags=["Counselor"])
 
@@ -305,6 +307,11 @@ async def assign_counselor(request: Request, counselor_id: str, member_id: str):
     if not counselor:
         raise HTTPException(status_code=404, detail="Counselor not found")
 
+    # Get member info
+    member = await db.users.find_one({"_id": ObjectId(member_id)})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
     await db.users.update_one(
         {"_id": ObjectId(member_id)},
         {"$set": {
@@ -322,6 +329,14 @@ async def assign_counselor(request: Request, counselor_id: str, member_id: str):
         details={"counselor_id": counselor_id},
         ip_address=request.client.host if request.client else None
     )
+
+    # Send notification email to member
+    counselor_name = f"{counselor.get('first_name', '')} {counselor.get('last_name', '')}".strip()
+    asyncio.create_task(send_counselor_assigned_email(
+        member.get("email"),
+        member.get("first_name", "Member"),
+        counselor_name
+    ))
 
     return {"message": "Counselor assigned to member"}
 

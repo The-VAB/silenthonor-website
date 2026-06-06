@@ -1,5 +1,6 @@
 # Admin router for Silent Honor Foundation
 import os
+import asyncio
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse
@@ -8,6 +9,7 @@ from bson import ObjectId
 from middleware.auth_middleware import get_current_admin
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
 from utils.auth import hash_password
+from utils.email import send_dd214_approved_email, send_admin_notification
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -187,6 +189,11 @@ async def verify_member(request: Request, member_id: str):
     status = data.get("status", "verified")
     notes = data.get("notes", "")
 
+    # Get member info before update
+    member = await db.users.find_one({"_id": ObjectId(member_id)})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
     update_fields = {
         "verified": status == "verified",
         "dd214_status": status,
@@ -213,6 +220,13 @@ async def verify_member(request: Request, member_id: str):
         details={"status": status, "notes": notes},
         ip_address=request.client.host if request.client else None
     )
+
+    # Send approval email if verified
+    if status == "verified":
+        asyncio.create_task(send_dd214_approved_email(
+            member.get("email"),
+            member.get("first_name", "Member")
+        ))
 
     return {"message": f"Member verification status updated to {status}"}
 
