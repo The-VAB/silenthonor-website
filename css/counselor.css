@@ -1,0 +1,652 @@
+.counselor-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* No Counselor State */
+.no-counselor-card {
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid var(--border);
+    padding: 3rem;
+    text-align: center;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.no-counselor-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.no-counselor-card h2 {
+    font-family: Oswald, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.no-counselor-card > p {
+    color: var(--muted);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+}
+
+.next-steps {
+    text-align: left;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.next-steps h3 {
+    font-family: Oswald, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    color: var(--red-light);
+}
+
+.next-steps ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.next-steps li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--muted);
+}
+
+.next-steps li::before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    color: var(--red);
+}
+
+/* Counselor Grid */
+.counselor-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Profile Card */
+.counselor-profile-card {
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    position: sticky;
+    top: 100px;
+}
+
+.counselor-avatar {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, var(--red), var(--red-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-family: Oswald, sans-serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--white);
+}
+
+.counselor-name {
+    font-family: Oswald, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.counselor-title {
+    color: var(--red-light);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.counselor-specialties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.specialty-tag {
+    background: rgba(185, 28, 28, 0.2);
+    border: 1px solid var(--red);
+    color: var(--red-light);
+    padding: 0.25rem 0.75rem;
+    font-size: 0.7rem;
+    font-family: Oswald, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.counselor-bio {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}
+
+.counselor-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.counselor-actions .btn-primary,
+.counselor-actions .btn-secondary {
+    width: 100%;
+    padding: 0.8rem;
+    font-family: Oswald, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.counselor-actions .btn-primary {
+    background: var(--red);
+    color: var(--white);
+}
+
+.counselor-actions .btn-primary:hover {
+    background: var(--red-light);
+}
+
+.counselor-actions .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white);
+}
+
+.counselor-actions .btn-secondary:hover {
+    border-color: var(--red);
+}
+
+/* Info Cards */
+.counselor-info-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.info-card {
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+}
+
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+}
+
+.info-card h3 {
+    font-family: Oswald, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.info-card > p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.info-card .btn-secondary,
+.info-card .btn-text {
+    font-family: Oswald, sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.info-card .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.info-card .btn-secondary:hover {
+    border-color: var(--red);
+}
+
+.info-card .btn-text {
+    color: var(--red-light);
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.info-card .btn-text:hover {
+    color: var(--white);
+}
+
+/* Highlight Card */
+.highlight-card {
+    border-color: var(--gold);
+    background: rgba(201, 149, 42, 0.1);
+}
+
+.highlight-card .info-icon {
+    color: var(--gold);
+}
+
+.highlight-card h3 {
+    color: var(--gold);
+}
+
+.highlight-card p strong {
+    color: var(--gold);
+}
+
+/* Appointment Slots */
+.appointment-slots {
+    margin-bottom: 1rem;
+}
+
+.slot-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.5rem;
+}
+
+.slot-time {
+    font-family: Oswald, sans-serif;
+    font-size: 0.9rem;
+}
+
+.slot-book {
+    background: transparent;
+    border: 1px solid var(--red);
+    color: var(--red-light);
+    padding: 0.3rem 0.75rem;
+    font-family: Oswald, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.slot-book:hover {
+    background: var(--red);
+    color: var(--white);
+}
+
+/* Progress Notes */
+.progress-notes {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.note-item {
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.5rem;
+    border-left: 2px solid var(--red);
+}
+
+.note-date {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+}
+
+.note-content {
+    font-size: 0.85rem;
+    color: var(--white);
+}
+
+/* Credit Goals */
+.credit-goals {
+    margin-bottom: 1rem;
+}
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.goal-item:last-child {
+    border-bottom: none;
+}
+
+.goal-status {
+    font-size: 1rem;
+}
+
+.goal-status.pending {
+    color: var(--muted);
+}
+
+.goal-status.completed {
+    color: #10B981;
+}
+
+.goal-item span:last-child {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    position: relative;
+    background: var(--navy);
+    border: 1px solid var(--border);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-small {
+    max-width: 400px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    font-family: Oswald, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: var(--white);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-body > p {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.modal-footer .btn-primary,
+.modal-footer .btn-secondary {
+    font-family: Oswald, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-footer .btn-primary {
+    background: var(--red);
+    color: var(--white);
+}
+
+.modal-footer .btn-primary:hover {
+    background: var(--red-light);
+}
+
+.modal-footer .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal-footer .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white);
+}
+
+/* Date Picker */
+.week-selector {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.week-nav {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.week-nav:hover {
+    border-color: var(--red);
+}
+
+#week-label {
+    font-family: Oswald, sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.day-btn {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 0.75rem 0.5rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.day-btn:hover:not(:disabled) {
+    border-color: var(--red);
+}
+
+.day-btn.selected {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+.day-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.day-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.day-num {
+    font-family: Oswald, sans-serif;
+    font-size: 1rem;
+}
+
+.time-slots {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.time-btn {
+    display: block;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    font-family: Oswald, sans-serif;
+    font-size: 0.9rem;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.time-btn:hover {
+    border-color: var(--red);
+}
+
+.time-btn.selected {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+/* Call Request Modal */
+.call-options {
+    margin-bottom: 1.5rem;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.radio-option:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.radio-option input {
+    accent-color: var(--red);
+}
+
+.call-notes label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+}
+
+.call-notes textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 0.75rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.call-notes textarea:focus {
+    outline: none;
+    border-color: var(--red);
+}
+
+.muted-text {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .counselor-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .counselor-profile-card {
+        position: static;
+    }
+}

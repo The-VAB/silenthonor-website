@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Counselor - Silent Honor Foundation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/counselor.css">
+    <script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">SILENT<span class="logo-accent">HONOR</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="courses.html">Courses</a>
+                <a href="messages.html">Messages</a>
+                <a href="counselor.html" class="active">My Counselor</a>
+            </div>
+            <div class="nav-user">
+                <div class="user-avatar" id="user-avatar">??</div>
+                <span class="user-name" id="user-name">Loading...</span>
+                <button class="btn-text" onclick="signOut()">Sign Out</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Your Credit Counselor</h1>
+            <p class="page-subtitle">Get personalized guidance on your credit repair journey</p>
+        </div>
+
+        <div id="loading-state" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading counselor information...</p>
+        </div>
+
+        <div id="counselor-content" class="counselor-content" style="display:none;">
+            <!-- No Counselor Assigned State -->
+            <div id="no-counselor" class="no-counselor-card" style="display:none;">
+                <div class="no-counselor-icon">&#128100;</div>
+                <h2>No Counselor Assigned Yet</h2>
+                <p>A certified financial counselor will be assigned to you shortly. Our team is reviewing your profile to match you with the best counselor for your needs.</p>
+                <div class="next-steps">
+                    <h3>In the meantime:</h3>
+                    <ul>
+                        <li>Complete your Credit Fundamentals 101 course</li>
+                        <li>Ensure your DD-214 is uploaded for verification</li>
+                        <li>Review your credit report and identify areas of concern</li>
+                    </ul>
+                </div>
+                <a href="courses.html" class="btn-primary">Continue Learning</a>
+            </div>
+
+            <!-- Counselor Assigned State -->
+            <div id="counselor-assigned" class="counselor-grid" style="display:none;">
+                <div class="counselor-profile-card">
+                    <div class="counselor-avatar">
+                        <span id="counselor-initials">??</span>
+                    </div>
+                    <h2 class="counselor-name" id="counselor-name">Loading...</h2>
+                    <p class="counselor-title" id="counselor-title">Certified Financial Counselor</p>
+                    <div class="counselor-specialties" id="counselor-specialties"></div>
+                    <div class="counselor-bio" id="counselor-bio"></div>
+                    <div class="counselor-actions">
+                        <a href="messages.html" class="btn-primary">Send Message</a>
+                        <button class="btn-secondary" onclick="requestCall()">Request Call</button>
+                    </div>
+                </div>
+
+                <div class="counselor-info-cards">
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <span class="info-icon">&#128197;</span>
+                            <h3>Schedule Appointment</h3>
+                        </div>
+                        <p>Book a one-on-one session with your counselor to discuss your credit goals and get personalized advice.</p>
+                        <div class="appointment-slots" id="appointment-slots">
+                            <p class="muted-text">Loading available times...</p>
+                        </div>
+                        <button class="btn-secondary" onclick="showScheduleModal()">View All Times</button>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <span class="info-icon">&#128221;</span>
+                            <h3>Your Progress Notes</h3>
+                        </div>
+                        <div class="progress-notes" id="progress-notes">
+                            <p class="muted-text">Your counselor will add notes as you progress through your credit repair journey.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <span class="info-icon">&#127919;</span>
+                            <h3>Your Credit Goals</h3>
+                        </div>
+                        <div class="credit-goals" id="credit-goals">
+                            <div class="goal-item">
+                                <span class="goal-status pending">&#9711;</span>
+                                <span>Obtain credit reports from all 3 bureaus</span>
+                            </div>
+                            <div class="goal-item">
+                                <span class="goal-status pending">&#9711;</span>
+                                <span>Identify and dispute inaccurate items</span>
+                            </div>
+                            <div class="goal-item">
+                                <span class="goal-status pending">&#9711;</span>
+                                <span>Create certified mail dispute letters</span>
+                            </div>
+                            <div class="goal-item">
+                                <span class="goal-status pending">&#9711;</span>
+                                <span>Track dispute responses</span>
+                            </div>
+                            <div class="goal-item">
+                                <span class="goal-status pending">&#9711;</span>
+                                <span>Improve credit utilization ratio</span>
+                            </div>
+                        </div>
+                        <a href="dispute-tracker.html" class="btn-text">Go to Dispute Tracker &#8594;</a>
+                    </div>
+
+                    <div class="info-card highlight-card">
+                        <div class="info-card-header">
+                            <span class="info-icon">&#128214;</span>
+                            <h3>Important Reminder</h3>
+                        </div>
+                        <p><strong>Always dispute via certified mail.</strong></p>
+                        <p>Never use the online dispute portals offered by credit bureaus. Certified mail preserves your legal rights under the Fair Credit Reporting Act (FCRA) and creates a paper trail that is essential if you need to take legal action.</p>
+                        <a href="course.html?id=credit-101" class="btn-text">Learn More in Credit 101 &#8594;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Schedule Modal -->
+    <div id="schedule-modal" class="modal" style="display:none;">
+        <div class="modal-backdrop" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Schedule Appointment</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Select a date and time for your appointment:</p>
+                <div class="date-picker">
+                    <div class="week-selector">
+                        <button class="week-nav" onclick="prevWeek()">&larr;</button>
+                        <span id="week-label">This Week</span>
+                        <button class="week-nav" onclick="nextWeek()">&rarr;</button>
+                    </div>
+                    <div class="days-grid" id="days-grid"></div>
+                </div>
+                <div class="time-slots" id="time-slots">
+                    <p class="muted-text">Select a date to see available times</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn-primary" id="confirm-btn" onclick="confirmAppointment()" disabled>Confirm Appointment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call Request Modal -->
+    <div id="call-modal" class="modal" style="display:none;">
+        <div class="modal-backdrop" onclick="closeCallModal()"></div>
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Request a Call</h2>
+                <button class="modal-close" onclick="closeCallModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Your counselor will call you at the phone number on file. When would you like to be called?</p>
+                <div class="call-options">
+                    <label class="radio-option">
+                        <input type="radio" name="call-time" value="asap" checked>
+                        <span>As soon as possible</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="call-time" value="morning">
+                        <span>Morning (9am - 12pm)</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="call-time" value="afternoon">
+                        <span>Afternoon (12pm - 5pm)</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="call-time" value="evening">
+                        <span>Evening (5pm - 8pm)</span>
+                    </label>
+                </div>
+                <div class="call-notes">
+                    <label for="call-notes">Brief description of what you'd like to discuss:</label>
+                    <textarea id="call-notes" placeholder="e.g., Question about disputing a collection account"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeCallModal()">Cancel</button>
+                <button class="btn-primary" onclick="submitCallRequest()">Submit Request</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Silent Honor Foundation. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/counselor.js"></script>
+</body>
+</html>
