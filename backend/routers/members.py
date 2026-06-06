@@ -1,13 +1,13 @@
 # Members router for Silent Honor Foundation
-import os
-import uuid
-import aiofiles
+import asyncio
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Request, UploadFile, File
 from bson import ObjectId
 
 from middleware.auth_middleware import get_current_user
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
+from utils.storage import upload_dd214 as storage_upload_dd214
+from utils.email import send_admin_notification
 
 router = APIRouter(prefix="/api/member", tags=["Members"])
 
@@ -200,7 +200,7 @@ async def get_dashboard_data(request: Request):
 # DD-214 Upload
 @router.post("/upload/dd214")
 async def upload_dd214(request: Request, file: UploadFile = File(...)):
-    """Upload DD-214 document"""
+    """Upload DD-214 document to Supabase or local storage"""
     user = await get_current_user(request)
 
     # Validate file type
@@ -213,21 +213,21 @@ async def upload_dd214(request: Request, file: UploadFile = File(...)):
     if len(contents) > 10 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="File too large. Maximum 10MB.")
 
-    # Generate unique filename
-    ext = file.filename.split(".")[-1] if "." in file.filename else "pdf"
-    filename = f"{uuid.uuid4()}.{ext}"
-    filepath = f"/app/uploads/dd214/{filename}"
+    # Upload to storage (Supabase or local fallback)
+    result = await storage_upload_dd214(contents, file.filename, user["_id"])
 
-    # Save file locally (will be migrated to Supabase)
-    os.makedirs("/app/uploads/dd214", exist_ok=True)
-    async with aiofiles.open(filepath, "wb") as f:
-        await f.write(contents)
+    if not result["success"]:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {result.get('error')}")
+
+    filename = result["filename"]
+    storage_type = result["storage_type"]
 
     # Update user record
     await db.users.update_one(
         {"_id": ObjectId(user["_id"])},
         {"$set": {
             "dd214_file": filename,
+            "dd214_storage_type": storage_type,
             "dd214_status": "pending_review",
             "dd214_uploaded_at": datetime.now(timezone.utc),
             "pipeline_stage": "dd214_pending"
@@ -239,7 +239,15 @@ async def upload_dd214(request: Request, file: UploadFile = File(...)):
         entity_type="user",
         entity_id=user["_id"],
         user_email=user.get("email"),
+        details={"storage_type": storage_type},
         ip_address=request.client.host if request.client else None
     )
 
-    return {"message": "File uploaded successfully", "filename": filename}
+    # Notify admin of new DD-214 upload
+    member_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+    asyncio.create_task(send_admin_notification(
+        "New DD-214 Upload",
+        f"{member_name} ({user.get('email')}) has uploaded their DD-214 for verification."
+    ))
+
+    return {"message": "File uploaded successfully", "filename": filename, "storage_type": storage_type}

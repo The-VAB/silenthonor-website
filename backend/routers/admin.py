@@ -10,6 +10,7 @@ from middleware.auth_middleware import get_current_admin
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
 from utils.auth import hash_password
 from utils.email import send_dd214_approved_email, send_admin_notification
+from utils.storage import get_dd214_url
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -171,14 +172,21 @@ async def get_member(request: Request, member_id: str):
 
 @router.get("/dd214/{filename}")
 async def get_dd214_file(request: Request, filename: str):
-    """Get DD-214 file for review"""
+    """Get DD-214 file for review - returns file or redirect to signed URL"""
     await get_current_admin(request)
 
+    # First try local file
     filepath = f"/app/uploads/dd214/{filename}"
-    if not os.path.exists(filepath):
-        raise HTTPException(status_code=404, detail="File not found")
+    if os.path.exists(filepath):
+        return FileResponse(filepath)
 
-    return FileResponse(filepath)
+    # Try to get Supabase signed URL
+    signed_url = await get_dd214_url(filename, "supabase")
+    if signed_url:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url=signed_url)
+
+    raise HTTPException(status_code=404, detail="File not found")
 
 @router.post("/members/{member_id}/verify")
 async def verify_member(request: Request, member_id: str):
