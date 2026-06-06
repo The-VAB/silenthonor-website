@@ -26,7 +26,9 @@ from middleware.auth_middleware import (
     clear_failed_attempts
 )
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
+from utils.email import send_welcome_email, send_password_reset_email
 import jwt
+import asyncio
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
@@ -87,6 +89,9 @@ async def register(request: Request, response: Response, data: RegisterRequest):
         user_email=email,
         ip_address=request.client.host if request.client else None
     )
+
+    # Send welcome email (non-blocking)
+    asyncio.create_task(send_welcome_email(email, data.first_name))
 
     return {
         "id": user_id,
@@ -220,8 +225,9 @@ async def forgot_password(request: Request, data: ForgotPasswordRequest):
             "used": False
         })
 
-        # TODO: Send email via Resend API
-        print(f"Password reset link: /reset-password.html?token={token}")
+        # Send password reset email (non-blocking)
+        first_name = user.get("first_name", "Member")
+        asyncio.create_task(send_password_reset_email(email, first_name, token))
 
         await log_audit_event(
             action=AUDIT_ACTIONS["PASSWORD_RESET_REQUESTED"],

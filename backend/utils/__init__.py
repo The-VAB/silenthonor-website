@@ -20,3 +20,12 @@ from .validators import (
     CounselorRequest,
     StaffRequest
 )
+from .email import (
+    send_email,
+    send_welcome_email,
+    send_password_reset_email,
+    send_dd214_approved_email,
+    send_counselor_assigned_email,
+    send_new_message_notification,
+    send_admin_notification
+)
