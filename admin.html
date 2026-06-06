@@ -296,6 +296,10 @@
     <button class="tab-btn" onclick="switchTab('dd214')" data-testid="tab-dd214">DD-214 Review</button>
     <button class="tab-btn" onclick="switchTab('courses')" data-testid="tab-courses">Courses</button>
     <button class="tab-btn" onclick="switchTab('contacts')" data-testid="tab-contacts">Contacts</button>
+    <button class="tab-btn" onclick="switchTab('messages')" data-testid="tab-messages">Messages</button>
+    <button class="tab-btn" onclick="switchTab('disputes')" data-testid="tab-disputes">Disputes</button>
+    <button class="tab-btn" onclick="switchTab('counselors')" data-testid="tab-counselors">Counselors</button>
+    <button class="tab-btn" onclick="switchTab('waitlist')" data-testid="tab-waitlist">Waitlist</button>
   </div>
 
   <!-- OVERVIEW -->
@@ -367,6 +371,72 @@
       </table>
     </div>
   </div>
+
+  <!-- MESSAGES (Admin View) -->
+  <div id="tab-messages" class="tab-content">
+    <div class="section-title">Member Messages</div>
+    <div style="overflow-x: auto;">
+      <table class="data-table" data-testid="messages-table">
+        <thead>
+          <tr><th>From</th><th>To</th><th>Message</th><th>Date</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="messages-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DISPUTES -->
+  <div id="tab-disputes" class="tab-content">
+    <div class="section-title">Member Disputes</div>
+    <div style="overflow-x: auto;">
+      <table class="data-table" data-testid="disputes-table">
+        <thead>
+          <tr><th>Member</th><th>Bureau</th><th>Account</th><th>Status</th><th>Date Sent</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="disputes-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- COUNSELORS -->
+  <div id="tab-counselors" class="tab-content">
+    <div class="section-title">
+      <span>Counselor Management</span>
+      <button class="action-btn primary" onclick="openCounselorModal()" data-testid="new-counselor-btn">+ Add Counselor</button>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="data-table" data-testid="counselors-table">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Title</th><th>Assigned Members</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="counselors-tbody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top: 2rem;">
+      <div class="section-title">Member-Counselor Assignments</div>
+      <div style="overflow-x: auto;">
+        <table class="data-table" data-testid="assignments-table">
+          <thead>
+            <tr><th>Member</th><th>Assigned Counselor</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="assignments-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAITLIST -->
+  <div id="tab-waitlist" class="tab-content">
+    <div class="section-title">Course Waitlist</div>
+    <div style="overflow-x: auto;">
+      <table class="data-table" data-testid="waitlist-table">
+        <thead>
+          <tr><th>Member</th><th>Email</th><th>Course</th><th>Date Joined</th></tr>
+        </thead>
+        <tbody id="waitlist-tbody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- Course Modal -->
@@ -407,9 +477,72 @@
   </div>
 </div>
 
+<!-- Counselor Modal -->
+<div class="modal-overlay" id="counselor-modal">
+  <div class="modal-card">
+    <div class="modal-title" id="counselor-modal-title">Add Counselor</div>
+    <input type="hidden" id="counselor-id">
+    <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="counselor-first-name"></div>
+    <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="counselor-last-name"></div>
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="counselor-email" type="email"></div>
+    <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="counselor-title" placeholder="e.g. Certified Financial Counselor"></div>
+    <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea" id="counselor-bio" placeholder="Brief description..."></textarea></div>
+    <div class="form-group"><label class="form-label">Specialties (comma-separated)</label><input class="form-input" id="counselor-specialties" placeholder="Credit Repair, Debt Management"></div>
+    <div class="modal-actions">
+      <button class="action-btn" onclick="closeCounselorModal()">Cancel</button>
+      <button class="action-btn primary" onclick="saveCounselor()">Save Counselor</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Counselor Modal -->
+<div class="modal-overlay" id="assign-modal">
+  <div class="modal-card">
+    <div class="modal-title">Assign Counselor</div>
+    <input type="hidden" id="assign-member-id">
+    <div id="assign-member-info" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
+    <div class="form-group">
+      <label class="form-label">Select Counselor</label>
+      <select class="form-select" id="assign-counselor-select"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="action-btn" onclick="closeAssignModal()">Cancel</button>
+      <button class="action-btn primary" onclick="confirmAssign()">Assign</button>
+    </div>
+  </div>
+</div>
+
+<!-- Member Notes Modal -->
+<div class="modal-overlay" id="notes-modal">
+  <div class="modal-card">
+    <div class="modal-title">Intake Notes</div>
+    <input type="hidden" id="notes-member-id">
+    <div id="notes-member-info" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
+    <div id="notes-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 1rem;"></div>
+    <div class="form-group">
+      <label class="form-label">Add Note</label>
+      <textarea class="form-textarea" id="new-note-content" placeholder="Enter intake note..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note Type</label>
+      <select class="form-select" id="new-note-type">
+        <option value="general">General</option>
+        <option value="intake">Intake</option>
+        <option value="progress">Progress</option>
+        <option value="followup">Follow-up</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="action-btn" onclick="closeNotesModal()">Close</button>
+      <button class="action-btn primary" onclick="saveNote()">Add Note</button>
+    </div>
+  </div>
+</div>
+
 <div id="footer-placeholder"></div>
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
+<script src="js/admin-extended.js"></script>
 <script>
 let currentAdmin = null;
 let currentVerifyMemberId = null;
@@ -431,6 +564,10 @@ async function loadAdmin() {
     loadMembers();
     loadCourses();
     loadContacts();
+    loadDisputes();
+    loadCounselors();
+    loadWaitlist();
+    loadMessages();
   } catch (err) {
     window.location.href = 'login.html';
   }
