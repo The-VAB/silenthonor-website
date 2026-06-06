@@ -16,6 +16,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from pydantic import BaseModel, EmailStr
 import uuid
+from endpoints_part5 import register_part5_endpoints
 
 # JWT Configuration
 JWT_ALGORITHM = "HS256"
@@ -147,6 +148,9 @@ async def startup_db():
     
     # Create uploads directory
     os.makedirs("/app/uploads/dd214", exist_ok=True)
+    
+    # Register Part 5 endpoints
+    register_part5_endpoints(app, db, get_current_user, get_current_admin, hash_password)
 
 @app.on_event("shutdown")
 async def shutdown_db():
