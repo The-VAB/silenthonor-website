@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Score Tracker - Silent Honor Foundation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/credit-tracker.css">
+    <script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">SILENT<span class="logo-accent">HONOR</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="courses.html">Courses</a>
+                <a href="dispute-tracker.html">Disputes</a>
+                <a href="credit-tracker.html" class="active">Credit</a>
+            </div>
+            <div class="nav-user">
+                <div class="user-avatar" id="user-avatar">??</div>
+                <span class="user-name" id="user-name">Loading...</span>
+                <button class="btn-text" onclick="signOut()">Sign Out</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1 class="page-title">Credit Score Tracker</h1>
+                <p class="page-subtitle">Monitor your credit score progress over time</p>
+            </div>
+            <button class="btn-primary" onclick="openScoreModal()">+ Log Score</button>
+        </div>
+
+        <div id="loading-state" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading credit history...</p>
+        </div>
+
+        <div id="credit-content" class="credit-content" style="display:none;">
+            <!-- Current Scores -->
+            <div class="current-scores">
+                <h2 class="section-title">Current Scores</h2>
+                <div class="scores-grid">
+                    <div class="score-card equifax">
+                        <div class="score-bureau">Equifax</div>
+                        <div class="score-value" id="current-equifax">—</div>
+                        <div class="score-date" id="date-equifax">No data yet</div>
+                    </div>
+                    <div class="score-card experian">
+                        <div class="score-bureau">Experian</div>
+                        <div class="score-value" id="current-experian">—</div>
+                        <div class="score-date" id="date-experian">No data yet</div>
+                    </div>
+                    <div class="score-card transunion">
+                        <div class="score-bureau">TransUnion</div>
+                        <div class="score-value" id="current-transunion">—</div>
+                        <div class="score-date" id="date-transunion">No data yet</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score Ranges Info -->
+            <div class="score-ranges">
+                <div class="range-item poor">
+                    <span class="range-label">Poor</span>
+                    <span class="range-values">300-579</span>
+                </div>
+                <div class="range-item fair">
+                    <span class="range-label">Fair</span>
+                    <span class="range-values">580-669</span>
+                </div>
+                <div class="range-item good">
+                    <span class="range-label">Good</span>
+                    <span class="range-values">670-739</span>
+                </div>
+                <div class="range-item verygood">
+                    <span class="range-label">Very Good</span>
+                    <span class="range-values">740-799</span>
+                </div>
+                <div class="range-item excellent">
+                    <span class="range-label">Excellent</span>
+                    <span class="range-values">800-850</span>
+                </div>
+            </div>
+
+            <!-- Progress Chart -->
+            <div class="chart-section">
+                <h2 class="section-title">Score History</h2>
+                <div class="chart-container" id="chart-container">
+                    <div class="chart-empty">
+                        <p>Log your credit scores to see your progress chart</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score History Table -->
+            <div class="history-section">
+                <h2 class="section-title">Score Log</h2>
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Equifax</th>
+                                <th>Experian</th>
+                                <th>TransUnion</th>
+                                <th>Source</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <tr>
+                                <td colspan="6" class="empty-row">No scores logged yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="tips-section">
+                <h2 class="section-title">Credit Score Tips</h2>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">&#128197;</div>
+                        <h3>Check Monthly</h3>
+                        <p>Log your scores at least once a month to track progress and catch any unexpected changes.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">&#128202;</div>
+                        <h3>All 3 Bureaus</h3>
+                        <p>Each bureau may have different information. Track all three for a complete picture.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">&#128176;</div>
+                        <h3>Free Reports</h3>
+                        <p>Get free credit reports at AnnualCreditReport.com (one per bureau per year).</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">&#128272;</div>
+                        <h3>Credit Monitoring</h3>
+                        <p>Many banks and credit cards offer free credit score monitoring services.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Log Score Modal -->
+    <div id="score-modal" class="modal" style="display:none;">
+        <div class="modal-backdrop" onclick="closeScoreModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="score-modal-title">Log Credit Scores</h2>
+                <button class="modal-close" onclick="closeScoreModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="score-id">
+
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-input" id="score-date">
+                </div>
+
+                <div class="scores-input-grid">
+                    <div class="form-group">
+                        <label class="form-label">Equifax</label>
+                        <input type="number" class="form-input score-input" id="score-equifax" min="300" max="850" placeholder="300-850">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Experian</label>
+                        <input type="number" class="form-input score-input" id="score-experian" min="300" max="850" placeholder="300-850">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">TransUnion</label>
+                        <input type="number" class="form-input score-input" id="score-transunion" min="300" max="850" placeholder="300-850">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Source</label>
+                    <select class="form-select" id="score-source">
+                        <option value="manual">Manual Entry</option>
+                        <option value="annualcreditreport">AnnualCreditReport.com</option>
+                        <option value="creditkarma">Credit Karma</option>
+                        <option value="bank">Bank/Credit Card</option>
+                        <option value="fico">FICO Score</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea class="form-textarea" id="score-notes" placeholder="Any notes about this score check..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeScoreModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveScore()">Save Score</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Silent Honor Foundation. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/credit-tracker.js"></script>
+</body>
+</html>

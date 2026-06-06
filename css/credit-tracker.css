@@ -1,0 +1,521 @@
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-header-content {
+    flex: 1;
+}
+
+.page-header .btn-primary {
+    font-family: Oswald, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.page-header .btn-primary:hover {
+    background: var(--red-light);
+}
+
+.section-title {
+    font-family: Oswald, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+}
+
+/* Current Scores */
+.current-scores {
+    margin-bottom: 2rem;
+}
+
+.scores-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.score-card {
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.score-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.score-card.equifax::before {
+    background: #e02020;
+}
+
+.score-card.experian::before {
+    background: #0066b2;
+}
+
+.score-card.transunion::before {
+    background: #00a0df;
+}
+
+.score-bureau {
+    font-family: Oswald, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+}
+
+.score-value {
+    font-family: Oswald, sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.score-date {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+/* Score quality colors */
+.score-poor { color: #EF4444; }
+.score-fair { color: #F97316; }
+.score-good { color: #EAB308; }
+.score-verygood { color: #22C55E; }
+.score-excellent { color: #10B981; }
+
+/* Score Ranges */
+.score-ranges {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.range-item {
+    flex: 1;
+    padding: 0.75rem;
+    text-align: center;
+    background: rgba(17, 24, 39, 0.8);
+}
+
+.range-item.poor {
+    border-bottom: 3px solid #EF4444;
+}
+
+.range-item.fair {
+    border-bottom: 3px solid #F97316;
+}
+
+.range-item.good {
+    border-bottom: 3px solid #EAB308;
+}
+
+.range-item.verygood {
+    border-bottom: 3px solid #22C55E;
+}
+
+.range-item.excellent {
+    border-bottom: 3px solid #10B981;
+}
+
+.range-label {
+    display: block;
+    font-family: Oswald, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.range-values {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+/* Chart Section */
+.chart-section {
+    margin-bottom: 2rem;
+}
+
+.chart-container {
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    min-height: 300px;
+    position: relative;
+}
+
+.chart-empty {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--muted);
+}
+
+.chart-canvas {
+    width: 100%;
+    height: 250px;
+}
+
+/* Simple chart implementation */
+.chart-lines {
+    position: relative;
+    height: 200px;
+    border-left: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin: 2rem 0 1rem 3rem;
+}
+
+.chart-y-axis {
+    position: absolute;
+    left: -3rem;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--muted);
+}
+
+.chart-points {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.chart-point {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.chart-point.equifax { background: #e02020; }
+.chart-point.experian { background: #0066b2; }
+.chart-point.transunion { background: #00a0df; }
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-dot.equifax { background: #e02020; }
+.legend-dot.experian { background: #0066b2; }
+.legend-dot.transunion { background: #00a0df; }
+
+/* History Table */
+.history-section {
+    margin-bottom: 2rem;
+}
+
+.history-table-container {
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid var(--border);
+}
+
+.history-table th,
+.history-table td {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.history-table th {
+    font-family: Oswald, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.history-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.empty-row {
+    text-align: center;
+    color: var(--muted);
+    padding: 2rem;
+}
+
+.delete-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.delete-btn:hover {
+    border-color: #EF4444;
+    color: #EF4444;
+}
+
+/* Tips Section */
+.tips-section {
+    margin-bottom: 2rem;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.tip-card {
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.tip-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.tip-card h3 {
+    font-family: Oswald, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.tip-card p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+    position: relative;
+    background: var(--navy);
+    border: 1px solid var(--border);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    font-family: Oswald, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: var(--white);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-family: Oswald, sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 0.7rem 0.9rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.form-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--red);
+}
+
+.scores-input-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.score-input {
+    text-align: center;
+    font-family: Oswald, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary {
+    font-family: Oswald, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--red);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background: var(--red-light);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white);
+}
+
+.btn-secondary:hover {
+    border-color: var(--red);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .scores-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .score-ranges {
+        flex-direction: column;
+    }
+
+    .scores-input-grid {
+        grid-template-columns: 1fr;
+    }
+}
