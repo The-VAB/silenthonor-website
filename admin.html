@@ -11,7 +11,7 @@
   padding: 120px 3.5rem 4rem;
   position: relative;
   z-index: 1;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
@@ -71,10 +71,10 @@
   color: var(--muted);
   border: none;
   border-bottom: 2px solid transparent;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.25rem;
   font-family: 'Oswald', sans-serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.2em;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s;
@@ -89,7 +89,7 @@
 /* Stats */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1.25rem;
   margin-bottom: 2rem;
 }
@@ -156,6 +156,7 @@
 .status-verified { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
 .status-pending { background: rgba(201, 149, 42, 0.12); color: var(--gold-light); border: 1px solid rgba(201, 149, 42, 0.3); }
 .status-rejected { background: rgba(185, 28, 28, 0.12); color: var(--red-light); border: 1px solid rgba(185, 28, 28, 0.3); }
+.status-info { background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
 
 .action-btn {
   background: transparent;
@@ -168,6 +169,7 @@
   text-transform: uppercase;
   cursor: pointer;
   margin-right: 0.35rem;
+  transition: all 0.2s;
 }
 
 .action-btn.primary { border-color: var(--red); color: var(--red-light); }
@@ -200,6 +202,8 @@
   max-height: 90vh;
   overflow-y: auto;
 }
+
+.modal-card.wide { max-width: 900px; }
 
 .modal-title {
   font-family: 'Oswald', sans-serif;
@@ -269,10 +273,167 @@
   border: 1px dashed var(--border);
 }
 
+/* Pipeline Kanban */
+.pipeline-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+.pipeline-column {
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid var(--border);
+  min-height: 400px;
+}
+
+.pipeline-header {
+  padding: 0.75rem 1rem;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pipeline-count {
+  background: var(--red);
+  color: white;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.6rem;
+  border-radius: 2px;
+}
+
+.pipeline-cards {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pipeline-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pipeline-card:hover {
+  border-color: var(--red);
+  background: rgba(185, 28, 28, 0.1);
+}
+
+.pipeline-card-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.pipeline-card-email {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.pipeline-card-branch {
+  font-size: 0.65rem;
+  color: var(--gold);
+  margin-top: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Report Cards */
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.report-card {
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+}
+
+.report-card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.report-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.85rem;
+}
+
+.report-row:last-child { border-bottom: none; }
+
+.report-label { color: var(--muted); }
+.report-value { font-weight: 600; }
+
+/* Audit Log */
+.audit-entry {
+  padding: 1rem;
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.audit-timestamp {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.audit-action {
+  font-size: 0.85rem;
+}
+
+.audit-action strong {
+  color: var(--red-light);
+}
+
+.audit-user {
+  font-size: 0.75rem;
+  color: var(--gold);
+  text-align: right;
+}
+
+@media (max-width: 1000px) {
+  .pipeline-board {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+}
+
 @media (max-width: 800px) {
   .admin-wrapper { padding: 100px 1.5rem 3rem; }
   .data-table { font-size: 0.78rem; }
   .data-table th, .data-table td { padding: 0.6rem 0.5rem; }
+  .pipeline-board {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+  }
+  .audit-entry {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .audit-user { text-align: left; }
 }
 </style>
 </head>
@@ -292,14 +453,16 @@
   <!-- Tab Nav -->
   <div class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('overview')" data-testid="tab-overview">Overview</button>
+    <button class="tab-btn" onclick="switchTab('pipeline')" data-testid="tab-pipeline">Pipeline</button>
     <button class="tab-btn" onclick="switchTab('members')" data-testid="tab-members">Members</button>
-    <button class="tab-btn" onclick="switchTab('dd214')" data-testid="tab-dd214">DD-214 Review</button>
+    <button class="tab-btn" onclick="switchTab('dd214')" data-testid="tab-dd214">DD-214</button>
     <button class="tab-btn" onclick="switchTab('courses')" data-testid="tab-courses">Courses</button>
-    <button class="tab-btn" onclick="switchTab('contacts')" data-testid="tab-contacts">Contacts</button>
-    <button class="tab-btn" onclick="switchTab('messages')" data-testid="tab-messages">Messages</button>
     <button class="tab-btn" onclick="switchTab('disputes')" data-testid="tab-disputes">Disputes</button>
     <button class="tab-btn" onclick="switchTab('counselors')" data-testid="tab-counselors">Counselors</button>
-    <button class="tab-btn" onclick="switchTab('waitlist')" data-testid="tab-waitlist">Waitlist</button>
+    <button class="tab-btn" onclick="switchTab('staff')" data-testid="tab-staff">Staff</button>
+    <button class="tab-btn" onclick="switchTab('contacts')" data-testid="tab-contacts">Contacts</button>
+    <button class="tab-btn" onclick="switchTab('reports')" data-testid="tab-reports">Reports</button>
+    <button class="tab-btn" onclick="switchTab('audit')" data-testid="tab-audit">Audit Log</button>
   </div>
 
   <!-- OVERVIEW -->
@@ -308,9 +471,18 @@
       <div class="stat-card"><div class="stat-value" id="stat-members" data-testid="stat-members">—</div><div class="stat-label">Total Members</div></div>
       <div class="stat-card"><div class="stat-value" id="stat-verified" data-testid="stat-verified">—</div><div class="stat-label">Verified</div></div>
       <div class="stat-card" style="border-left-color: var(--gold);"><div class="stat-value" id="stat-pending" data-testid="stat-pending">—</div><div class="stat-label">Pending Review</div></div>
+      <div class="stat-card" style="border-left-color: #3b82f6;"><div class="stat-value" id="stat-counselors" data-testid="stat-counselors">—</div><div class="stat-label">Counselors</div></div>
       <div class="stat-card" style="border-left-color: #22c55e;"><div class="stat-value" id="stat-courses" data-testid="stat-courses">—</div><div class="stat-label">Courses</div></div>
-      <div class="stat-card" style="border-left-color: rgba(255,255,255,0.3);"><div class="stat-value" id="stat-contacts" data-testid="stat-contacts">—</div><div class="stat-label">Messages</div></div>
+      <div class="stat-card" style="border-left-color: rgba(255,255,255,0.3);"><div class="stat-value" id="stat-contacts" data-testid="stat-contacts">—</div><div class="stat-label">Contacts</div></div>
     </div>
+    <div class="section-title">Pipeline Overview</div>
+    <div class="stats-grid" id="pipeline-stats"></div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div id="tab-pipeline" class="tab-content">
+    <div class="section-title">Member Pipeline</div>
+    <div class="pipeline-board" id="pipeline-board"></div>
   </div>
 
   <!-- MEMBERS -->
@@ -320,7 +492,7 @@
       <table class="data-table" data-testid="members-table">
         <thead>
           <tr>
-            <th>Name</th><th>Email</th><th>Branch</th><th>Status</th><th>Verified</th><th>Joined</th>
+            <th>Name</th><th>Email</th><th>Branch</th><th>Stage</th><th>DD-214</th><th>Counselor</th><th>Joined</th><th>Actions</th>
           </tr>
         </thead>
         <tbody id="members-tbody"></tbody>
@@ -359,39 +531,13 @@
     </div>
   </div>
 
-  <!-- CONTACTS -->
-  <div id="tab-contacts" class="tab-content">
-    <div class="section-title">Contact Submissions</div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="contacts-table">
-        <thead>
-          <tr><th>Name</th><th>Email</th><th>Topic</th><th>Message</th><th>Received</th></tr>
-        </thead>
-        <tbody id="contacts-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- MESSAGES (Admin View) -->
-  <div id="tab-messages" class="tab-content">
-    <div class="section-title">Member Messages</div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="messages-table">
-        <thead>
-          <tr><th>From</th><th>To</th><th>Message</th><th>Date</th><th>Actions</th></tr>
-        </thead>
-        <tbody id="messages-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
   <!-- DISPUTES -->
   <div id="tab-disputes" class="tab-content">
-    <div class="section-title">Member Disputes</div>
+    <div class="section-title">All Member Disputes</div>
     <div style="overflow-x: auto;">
       <table class="data-table" data-testid="disputes-table">
         <thead>
-          <tr><th>Member</th><th>Bureau</th><th>Account</th><th>Status</th><th>Date Sent</th><th>Actions</th></tr>
+          <tr><th>Member</th><th>Bureau</th><th>Account</th><th>Reason</th><th>Status</th><th>Date Sent</th><th>Tracking #</th></tr>
         </thead>
         <tbody id="disputes-tbody"></tbody>
       </table>
@@ -407,7 +553,7 @@
     <div style="overflow-x: auto;">
       <table class="data-table" data-testid="counselors-table">
         <thead>
-          <tr><th>Name</th><th>Email</th><th>Title</th><th>Assigned Members</th><th>Status</th><th>Actions</th></tr>
+          <tr><th>Name</th><th>Email</th><th>Title</th><th>Specialties</th><th>Assigned</th><th>Status</th><th>Actions</th></tr>
         </thead>
         <tbody id="counselors-tbody"></tbody>
       </table>
@@ -417,7 +563,7 @@
       <div style="overflow-x: auto;">
         <table class="data-table" data-testid="assignments-table">
           <thead>
-            <tr><th>Member</th><th>Assigned Counselor</th><th>Actions</th></tr>
+            <tr><th>Member</th><th>Stage</th><th>Assigned Counselor</th><th>Actions</th></tr>
           </thead>
           <tbody id="assignments-tbody"></tbody>
         </table>
@@ -425,17 +571,45 @@
     </div>
   </div>
 
-  <!-- WAITLIST -->
-  <div id="tab-waitlist" class="tab-content">
-    <div class="section-title">Course Waitlist</div>
+  <!-- STAFF -->
+  <div id="tab-staff" class="tab-content">
+    <div class="section-title">
+      <span>Staff Management</span>
+      <button class="action-btn primary" onclick="openStaffModal()" data-testid="new-staff-btn">+ Add Staff</button>
+    </div>
     <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="waitlist-table">
+      <table class="data-table" data-testid="staff-table">
         <thead>
-          <tr><th>Member</th><th>Email</th><th>Course</th><th>Date Joined</th></tr>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr>
         </thead>
-        <tbody id="waitlist-tbody"></tbody>
+        <tbody id="staff-tbody"></tbody>
       </table>
     </div>
+  </div>
+
+  <!-- CONTACTS -->
+  <div id="tab-contacts" class="tab-content">
+    <div class="section-title">Contact Submissions</div>
+    <div style="overflow-x: auto;">
+      <table class="data-table" data-testid="contacts-table">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Topic</th><th>Message</th><th>Received</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="contacts-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div id="tab-reports" class="tab-content">
+    <div class="section-title">Reports & Analytics</div>
+    <div class="report-grid" id="reports-container"></div>
+  </div>
+
+  <!-- AUDIT LOG -->
+  <div id="tab-audit" class="tab-content">
+    <div class="section-title">Audit Log</div>
+    <div id="audit-log-container"></div>
   </div>
 </div>
 
@@ -468,7 +642,11 @@
   <div class="modal-card">
     <div class="modal-title">Verify Member DD-214</div>
     <div id="verify-member-info" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
-    <div id="dd214-preview" style="margin-bottom: 1.5rem;"></div>
+    <div id="dd214-preview" style="margin-bottom: 1rem;"></div>
+    <div class="form-group">
+      <label class="form-label">Verification Notes (Optional)</label>
+      <textarea class="form-textarea" id="verify-notes" placeholder="Add notes about the verification..."></textarea>
+    </div>
     <div class="modal-actions">
       <button class="action-btn" onclick="closeVerifyModal()">Cancel</button>
       <button class="action-btn danger" onclick="verifyMember('rejected')" data-testid="reject-member-btn">Reject</button>
@@ -491,6 +669,28 @@
     <div class="modal-actions">
       <button class="action-btn" onclick="closeCounselorModal()">Cancel</button>
       <button class="action-btn primary" onclick="saveCounselor()">Save Counselor</button>
+    </div>
+  </div>
+</div>
+
+<!-- Staff Modal -->
+<div class="modal-overlay" id="staff-modal">
+  <div class="modal-card">
+    <div class="modal-title" id="staff-modal-title">Add Staff</div>
+    <input type="hidden" id="staff-id">
+    <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="staff-first-name"></div>
+    <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="staff-last-name"></div>
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="staff-email" type="email"></div>
+    <div class="form-group">
+      <label class="form-label">Role</label>
+      <select class="form-select" id="staff-role">
+        <option value="staff">Staff</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="action-btn" onclick="closeStaffModal()">Cancel</button>
+      <button class="action-btn primary" onclick="saveStaff()">Save Staff</button>
     </div>
   </div>
 </div>
@@ -539,13 +739,65 @@
   </div>
 </div>
 
+<!-- Member Detail Modal -->
+<div class="modal-overlay" id="member-modal">
+  <div class="modal-card wide">
+    <div class="modal-title">Member Details</div>
+    <div id="member-detail-content"></div>
+    <div class="modal-actions">
+      <button class="action-btn" onclick="closeMemberModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stage Change Modal -->
+<div class="modal-overlay" id="stage-modal">
+  <div class="modal-card">
+    <div class="modal-title">Change Pipeline Stage</div>
+    <input type="hidden" id="stage-member-id">
+    <div id="stage-member-info" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
+    <div class="form-group">
+      <label class="form-label">Select New Stage</label>
+      <select class="form-select" id="stage-select">
+        <option value="applied">Applied</option>
+        <option value="dd214_pending">DD-214 Pending</option>
+        <option value="dd214_review">DD-214 Review</option>
+        <option value="approved">Approved</option>
+        <option value="counselor_assigned">Counselor Assigned</option>
+        <option value="intake_complete">Intake Complete</option>
+        <option value="active">Active</option>
+        <option value="graduated">Graduated</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="action-btn" onclick="closeStageModal()">Cancel</button>
+      <button class="action-btn primary" onclick="confirmStageChange()">Update Stage</button>
+    </div>
+  </div>
+</div>
+
 <div id="footer-placeholder"></div>
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
-<script src="js/admin-extended.js"></script>
 <script>
+// Pipeline stages
+const PIPELINE_STAGES = [
+  { id: 'applied', label: 'Applied' },
+  { id: 'dd214_pending', label: 'DD-214 Pending' },
+  { id: 'dd214_review', label: 'DD-214 Review' },
+  { id: 'approved', label: 'Approved' },
+  { id: 'counselor_assigned', label: 'Counselor Assigned' },
+  { id: 'intake_complete', label: 'Intake Complete' },
+  { id: 'active', label: 'Active' },
+  { id: 'graduated', label: 'Graduated' },
+  { id: 'inactive', label: 'Inactive' }
+];
+
 let currentAdmin = null;
 let currentVerifyMemberId = null;
+let membersList = [];
+let counselorsList = [];
 
 async function loadAdmin() {
   try {
@@ -566,8 +818,10 @@ async function loadAdmin() {
     loadContacts();
     loadDisputes();
     loadCounselors();
-    loadWaitlist();
-    loadMessages();
+    loadStaff();
+    loadPipeline();
+    loadReports();
+    loadAuditLog();
   } catch (err) {
     window.location.href = 'login.html';
   }
@@ -587,36 +841,90 @@ async function loadStats() {
     document.getElementById('stat-members').textContent = data.total_members;
     document.getElementById('stat-verified').textContent = data.verified_members;
     document.getElementById('stat-pending').textContent = data.pending_verification;
+    document.getElementById('stat-counselors').textContent = data.total_counselors;
     document.getElementById('stat-courses').textContent = data.total_courses;
     document.getElementById('stat-contacts').textContent = data.total_contacts;
-  } catch (e) {}
+
+    // Pipeline stats
+    if (data.pipeline) {
+      const statsContainer = document.getElementById('pipeline-stats');
+      let html = '';
+      for (const stage of PIPELINE_STAGES) {
+        const count = data.pipeline[stage.id] || 0;
+        html += `<div class="stat-card" style="border-left-color: var(--gold);">
+          <div class="stat-value">${count}</div>
+          <div class="stat-label">${stage.label}</div>
+        </div>`;
+      }
+      statsContainer.innerHTML = html;
+    }
+  } catch (e) { console.error('Stats error:', e); }
+}
+
+async function loadPipeline() {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/pipeline`, { credentials: 'include' });
+    const pipeline = await res.json();
+    const board = document.getElementById('pipeline-board');
+
+    let html = '';
+    for (const stage of PIPELINE_STAGES) {
+      const members = pipeline[stage.id] || [];
+      html += `<div class="pipeline-column">
+        <div class="pipeline-header">
+          <span>${stage.label}</span>
+          <span class="pipeline-count">${members.length}</span>
+        </div>
+        <div class="pipeline-cards">`;
+
+      for (const m of members) {
+        html += `<div class="pipeline-card" onclick="openMemberModal('${m.id}')">
+          <div class="pipeline-card-name">${m.name || 'Unknown'}</div>
+          <div class="pipeline-card-email">${m.email}</div>
+          ${m.branch ? `<div class="pipeline-card-branch">${m.branch}</div>` : ''}
+        </div>`;
+      }
+
+      if (members.length === 0) {
+        html += `<div style="padding: 1rem; text-align: center; color: var(--muted); font-size: 0.8rem;">No members</div>`;
+      }
+
+      html += `</div></div>`;
+    }
+    board.innerHTML = html;
+  } catch (e) { console.error('Pipeline error:', e); }
 }
 
 async function loadMembers() {
   try {
     const res = await fetch(`${window.API_BASE}/api/admin/members`, { credentials: 'include' });
-    const members = await res.json();
+    membersList = await res.json();
     const tbody = document.getElementById('members-tbody');
     const dd214Tbody = document.getElementById('dd214-tbody');
 
-    if (!members.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted);">No members yet.</td></tr>';
+    if (!membersList.length) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--muted);">No members yet.</td></tr>';
       dd214Tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted);">No pending reviews.</td></tr>';
       return;
     }
 
-    tbody.innerHTML = members.map(m => `
+    tbody.innerHTML = membersList.map(m => `
       <tr>
-        <td>${m.first_name} ${m.last_name}</td>
+        <td><strong>${m.first_name} ${m.last_name}</strong></td>
         <td>${m.email}</td>
         <td>${m.branch || '—'}</td>
-        <td>${m.service_status || '—'}</td>
-        <td><span class="status-badge ${m.verified ? 'status-verified' : 'status-pending'}">${m.verified ? 'Verified' : 'Pending'}</span></td>
+        <td><span class="status-badge status-info">${formatStage(m.pipeline_stage)}</span></td>
+        <td><span class="status-badge ${m.verified ? 'status-verified' : m.dd214_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${m.dd214_status || 'pending'}</span></td>
+        <td>${m.has_counselor ? '<span style="color: #4ade80;">Yes</span>' : '<span style="color: var(--muted);">No</span>'}</td>
         <td>${m.created_at ? new Date(m.created_at).toLocaleDateString() : '—'}</td>
+        <td>
+          <button class="action-btn" onclick="openMemberModal('${m.id}')">View</button>
+          <button class="action-btn" onclick="openStageModal('${m.id}', '${m.first_name} ${m.last_name}', '${m.pipeline_stage || 'applied'}')">Stage</button>
+        </td>
       </tr>
     `).join('');
 
-    const pending = members.filter(m => m.dd214_file);
+    const pending = membersList.filter(m => m.dd214_file && m.dd214_status !== 'verified');
     if (!pending.length) {
       dd214Tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted);">No DD-214 submissions awaiting review.</td></tr>';
     } else {
@@ -633,7 +941,12 @@ async function loadMembers() {
         </tr>
       `).join('');
     }
-  } catch (e) {}
+  } catch (e) { console.error('Members error:', e); }
+}
+
+function formatStage(stage) {
+  const found = PIPELINE_STAGES.find(s => s.id === stage);
+  return found ? found.label : stage || 'Applied';
 }
 
 async function loadCourses() {
@@ -657,7 +970,7 @@ async function loadCourses() {
         </td>
       </tr>
     `).join('');
-  } catch (e) {}
+  } catch (e) { console.error('Courses error:', e); }
 }
 
 async function loadContacts() {
@@ -666,7 +979,7 @@ async function loadContacts() {
     const contacts = await res.json();
     const tbody = document.getElementById('contacts-tbody');
     if (!contacts.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--muted);">No contact submissions yet.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--muted);">No contact submissions yet.</td></tr>';
       return;
     }
     tbody.innerHTML = contacts.map(c => `
@@ -674,11 +987,209 @@ async function loadContacts() {
         <td>${c.first_name} ${c.last_name}</td>
         <td><a href="mailto:${c.email}" style="color: var(--red-light);">${c.email}</a></td>
         <td>${c.topic || '—'}</td>
-        <td style="max-width: 300px; white-space: normal;">${(c.message || '').slice(0, 200)}${(c.message || '').length > 200 ? '...' : ''}</td>
+        <td style="max-width: 250px; white-space: normal;">${(c.message || '').slice(0, 150)}${(c.message || '').length > 150 ? '...' : ''}</td>
         <td>${c.created_at ? new Date(c.created_at).toLocaleString() : '—'}</td>
+        <td><span class="status-badge ${c.responded ? 'status-verified' : 'status-pending'}">${c.responded ? 'Responded' : 'New'}</span></td>
+        <td>
+          <button class="action-btn ${c.responded ? '' : 'success'}" onclick="toggleContactResponse('${c.id}', ${!c.responded})">${c.responded ? 'Reopen' : 'Mark Done'}</button>
+          <button class="action-btn danger" onclick="deleteContact('${c.id}')">Delete</button>
+        </td>
       </tr>
     `).join('');
-  } catch (e) {}
+  } catch (e) { console.error('Contacts error:', e); }
+}
+
+async function toggleContactResponse(id, responded) {
+  try {
+    await fetch(`${window.API_BASE}/api/admin/contacts/${id}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ responded })
+    });
+    loadContacts();
+  } catch (e) { console.error('Contact update error:', e); }
+}
+
+async function deleteContact(id) {
+  if (!confirm('Delete this contact submission?')) return;
+  try {
+    await fetch(`${window.API_BASE}/api/admin/contacts/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    loadContacts();
+  } catch (e) { console.error('Contact delete error:', e); }
+}
+
+async function loadDisputes() {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/disputes`, { credentials: 'include' });
+    const disputes = await res.json();
+    const tbody = document.getElementById('disputes-tbody');
+    if (!disputes.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--muted);">No disputes yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = disputes.map(d => {
+      const statusClass = d.status === 'resolved' ? 'status-verified' : d.status === 'rejected' ? 'status-rejected' : 'status-pending';
+      return `<tr>
+        <td>${d.user_name || 'Unknown'}<br><span style="font-size: 0.75rem; color: var(--muted);">${d.user_email || ''}</span></td>
+        <td>${d.bureau || '—'}</td>
+        <td>${d.account_name || '—'}</td>
+        <td>${d.reason || '—'}</td>
+        <td><span class="status-badge ${statusClass}">${d.status}</span></td>
+        <td>${d.date_sent ? new Date(d.date_sent).toLocaleDateString() : '—'}</td>
+        <td style="font-size: 0.75rem;">${d.tracking_number || '—'}</td>
+      </tr>`;
+    }).join('');
+  } catch (e) { console.error('Disputes error:', e); }
+}
+
+async function loadCounselors() {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/counselors`, { credentials: 'include' });
+    counselorsList = await res.json();
+    const tbody = document.getElementById('counselors-tbody');
+
+    if (!counselorsList.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--muted);">No counselors yet. Add your first counselor.</td></tr>';
+    } else {
+      tbody.innerHTML = counselorsList.map(c => `
+        <tr>
+          <td><strong>${c.name}</strong></td>
+          <td>${c.email}</td>
+          <td>${c.title || '—'}</td>
+          <td style="font-size: 0.8rem;">${c.specialties && c.specialties.length ? c.specialties.join(', ') : '—'}</td>
+          <td>${c.assigned_members}</td>
+          <td><span class="status-badge ${c.active ? 'status-verified' : 'status-rejected'}">${c.active ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <button class="action-btn" onclick='editCounselorById("${c.id}")'>Edit</button>
+            <button class="action-btn danger" onclick='deactivateCounselor("${c.id}")'>${c.active ? 'Deactivate' : 'Activate'}</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    loadMemberAssignments();
+  } catch (e) { console.error('Counselors error:', e); }
+}
+
+async function loadMemberAssignments() {
+  try {
+    const tbody = document.getElementById('assignments-tbody');
+    if (!membersList.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: var(--muted);">No members to assign.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = membersList.map(m => {
+      const counselor = counselorsList.find(c => c.id === m.assigned_counselor_id);
+      const counselorName = counselor ? counselor.name : '<span style="color: var(--muted);">Not assigned</span>';
+      return `<tr>
+        <td>${m.first_name} ${m.last_name}<br><span style="font-size: 0.75rem; color: var(--muted);">${m.email}</span></td>
+        <td><span class="status-badge status-info">${formatStage(m.pipeline_stage)}</span></td>
+        <td>${counselorName}</td>
+        <td>
+          <button class="action-btn primary" onclick='openAssignModal("${m.id}", "${m.first_name} ${m.last_name}")'>Assign</button>
+          <button class="action-btn" onclick='openNotesModal("${m.id}", "${m.first_name} ${m.last_name}")'>Notes</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (e) { console.error('Assignments error:', e); }
+}
+
+async function loadStaff() {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/staff`, { credentials: 'include' });
+    const staff = await res.json();
+    const tbody = document.getElementById('staff-tbody');
+
+    if (!staff.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted);">No staff members yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = staff.map(s => `
+      <tr>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.email}</td>
+        <td><span class="status-badge ${s.role === 'admin' ? 'status-verified' : 'status-info'}">${s.role}</span></td>
+        <td><span class="status-badge ${s.active ? 'status-verified' : 'status-rejected'}">${s.active ? 'Active' : 'Inactive'}</span></td>
+        <td>${s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'}</td>
+        <td>
+          <button class="action-btn" onclick='editStaff(${JSON.stringify(s).replace(/'/g, "&#39;")})'>Edit</button>
+          <button class="action-btn danger" onclick='toggleStaffStatus("${s.id}", ${!s.active})'>${s.active ? 'Deactivate' : 'Activate'}</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (e) { console.error('Staff error:', e); }
+}
+
+async function loadReports() {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/reports/overview`, { credentials: 'include' });
+    const data = await res.json();
+    const container = document.getElementById('reports-container');
+
+    container.innerHTML = `
+      <div class="report-card">
+        <div class="report-card-title">Member Summary</div>
+        <div class="report-row"><span class="report-label">Total Members</span><span class="report-value">${data.total_members || 0}</span></div>
+        <div class="report-row"><span class="report-label">Verified Members</span><span class="report-value">${data.verified_members || 0}</span></div>
+        <div class="report-row"><span class="report-label">Pending Verification</span><span class="report-value">${data.pending_verification || 0}</span></div>
+        <div class="report-row"><span class="report-label">Active Members</span><span class="report-value">${data.active_members || 0}</span></div>
+      </div>
+      <div class="report-card">
+        <div class="report-card-title">Staff & Counselors</div>
+        <div class="report-row"><span class="report-label">Total Counselors</span><span class="report-value">${data.total_counselors || 0}</span></div>
+        <div class="report-row"><span class="report-label">Total Staff</span><span class="report-value">${data.total_staff || 0}</span></div>
+        <div class="report-row"><span class="report-label">Avg Members/Counselor</span><span class="report-value">${data.avg_members_per_counselor || '—'}</span></div>
+      </div>
+      <div class="report-card">
+        <div class="report-card-title">Courses & Progress</div>
+        <div class="report-row"><span class="report-label">Total Courses</span><span class="report-value">${data.total_courses || 0}</span></div>
+        <div class="report-row"><span class="report-label">Live Courses</span><span class="report-value">${data.live_courses || 0}</span></div>
+        <div class="report-row"><span class="report-label">Total Lessons</span><span class="report-value">${data.total_lessons || 0}</span></div>
+      </div>
+      <div class="report-card">
+        <div class="report-card-title">Activity</div>
+        <div class="report-row"><span class="report-label">Total Disputes</span><span class="report-value">${data.total_disputes || 0}</span></div>
+        <div class="report-row"><span class="report-label">Pending Disputes</span><span class="report-value">${data.pending_disputes || 0}</span></div>
+        <div class="report-row"><span class="report-label">Contact Submissions</span><span class="report-value">${data.total_contacts || 0}</span></div>
+      </div>
+    `;
+  } catch (e) {
+    console.error('Reports error:', e);
+    document.getElementById('reports-container').innerHTML = '<div class="empty-state">Failed to load reports.</div>';
+  }
+}
+
+async function loadAuditLog() {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/audit-log`, { credentials: 'include' });
+    const logs = await res.json();
+    const container = document.getElementById('audit-log-container');
+
+    if (!logs.length) {
+      container.innerHTML = '<div class="empty-state">No audit log entries yet.</div>';
+      return;
+    }
+
+    container.innerHTML = logs.map(l => `
+      <div class="audit-entry">
+        <div class="audit-timestamp">${l.timestamp ? new Date(l.timestamp).toLocaleString() : '—'}</div>
+        <div class="audit-action">
+          <strong>${l.action}</strong> on ${l.entity_type}
+          ${l.details ? `<span style="color: var(--muted);"> — ${JSON.stringify(l.details).slice(0, 100)}</span>` : ''}
+        </div>
+        <div class="audit-user">${l.user_email || 'System'}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Audit log error:', e);
+    document.getElementById('audit-log-container').innerHTML = '<div class="empty-state">Failed to load audit log.</div>';
+  }
 }
 
 // Course CRUD
@@ -759,6 +1270,7 @@ function openVerifyModal(memberId, name, email, file) {
   document.getElementById('dd214-preview').innerHTML = `
     <a href="${window.API_BASE}/api/admin/dd214/${file}" target="_blank" class="action-btn primary">Open DD-214 Document</a>
   `;
+  document.getElementById('verify-notes').value = '';
   document.getElementById('verify-modal').classList.add('open');
 }
 
@@ -769,19 +1281,364 @@ function closeVerifyModal() {
 
 async function verifyMember(status) {
   if (!currentVerifyMemberId) return;
+  const notes = document.getElementById('verify-notes').value;
   try {
     const res = await fetch(`${window.API_BASE}/api/admin/members/${currentVerifyMemberId}/verify`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status, notes })
     });
     if (res.ok) {
       closeVerifyModal();
       loadMembers();
       loadStats();
+      loadPipeline();
     } else {
       alert('Failed to update verification.');
+    }
+  } catch (e) {
+    alert('Connection error.');
+  }
+}
+
+// Counselor CRUD
+function openCounselorModal(counselor) {
+  document.getElementById('counselor-modal-title').textContent = counselor ? 'Edit Counselor' : 'Add Counselor';
+  document.getElementById('counselor-id').value = counselor ? counselor.id : '';
+  const nameParts = counselor && counselor.name ? counselor.name.split(' ') : ['', ''];
+  document.getElementById('counselor-first-name').value = nameParts[0] || '';
+  document.getElementById('counselor-last-name').value = nameParts.slice(1).join(' ') || '';
+  document.getElementById('counselor-email').value = counselor ? counselor.email : '';
+  document.getElementById('counselor-title').value = counselor ? counselor.title || '' : '';
+  document.getElementById('counselor-bio').value = counselor ? counselor.bio || '' : '';
+  document.getElementById('counselor-specialties').value = counselor && counselor.specialties ? counselor.specialties.join(', ') : '';
+  document.getElementById('counselor-modal').classList.add('open');
+}
+
+function closeCounselorModal() {
+  document.getElementById('counselor-modal').classList.remove('open');
+}
+
+function editCounselorById(id) {
+  const counselor = counselorsList.find(c => c.id === id);
+  if (counselor) openCounselorModal(counselor);
+}
+
+async function saveCounselor() {
+  const id = document.getElementById('counselor-id').value;
+  const payload = {
+    first_name: document.getElementById('counselor-first-name').value,
+    last_name: document.getElementById('counselor-last-name').value,
+    email: document.getElementById('counselor-email').value,
+    title: document.getElementById('counselor-title').value,
+    bio: document.getElementById('counselor-bio').value,
+    specialties: document.getElementById('counselor-specialties').value.split(',').map(s => s.trim()).filter(s => s)
+  };
+
+  if (!payload.email) {
+    alert('Email is required.');
+    return;
+  }
+
+  const url = id ? `${window.API_BASE}/api/admin/counselors/${id}` : `${window.API_BASE}/api/admin/counselors`;
+  const method = id ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, {
+      method,
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      closeCounselorModal();
+      loadCounselors();
+      loadStats();
+    } else {
+      alert('Failed to save counselor.');
+    }
+  } catch (e) {
+    alert('Connection error.');
+  }
+}
+
+async function deactivateCounselor(id) {
+  if (!confirm('Toggle counselor status?')) return;
+  try {
+    await fetch(`${window.API_BASE}/api/admin/counselors/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    loadCounselors();
+  } catch (e) {}
+}
+
+// Staff CRUD
+function openStaffModal(staff) {
+  document.getElementById('staff-modal-title').textContent = staff ? 'Edit Staff' : 'Add Staff';
+  document.getElementById('staff-id').value = staff ? staff.id : '';
+  const nameParts = staff && staff.name ? staff.name.split(' ') : ['', ''];
+  document.getElementById('staff-first-name').value = nameParts[0] || '';
+  document.getElementById('staff-last-name').value = nameParts.slice(1).join(' ') || '';
+  document.getElementById('staff-email').value = staff ? staff.email : '';
+  document.getElementById('staff-role').value = staff ? staff.role : 'staff';
+  document.getElementById('staff-modal').classList.add('open');
+}
+
+function closeStaffModal() {
+  document.getElementById('staff-modal').classList.remove('open');
+}
+
+function editStaff(staff) {
+  openStaffModal(staff);
+}
+
+async function saveStaff() {
+  const id = document.getElementById('staff-id').value;
+  const payload = {
+    first_name: document.getElementById('staff-first-name').value,
+    last_name: document.getElementById('staff-last-name').value,
+    email: document.getElementById('staff-email').value,
+    role: document.getElementById('staff-role').value
+  };
+
+  if (!payload.email) {
+    alert('Email is required.');
+    return;
+  }
+
+  const url = id ? `${window.API_BASE}/api/admin/staff/${id}` : `${window.API_BASE}/api/admin/staff`;
+  const method = id ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, {
+      method,
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      closeStaffModal();
+      loadStaff();
+    } else {
+      alert('Failed to save staff member.');
+    }
+  } catch (e) {
+    alert('Connection error.');
+  }
+}
+
+async function toggleStaffStatus(id, active) {
+  try {
+    await fetch(`${window.API_BASE}/api/admin/staff/${id}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active })
+    });
+    loadStaff();
+  } catch (e) {}
+}
+
+// Assignment Modal
+let assignMemberId = null;
+
+function openAssignModal(memberId, memberName) {
+  assignMemberId = memberId;
+  document.getElementById('assign-member-id').value = memberId;
+  document.getElementById('assign-member-info').innerHTML = '<strong>Assigning counselor to:</strong> ' + memberName;
+
+  const select = document.getElementById('assign-counselor-select');
+  let html = '<option value="">-- Select Counselor --</option>';
+  for (const c of counselorsList.filter(c => c.active)) {
+    html += `<option value="${c.id}">${c.name}</option>`;
+  }
+  select.innerHTML = html;
+
+  document.getElementById('assign-modal').classList.add('open');
+}
+
+function closeAssignModal() {
+  assignMemberId = null;
+  document.getElementById('assign-modal').classList.remove('open');
+}
+
+async function confirmAssign() {
+  const counselorId = document.getElementById('assign-counselor-select').value;
+  if (!counselorId || !assignMemberId) {
+    alert('Please select a counselor.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/counselors/${counselorId}/assign/${assignMemberId}`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    if (res.ok) {
+      closeAssignModal();
+      loadCounselors();
+      loadMembers();
+      loadPipeline();
+    } else {
+      alert('Failed to assign counselor.');
+    }
+  } catch (e) {
+    alert('Connection error.');
+  }
+}
+
+// Notes Modal
+let notesMemberId = null;
+let notesMemberName = '';
+
+async function openNotesModal(memberId, memberName) {
+  notesMemberId = memberId;
+  notesMemberName = memberName;
+  document.getElementById('notes-member-id').value = memberId;
+  document.getElementById('notes-member-info').innerHTML = '<strong>Notes for:</strong> ' + memberName;
+  document.getElementById('new-note-content').value = '';
+
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/members/${memberId}/notes`, { credentials: 'include' });
+    const notes = await res.json();
+    const notesList = document.getElementById('notes-list');
+
+    if (!notes.length) {
+      notesList.innerHTML = '<div class="empty-state" style="padding: 1rem;">No notes yet.</div>';
+    } else {
+      notesList.innerHTML = notes.map(n => `
+        <div style="padding: 0.75rem; background: rgba(0,0,0,0.2); margin-bottom: 0.5rem; border-left: 2px solid var(--red);">
+          <div style="font-size: 0.7rem; color: var(--muted); margin-bottom: 0.25rem;">
+            ${new Date(n.created_at).toLocaleString()} — ${n.note_type} — ${n.created_by}
+          </div>
+          <div style="font-size: 0.85rem;">${n.content}</div>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    document.getElementById('notes-list').innerHTML = '<div class="empty-state" style="padding: 1rem;">Failed to load notes.</div>';
+  }
+
+  document.getElementById('notes-modal').classList.add('open');
+}
+
+function closeNotesModal() {
+  notesMemberId = null;
+  document.getElementById('notes-modal').classList.remove('open');
+}
+
+async function saveNote() {
+  if (!notesMemberId) return;
+
+  const content = document.getElementById('new-note-content').value.trim();
+  const noteType = document.getElementById('new-note-type').value;
+
+  if (!content) {
+    alert('Please enter a note.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/members/${notesMemberId}/notes`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, note_type: noteType })
+    });
+
+    if (res.ok) {
+      document.getElementById('new-note-content').value = '';
+      openNotesModal(notesMemberId, notesMemberName);
+    } else {
+      alert('Failed to save note.');
+    }
+  } catch (e) {
+    alert('Connection error.');
+  }
+}
+
+// Member Detail Modal
+async function openMemberModal(memberId) {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/members/${memberId}`, { credentials: 'include' });
+    const member = await res.json();
+
+    const content = document.getElementById('member-detail-content');
+    content.innerHTML = `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div>
+          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.2rem; margin-bottom: 1rem;">${member.first_name || ''} ${member.last_name || ''}</h3>
+          <div class="report-row"><span class="report-label">Email</span><span class="report-value">${member.email}</span></div>
+          <div class="report-row"><span class="report-label">Branch</span><span class="report-value">${member.branch || '—'}</span></div>
+          <div class="report-row"><span class="report-label">Service Status</span><span class="report-value">${member.service_status || '—'}</span></div>
+          <div class="report-row"><span class="report-label">State</span><span class="report-value">${member.state || '—'}</span></div>
+          <div class="report-row"><span class="report-label">Phone</span><span class="report-value">${member.phone || '—'}</span></div>
+        </div>
+        <div>
+          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.2rem; margin-bottom: 1rem;">Status</h3>
+          <div class="report-row"><span class="report-label">Pipeline Stage</span><span class="report-value">${formatStage(member.pipeline_stage)}</span></div>
+          <div class="report-row"><span class="report-label">DD-214 Status</span><span class="report-value">${member.dd214_status || 'pending'}</span></div>
+          <div class="report-row"><span class="report-label">Verified</span><span class="report-value">${member.verified ? 'Yes' : 'No'}</span></div>
+          <div class="report-row"><span class="report-label">Counselor</span><span class="report-value">${member.counselor ? member.counselor.name : 'Not assigned'}</span></div>
+          <div class="report-row"><span class="report-label">Joined</span><span class="report-value">${member.created_at ? new Date(member.created_at).toLocaleDateString() : '—'}</span></div>
+        </div>
+      </div>
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem;">
+        <button class="action-btn primary" onclick="closeMemberModal(); openAssignModal('${memberId}', '${member.first_name} ${member.last_name}')">Assign Counselor</button>
+        <button class="action-btn" onclick="closeMemberModal(); openNotesModal('${memberId}', '${member.first_name} ${member.last_name}')">View Notes</button>
+        <button class="action-btn" onclick="closeMemberModal(); openStageModal('${memberId}', '${member.first_name} ${member.last_name}', '${member.pipeline_stage || 'applied'}')">Change Stage</button>
+      </div>
+    `;
+    document.getElementById('member-modal').classList.add('open');
+  } catch (e) {
+    console.error('Member detail error:', e);
+  }
+}
+
+function closeMemberModal() {
+  document.getElementById('member-modal').classList.remove('open');
+}
+
+// Stage Change Modal
+let stageMemberId = null;
+
+function openStageModal(memberId, memberName, currentStage) {
+  stageMemberId = memberId;
+  document.getElementById('stage-member-id').value = memberId;
+  document.getElementById('stage-member-info').innerHTML = '<strong>Changing stage for:</strong> ' + memberName;
+  document.getElementById('stage-select').value = currentStage;
+  document.getElementById('stage-modal').classList.add('open');
+}
+
+function closeStageModal() {
+  stageMemberId = null;
+  document.getElementById('stage-modal').classList.remove('open');
+}
+
+async function confirmStageChange() {
+  if (!stageMemberId) return;
+  const newStage = document.getElementById('stage-select').value;
+
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/members/${stageMemberId}/stage`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stage: newStage })
+    });
+
+    if (res.ok) {
+      closeStageModal();
+      loadMembers();
+      loadPipeline();
+      loadStats();
+    } else {
+      alert('Failed to update stage.');
     }
   } catch (e) {
     alert('Connection error.');
