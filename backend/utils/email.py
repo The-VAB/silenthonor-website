@@ -362,3 +362,148 @@ async def send_admin_notification(subject: str, message: str) -> bool:
     </html>
     """
     return await send_email(ADMIN_EMAIL, f"[Admin] {subject}", html_content, message)
+
+async def send_new_membership_notification(member_data: dict) -> bool:
+    """Send new membership application notification to admin (m.lugenbell@silenthonor.org)"""
+    admin_email = "m.lugenbell@silenthonor.org"
+    first_name = member_data.get("first_name", "")
+    last_name = member_data.get("last_name", "")
+    subject = f"New Membership Application - {first_name} {last_name}"
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; background: #0B1220; color: #ffffff; padding: 40px; }}
+            .container {{ max-width: 600px; margin: 0 auto; background: #111827; padding: 40px; border: 1px solid #374151; }}
+            .header {{ text-align: center; margin-bottom: 30px; }}
+            .logo {{ font-family: Oswald, sans-serif; font-size: 28px; font-weight: 700; }}
+            .logo-accent {{ color: #B91C1C; }}
+            h1 {{ font-family: Oswald, sans-serif; color: #C9952A; margin-bottom: 20px; }}
+            p {{ color: #9CA3AF; line-height: 1.8; }}
+            .btn {{ display: inline-block; background: #B91C1C; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+            .info-table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+            .info-table td {{ padding: 10px 0; border-bottom: 1px solid #374151; }}
+            .info-table td:first-child {{ color: #6B7280; width: 40%; }}
+            .info-table td:last-child {{ color: #ffffff; }}
+            .notes {{ background: rgba(201, 149, 42, 0.1); border: 1px solid #C9952A; padding: 15px; margin: 20px 0; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+            </div>
+            <h1>New Membership Application</h1>
+            <p>A new veteran has submitted a membership application and is awaiting DD-214 review.</p>
+
+            <table class="info-table">
+                <tr><td>Name</td><td><strong>{first_name} {last_name}</strong></td></tr>
+                <tr><td>Email</td><td>{member_data.get('email', 'N/A')}</td></tr>
+                <tr><td>Phone</td><td>{member_data.get('phone', 'N/A')}</td></tr>
+                <tr><td>Branch</td><td>{member_data.get('branch', 'N/A')}</td></tr>
+                <tr><td>Service Status</td><td>{member_data.get('service_status', 'N/A')}</td></tr>
+                <tr><td>State</td><td>{member_data.get('state', 'N/A')}</td></tr>
+            </table>
+
+            <div class="notes"><strong>What they need help with:</strong><br>{member_data.get('challenges', 'Not specified')}</div>
+
+            <p style="text-align: center;">
+                <a href="https://silenthonor.org/admin.html" class="btn">Review Application</a>
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+
+    text_content = f"""
+    New Membership Application - {first_name} {last_name}
+
+    A new veteran has submitted a membership application.
+
+    Name: {first_name} {last_name}
+    Email: {member_data.get('email', 'N/A')}
+    Phone: {member_data.get('phone', 'N/A')}
+    Branch: {member_data.get('branch', 'N/A')}
+    Service Status: {member_data.get('service_status', 'N/A')}
+
+    What they need help with:
+    {member_data.get('challenges', 'Not specified')}
+
+    Review application: https://silenthonor.org/admin.html
+    """
+
+    return await send_email(admin_email, subject, html_content, text_content)
+
+async def send_staff_welcome_email(to: str, first_name: str, role: str, temp_password: str) -> bool:
+    """Send welcome email to new staff member with login credentials"""
+    subject = f"Welcome to Silent Honor Foundation - Your {role.title()} Account"
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; background: #0B1220; color: #ffffff; padding: 40px; }}
+            .container {{ max-width: 600px; margin: 0 auto; background: #111827; padding: 40px; border: 1px solid #374151; }}
+            .header {{ text-align: center; margin-bottom: 30px; }}
+            .logo {{ font-family: Oswald, sans-serif; font-size: 28px; font-weight: 700; }}
+            .logo-accent {{ color: #B91C1C; }}
+            h1 {{ font-family: Oswald, sans-serif; color: #C9952A; margin-bottom: 20px; }}
+            p {{ color: #9CA3AF; line-height: 1.8; }}
+            .btn {{ display: inline-block; background: #B91C1C; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+            .footer {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #374151; text-align: center; font-size: 12px; color: #6B7280; }}
+            .credentials {{ background: rgba(185, 28, 28, 0.1); border: 1px solid #B91C1C; padding: 20px; margin: 20px 0; }}
+            .credentials p {{ margin: 5px 0; }}
+            .warning {{ color: #F97316; font-size: 13px; margin-top: 15px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+            </div>
+            <h1>Welcome to the Team!</h1>
+            <p>Hi {first_name},</p>
+            <p>Your {role} account has been created for the Silent Honor Foundation portal. You can now log in and start helping our veteran members.</p>
+
+            <div class="credentials">
+                <p><strong style="color: #ffffff;">Your Login Credentials:</strong></p>
+                <p>Email: <strong style="color: #ffffff;">{to}</strong></p>
+                <p>Temporary Password: <strong style="color: #ffffff;">{temp_password}</strong></p>
+                <p class="warning">Please change your password after your first login for security.</p>
+            </div>
+
+            <p style="text-align: center;">
+                <a href="https://silenthonor.org/login.html" class="btn">Log In Now</a>
+            </p>
+
+            <div class="footer">
+                <p>Silent Honor Foundation | Veterans Helping Veterans</p>
+                <p>If you have questions, contact m.lugenbell@silenthonor.org</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    text_content = f"""
+    Welcome to Silent Honor Foundation!
+
+    Hi {first_name},
+
+    Your {role} account has been created for the Silent Honor Foundation portal.
+
+    Your Login Credentials:
+    Email: {to}
+    Temporary Password: {temp_password}
+
+    IMPORTANT: Please change your password after your first login for security.
+
+    Log in at: https://silenthonor.org/login.html
+
+    Silent Honor Foundation | Veterans Helping Veterans
+    """
+
+    return await send_email(to, subject, html_content, text_content)
