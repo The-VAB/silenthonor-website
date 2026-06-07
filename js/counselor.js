@@ -34,7 +34,7 @@ function initCounselor(user) {
 
 async function loadCounselor() {
     try {
-        var r = await fetch(window.API_BASE + "/api/counselor/assigned", { credentials: "include" });
+        var r = await fetch(window.API_BASE + "/api/member/counselor", { credentials: "include" });
         if (r.ok) {
             counselorData = await r.json();
             renderCounselor(counselorData);
