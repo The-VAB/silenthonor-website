@@ -7,14 +7,17 @@ class RegisterRequest(BaseModel):
     password: str
     first_name: str
     last_name: str
+    dob: Optional[str] = None
     phone: Optional[str] = None
     state: Optional[str] = None
     branch: Optional[str] = None
     service_status: Optional[str] = None
-    years_of_service: Optional[str] = None
-    separation_year: Optional[str] = None
-    challenges: Optional[list] = []
+    years_of_service: Optional[int] = None
+    separation_year: Optional[int] = None
+    how_heard: Optional[str] = None
+    challenges: Optional[str] = None
     notes: Optional[str] = None
+    consent_contact: Optional[bool] = False
 
 class LoginRequest(BaseModel):
     email: EmailStr

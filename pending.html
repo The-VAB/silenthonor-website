@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Under Review - Silent Honor Foundation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <style>
+        body {
+            background: var(--navy-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .pending-container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 40px;
+        }
+        .logo-accent {
+            color: var(--red-primary);
+        }
+        .icon-container {
+            width: 120px;
+            height: 120px;
+            background: rgba(201, 149, 42, 0.1);
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+        }
+        .icon-container svg {
+            width: 60px;
+            height: 60px;
+            color: var(--gold);
+        }
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 15px;
+        }
+        .subheading {
+            font-family: 'Lora', serif;
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+        .description {
+            font-family: 'Barlow', sans-serif;
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+        .description a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        .description a:hover {
+            text-decoration: underline;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 40px 0;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            right: 50px;
+            height: 2px;
+            background: var(--border);
+        }
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 25%;
+            position: relative;
+            z-index: 1;
+        }
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .step-icon.completed {
+            background: #10B981;
+            color: white;
+        }
+        .step-icon.current {
+            background: var(--gold);
+            color: var(--navy-dark);
+            animation: pulse 2s infinite;
+        }
+        .step-icon.pending {
+            background: var(--navy-mid);
+            border: 2px solid var(--border);
+            color: var(--muted);
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(201, 149, 42, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(201, 149, 42, 0); }
+        }
+        .step-label {
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-align: center;
+        }
+        .step-label.active {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* Spinner for current step */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top-color: var(--navy-dark);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-home {
+            display: inline-block;
+            background: var(--red-primary);
+            color: var(--white);
+            padding: 14px 32px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-home:hover {
+            background: var(--red-light);
+        }
+
+        /* Card style */
+        .card {
+            background: var(--navy-mid);
+            border: 1px solid var(--border);
+            padding: 30px;
+            margin-top: 30px;
+        }
+        .card h3 {
+            font-family: 'Oswald', sans-serif;
+            color: var(--white);
+            margin-bottom: 15px;
+        }
+        .card p {
+            font-family: 'Barlow', sans-serif;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .timeline {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            .timeline::before {
+                top: 0;
+                bottom: 0;
+                left: 19px;
+                right: auto;
+                width: 2px;
+                height: auto;
+            }
+            .timeline-step {
+                flex-direction: row;
+                width: 100%;
+                gap: 15px;
+            }
+            .step-label {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pending-container">
+        <div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+
+        <div class="icon-container">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+
+        <h1>Application Under Review</h1>
+        <p class="subheading">We've received your application and DD-214</p>
+
+        <p class="description">
+            Our team is reviewing your information. You'll receive an email once you're approved, typically within 2-3 business days.
+            <br><br>
+            If you have questions, contact us at <a href="mailto:m.lugenbell@silenthonor.org">m.lugenbell@silenthonor.org</a>
+        </p>
+
+        <div class="timeline">
+            <div class="timeline-step">
+                <div class="step-icon completed">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <span class="step-label">Applied</span>
+            </div>
+            <div class="timeline-step">
+                <div class="step-icon current">
+                    <div class="spinner"></div>
+                </div>
+                <span class="step-label active">Under Review</span>
+            </div>
+            <div class="timeline-step">
+                <div class="step-icon pending">3</div>
+                <span class="step-label">Approved</span>
+            </div>
+            <div class="timeline-step">
+                <div class="step-icon pending">4</div>
+                <span class="step-label">Access Granted</span>
+            </div>
+        </div>
+
+        <a href="index.html" class="btn-home">Back to Home</a>
+
+        <div class="card">
+            <h3>What happens next?</h3>
+            <p>
+                Our team will verify your DD-214 and military service records. Once approved, you'll receive an email with your login link and full access to all member benefits including financial courses, credit repair services, and personalized counseling.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        window.API_BASE = "https://api.srv1077820.hstgr.cloud";
+
+        // Check if user is already approved
+        async function checkStatus() {
+            try {
+                var r = await fetch(window.API_BASE + "/api/auth/me", { credentials: "include" });
+                if (r.ok) {
+                    var user = await r.json();
+                    if (user.verified) {
+                        window.location.href = "dashboard.html";
+                    }
+                }
+            } catch (e) {
+                // Not logged in or error - stay on page
+            }
+        }
+        checkStatus();
+    </script>
+</body>
+</html>
