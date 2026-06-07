@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apply for Credit Repair Program - Silent Honor Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+<style>
+.app-wrapper {
+  min-height: 100vh;
+  padding: 120px 2rem 4rem;
+  position: relative;
+  z-index: 1;
+}
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.app-tag {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+.app-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  color: var(--white);
+}
+.app-subtitle {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Info Cards */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.info-card {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  text-align: center;
+}
+.info-card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.info-card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  margin-bottom: 0.3rem;
+}
+.info-card-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Form */
+.app-form-container {
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid var(--border);
+  padding: 2rem;
+}
+.form-section {
+  margin-bottom: 2rem;
+}
+.form-section:last-child {
+  margin-bottom: 0;
+}
+.section-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.form-group {
+  margin-bottom: 1.25rem;
+}
+.form-label {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.form-label .required {
+  color: var(--red-light);
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: var(--navy);
+  border: 1px solid var(--border);
+  color: var(--white);
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  font-family: 'Barlow', sans-serif;
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.form-input.error, .form-select.error {
+  border-color: var(--red-light);
+}
+.field-error {
+  color: var(--red-light);
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  display: none;
+}
+.field-error.show {
+  display: block;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Checkboxes */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.checkbox-item input[type="checkbox"] {
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.checkbox-item label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* Important Notice */
+.notice-box {
+  background: rgba(185, 28, 28, 0.1);
+  border: 1px solid rgba(185, 28, 28, 0.3);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.notice-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--red-light);
+  margin-bottom: 0.5rem;
+}
+.notice-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Consent */
+.consent-section {
+  background: rgba(201, 149, 42, 0.05);
+  border: 1px solid rgba(201, 149, 42, 0.2);
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+}
+.consent-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.consent-item:last-child {
+  margin-bottom: 0;
+}
+.consent-item input[type="checkbox"] {
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.consent-item label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+/* Buttons */
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  text-align: center;
+}
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.btn-secondary:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.btn-primary {
+  background: var(--red);
+  color: var(--white);
+}
+.btn-primary:hover {
+  background: var(--red-light);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error/Success Messages */
+.error-msg, .success-msg {
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+.error-msg {
+  background: rgba(185, 28, 28, 0.1);
+  border: 1px solid rgba(185, 28, 28, 0.3);
+  color: var(--red-light);
+}
+.success-msg {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10B981;
+}
+.error-msg.show, .success-msg.show {
+  display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-wrapper {
+    padding: 100px 1rem 3rem;
+  }
+  .info-cards {
+    grid-template-columns: 1fr;
+  }
+  .form-row, .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+  .form-buttons {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="app-wrapper page-content">
+  <div class="app-container">
+
+    <div class="app-header">
+      <div class="app-tag">Free Credit Repair Services</div>
+      <h1 class="app-title">Credit Repair Program Application</h1>
+      <p class="app-subtitle">Our certified counselors will help you dispute inaccurate items, build positive credit history, and achieve your financial goals.</p>
+    </div>
+
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-card-icon">📋</div>
+        <div class="info-card-title">Credit Analysis</div>
+        <div class="info-card-text">Full review of your credit reports from all 3 bureaus</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">📝</div>
+        <div class="info-card-title">Dispute Letters</div>
+        <div class="info-card-text">Certified mail disputes to Equifax, Experian, TransUnion</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">📈</div>
+        <div class="info-card-title">Progress Tracking</div>
+        <div class="info-card-text">Monitor your score improvements over time</div>
+      </div>
+    </div>
+
+    <div class="app-form-container">
+      <div class="error-msg" id="error-msg"></div>
+      <div class="success-msg" id="success-msg"></div>
+
+      <form id="application-form">
+
+        <!-- Credit Situation -->
+        <div class="form-section">
+          <div class="section-title">Current Credit Situation</div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Equifax Score</label>
+              <input type="number" id="score_equifax" class="form-input" placeholder="e.g. 580" min="300" max="850">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Experian Score</label>
+              <input type="number" id="score_experian" class="form-input" placeholder="e.g. 590" min="300" max="850">
+            </div>
+            <div class="form-group">
+              <label class="form-label">TransUnion Score</label>
+              <input type="number" id="score_transunion" class="form-input" placeholder="e.g. 585" min="300" max="850">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">When did you last check your credit?</label>
+            <select id="last_check" class="form-select">
+              <option value="">Select one</option>
+              <option>Within the last month</option>
+              <option>1-3 months ago</option>
+              <option>3-6 months ago</option>
+              <option>6-12 months ago</option>
+              <option>Over a year ago</option>
+              <option>Never</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">What issues are you seeing on your credit report? <span class="required">*</span></label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="issue_collections" value="Collections accounts">
+                <label for="issue_collections">Collections accounts</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="issue_late_payments" value="Late payments">
+                <label for="issue_late_payments">Late payments</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="issue_charge_offs" value="Charge-offs">
+                <label for="issue_charge_offs">Charge-offs</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="issue_inquiries" value="Too many hard inquiries">
+                <label for="issue_inquiries">Too many hard inquiries</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="issue_bankruptcy" value="Bankruptcy">
+                <label for="issue_bankruptcy">Bankruptcy</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="issue_errors" value="Errors/inaccuracies">
+                <label for="issue_errors">Errors/inaccuracies on my report</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="issue_identity_theft" value="Identity theft">
+                <label for="issue_identity_theft">Identity theft or fraud</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="issue_not_sure" value="Not sure">
+                <label for="issue_not_sure">Not sure / Haven't reviewed it</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Goals -->
+        <div class="form-section">
+          <div class="section-title">Your Goals</div>
+
+          <div class="form-group">
+            <label class="form-label">What is your primary credit goal? <span class="required">*</span></label>
+            <select id="primary_goal" class="form-select" required>
+              <option value="">Select your main goal</option>
+              <option>Buy a home using my VA loan</option>
+              <option>Get approved for a car loan</option>
+              <option>Qualify for better credit cards</option>
+              <option>Lower my interest rates</option>
+              <option>Start a business</option>
+              <option>Improve my overall score</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Target Credit Score</label>
+            <select id="target_score" class="form-select">
+              <option value="">What score are you aiming for?</option>
+              <option>620+ (FHA/VA loan minimum)</option>
+              <option>680+ (Conventional loan)</option>
+              <option>720+ (Best rates)</option>
+              <option>750+ (Excellent credit)</option>
+              <option>Just want to improve</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Timeline for achieving your goal</label>
+            <select id="timeline" class="form-select">
+              <option value="">When do you need this?</option>
+              <option>As soon as possible</option>
+              <option>Within 3 months</option>
+              <option>Within 6 months</option>
+              <option>Within 1 year</option>
+              <option>No specific timeline</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="form-section">
+          <div class="section-title">Additional Information</div>
+
+          <div class="form-group">
+            <label class="form-label">Anything else we should know?</label>
+            <textarea id="additional_info" class="form-textarea" placeholder="Tell us about your situation, any concerns, or specific items you want to dispute..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Preferred Contact Method</label>
+              <select id="contact_method" class="form-select">
+                <option value="email">Email</option>
+                <option value="phone">Phone</option>
+                <option value="text">Text Message</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Best Time to Contact</label>
+              <select id="contact_time" class="form-select">
+                <option value="">Any time</option>
+                <option value="morning">Morning (9am-12pm)</option>
+                <option value="afternoon">Afternoon (12pm-5pm)</option>
+                <option value="evening">Evening (5pm-8pm)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Important Notice -->
+        <div class="notice-box">
+          <div class="notice-title">Important: Certified Mail Only</div>
+          <div class="notice-text">
+            We ONLY send disputes via certified mail with tracking numbers. Never dispute online through the bureaus' websites - this can hurt your case. Our process creates a legal paper trail that protects your rights under the Fair Credit Reporting Act (FCRA).
+          </div>
+        </div>
+
+        <!-- Consent -->
+        <div class="consent-section">
+          <div class="consent-item">
+            <input type="checkbox" id="consent_accurate" required>
+            <label for="consent_accurate">I certify that all information provided is accurate to the best of my knowledge.</label>
+          </div>
+          <div class="consent-item">
+            <input type="checkbox" id="consent_program" required>
+            <label for="consent_program">I understand this is a free program and that results may vary based on my individual credit situation.</label>
+          </div>
+          <div class="consent-item">
+            <input type="checkbox" id="consent_credit_pull">
+            <label for="consent_credit_pull">I authorize Silent Honor Foundation to review my credit reports for the purpose of providing credit repair services. (Optional - you can bring your own reports)</label>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <a href="dashboard.html" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Submit Application</button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function() {
+  var errorMsg = document.getElementById("error-msg");
+  var successMsg = document.getElementById("success-msg");
+  var submitBtn = document.getElementById("submit-btn");
+
+  // Check if logged in and verified
+  document.addEventListener("DOMContentLoaded", async function() {
+    try {
+      var response = await fetch(window.API_BASE + "/api/auth/me", {
+        credentials: "include"
+      });
+      if (!response.ok) {
+        window.location.href = "login.html";
+        return;
+      }
+      var user = await response.json();
+      if (!user.verified) {
+        window.location.href = "pending.html";
+        return;
+      }
+      if (user.role !== "member") {
+        window.location.href = "dashboard.html";
+        return;
+      }
+    } catch (e) {
+      window.location.href = "login.html";
+    }
+  });
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.add("show");
+    successMsg.classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showSuccess(msg) {
+    successMsg.textContent = msg;
+    successMsg.classList.add("show");
+    errorMsg.classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function hideMessages() {
+    errorMsg.classList.remove("show");
+    successMsg.classList.remove("show");
+  }
+
+  function getSelectedIssues() {
+    var issues = [];
+    document.querySelectorAll(".checkbox-group input[type='checkbox']:checked").forEach(function(cb) {
+      issues.push(cb.value);
+    });
+    return issues;
+  }
+
+  document.getElementById("application-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    hideMessages();
+
+    var issues = getSelectedIssues();
+    var primaryGoal = document.getElementById("primary_goal").value;
+    var consentAccurate = document.getElementById("consent_accurate").checked;
+    var consentProgram = document.getElementById("consent_program").checked;
+
+    // Validation
+    if (issues.length === 0) {
+      showError("Please select at least one credit issue you're experiencing.");
+      return;
+    }
+    if (!primaryGoal) {
+      showError("Please select your primary credit goal.");
+      return;
+    }
+    if (!consentAccurate) {
+      showError("Please certify that your information is accurate.");
+      return;
+    }
+    if (!consentProgram) {
+      showError("Please acknowledge the program terms.");
+      return;
+    }
+
+    submitBtn.textContent = "Submitting...";
+    submitBtn.disabled = true;
+
+    try {
+      var applicationData = {
+        score_equifax: document.getElementById("score_equifax").value ? parseInt(document.getElementById("score_equifax").value) : null,
+        score_experian: document.getElementById("score_experian").value ? parseInt(document.getElementById("score_experian").value) : null,
+        score_transunion: document.getElementById("score_transunion").value ? parseInt(document.getElementById("score_transunion").value) : null,
+        last_credit_check: document.getElementById("last_check").value || null,
+        credit_issues: issues,
+        primary_goal: primaryGoal,
+        target_score: document.getElementById("target_score").value || null,
+        timeline: document.getElementById("timeline").value || null,
+        additional_info: document.getElementById("additional_info").value.trim() || null,
+        contact_method: document.getElementById("contact_method").value,
+        contact_time: document.getElementById("contact_time").value || null,
+        consent_credit_pull: document.getElementById("consent_credit_pull").checked
+      };
+
+      var response = await fetch(window.API_BASE + "/api/member/apply/credit-repair", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(applicationData)
+      });
+
+      var data = await response.json();
+
+      if (response.ok) {
+        showSuccess("Your application has been submitted! A counselor will review it and contact you within 2-3 business days.");
+        document.getElementById("application-form").reset();
+        setTimeout(function() {
+          window.location.href = "dashboard.html";
+        }, 3000);
+      } else {
+        showError(data.detail || "Failed to submit application. Please try again.");
+        submitBtn.textContent = "Submit Application";
+        submitBtn.disabled = false;
+      }
+    } catch (err) {
+      console.error("Application error:", err);
+      showError("Connection error. Please check your internet and try again.");
+      submitBtn.textContent = "Submit Application";
+      submitBtn.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

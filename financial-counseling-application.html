@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apply for Financial Counseling - Silent Honor Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+<style>
+.app-wrapper {
+  min-height: 100vh;
+  padding: 120px 2rem 4rem;
+  position: relative;
+  z-index: 1;
+}
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.app-tag {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+.app-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  color: var(--white);
+}
+.app-subtitle {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Info Cards */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.info-card {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  text-align: center;
+}
+.info-card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.info-card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  margin-bottom: 0.3rem;
+}
+.info-card-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Form */
+.app-form-container {
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid var(--border);
+  padding: 2rem;
+}
+.form-section {
+  margin-bottom: 2rem;
+}
+.form-section:last-child {
+  margin-bottom: 0;
+}
+.section-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.form-group {
+  margin-bottom: 1.25rem;
+}
+.form-label {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.form-label .required {
+  color: var(--red-light);
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: var(--navy);
+  border: 1px solid var(--border);
+  color: var(--white);
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  font-family: 'Barlow', sans-serif;
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.form-input.error, .form-select.error {
+  border-color: var(--red-light);
+}
+.field-error {
+  color: var(--red-light);
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  display: none;
+}
+.field-error.show {
+  display: block;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Checkboxes */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.checkbox-item input[type="checkbox"] {
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.checkbox-item label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* Income/Expense Grid */
+.money-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.money-section h4 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+
+/* Consent */
+.consent-section {
+  background: rgba(201, 149, 42, 0.05);
+  border: 1px solid rgba(201, 149, 42, 0.2);
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+}
+.consent-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.consent-item:last-child {
+  margin-bottom: 0;
+}
+.consent-item input[type="checkbox"] {
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.consent-item label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+/* Buttons */
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  text-align: center;
+}
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.btn-secondary:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.btn-primary {
+  background: var(--red);
+  color: var(--white);
+}
+.btn-primary:hover {
+  background: var(--red-light);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error/Success Messages */
+.error-msg, .success-msg {
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+.error-msg {
+  background: rgba(185, 28, 28, 0.1);
+  border: 1px solid rgba(185, 28, 28, 0.3);
+  color: var(--red-light);
+}
+.success-msg {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10B981;
+}
+.error-msg.show, .success-msg.show {
+  display: block;
+}
+
+/* Input with prefix */
+.input-with-prefix {
+  position: relative;
+}
+.input-with-prefix .prefix {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-family: 'Barlow', sans-serif;
+}
+.input-with-prefix input {
+  padding-left: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-wrapper {
+    padding: 100px 1rem 3rem;
+  }
+  .info-cards {
+    grid-template-columns: 1fr;
+  }
+  .form-row, .money-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-buttons {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+
+<div class="app-wrapper page-content">
+  <div class="app-container">
+
+    <div class="app-header">
+      <div class="app-tag">One-on-One Financial Guidance</div>
+      <h1 class="app-title">Financial Counseling Application</h1>
+      <p class="app-subtitle">Work with a certified financial counselor to create a personalized plan for achieving your financial goals and building long-term stability.</p>
+    </div>
+
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-card-icon">🎯</div>
+        <div class="info-card-title">Personal Plan</div>
+        <div class="info-card-text">Custom financial roadmap tailored to your goals</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">💰</div>
+        <div class="info-card-title">Budget Analysis</div>
+        <div class="info-card-text">Identify savings opportunities and spending patterns</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">📞</div>
+        <div class="info-card-title">Ongoing Support</div>
+        <div class="info-card-text">Regular check-ins to track your progress</div>
+      </div>
+    </div>
+
+    <div class="app-form-container">
+      <div class="error-msg" id="error-msg"></div>
+      <div class="success-msg" id="success-msg"></div>
+
+      <form id="application-form">
+
+        <!-- Employment & Income -->
+        <div class="form-section">
+          <div class="section-title">Employment & Income</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Employment Status <span class="required">*</span></label>
+              <select id="employment_status" class="form-select" required>
+                <option value="">Select status</option>
+                <option>Employed Full-Time</option>
+                <option>Employed Part-Time</option>
+                <option>Self-Employed</option>
+                <option>Unemployed</option>
+                <option>Retired</option>
+                <option>Disabled</option>
+                <option>Student</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monthly Income (After Taxes)</label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="number" id="monthly_income" class="form-input" placeholder="0" min="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Other Sources of Income</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="income_va" value="VA Disability">
+                <label for="income_va">VA Disability Benefits</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="income_ss" value="Social Security">
+                <label for="income_ss">Social Security</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="income_pension" value="Military Pension">
+                <label for="income_pension">Military Pension</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="income_rental" value="Rental Income">
+                <label for="income_rental">Rental Income</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="income_other" value="Other">
+                <label for="income_other">Other</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Challenges -->
+        <div class="form-section">
+          <div class="section-title">Financial Challenges</div>
+
+          <div class="form-group">
+            <label class="form-label">What challenges are you facing? <span class="required">*</span></label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="challenge_debt" value="Too much debt">
+                <label for="challenge_debt">Too much debt</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="challenge_budget" value="Trouble budgeting">
+                <label for="challenge_budget">Trouble sticking to a budget</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="challenge_savings" value="No emergency savings">
+                <label for="challenge_savings">No emergency savings</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="challenge_retirement" value="Not saving for retirement">
+                <label for="challenge_retirement">Not saving for retirement</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="challenge_paycheck" value="Living paycheck to paycheck">
+                <label for="challenge_paycheck">Living paycheck to paycheck</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="challenge_home" value="Want to buy a home">
+                <label for="challenge_home">Want to buy a home but not sure where to start</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="challenge_business" value="Starting a business">
+                <label for="challenge_business">Thinking about starting a business</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="challenge_investing" value="Learning to invest">
+                <label for="challenge_investing">Want to learn about investing</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Total Debt (Estimate)</label>
+              <select id="total_debt" class="form-select">
+                <option value="">Select range</option>
+                <option>Under $5,000</option>
+                <option>$5,000 - $10,000</option>
+                <option>$10,000 - $25,000</option>
+                <option>$25,000 - $50,000</option>
+                <option>$50,000 - $100,000</option>
+                <option>Over $100,000</option>
+                <option>No debt</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Current Savings</label>
+              <select id="current_savings" class="form-select">
+                <option value="">Select range</option>
+                <option>None</option>
+                <option>Under $1,000</option>
+                <option>$1,000 - $5,000</option>
+                <option>$5,000 - $10,000</option>
+                <option>$10,000 - $25,000</option>
+                <option>Over $25,000</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Goals -->
+        <div class="form-section">
+          <div class="section-title">Your Financial Goals</div>
+
+          <div class="form-group">
+            <label class="form-label">What is your primary financial goal? <span class="required">*</span></label>
+            <select id="primary_goal" class="form-select" required>
+              <option value="">Select your main goal</option>
+              <option>Get out of debt</option>
+              <option>Build emergency fund</option>
+              <option>Save for a home</option>
+              <option>Retire comfortably</option>
+              <option>Start a business</option>
+              <option>Pay for education</option>
+              <option>Build wealth/investments</option>
+              <option>Better money management</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tell us more about your goals and situation</label>
+            <textarea id="additional_info" class="form-textarea" placeholder="What would you like to accomplish? Any specific concerns or questions for your counselor?"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Preferred Contact Method</label>
+              <select id="contact_method" class="form-select">
+                <option value="email">Email</option>
+                <option value="phone">Phone</option>
+                <option value="text">Text Message</option>
+                <option value="video">Video Call</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Best Time to Contact</label>
+              <select id="contact_time" class="form-select">
+                <option value="">Any time</option>
+                <option value="morning">Morning (9am-12pm)</option>
+                <option value="afternoon">Afternoon (12pm-5pm)</option>
+                <option value="evening">Evening (5pm-8pm)</option>
+                <option value="weekend">Weekends</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consent -->
+        <div class="consent-section">
+          <div class="consent-item">
+            <input type="checkbox" id="consent_accurate" required>
+            <label for="consent_accurate">I certify that all information provided is accurate to the best of my knowledge.</label>
+          </div>
+          <div class="consent-item">
+            <input type="checkbox" id="consent_program" required>
+            <label for="consent_program">I understand this is a free program and I commit to actively participating in counseling sessions.</label>
+          </div>
+          <div class="consent-item">
+            <input type="checkbox" id="consent_confidential">
+            <label for="consent_confidential">I understand that my financial information will be kept confidential and used only to provide counseling services.</label>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <a href="dashboard.html" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Submit Application</button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script>
+(function() {
+  var errorMsg = document.getElementById("error-msg");
+  var successMsg = document.getElementById("success-msg");
+  var submitBtn = document.getElementById("submit-btn");
+
+  // Check if logged in and verified
+  document.addEventListener("DOMContentLoaded", async function() {
+    try {
+      var response = await fetch(window.API_BASE + "/api/auth/me", {
+        credentials: "include"
+      });
+      if (!response.ok) {
+        window.location.href = "login.html";
+        return;
+      }
+      var user = await response.json();
+      if (!user.verified) {
+        window.location.href = "pending.html";
+        return;
+      }
+      if (user.role !== "member") {
+        window.location.href = "dashboard.html";
+        return;
+      }
+    } catch (e) {
+      window.location.href = "login.html";
+    }
+  });
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.add("show");
+    successMsg.classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showSuccess(msg) {
+    successMsg.textContent = msg;
+    successMsg.classList.add("show");
+    errorMsg.classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function hideMessages() {
+    errorMsg.classList.remove("show");
+    successMsg.classList.remove("show");
+  }
+
+  function getCheckedValues(prefix) {
+    var values = [];
+    document.querySelectorAll("input[id^='" + prefix + "']:checked").forEach(function(cb) {
+      values.push(cb.value);
+    });
+    return values;
+  }
+
+  document.getElementById("application-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    hideMessages();
+
+    var employmentStatus = document.getElementById("employment_status").value;
+    var challenges = getCheckedValues("challenge_");
+    var primaryGoal = document.getElementById("primary_goal").value;
+    var consentAccurate = document.getElementById("consent_accurate").checked;
+    var consentProgram = document.getElementById("consent_program").checked;
+
+    // Validation
+    if (!employmentStatus) {
+      showError("Please select your employment status.");
+      return;
+    }
+    if (challenges.length === 0) {
+      showError("Please select at least one financial challenge you're facing.");
+      return;
+    }
+    if (!primaryGoal) {
+      showError("Please select your primary financial goal.");
+      return;
+    }
+    if (!consentAccurate) {
+      showError("Please certify that your information is accurate.");
+      return;
+    }
+    if (!consentProgram) {
+      showError("Please acknowledge the program terms.");
+      return;
+    }
+
+    submitBtn.textContent = "Submitting...";
+    submitBtn.disabled = true;
+
+    try {
+      var applicationData = {
+        employment_status: employmentStatus,
+        monthly_income: document.getElementById("monthly_income").value ? parseInt(document.getElementById("monthly_income").value) : null,
+        income_sources: getCheckedValues("income_"),
+        financial_challenges: challenges,
+        total_debt: document.getElementById("total_debt").value || null,
+        current_savings: document.getElementById("current_savings").value || null,
+        primary_goal: primaryGoal,
+        additional_info: document.getElementById("additional_info").value.trim() || null,
+        contact_method: document.getElementById("contact_method").value,
+        contact_time: document.getElementById("contact_time").value || null,
+        consent_confidential: document.getElementById("consent_confidential").checked
+      };
+
+      var response = await fetch(window.API_BASE + "/api/member/apply/financial-counseling", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(applicationData)
+      });
+
+      var data = await response.json();
+
+      if (response.ok) {
+        showSuccess("Your application has been submitted! A counselor will review it and contact you within 2-3 business days.");
+        document.getElementById("application-form").reset();
+        setTimeout(function() {
+          window.location.href = "dashboard.html";
+        }, 3000);
+      } else {
+        showError(data.detail || "Failed to submit application. Please try again.");
+        submitBtn.textContent = "Submit Application";
+        submitBtn.disabled = false;
+      }
+    } catch (err) {
+      console.error("Application error:", err);
+      showError("Connection error. Please check your internet and try again.");
+      submitBtn.textContent = "Submit Application";
+      submitBtn.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>
