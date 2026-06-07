@@ -33,7 +33,7 @@ loadCounselorAsConversation();
 }
 async function loadCounselorAsConversation(){
 try{
-var r=await fetch(window.API_BASE+"/api/counselor/assigned",{credentials:"include"});
+var r=await fetch(window.API_BASE+"/api/member/counselor",{credentials:"include"});
 if(r.ok){
 var counselor=await r.json();
 if(counselor&&counselor.id){
