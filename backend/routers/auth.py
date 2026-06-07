@@ -26,7 +26,7 @@ from middleware.auth_middleware import (
     clear_failed_attempts
 )
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
-from utils.email import send_welcome_email, send_password_reset_email
+from utils.email import send_welcome_email, send_password_reset_email, send_new_membership_notification
 import jwt
 import asyncio
 
@@ -92,6 +92,9 @@ async def register(request: Request, response: Response, data: RegisterRequest):
 
     # Send welcome email (non-blocking)
     asyncio.create_task(send_welcome_email(email, data.first_name))
+
+    # Send new membership notification to admin
+    asyncio.create_task(send_new_membership_notification(user_doc))
 
     return {
         "id": user_id,
