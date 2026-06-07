@@ -1,9 +1,59 @@
--e 
 # Environment and credential files
 .env
 .env.*
 *.env
+!.env.example
 credentials.json
 *.pem
 *.key
 .credentials
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+.eggs/
+*.egg-info/
+*.egg
+
+# Node (if using any)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Uploads (local testing)
+backend/uploads/
+uploads/
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Docker
+*.pid
+docker-compose.override.yml
