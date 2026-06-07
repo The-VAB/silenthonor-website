@@ -1,10 +1,29 @@
+# Silent Honor Foundation Backend Dependencies
+# FastAPI & ASGI
 fastapi==0.104.1
 uvicorn==0.24.0
+python-multipart==0.0.6
+
+# MongoDB
 motor==3.3.2
 pymongo==4.6.1
-python-dotenv==1.0.0
+
+# Auth & Security
 bcrypt==4.1.2
 PyJWT==2.8.0
-python-multipart==0.0.6
-aiofiles==23.2.1
+
+# Validation & Config
 pydantic==2.5.2
+python-dotenv==1.0.0
+
+# File handling
+aiofiles==23.2.1
+
+# Email (Resend)
+resend==0.7.0
+
+# Supabase Storage
+supabase==2.3.0
+
+# HTTP Client
+httpx==0.25.2
