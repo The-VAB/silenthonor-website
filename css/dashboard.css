@@ -94,4 +94,36 @@
 .loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:1200px){.dash-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}}
+/* Pipeline Badge */
+.pipeline-badge{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.4rem 0.8rem;display:inline-block;margin-top:0.75rem}
+/* DD-214 Alert States */
+.dd214-alert.verified{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);border-left-color:#10B981}
+.dd214-alert.verified .dd214-alert-title{color:#10B981}
+.dd214-alert.rejected{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);border-left-color:#EF4444}
+.dd214-alert.rejected .dd214-alert-title{color:#EF4444}
+.dd214-status{display:none;align-items:center;gap:0.75rem;padding:1rem;margin-top:1rem}
+.dd214-status.pending{background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3)}
+.dd214-status.pending .dd214-status-text{color:#EAB308}
+.dd214-status.verified{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3)}
+/* Credit Card with Bureaus */
+.credit-card{position:relative}
+.credit-bureaus{display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap}
+.bureau-score{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:500;letter-spacing:0.05em;padding:0.2rem 0.5rem;background:rgba(255,255,255,0.05);border-radius:2px}
+.bureau-score.eq{color:#EF4444;border-left:2px solid #EF4444}
+.bureau-score.ex{color:#3B82F6;border-left:2px solid #3B82F6}
+.bureau-score.tu{color:#10B981;border-left:2px solid #10B981}
+/* Counselor Pending State */
+.counselor-pending{text-align:center;padding:1rem 0}
+.counselor-pending .counselor-icon{font-size:3rem;margin-bottom:1rem;opacity:0.5}
+.counselor-pending h4{font-family:Oswald,sans-serif;font-size:1rem;font-weight:600;margin-bottom:0.5rem;color:var(--gold)}
+.counselor-pending p{font-size:0.85rem;color:var(--muted);line-height:1.5}
+/* Specialty Tags */
+.counselor-specialties{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem}
+.specialty-tag{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;background:rgba(185,28,28,0.15);color:var(--red-light);border:1px solid rgba(185,28,28,0.3)}
+/* Quick Links */
+.quick-links{display:flex;flex-direction:column;gap:0.5rem}
+.quick-link{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--white);text-decoration:none;transition:all 0.2s}
+.quick-link:hover{border-color:var(--red);background:rgba(185,28,28,0.1)}
+.quick-link-icon{font-size:1.2rem;width:30px;text-align:center}
+.quick-link span:last-child{font-family:Oswald,sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase}
 @media(max-width:768px){.dash-nav{padding:0 1rem}.dash-nav-links{display:none}.dash-content{padding:90px 1rem 2rem}.stats-row{grid-template-columns:1fr}.course-item{flex-wrap:wrap}.course-progress{width:100%;margin-top:0.5rem}}

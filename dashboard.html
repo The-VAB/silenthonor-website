@@ -1,4 +1,4 @@
-<\!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,9 +11,13 @@
 <div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
 <div class="dash-wrapper">
 <nav class="dash-nav">
-<div class="dash-nav-logo"><img src="images/logo.png" alt="Silent Honor" onerror="this.style.display='none'"><span>Silent Honor</span></div>
+<div class="dash-nav-logo">
+<img src="images/logo.png" alt="Silent Honor" onerror="this.style.display='none'">
+<span>Silent Honor</span>
+</div>
 <div class="dash-nav-links">
 <a href="dashboard.html" class="dash-nav-link active">Dashboard</a>
+<a href="counselor.html" class="dash-nav-link">Counselor</a>
 <a href="messages.html" class="dash-nav-link">Messages</a>
 <a href="dispute-tracker.html" class="dash-nav-link">Disputes</a>
 <a href="credit-tracker.html" class="dash-nav-link">Credit</a>
@@ -24,17 +28,22 @@
 <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
 </div>
 </nav>
+
 <div class="dash-content">
-<div class="loading-state" id="loading-state"><div class="loading-spinner"></div><p style="color:var(--muted);">Loading your dashboard...</p></div>
-<div id="dashboard-content" style="display:none;">
-<div class="dash-header"><h1 class="dash-welcome">Welcome back, <em id="welcome-name">Member</em></h1><p class="dash-subtitle">Your path to financial freedom continues here.</p></div>
-<div class="stats-row">
-<div class="stat-card"><div class="stat-label">Courses Active</div><div class="stat-value" id="stat-courses">0</div></div>
-<div class="stat-card"><div class="stat-label">Disputes Filed</div><div class="stat-value" id="stat-disputes">0</div></div>
-<div class="stat-card"><div class="stat-label">Credit Score Change</div><div class="stat-value positive" id="stat-credit">--</div></div>
-<div class="stat-card"><div class="stat-label">Member Since</div><div class="stat-value" id="stat-member-since">--</div></div>
+<div class="loading-state" id="loading-state">
+<div class="loading-spinner"></div>
+<p style="color:var(--muted);">Loading your dashboard...</p>
 </div>
-<div class="dd214-alert" id="dd214-alert">
+
+<div id="dashboard-content" style="display:none;">
+<div class="dash-header">
+<h1 class="dash-welcome">Welcome back, <em id="welcome-name">Member</em></h1>
+<p class="dash-subtitle">Your path to financial freedom continues here.</p>
+<div class="pipeline-status" id="pipeline-status"></div>
+</div>
+
+<!-- DD-214 Alert -->
+<div class="dd214-alert" id="dd214-alert" style="display:none;">
 <div class="dd214-alert-title">DD-214 Verification Required</div>
 <div class="dd214-alert-text">Upload your DD-214 to unlock all member benefits. Your document is encrypted and stored securely.</div>
 <div class="dd214-upload-area" id="dd214-upload">
@@ -43,43 +52,609 @@
 <div class="dd214-upload-hint">PDF, JPG, or PNG up to 10MB</div>
 </div>
 <input type="file" id="dd214-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
-<div class="dd214-status" id="dd214-status"><span style="color:#10B981;font-size:1.2rem">&#10003;</span><span class="dd214-status-text">DD-214 uploaded. Verification in progress.</span></div>
+<div class="dd214-status pending" id="dd214-pending" style="display:none;">
+<span style="color:var(--gold);font-size:1.2rem">&#9888;</span>
+<span class="dd214-status-text">DD-214 uploaded and awaiting admin verification.</span>
 </div>
+<div class="dd214-status verified" id="dd214-verified" style="display:none;">
+<span style="color:#10B981;font-size:1.2rem">&#10003;</span>
+<span class="dd214-status-text">DD-214 verified! You have full access to all member benefits.</span>
+</div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+<div class="stat-card">
+<div class="stat-label">Courses Active</div>
+<div class="stat-value" id="stat-courses">0</div>
+</div>
+<div class="stat-card">
+<div class="stat-label">Disputes Filed</div>
+<div class="stat-value" id="stat-disputes">0</div>
+</div>
+<div class="stat-card credit-card">
+<div class="stat-label">Credit Score</div>
+<div class="stat-value" id="stat-credit">--</div>
+<div class="credit-bureaus" id="credit-bureaus"></div>
+</div>
+<div class="stat-card">
+<div class="stat-label">Member Since</div>
+<div class="stat-value" id="stat-member-since">--</div>
+</div>
+</div>
+
+<!-- Main Grid -->
 <div class="dash-grid">
 <div class="dash-main">
+<!-- Courses Panel -->
 <div class="dash-panel">
-<div class="panel-header"><h3 class="panel-title">Your Courses</h3><a href="#" class="panel-action">View All</a></div>
+<div class="panel-header">
+<h3 class="panel-title">Your Courses</h3>
+<a href="#" class="panel-action">View All</a>
+</div>
 <div class="panel-body" id="courses-list">
-<div class="course-item"><div class="course-icon">&#128218;</div><div class="course-info"><div class="course-title">Credit Fundamentals 101</div><div class="course-meta">8 Lessons - 2hr 15min</div></div><div class="course-progress"><div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div><div class="progress-text">65% Complete</div></div><a href="course.html?id=credit-101" class="course-btn continue">Continue</a></div>
-<div class="course-item"><div class="course-icon">&#127968;</div><div class="course-info"><div class="course-title">VA Loan Mastery</div><div class="course-meta">12 Lessons - 4hr 30min</div></div><div class="course-progress"><div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div><div class="progress-text">20% Complete</div></div><a href="course.html?id=va-loan" class="course-btn continue">Continue</a></div>
-<div class="course-item"><div class="course-icon">&#128176;</div><div class="course-info"><div class="course-title">Debt Freedom Blueprint</div><div class="course-meta">10 Lessons - 3hr 45min</div></div><div class="course-progress"><div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div><div class="progress-text">Not Started</div></div><button class="course-btn waitlist" id="waitlist-debt">Join Waitlist</button></div>
+<div class="empty-state">
+<div class="empty-state-icon">&#128218;</div>
+<div class="empty-state-text">Loading courses...</div>
 </div>
 </div>
+</div>
+
+<!-- Disputes Panel -->
 <div class="dash-panel">
-<div class="panel-header"><h3 class="panel-title">Dispute Tracker</h3><a href="dispute-tracker.html" class="panel-action">Manage Disputes</a></div>
-<div class="panel-body" id="disputes-list"><div class="empty-state"><div class="empty-state-icon">&#128203;</div><div class="empty-state-text">No active disputes. Work with your counselor to file disputes via certified mail.</div></div></div>
+<div class="panel-header">
+<h3 class="panel-title">Active Disputes</h3>
+<a href="dispute-tracker.html" class="panel-action">Manage Disputes</a>
+</div>
+<div class="panel-body" id="disputes-list">
+<div class="empty-state">
+<div class="empty-state-icon">&#128203;</div>
+<div class="empty-state-text">No active disputes. Work with your counselor to file disputes via certified mail.</div>
 </div>
 </div>
+</div>
+</div>
+
 <div class="dash-sidebar">
+<!-- Counselor Panel -->
 <div class="dash-panel">
-<div class="panel-header"><h3 class="panel-title">Your Counselor</h3></div>
+<div class="panel-header">
+<h3 class="panel-title">Your Counselor</h3>
+</div>
 <div class="panel-body" id="counselor-section">
-<div class="counselor-card"><div class="counselor-photo">&#128100;</div><div class="counselor-info"><h4 id="counselor-name">Counselor Pending</h4><div class="counselor-title" id="counselor-title">Assignment in progress</div><div class="counselor-status"><span class="counselor-status-dot"></span><span>Available</span></div></div></div>
-<div class="counselor-actions"><a href="messages.html" class="counselor-btn primary">Send Message</a><a href="#" class="counselor-btn secondary" id="schedule-btn">Schedule Call</a></div>
+<div class="counselor-pending" id="counselor-pending">
+<div class="counselor-icon">&#128100;</div>
+<h4>Counselor Assignment Pending</h4>
+<p>Once your DD-214 is verified, a certified financial counselor will be assigned to guide your credit repair journey.</p>
+</div>
+<div class="counselor-card" id="counselor-card" style="display:none;">
+<div class="counselor-photo">&#128100;</div>
+<div class="counselor-info">
+<h4 id="counselor-name">—</h4>
+<div class="counselor-title" id="counselor-title">Certified Financial Counselor</div>
+<div class="counselor-specialties" id="counselor-specialties"></div>
+<div class="counselor-status">
+<span class="counselor-status-dot"></span>
+<span>Available</span>
 </div>
 </div>
+</div>
+<div class="counselor-actions" id="counselor-actions" style="display:none;">
+<a href="counselor.html" class="counselor-btn primary">View Profile</a>
+<a href="messages.html" class="counselor-btn secondary">Send Message</a>
+</div>
+</div>
+</div>
+
+<!-- Messages Panel -->
 <div class="dash-panel">
-<div class="panel-header"><h3 class="panel-title">Recent Messages</h3><a href="messages.html" class="panel-action">View All</a></div>
-<div class="panel-body" id="messages-list"><div class="empty-state"><div class="empty-state-icon">&#128172;</div><div class="empty-state-text">No messages yet. Send a message to your counselor to get started.</div></div></div>
-<div class="message-input-area"><input type="text" class="message-input" id="quick-message" placeholder="Quick message..."><button class="message-send" id="send-quick-msg">Send</button></div>
+<div class="panel-header">
+<h3 class="panel-title">Recent Messages</h3>
+<a href="messages.html" class="panel-action">View All</a>
+</div>
+<div class="panel-body" id="messages-list">
+<div class="empty-state">
+<div class="empty-state-icon">&#128172;</div>
+<div class="empty-state-text">No messages yet. Messages will appear here once you have a counselor assigned.</div>
+</div>
+</div>
+<div class="message-input-area" id="message-input-area" style="display:none;">
+<input type="text" class="message-input" id="quick-message" placeholder="Quick message to counselor...">
+<button class="message-send" id="send-quick-msg">Send</button>
+</div>
+</div>
+
+<!-- Quick Links Panel -->
+<div class="dash-panel">
+<div class="panel-header">
+<h3 class="panel-title">Quick Links</h3>
+</div>
+<div class="panel-body">
+<div class="quick-links">
+<a href="credit-tracker.html" class="quick-link">
+<span class="quick-link-icon">&#128200;</span>
+<span>Track Credit Scores</span>
+</a>
+<a href="dispute-tracker.html" class="quick-link">
+<span class="quick-link-icon">&#128221;</span>
+<span>File New Dispute</span>
+</a>
+<a href="counselor.html" class="quick-link">
+<span class="quick-link-icon">&#128197;</span>
+<span>Schedule Appointment</span>
+</a>
+<a href="course.html?id=credit-education" class="quick-link">
+<span class="quick-link-icon">&#127891;</span>
+<span>Credit Education Course</span>
+</a>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
+</div>
+</div>
+
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
-<script src="js/dashboard.js"></script>
+<script>
+let currentUser = null;
+let hasCounselor = false;
+
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    const response = await fetch(`${window.API_BASE}/api/auth/me`, { credentials: 'include' });
+    if (!response.ok) {
+      window.location.href = 'login.html';
+      return;
+    }
+    currentUser = await response.json();
+    if (currentUser.role === 'admin') {
+      window.location.href = 'admin.html';
+      return;
+    }
+    if (currentUser.role === 'counselor') {
+      window.location.href = 'counselor-portal.html';
+      return;
+    }
+    initDashboard(currentUser);
+  } catch (e) {
+    console.error('Auth check failed:', e);
+    window.location.href = 'login.html';
+  }
+});
+
+function initDashboard(user) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('dashboard-content').style.display = 'block';
+
+  // Set user info
+  const initials = (user.first_name ? user.first_name.charAt(0) : '') + (user.last_name ? user.last_name.charAt(0) : '');
+  document.getElementById('user-avatar').textContent = initials.toUpperCase() || '??';
+  document.getElementById('user-name').textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+  document.getElementById('welcome-name').textContent = user.first_name || 'Member';
+
+  // Member since
+  if (user.created_at) {
+    const d = new Date(user.created_at);
+    document.getElementById('stat-member-since').textContent = d.toLocaleString('default', { month: 'short' }) + ' ' + d.getFullYear();
+  }
+
+  // Pipeline status
+  showPipelineStatus(user.pipeline_stage);
+
+  // DD-214 status
+  handleDD214Status(user);
+
+  // Load dashboard data
+  loadDashboardData();
+
+  // Setup interactions
+  setupDD214Upload();
+  setupEventListeners();
+}
+
+function showPipelineStatus(stage) {
+  const statusEl = document.getElementById('pipeline-status');
+  const stages = {
+    'applied': { label: 'Application Received', color: 'var(--gold)' },
+    'dd214_pending': { label: 'DD-214 Upload Pending', color: 'var(--gold)' },
+    'dd214_review': { label: 'DD-214 Under Review', color: 'var(--gold)' },
+    'approved': { label: 'Verified Member', color: '#10B981' },
+    'counselor_assigned': { label: 'Counselor Assigned', color: '#10B981' },
+    'intake_complete': { label: 'Intake Complete', color: '#10B981' },
+    'active': { label: 'Active Member', color: '#10B981' },
+    'graduated': { label: 'Program Graduate', color: '#3B82F6' }
+  };
+
+  const info = stages[stage] || { label: 'Member', color: 'var(--muted)' };
+  statusEl.innerHTML = `<span class="pipeline-badge" style="background: ${info.color}20; color: ${info.color}; border: 1px solid ${info.color}50;">${info.label}</span>`;
+}
+
+function handleDD214Status(user) {
+  const alertEl = document.getElementById('dd214-alert');
+  const uploadEl = document.getElementById('dd214-upload');
+  const pendingEl = document.getElementById('dd214-pending');
+  const verifiedEl = document.getElementById('dd214-verified');
+
+  if (user.verified || user.dd214_status === 'verified') {
+    // Fully verified
+    alertEl.style.display = 'block';
+    alertEl.className = 'dd214-alert verified';
+    alertEl.querySelector('.dd214-alert-title').textContent = 'Verification Complete';
+    alertEl.querySelector('.dd214-alert-text').style.display = 'none';
+    uploadEl.style.display = 'none';
+    pendingEl.style.display = 'none';
+    verifiedEl.style.display = 'flex';
+  } else if (user.dd214_file || user.dd214_status === 'pending_review') {
+    // Uploaded but pending
+    alertEl.style.display = 'block';
+    alertEl.querySelector('.dd214-alert-title').textContent = 'DD-214 Under Review';
+    alertEl.querySelector('.dd214-alert-text').textContent = 'Your DD-214 has been submitted and is awaiting admin verification. This usually takes 1-2 business days.';
+    uploadEl.style.display = 'none';
+    pendingEl.style.display = 'flex';
+    verifiedEl.style.display = 'none';
+  } else if (user.dd214_status === 'rejected') {
+    // Rejected - allow re-upload
+    alertEl.style.display = 'block';
+    alertEl.className = 'dd214-alert rejected';
+    alertEl.querySelector('.dd214-alert-title').textContent = 'DD-214 Requires Re-submission';
+    alertEl.querySelector('.dd214-alert-text').textContent = 'Your previous DD-214 submission could not be verified. Please upload a clearer copy of your DD-214 document.';
+    uploadEl.style.display = 'block';
+    pendingEl.style.display = 'none';
+    verifiedEl.style.display = 'none';
+  } else {
+    // No upload yet
+    alertEl.style.display = 'block';
+    uploadEl.style.display = 'block';
+    pendingEl.style.display = 'none';
+    verifiedEl.style.display = 'none';
+  }
+}
+
+async function loadDashboardData() {
+  // Load dashboard summary
+  try {
+    const r = await fetch(`${window.API_BASE}/api/member/dashboard`, { credentials: 'include' });
+    if (r.ok) {
+      const data = await r.json();
+
+      // Courses
+      document.getElementById('stat-courses').textContent = (data.courses?.in_progress || 0) + (data.courses?.completed || 0);
+
+      // Disputes
+      document.getElementById('stat-disputes').textContent = data.disputes?.total || 0;
+
+      // Credit scores
+      if (data.credit_scores && (data.credit_scores.equifax || data.credit_scores.experian || data.credit_scores.transunion)) {
+        const scores = [data.credit_scores.equifax, data.credit_scores.experian, data.credit_scores.transunion].filter(s => s);
+        const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+        document.getElementById('stat-credit').textContent = avg;
+
+        let bureausHtml = '';
+        if (data.credit_scores.equifax) bureausHtml += `<span class="bureau-score eq">EQ: ${data.credit_scores.equifax}</span>`;
+        if (data.credit_scores.experian) bureausHtml += `<span class="bureau-score ex">EX: ${data.credit_scores.experian}</span>`;
+        if (data.credit_scores.transunion) bureausHtml += `<span class="bureau-score tu">TU: ${data.credit_scores.transunion}</span>`;
+        document.getElementById('credit-bureaus').innerHTML = bureausHtml;
+      }
+
+      // Counselor status
+      hasCounselor = data.counselor_assigned;
+      if (hasCounselor) {
+        document.getElementById('message-input-area').style.display = 'flex';
+      }
+    }
+  } catch (e) { console.error('Dashboard data error:', e); }
+
+  // Load courses
+  loadCourses();
+
+  // Load disputes
+  loadDisputes();
+
+  // Load counselor
+  loadCounselor();
+
+  // Load messages
+  loadMessages();
+}
+
+async function loadCourses() {
+  try {
+    const r = await fetch(`${window.API_BASE}/api/member/courses`, { credentials: 'include' });
+    if (r.ok) {
+      const courses = await r.json();
+      renderCourses(courses);
+    }
+  } catch (e) { console.error('Courses error:', e); }
+}
+
+function renderCourses(courses) {
+  const container = document.getElementById('courses-list');
+  if (!courses || courses.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">&#128218;</div>
+      <div class="empty-state-text">No courses available yet. Check back soon!</div>
+    </div>`;
+    return;
+  }
+
+  const icons = { 'credit': '&#128179;', 'finance': '&#128176;', 'va': '&#127968;', 'default': '&#128218;' };
+
+  container.innerHTML = courses.slice(0, 4).map(c => {
+    const icon = icons[c.category?.toLowerCase()] || icons.default;
+    const progressPct = c.progress || 0;
+    const isLive = c.status === 'live';
+
+    return `<div class="course-item">
+      <div class="course-icon">${icon}</div>
+      <div class="course-info">
+        <div class="course-title">${c.title}</div>
+        <div class="course-meta">${c.total_lessons} Lessons ${c.status === 'coming_soon' ? '- Coming Soon' : ''}</div>
+      </div>
+      <div class="course-progress">
+        <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+        <div class="progress-text">${progressPct > 0 ? progressPct + '% Complete' : 'Not Started'}</div>
+      </div>
+      ${isLive
+        ? `<a href="course.html?id=${c.id}" class="course-btn continue">${progressPct > 0 ? 'Continue' : 'Start'}</a>`
+        : `<button class="course-btn waitlist" onclick="joinWaitlist('${c.id}')">Join Waitlist</button>`
+      }
+    </div>`;
+  }).join('');
+}
+
+async function loadDisputes() {
+  try {
+    const r = await fetch(`${window.API_BASE}/api/disputes`, { credentials: 'include' });
+    if (r.ok) {
+      const disputes = await r.json();
+      renderDisputes(disputes);
+    }
+  } catch (e) { console.error('Disputes error:', e); }
+}
+
+function renderDisputes(disputes) {
+  const container = document.getElementById('disputes-list');
+  if (!disputes || disputes.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">&#128203;</div>
+      <div class="empty-state-text">No active disputes. Work with your counselor to file disputes via certified mail.</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = disputes.slice(0, 3).map(d => {
+    const statusClass = d.status?.toLowerCase().replace(/\s+/g, '-') || 'pending';
+    return `<div class="dispute-item">
+      <div class="dispute-info">
+        <h4>${d.account_name || d.creditor || 'Unknown Account'}</h4>
+        <div class="dispute-meta">${d.bureau || 'All Bureaus'} - Filed ${formatDate(d.created_at || d.date_sent)}</div>
+      </div>
+      <span class="dispute-status ${statusClass}">${d.status || 'Pending'}</span>
+    </div>`;
+  }).join('');
+}
+
+async function loadCounselor() {
+  try {
+    const r = await fetch(`${window.API_BASE}/api/member/counselor`, { credentials: 'include' });
+    if (r.ok) {
+      const data = await r.json();
+      if (data && data.id) {
+        hasCounselor = true;
+        document.getElementById('counselor-pending').style.display = 'none';
+        document.getElementById('counselor-card').style.display = 'flex';
+        document.getElementById('counselor-actions').style.display = 'flex';
+        document.getElementById('message-input-area').style.display = 'flex';
+
+        document.getElementById('counselor-name').textContent = data.name;
+        document.getElementById('counselor-title').textContent = data.title || 'Certified Financial Counselor';
+
+        if (data.specialties && data.specialties.length) {
+          document.getElementById('counselor-specialties').innerHTML = data.specialties.map(s =>
+            `<span class="specialty-tag">${s}</span>`
+          ).join('');
+        }
+      }
+    }
+  } catch (e) { console.error('Counselor error:', e); }
+}
+
+async function loadMessages() {
+  try {
+    const r = await fetch(`${window.API_BASE}/api/messages`, { credentials: 'include' });
+    if (r.ok) {
+      const messages = await r.json();
+      renderMessages(messages.slice(0, 3));
+    }
+  } catch (e) { console.error('Messages error:', e); }
+}
+
+function renderMessages(messages) {
+  const container = document.getElementById('messages-list');
+  if (!messages || messages.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">&#128172;</div>
+      <div class="empty-state-text">${hasCounselor ? 'No messages yet. Send a message to your counselor!' : 'Messages will appear here once you have a counselor assigned.'}</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = messages.map(m => {
+    const unreadClass = m.read ? '' : 'message-unread';
+    return `<div class="message-item ${unreadClass}">
+      <div class="message-header">
+        <span class="message-from">${m.from_name || 'Counselor'}</span>
+        <span class="message-time">${formatTime(m.created_at)}</span>
+      </div>
+      <div class="message-preview">${truncate(m.content, 80)}</div>
+    </div>`;
+  }).join('');
+}
+
+function formatDate(s) {
+  if (!s) return 'Unknown';
+  return new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatTime(s) {
+  if (!s) return '';
+  const d = new Date(s);
+  const n = new Date();
+  const diff = Math.floor((n - d) / (1000 * 60 * 60 * 24));
+  if (diff === 0) return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7) return d.toLocaleDateString('en-US', { weekday: 'short' });
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function truncate(s, l) {
+  if (!s) return '';
+  return s.length > l ? s.substring(0, l) + '...' : s;
+}
+
+function setupDD214Upload() {
+  const input = document.getElementById('dd214-input');
+  const upload = document.getElementById('dd214-upload');
+  if (!input || !upload) return;
+
+  upload.addEventListener('click', () => input.click());
+  input.addEventListener('change', async (e) => {
+    const f = e.target.files[0];
+    if (f) await uploadDD214(f);
+  });
+
+  upload.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    upload.classList.add('dragover');
+  });
+  upload.addEventListener('dragleave', () => upload.classList.remove('dragover'));
+  upload.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    upload.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) await uploadDD214(f);
+  });
+}
+
+async function uploadDD214(file) {
+  const upload = document.getElementById('dd214-upload');
+  const pending = document.getElementById('dd214-pending');
+
+  // Validate file type
+  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+  if (!allowedTypes.includes(file.type)) {
+    alert('Invalid file type. Please upload a PDF, JPG, or PNG file.');
+    return;
+  }
+
+  // Validate file size (10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    alert('File too large. Maximum size is 10MB.');
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append('file', file);
+
+  upload.innerHTML = '<div class="dd214-upload-text">Uploading securely...</div>';
+
+  try {
+    const r = await fetch(`${window.API_BASE}/api/member/upload/dd214`, {
+      method: 'POST',
+      credentials: 'include',
+      body: fd
+    });
+
+    if (r.ok) {
+      upload.style.display = 'none';
+      pending.style.display = 'flex';
+      document.querySelector('.dd214-alert-title').textContent = 'DD-214 Under Review';
+      document.querySelector('.dd214-alert-text').textContent = 'Your DD-214 has been submitted and is awaiting admin verification. This usually takes 1-2 business days.';
+    } else {
+      const err = await r.json();
+      alert(err.detail || 'Upload failed. Please try again.');
+      resetDD214Upload();
+    }
+  } catch (e) {
+    alert('Connection error. Please try again.');
+    resetDD214Upload();
+  }
+}
+
+function resetDD214Upload() {
+  const upload = document.getElementById('dd214-upload');
+  upload.innerHTML = `<div class="dd214-upload-icon">&#128196;</div>
+    <div class="dd214-upload-text">Click to upload or drag and drop</div>
+    <div class="dd214-upload-hint">PDF, JPG, or PNG up to 10MB</div>`;
+}
+
+function setupEventListeners() {
+  const sendBtn = document.getElementById('send-quick-msg');
+  if (sendBtn) sendBtn.addEventListener('click', sendQuickMessage);
+
+  const msgInput = document.getElementById('quick-message');
+  if (msgInput) msgInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendQuickMessage();
+  });
+}
+
+async function joinWaitlist(courseId) {
+  try {
+    const r = await fetch(`${window.API_BASE}/api/courses/${courseId}/waitlist`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    if (r.ok) {
+      alert('You have been added to the waitlist! We will notify you when the course becomes available.');
+    } else {
+      alert('Could not join waitlist. You may already be on the list.');
+    }
+  } catch (e) {
+    alert('Connection error. Please try again.');
+  }
+}
+
+async function sendQuickMessage() {
+  const input = document.getElementById('quick-message');
+  const content = input.value.trim();
+  if (!content) return;
+  if (!hasCounselor) {
+    alert('You need a counselor assigned before sending messages.');
+    return;
+  }
+
+  try {
+    const r = await fetch(`${window.API_BASE}/api/messages`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    });
+
+    if (r.ok) {
+      input.value = '';
+      loadMessages();
+    } else {
+      alert('Could not send message. Please try again.');
+    }
+  } catch (e) {
+    alert('Connection error. Please try again.');
+  }
+}
+
+async function signOut() {
+  try {
+    await fetch(`${window.API_BASE}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (e) {}
+  localStorage.removeItem('sh_user');
+  window.location.href = 'login.html';
+}
+</script>
 </body>
 </html>
