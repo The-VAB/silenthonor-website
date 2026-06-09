@@ -1072,6 +1072,7 @@
 <script>
 var currentUser = null;
 var hasCounselor = false;
+var counselorUserId = null;
 
 document.addEventListener("DOMContentLoaded", async function() {
   try {
@@ -1356,6 +1357,7 @@ async function loadCounselor() {
       var data = await r.json();
       if (data && data.id) {
         hasCounselor = true;
+        counselorUserId = data.id;
         document.getElementById("counselor-pending").style.display = "none";
         document.getElementById("counselor-card").style.display = "flex";
         document.getElementById("counselor-actions").style.display = "flex";
@@ -1541,7 +1543,7 @@ async function sendQuickMessage() {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: content })
+      body: JSON.stringify({ content: content, to_user_id: counselorUserId })
     });
 
     if (r.ok) {

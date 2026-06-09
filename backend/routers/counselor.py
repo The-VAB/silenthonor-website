@@ -20,6 +20,7 @@ def set_db(database):
     db = database
 
 # Member-facing endpoints
+@router.get("/member/counselor")
 @router.get("/counselor/assigned")
 async def get_assigned_counselor(request: Request):
     """Get member's assigned counselor (deprecated - use /api/member/counselor)"""

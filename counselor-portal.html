@@ -466,7 +466,7 @@
 
     async function loadMemberMessages(memberId) {
         try {
-            var r = await fetch(window.API_BASE + "/api/messages/conversation/" + memberId, { credentials: "include" });
+            var r = await fetch(window.API_BASE + "/api/messages?conversation_id=" + memberId, { credentials: "include" });
             if (r.ok) {
                 var messages = await r.json();
                 renderMessages(messages.slice(0, 5));

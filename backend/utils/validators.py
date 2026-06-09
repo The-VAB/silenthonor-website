@@ -80,4 +80,25 @@ class StaffRequest(BaseModel):
     password: Optional[str] = None
     role: str = "staff"
     title: Optional[str] = ""
+    bio: Optional[str] = ""
+    specialties: Optional[list] = []
+    credentials: Optional[str] = ""
+    functional_role: Optional[str] = ""
     permissions: Optional[list] = []
+
+class ModuleRequest(BaseModel):
+    course_id: str
+    title: str
+    order: int = 0
+    description: Optional[str] = None
+
+class LessonRequest(BaseModel):
+    course_id: str
+    module_id: Optional[str] = None
+    title: str
+    content: str = ""
+    lesson_type: str = "text"
+    order: int = 0
+    video_url: Optional[str] = None
+    resource_url: Optional[str] = None
+    duration: Optional[str] = None
