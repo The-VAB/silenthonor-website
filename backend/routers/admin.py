@@ -63,57 +63,6 @@ async def get_admin_stats(request: Request):
         "pipeline": pipeline_stats
     }
 
-@router.get("/pipeline")
-async def get_pipeline_view(request: Request):
-    """Get members organized by pipeline stage"""
-    await get_current_admin(request)
-
-    pipeline = {}
-    for stage in PIPELINE_STAGES:
-        members = await db.users.find(
-            {"role": "member", "pipeline_stage": stage},
-            {"_id": 1, "email": 1, "first_name": 1, "last_name": 1, "branch": 1,
-             "dd214_status": 1, "created_at": 1, "assigned_counselor_id": 1}
-        ).sort("created_at", -1).to_list(100)
-
-        pipeline[stage] = [{
-            "id": str(m["_id"]),
-            "email": m["email"],
-            "name": f"{m.get('first_name', '')} {m.get('last_name', '')}".strip(),
-            "branch": m.get("branch"),
-            "dd214_status": m.get("dd214_status"),
-            "created_at": m.get("created_at").isoformat() if m.get("created_at") else None,
-            "has_counselor": bool(m.get("assigned_counselor_id"))
-        } for m in members]
-
-    return pipeline
-
-@router.put("/members/{member_id}/stage")
-async def update_member_stage(request: Request, member_id: str):
-    """Update member's pipeline stage"""
-    admin = await get_current_admin(request)
-    data = await request.json()
-
-    new_stage = data.get("stage")
-    if new_stage not in PIPELINE_STAGES:
-        raise HTTPException(status_code=400, detail=f"Invalid stage. Must be one of: {PIPELINE_STAGES}")
-
-    await db.users.update_one(
-        {"_id": ObjectId(member_id)},
-        {"$set": {"pipeline_stage": new_stage, "updated_at": datetime.now(timezone.utc)}}
-    )
-
-    await log_audit_event(
-        action=AUDIT_ACTIONS["MEMBER_STAGE_CHANGED"],
-        entity_type="user",
-        entity_id=member_id,
-        user_id=admin["_id"],
-        user_email=admin.get("email"),
-        details={"new_stage": new_stage},
-        ip_address=request.client.host if request.client else None
-    )
-
-    return {"message": f"Member moved to {new_stage}"}
 
 @router.get("/members")
 async def get_members(request: Request):
@@ -464,9 +413,15 @@ async def get_analytics(request: Request):
     branches = {(b["_id"] or "Not Specified"): b["count"] for b in branch_agg}
 
     # Pipeline distributions
-    pipeline_dist = {s: await db.users.count_documents({"role": "member", "pipeline_stage": s}) for s in PIPELINE_STAGES}
-    cr_dist = {s: await db.users.count_documents({"role": "member", "credit_repair_stage": s}) for s in CR_STAGES}
-    fc_dist = {s: await db.users.count_documents({"role": "member", "financial_counseling_stage": s}) for s in FC_STAGES}
+    pipeline_dist = {}
+    for s in PIPELINE_STAGES:
+        pipeline_dist[s] = await db.users.count_documents({"role": "member", "pipeline_stage": s})
+    cr_dist = {}
+    for s in CR_STAGES:
+        cr_dist[s] = await db.users.count_documents({"role": "member", "credit_repair_stage": s})
+    fc_dist = {}
+    for s in FC_STAGES:
+        fc_dist[s] = await db.users.count_documents({"role": "member", "financial_counseling_stage": s})
 
     # DD-214 status
     dd214_dist = {}
@@ -496,9 +451,14 @@ async def get_member_full(request: Request, member_id: str):
     """Get complete member profile including courses, disputes, notes"""
     await get_current_admin(request)
 
-    member = await db.users.find_one({"_id": ObjectId(member_id)})
+    try:
+        oid = ObjectId(member_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail=f"Invalid member ID format: {member_id}")
+
+    member = await db.users.find_one({"_id": oid})
     if not member:
-        raise HTTPException(status_code=404, detail="Member not found")
+        raise HTTPException(status_code=404, detail=f"Member {member_id} not found in database")
 
     # Enrolled courses with progress
     progress_docs = await db.course_progress.find({"user_id": ObjectId(member_id)}).to_list(50)
