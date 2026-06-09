@@ -37,8 +37,9 @@
 </div>
 <div class="messages-container">
 <div class="messages-sidebar">
-<div class="conversations-header">
+<div class="conversations-header" style="display:flex;align-items:center;justify-content:space-between;">
 <h3>Conversations</h3>
+<button onclick="startNewConversation()" style="background:var(--red);color:var(--white);border:none;font-family:'Oswald',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:0.35rem 0.75rem;cursor:pointer;border-radius:3px;" title="Start new conversation">+ New</button>
 </div>
 <div class="conversations-list" id="conversations-list">
 <div class="empty-state"><div class="empty-state-icon">&#128172;</div><div class="empty-state-text">No conversations yet</div></div>

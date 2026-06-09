@@ -164,6 +164,26 @@ function escapeHtml(str){
 if(!str)return"";
 return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
+async function startNewConversation(){
+// If counselor already loaded as conversation, just select it
+var existing=document.querySelector(".conversation-item");
+if(existing){existing.click();return;}
+// Load counselor to start conversation
+var r=await fetch(window.API_BASE+"/api/member/counselor",{credentials:"include"}).catch(()=>null);
+if(r&&r.ok){
+var counselor=await r.json();
+if(counselor&&counselor.id){
+var conv={id:counselor.id,name:counselor.name||"Your Counselor"};
+renderConversations([conv]);
+selectConversation(conv);
+return;
+}
+}
+// No counselor assigned — message admin
+var conv={id:"admin",name:"Silent Honor Support"};
+renderConversations([conv]);
+selectConversation(conv);
+}
 async function signOut(){
 try{await fetch(window.API_BASE+"/api/auth/logout",{method:"POST",credentials:"include"});}catch(e){}
 localStorage.removeItem("sh_user");window.location.href="login.html";

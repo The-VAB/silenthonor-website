@@ -62,7 +62,8 @@ async def get_assigned_counselor(request: Request):
         "email": counselor.get("email"),
         "title": counselor.get("title", "Certified Financial Counselor"),
         "bio": counselor.get("bio", ""),
-        "specialties": counselor.get("specialties", [])
+        "specialties": counselor.get("specialties", []),
+        "calendly_url": counselor.get("calendly_url")
     }
 
 @router.get("/courses")

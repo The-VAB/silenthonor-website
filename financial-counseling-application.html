@@ -472,15 +472,66 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Current Savings</label>
-              <select id="current_savings" class="form-select">
-                <option value="">Select range</option>
-                <option>None</option>
-                <option>Under $1,000</option>
-                <option>$1,000 - $5,000</option>
-                <option>$5,000 - $10,000</option>
-                <option>$10,000 - $25,000</option>
-                <option>Over $25,000</option>
+              <label class="form-label">Monthly Expenses (Estimate)</label>
+              <div class="input-with-prefix">
+                <span class="prefix">$</span>
+                <input type="number" id="monthly_expenses" class="form-input" placeholder="0" min="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Types of Debt (check all that apply)</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item"><input type="checkbox" id="debt_credit_cards" value="Credit Cards"><label for="debt_credit_cards">Credit cards</label></div>
+              <div class="checkbox-item"><input type="checkbox" id="debt_medical" value="Medical Bills"><label for="debt_medical">Medical bills</label></div>
+              <div class="checkbox-item"><input type="checkbox" id="debt_student" value="Student Loans"><label for="debt_student">Student loans</label></div>
+              <div class="checkbox-item"><input type="checkbox" id="debt_auto" value="Auto Loan"><label for="debt_auto">Auto loan</label></div>
+              <div class="checkbox-item"><input type="checkbox" id="debt_personal" value="Personal Loans"><label for="debt_personal">Personal loans</label></div>
+              <div class="checkbox-item"><input type="checkbox" id="debt_collections" value="Collections"><label for="debt_collections">Collections / charge-offs</label></div>
+              <div class="checkbox-item"><input type="checkbox" id="debt_irs" value="IRS/Tax Debt"><label for="debt_irs">IRS / tax debt</label></div>
+              <div class="checkbox-item"><input type="checkbox" id="debt_other" value="Other"><label for="debt_other">Other</label></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Do you have a written budget?</label>
+              <select id="has_written_budget" class="form-select">
+                <option value="">Select</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+                <option value="sometimes">Informally / sometimes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Have you worked with a financial counselor before?</label>
+              <select id="worked_with_counselor_before" class="form-select">
+                <option value="">Select</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Do you have an emergency fund?</label>
+              <select id="has_emergency_fund" class="form-select" onchange="toggleEmergencyMonths()">
+                <option value="">Select</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+                <option value="partial">Working on it</option>
+              </select>
+            </div>
+            <div class="form-group" id="emergency-months-group" style="display:none;">
+              <label class="form-label">How many months of expenses does it cover?</label>
+              <select id="emergency_fund_months" class="form-select">
+                <option value="">Select</option>
+                <option value="less_than_1">Less than 1 month</option>
+                <option value="1_2">1–2 months</option>
+                <option value="3_5">3–5 months</option>
+                <option value="6_plus">6+ months</option>
               </select>
             </div>
           </div>
@@ -622,6 +673,12 @@
     return values;
   }
 
+  window.toggleEmergencyMonths = function() {
+    var val = document.getElementById("has_emergency_fund").value;
+    var group = document.getElementById("emergency-months-group");
+    if (group) group.style.display = (val === "yes" || val === "partial") ? "block" : "none";
+  };
+
   document.getElementById("application-form").addEventListener("submit", async function(e) {
     e.preventDefault();
     hideMessages();
@@ -661,10 +718,15 @@
       var applicationData = {
         employment_status: employmentStatus,
         monthly_income: document.getElementById("monthly_income").value ? parseInt(document.getElementById("monthly_income").value) : null,
+        monthly_expenses: document.getElementById("monthly_expenses").value ? parseInt(document.getElementById("monthly_expenses").value) : null,
         income_sources: getCheckedValues("income_"),
         financial_challenges: challenges,
         total_debt: document.getElementById("total_debt").value || null,
-        current_savings: document.getElementById("current_savings").value || null,
+        debt_types: getCheckedValues("debt_"),
+        has_written_budget: document.getElementById("has_written_budget").value || null,
+        has_emergency_fund: document.getElementById("has_emergency_fund").value || null,
+        emergency_fund_months: document.getElementById("emergency_fund_months") ? document.getElementById("emergency_fund_months").value || null : null,
+        worked_with_counselor_before: document.getElementById("worked_with_counselor_before").value || null,
         primary_goal: primaryGoal,
         additional_info: document.getElementById("additional_info").value.trim() || null,
         contact_method: document.getElementById("contact_method").value,
