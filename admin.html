@@ -409,8 +409,8 @@ input,select,textarea{font-family:inherit;font-size:14px;}
   </div>
   <div class="table-wrap">
     <table class="data-table">
-      <thead><tr><th>Name</th><th>Email</th><th>Branch</th><th>Stage</th><th>DD-214</th><th>Verified</th><th>Joined</th></tr></thead>
-      <tbody id="members-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
+      <thead><tr><th>Name</th><th>Email</th><th>Branch</th><th>Stage</th><th>DD-214</th><th>Verified</th><th>Joined</th><th>Actions</th></tr></thead>
+      <tbody id="members-tbody"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -739,6 +739,27 @@ input,select,textarea{font-family:inherit;font-size:14px;}
   </div>
 </div>
 
+<div id="set-pw-modal" class="modal-backdrop">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <span class="modal-title">Set Password</span>
+      <button class="modal-close" onclick="closeModal('set-pw-modal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="set-pw-member-id">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Setting new password for: <strong id="set-pw-member-name"></strong></p>
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <input id="set-pw-input" class="form-input" type="text" placeholder="Enter new password (min 6 chars)">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('set-pw-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="setMemberPassword()">Set Password</button>
+    </div>
+  </div>
+</div>
+
 <div id="new-msg-modal" class="modal-backdrop">
   <div class="modal" style="max-width:460px;">
     <div class="modal-header">
@@ -877,7 +898,15 @@ function roleBadge(role) {
 async function loadOverview() {
   try {
     const r = await fetch(`${API}/api/admin/analytics`, {credentials:'include'});
-    if (!r.ok) return;
+    if (!r.ok) {
+      if (r.status === 401 || r.status === 403) {
+        toast(`Analytics: auth error (${r.status}) — try logging out and back in`, 'error');
+      } else {
+        const body = await r.json().catch(() => ({}));
+        toast(`Analytics error ${r.status}: ${body.detail || 'unknown error'}`, 'error');
+      }
+      return;
+    }
     const d = await r.json();
     const k = d.kpis || {};
     document.getElementById('kpi-total').textContent = k.total_members ?? '—';
@@ -892,7 +921,7 @@ async function loadOverview() {
     drawDD214Chart(d.dd214 || {});
     renderActionRequired(k);
     loadActivityFeed();
-  } catch(e) { console.error(e); }
+  } catch(e) { toast(`Analytics fetch failed: ${e.message}`, 'error'); }
 }
 
 function drawGrowthChart(monthly) {
@@ -1133,7 +1162,7 @@ function filterMembers() {
   const count = document.getElementById('member-count');
   if (count) count.textContent = `${list.length} members`;
   const tbody = document.getElementById('members-tbody');
-  if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">No members found</td></tr>'; return; }
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted);">No members found</td></tr>'; return; }
   tbody.innerHTML = list.map(m => `
     <tr onclick="openMemberPanel('${m.id}')">
       <td><strong>${m.first_name||''} ${m.last_name||''}</strong></td>
@@ -1143,7 +1172,44 @@ function filterMembers() {
       <td>${stageBadge(m.dd214_status)}</td>
       <td>${m.verified ? '<span class="badge badge-green">&#10003; Yes</span>' : '<span class="badge badge-gray">No</span>'}</td>
       <td style="color:var(--text-muted)">${fmtDate(m.created_at)}</td>
+      <td onclick="event.stopPropagation()" style="white-space:nowrap;">
+        ${!m.verified ? `<button class="btn btn-green btn-xs" onclick="quickVerifyMember('${m.id}')">Verify</button> ` : ''}
+        <button class="btn btn-outline btn-xs" onclick="openSetPasswordModal('${m.id}','${(m.first_name||'') + ' ' + (m.last_name||m.email)}')">Set PW</button>
+      </td>
     </tr>`).join('');
+}
+
+async function quickVerifyMember(memberId) {
+  if (!confirm('Verify this member? This will set them as verified and move them to Approved status.')) return;
+  try {
+    const r = await fetch(`${API}/api/admin/members/${memberId}/verify`, {
+      method:'POST', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({status:'verified', notes:'Admin quick-verify'})
+    });
+    if (r.ok) { toast('Member verified', 'success'); loadMembers(); }
+    else { const e = await r.json(); toast(e.detail||'Error verifying', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+function openSetPasswordModal(memberId, memberName) {
+  document.getElementById('set-pw-member-id').value = memberId;
+  document.getElementById('set-pw-member-name').textContent = memberName.trim() || 'Member';
+  document.getElementById('set-pw-input').value = '';
+  document.getElementById('set-pw-modal').classList.add('open');
+}
+
+async function setMemberPassword() {
+  const memberId = document.getElementById('set-pw-member-id').value;
+  const newPassword = document.getElementById('set-pw-input').value.trim();
+  if (!newPassword || newPassword.length < 6) { toast('Password must be at least 6 characters', 'error'); return; }
+  try {
+    const r = await fetch(`${API}/api/admin/members/${memberId}/password`, {
+      method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({password: newPassword})
+    });
+    if (r.ok) { toast('Password updated', 'success'); closeModal('set-pw-modal'); }
+    else { const e = await r.json(); toast(e.detail||'Error setting password', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
 }
 
 // ===== DD-214 =====
@@ -1214,11 +1280,17 @@ async function openMemberPanel(memberId) {
   switchPanelTab('overview');
   try {
     const r = await fetch(`${API}/api/admin/members/${memberId}/full`, {credentials:'include'});
-    if (!r.ok) throw new Error('Failed');
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      document.getElementById('panel-overview-content').innerHTML = `<div class="empty-state"><div>Error ${r.status}: ${body.detail || 'Failed to load member'}</div></div>`;
+      document.getElementById('panel-name').textContent = 'Error';
+      return;
+    }
     currentMemberData = await r.json();
     renderMemberPanel(currentMemberData);
   } catch(e) {
-    document.getElementById('panel-overview-content').innerHTML = '<div class="empty-state"><div>Error loading member data</div></div>';
+    document.getElementById('panel-overview-content').innerHTML = `<div class="empty-state"><div>Network error: ${e.message}</div></div>`;
+    document.getElementById('panel-name').textContent = 'Error';
   }
 }
 
