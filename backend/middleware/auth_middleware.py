@@ -35,7 +35,9 @@ async def get_current_user(request: Request) -> dict:
         user = await db.users.find_one({"_id": ObjectId(payload["sub"])})
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
-        user["_id"] = str(user["_id"])
+        for k, v in user.items():
+            if isinstance(v, ObjectId):
+                user[k] = str(v)
         user.pop("password_hash", None)
         return user
     except jwt.ExpiredSignatureError:
