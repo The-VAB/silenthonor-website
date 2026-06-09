@@ -638,6 +638,7 @@ input,select,textarea{font-family:inherit;font-size:14px;}
         <div class="form-group"><label class="form-label">Credentials</label><input type="text" id="staff-credentials" class="form-input" placeholder="e.g. AFC, NFEC"></div>
         <div class="form-group span-2"><label class="form-label">Specialties (comma separated)</label><input type="text" id="staff-specialties" class="form-input" placeholder="Credit Repair, Budgeting, VA Benefits"></div>
         <div class="form-group span-2"><label class="form-label">Bio</label><textarea id="staff-bio" class="form-textarea" rows="3" placeholder="Brief bio..."></textarea></div>
+        <div class="form-group span-2"><label class="form-label">Calendly Booking URL <span style="color:var(--muted);font-weight:400;">(optional — members use this to schedule appointments)</span></label><input type="url" id="staff-calendly" class="form-input" placeholder="https://calendly.com/your-name"></div>
       </div>
       <div id="staff-temp-pass-display" style="display:none;margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;">
         <div style="font-size:12px;color:#166534;font-weight:600;margin-bottom:4px;">TEMPORARY PASSWORD (shown once):</div>
@@ -2101,8 +2102,9 @@ async function loadStaff() {
         <td style="color:var(--text-muted)">${s.email}</td>
         <td>${s.client_count||0}</td>
         <td>${s.active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
-        <td onclick="event.stopPropagation()" style="display:flex;gap:6px;">
-          <button class="btn btn-outline btn-xs" onclick="editStaff('${s.id}','${s.first_name}','${s.last_name}','${s.email}','${s.role}','${s.title||''}')">Edit</button>
+        <td onclick="event.stopPropagation()" style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-xs" onclick="editStaff('${s.id}','${s.first_name}','${s.last_name}','${s.email}','${s.role}','${s.title||''}','${s.calendly_url||''}')">Edit</button>
+          <button class="btn btn-green btn-xs" onclick="sendStaffInvite('${s.id}','${s.email}')">Send Invite</button>
           <button class="btn ${s.active?'btn-red':'btn-green'} btn-xs" onclick="toggleStaffActive('${s.id}',${!s.active})">${s.active?'Deactivate':'Activate'}</button>
         </td>
       </tr>`).join('');
@@ -2112,13 +2114,13 @@ async function loadStaff() {
 function openStaffModal() {
   staffEditId = null;
   document.getElementById('staff-modal-title').textContent = 'Add Staff Member';
-  ['staff-first-name','staff-last-name','staff-email','staff-title','staff-credentials','staff-specialties','staff-bio'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['staff-first-name','staff-last-name','staff-email','staff-title','staff-credentials','staff-specialties','staff-bio','staff-calendly'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   document.getElementById('staff-role').value = 'counselor';
   document.getElementById('staff-temp-pass-display').style.display = 'none';
   document.getElementById('staff-modal').classList.add('open');
 }
 
-function editStaff(id, fn, ln, email, role, title) {
+function editStaff(id, fn, ln, email, role, title, calendly) {
   staffEditId = id;
   document.getElementById('staff-modal-title').textContent = 'Edit Staff Member';
   document.getElementById('staff-first-name').value = fn;
@@ -2126,8 +2128,19 @@ function editStaff(id, fn, ln, email, role, title) {
   document.getElementById('staff-email').value = email;
   document.getElementById('staff-role').value = role;
   document.getElementById('staff-title').value = title;
+  const calEl = document.getElementById('staff-calendly');
+  if (calEl) calEl.value = calendly || '';
   document.getElementById('staff-temp-pass-display').style.display = 'none';
   document.getElementById('staff-modal').classList.add('open');
+}
+
+async function sendStaffInvite(staffId, email) {
+  if (!confirm(`Send portal invite email to ${email}?`)) return;
+  try {
+    const r = await fetch(`${API}/api/admin/staff/${staffId}/invite`, {method:'POST',credentials:'include'});
+    if (r.ok) toast(`Invite sent to ${email}`, 'success');
+    else { const e = await r.json(); toast(e.detail||'Failed to send invite','error'); }
+  } catch(e) { toast('Network error','error'); }
 }
 
 async function saveStaff() {
@@ -2141,7 +2154,8 @@ async function saveStaff() {
     title: document.getElementById('staff-title').value,
     credentials: document.getElementById('staff-credentials').value,
     bio: document.getElementById('staff-bio').value,
-    specialties: document.getElementById('staff-specialties').value.split(',').map(s=>s.trim()).filter(Boolean)
+    specialties: document.getElementById('staff-specialties').value.split(',').map(s=>s.trim()).filter(Boolean),
+    calendly_url: (document.getElementById('staff-calendly')?.value || '').trim() || null
   };
   try {
     let r;

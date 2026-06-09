@@ -9,7 +9,7 @@ from bson import ObjectId
 from middleware.auth_middleware import get_current_admin
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
 from utils.auth import hash_password
-from utils.email import send_dd214_approved_email, send_admin_notification
+from utils.email import send_dd214_approved_email, send_admin_notification, send_staff_invite_email
 from utils.storage import get_dd214_url
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
@@ -289,6 +289,49 @@ async def set_member_password(request: Request, member_id: str):
     )
 
     return {"message": "Password updated"}
+
+@router.post("/staff/{staff_id}/invite")
+async def send_staff_invite(request: Request, staff_id: str):
+    """Send portal invite email to counselor/staff so they can set their password"""
+    admin = await get_current_admin(request)
+
+    try:
+        oid = ObjectId(staff_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid staff ID")
+
+    staff = await db.users.find_one({"_id": oid, "role": {"$in": ["counselor", "staff", "admin"]}})
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff member not found")
+
+    import secrets
+    from datetime import timedelta
+    token = secrets.token_urlsafe(32)
+    now = datetime.now(timezone.utc)
+
+    await db.password_reset_tokens.insert_one({
+        "token": token,
+        "user_id": oid,
+        "email": staff["email"],
+        "created_at": now,
+        "expires_at": now + timedelta(hours=24),
+        "used": False
+    })
+
+    first_name = staff.get("first_name", staff.get("email", "there"))
+    role = staff.get("role", "counselor")
+    asyncio.create_task(send_staff_invite_email(staff["email"], first_name, role, token))
+
+    await log_audit_event(
+        action="STAFF_INVITE_SENT",
+        entity_type="user",
+        entity_id=staff_id,
+        user_id=admin["_id"],
+        user_email=admin.get("email"),
+        ip_address=request.client.host if request.client else None
+    )
+
+    return {"message": f"Invite sent to {staff['email']}"}
 
 @router.get("/contacts")
 async def get_contacts(request: Request):

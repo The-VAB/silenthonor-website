@@ -85,6 +85,7 @@ class StaffRequest(BaseModel):
     credentials: Optional[str] = ""
     functional_role: Optional[str] = ""
     permissions: Optional[list] = []
+    calendly_url: Optional[str] = None
 
 class ModuleRequest(BaseModel):
     course_id: str

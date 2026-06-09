@@ -507,3 +507,62 @@ async def send_staff_welcome_email(to: str, first_name: str, role: str, temp_pas
     """
 
     return await send_email(to, subject, html_content, text_content)
+
+async def send_staff_invite_email(to: str, first_name: str, role: str, reset_token: str) -> bool:
+    """Send portal invitation email to new counselor/staff with password setup link"""
+    setup_url = f"https://silenthonor.org/reset-password.html?token={reset_token}"
+    role_label = role.capitalize()
+    portal_url = "https://silenthonor.org/counselor-portal.html" if role == "counselor" else "https://silenthonor.org/admin.html"
+    subject = "You've Been Invited to the Silent Honor Staff Portal"
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; background: #0B1220; color: #ffffff; padding: 40px; }}
+            .container {{ max-width: 600px; margin: 0 auto; background: #111827; padding: 40px; border: 1px solid #374151; }}
+            .header {{ text-align: center; margin-bottom: 30px; }}
+            .logo {{ font-family: Oswald, sans-serif; font-size: 28px; font-weight: 700; }}
+            .logo-accent {{ color: #B91C1C; }}
+            h1 {{ font-family: Oswald, sans-serif; color: #ffffff; margin-bottom: 20px; }}
+            p {{ color: #9CA3AF; line-height: 1.8; }}
+            .btn {{ display: inline-block; background: #B91C1C; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+            .info-box {{ background: #1F2937; border: 1px solid #374151; padding: 20px; margin: 20px 0; }}
+            .footer {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #374151; text-align: center; font-size: 12px; color: #6B7280; }}
+            .warning {{ color: #F97316; font-size: 13px; margin-top: 20px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+            </div>
+            <h1>Welcome to the Team, {first_name}!</h1>
+            <p>You have been added as a <strong>{role_label}</strong> at Silent Honor Foundation. Please set up your password to access the staff portal.</p>
+            <div class="info-box">
+                <p><strong>Your portal:</strong> <a href="{portal_url}" style="color:#C9952A;">{portal_url}</a></p>
+                <p>Once your password is set, log in with your email address at the link above.</p>
+            </div>
+            <p style="text-align: center;">
+                <a href="{setup_url}" class="btn">Set Up My Password</a>
+            </p>
+            <p class="warning">This link will expire in 24 hours. Contact your administrator if it has expired.</p>
+            <div class="footer">
+                <p>Silent Honor Foundation | Veterans Helping Veterans</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    text_content = f"""Welcome to Silent Honor Foundation, {first_name}!
+
+You have been added as a {role_label}. Set up your password here:
+{setup_url}
+
+Your portal: {portal_url}
+
+This link expires in 24 hours.
+
+Silent Honor Foundation | Veterans Helping Veterans
+    """
+    return await send_email(to, subject, html_content, text_content)

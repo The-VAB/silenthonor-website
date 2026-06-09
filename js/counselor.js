@@ -78,6 +78,9 @@ function renderCounselor(data) {
     var bio = data.bio || "Dedicated to helping veterans achieve financial freedom and rebuild their credit through personalized guidance and proven strategies.";
     document.getElementById("counselor-bio").textContent = bio;
 
+    // Store calendly URL for scheduling button
+    window.counselorCalendlyUrl = data.calendly_url || null;
+
     // Load upcoming appointment slots
     renderAppointmentSlots();
 
@@ -93,10 +96,17 @@ function showNoCounselor() {
 }
 
 function renderAppointmentSlots() {
-    // Show next 3 available slots (mock data for now)
+    var container = document.getElementById("appointment-slots");
+    if (window.counselorCalendlyUrl) {
+        container.innerHTML = "<div style='text-align:center;padding:12px 0;'>" +
+            "<p style='font-size:0.85rem;color:var(--muted);margin-bottom:12px;'>Book directly on your counselor's scheduling page.</p>" +
+            "<a href='" + window.counselorCalendlyUrl + "' target='_blank' class='btn-primary' style='text-decoration:none;display:inline-block;padding:10px 20px;'>Book an Appointment</a>" +
+            "</div>";
+        return;
+    }
+    // Fallback: show mock slots
     var slots = getNextAvailableSlots(3);
     var html = "";
-
     for (var i = 0; i < slots.length; i++) {
         var slot = slots[i];
         html += "<div class='slot-item'>";
@@ -104,8 +114,7 @@ function renderAppointmentSlots() {
         html += "<button class='slot-book' onclick='bookSlot(\"" + slot.date + "\", \"" + slot.time + "\")'>Book</button>";
         html += "</div>";
     }
-
-    document.getElementById("appointment-slots").innerHTML = html;
+    container.innerHTML = html;
 }
 
 function getNextAvailableSlots(count) {
@@ -172,6 +181,10 @@ async function loadProgressNotes() {
 
 // Schedule Modal
 function showScheduleModal() {
+    if (window.counselorCalendlyUrl) {
+        window.open(window.counselorCalendlyUrl, '_blank');
+        return;
+    }
     document.getElementById("schedule-modal").style.display = "flex";
     renderWeek();
 }

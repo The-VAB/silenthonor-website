@@ -10,26 +10,39 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dispute-tracker.css">
     <script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+<style>
+.dash-nav{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(11,18,32,0.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;z-index:100;}
+.dash-nav-logo{display:flex;align-items:center;gap:0.5rem;font-family:'Oswald',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);text-decoration:none;}
+.dash-nav-links{display:flex;gap:0.25rem;}
+.dash-nav-link{font-family:'Barlow',sans-serif;font-size:0.85rem;color:var(--muted);text-decoration:none;padding:0.5rem 1rem;border-radius:4px;transition:all 0.2s;}
+.dash-nav-link:hover{color:var(--white);background:rgba(255,255,255,0.05);}
+.dash-nav-link.active{color:var(--gold);background:rgba(201,149,42,0.1);}
+.dash-nav-user{display:flex;align-items:center;gap:0.75rem;}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:0.8rem;font-weight:600;color:var(--white);}
+.user-name{font-family:'Barlow',sans-serif;font-size:0.9rem;color:var(--white);}
+.sign-out-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Barlow',sans-serif;font-size:0.8rem;padding:0.4rem 0.75rem;cursor:pointer;transition:all 0.2s;}
+.sign-out-btn:hover{border-color:var(--red);color:var(--red-light);}
+.main-content{padding-top:80px;}
+</style>
 </head>
 <body>
-    <header class="site-header">
-        <nav class="nav-container">
-            <a href="index.html" class="logo">
-                <span class="logo-text">SILENT<span class="logo-accent">HONOR</span></span>
-            </a>
-            <div class="nav-links">
-                <a href="dashboard.html">Dashboard</a>
-                <a href="courses.html">Courses</a>
-                <a href="dispute-tracker.html" class="active">Disputes</a>
-                <a href="credit-tracker.html">Credit</a>
-            </div>
-            <div class="nav-user">
-                <div class="user-avatar" id="user-avatar">??</div>
-                <span class="user-name" id="user-name">Loading...</span>
-                <button class="btn-text" onclick="signOut()">Sign Out</button>
-            </div>
-        </nav>
-    </header>
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<nav class="dash-nav">
+  <a href="dashboard.html" class="dash-nav-logo"><span>SILENT<span style="color:var(--red)">HONOR</span></span></a>
+  <div class="dash-nav-links">
+    <a href="dashboard.html" class="dash-nav-link">Dashboard</a>
+    <a href="member-courses.html" class="dash-nav-link">Courses</a>
+    <a href="messages.html" class="dash-nav-link">Messages</a>
+    <a href="counselor.html" class="dash-nav-link">Counselor</a>
+    <a href="dispute-tracker.html" class="dash-nav-link active">Disputes</a>
+    <a href="credit-tracker.html" class="dash-nav-link">Credit</a>
+  </div>
+  <div class="dash-nav-user">
+    <div class="user-avatar" id="user-avatar">??</div>
+    <span class="user-name" id="user-name">Loading...</span>
+    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+  </div>
+</nav>
 
     <main class="main-content">
         <div class="page-header">
@@ -37,7 +50,6 @@
                 <h1 class="page-title">Dispute Tracker</h1>
                 <p class="page-subtitle">Track your credit report disputes via certified mail</p>
             </div>
-            <button class="btn-primary" onclick="openDisputeModal()">+ New Dispute</button>
         </div>
 
         <!-- Important Notice -->
@@ -89,7 +101,7 @@
                 <div class="empty-state">
                     <div class="empty-icon">&#128221;</div>
                     <h3>No Disputes Yet</h3>
-                    <p>Start tracking your credit report disputes by clicking the "New Dispute" button above.</p>
+                    <p>Your counselor will add disputes here as they work on your credit report. Check back after your counseling sessions.</p>
                 </div>
             </div>
         </div>

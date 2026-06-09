@@ -47,6 +47,7 @@ async def get_staff(request: Request):
             "permissions": s.get("permissions", []),
             "active": s.get("active", True),
             "client_count": client_count,
+            "calendly_url": s.get("calendly_url", ""),
             "created_at": s.get("created_at").isoformat() if s.get("created_at") else None,
             "last_active": s.get("last_active").isoformat() if s.get("last_active") else None
         })
@@ -72,6 +73,10 @@ async def create_staff(request: Request, data: StaffRequest):
         "last_name": data.last_name,
         "role": data.role,
         "title": data.title or "",
+        "bio": data.bio or "",
+        "specialties": data.specialties or [],
+        "credentials": data.credentials or "",
+        "calendly_url": data.calendly_url or None,
         "permissions": data.permissions or [],
         "active": True,
         "created_at": datetime.now(timezone.utc)
@@ -106,7 +111,7 @@ async def update_staff(request: Request, staff_id: str):
     admin = await get_current_admin(request)
     data = await request.json()
 
-    allowed = ["first_name", "last_name", "email", "role", "title", "active"]
+    allowed = ["first_name", "last_name", "email", "role", "title", "active", "bio", "specialties", "calendly_url", "credentials"]
     update_data = {k: v for k, v in data.items() if k in allowed}
 
     if "role" in update_data and update_data["role"] not in STAFF_ROLES:
