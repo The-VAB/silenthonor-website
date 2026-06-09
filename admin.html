@@ -2236,7 +2236,11 @@ async function deleteAnnouncement(id) {
 async function loadReports() {
   try {
     const r = await fetch(`${API}/api/admin/analytics`, {credentials:'include'});
-    if (!r.ok) return;
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      document.getElementById('reports-content').innerHTML = `<div class="empty-state"><div style="color:var(--red);">Reports error ${r.status}: ${body.detail || 'Server error — check backend logs'}</div></div>`;
+      return;
+    }
     const d = await r.json();
     const k = d.kpis || {};
     const el = document.getElementById('reports-content');
