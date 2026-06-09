@@ -686,6 +686,7 @@
       <select class="form-select" id="staff-role">
         <option value="staff">Staff</option>
         <option value="admin">Admin</option>
+        <option value="counselor">Counselor</option>
       </select>
     </div>
     <div class="modal-actions">
@@ -909,7 +910,7 @@ async function loadMembers() {
     }
 
     tbody.innerHTML = membersList.map(m => `
-      <tr>
+      <tr style="cursor:pointer;" onclick="openMemberModal('${m.id}')">
         <td><strong>${m.first_name} ${m.last_name}</strong></td>
         <td>${m.email}</td>
         <td>${m.branch || '—'}</td>
@@ -1112,7 +1113,7 @@ async function loadStaff() {
 
     tbody.innerHTML = staff.map(s => `
       <tr>
-        <td><strong>${s.name}</strong></td>
+        <td><strong>${s.first_name || ''} ${s.last_name || ''}</strong></td>
         <td>${s.email}</td>
         <td><span class="status-badge ${s.role === 'admin' ? 'status-verified' : 'status-info'}">${s.role}</span></td>
         <td><span class="status-badge ${s.active ? 'status-verified' : 'status-rejected'}">${s.active ? 'Active' : 'Inactive'}</span></td>
@@ -1568,35 +1569,80 @@ async function openMemberModal(memberId) {
     const res = await fetch(`${window.API_BASE}/api/admin/members/${memberId}`, { credentials: 'include' });
     const member = await res.json();
 
+    // Build stage options
+    const stageOptions = PIPELINE_STAGES.map(s =>
+      `<option value="${s.id}" ${member.pipeline_stage === s.id ? 'selected' : ''}>${s.label}</option>`
+    ).join('');
+
+    // Build counselor options
+    const counselorOptions = '<option value="">— Not Assigned —</option>' +
+      counselorsList.filter(c => c.active).map(c =>
+        `<option value="${c.id}" ${member.counselor && member.counselor.id === c.id ? 'selected' : ''}>${c.name}</option>`
+      ).join('');
+
     const content = document.getElementById('member-detail-content');
     content.innerHTML = `
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
         <div>
           <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.2rem; margin-bottom: 1rem;">${member.first_name || ''} ${member.last_name || ''}</h3>
           <div class="report-row"><span class="report-label">Email</span><span class="report-value">${member.email}</span></div>
+          <div class="report-row"><span class="report-label">Phone</span><span class="report-value">${member.phone || '—'}</span></div>
           <div class="report-row"><span class="report-label">Branch</span><span class="report-value">${member.branch || '—'}</span></div>
           <div class="report-row"><span class="report-label">Service Status</span><span class="report-value">${member.service_status || '—'}</span></div>
           <div class="report-row"><span class="report-label">State</span><span class="report-value">${member.state || '—'}</span></div>
-          <div class="report-row"><span class="report-label">Phone</span><span class="report-value">${member.phone || '—'}</span></div>
-        </div>
-        <div>
-          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.2rem; margin-bottom: 1rem;">Status</h3>
-          <div class="report-row"><span class="report-label">Pipeline Stage</span><span class="report-value">${formatStage(member.pipeline_stage)}</span></div>
           <div class="report-row"><span class="report-label">DD-214 Status</span><span class="report-value">${member.dd214_status || 'pending'}</span></div>
-          <div class="report-row"><span class="report-label">Verified</span><span class="report-value">${member.verified ? 'Yes' : 'No'}</span></div>
-          <div class="report-row"><span class="report-label">Counselor</span><span class="report-value">${member.counselor ? member.counselor.name : 'Not assigned'}</span></div>
           <div class="report-row"><span class="report-label">Joined</span><span class="report-value">${member.created_at ? new Date(member.created_at).toLocaleDateString() : '—'}</span></div>
         </div>
-      </div>
-      <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem;">
-        <button class="action-btn primary" onclick="closeMemberModal(); openAssignModal('${memberId}', '${member.first_name} ${member.last_name}')">Assign Counselor</button>
-        <button class="action-btn" onclick="closeMemberModal(); openNotesModal('${memberId}', '${member.first_name} ${member.last_name}')">View Notes</button>
-        <button class="action-btn" onclick="closeMemberModal(); openStageModal('${memberId}', '${member.first_name} ${member.last_name}', '${member.pipeline_stage || 'applied'}')">Change Stage</button>
+        <div>
+          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.2rem; margin-bottom: 1rem;">Manage</h3>
+          <div class="form-group">
+            <label class="form-label">Pipeline Stage</label>
+            <select class="form-select" id="modal-stage-select">${stageOptions}</select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assigned Counselor</label>
+            <select class="form-select" id="modal-counselor-select">${counselorOptions}</select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Admin Notes</label>
+            <textarea class="form-textarea" id="modal-notes" style="min-height:80px;" placeholder="Add a note...">${member.admin_notes || ''}</textarea>
+          </div>
+          <button class="action-btn primary" onclick="saveMemberInline('${memberId}')">Save Changes</button>
+        </div>
       </div>
     `;
     document.getElementById('member-modal').classList.add('open');
   } catch (e) {
     console.error('Member detail error:', e);
+  }
+}
+
+async function saveMemberInline(memberId) {
+  const stage = document.getElementById('modal-stage-select').value;
+  const counselorId = document.getElementById('modal-counselor-select').value;
+  const notes = document.getElementById('modal-notes').value.trim();
+
+  const payload = { pipeline_stage: stage };
+  if (counselorId) payload.assigned_counselor_id = counselorId;
+  if (notes) payload.admin_notes = notes;
+
+  try {
+    const res = await fetch(`${window.API_BASE}/api/admin/members/${memberId}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      closeMemberModal();
+      loadMembers();
+      loadPipeline();
+      loadStats();
+    } else {
+      alert('Failed to save changes.');
+    }
+  } catch (e) {
+    alert('Connection error.');
   }
 }
 
@@ -1653,7 +1699,7 @@ async function handleLogout() {
     });
   } catch (e) {}
   localStorage.removeItem('sh_user');
-  window.location.href = 'index.html';
+  window.location.href = 'login.html';
 }
 
 document.addEventListener('DOMContentLoaded', loadAdmin);

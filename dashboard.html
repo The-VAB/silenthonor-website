@@ -4,241 +4,1121 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Member Dashboard - Silent Honor Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/global.css">
-<link rel="stylesheet" href="css/dashboard.css">
+<script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+<style>
+/* Dashboard Layout */
+.dash-wrapper {
+  min-height: 100vh;
+  background: var(--navy-dark);
+}
+.dash-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(11, 18, 32, 0.98);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  z-index: 100;
+}
+.dash-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--white);
+}
+.dash-nav-logo span:last-child {
+  color: var(--red-light);
+}
+.dash-nav-links {
+  display: flex;
+  gap: 0.25rem;
+}
+.dash-nav-link {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.dash-nav-link:hover {
+  color: var(--white);
+  background: rgba(255,255,255,0.05);
+}
+.dash-nav-link.active {
+  color: var(--gold);
+  background: rgba(201, 149, 42, 0.1);
+}
+.dash-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--white);
+}
+.user-name {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  color: var(--white);
+}
+.sign-out-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sign-out-btn:hover {
+  border-color: var(--red);
+  color: var(--red-light);
+}
+
+/* Content Area */
+.dash-content {
+  padding: 80px 2rem 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+}
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Header */
+.dash-header {
+  margin-bottom: 2rem;
+}
+.dash-welcome {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.25rem;
+}
+.dash-welcome em {
+  font-style: normal;
+  color: var(--gold);
+}
+.dash-subtitle {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.pipeline-badge {
+  display: inline-block;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  margin-top: 0.5rem;
+}
+
+/* Announcements */
+.announcements-section {
+  margin-bottom: 2rem;
+}
+.announcement-card {
+  background: rgba(201, 149, 42, 0.1);
+  border: 1px solid rgba(201, 149, 42, 0.3);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.announcement-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+.announcement-content {
+  flex: 1;
+}
+.announcement-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 0.25rem;
+}
+.announcement-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.announcement-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+/* Programs Section */
+.programs-section {
+  margin-bottom: 2rem;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--white);
+}
+.program-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+.program-card {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.program-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.program-card.credit-repair::before {
+  background: linear-gradient(90deg, var(--red), var(--red-light));
+}
+.program-card.financial::before {
+  background: linear-gradient(90deg, var(--gold), #D4A84B);
+}
+.program-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+.program-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+.program-desc {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.program-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem 0;
+}
+.program-features li {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 0.35rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+.program-features li::before {
+  content: '\2713';
+  position: absolute;
+  left: 0;
+  color: #10B981;
+}
+.program-btn {
+  display: inline-block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.program-btn.apply {
+  background: var(--red);
+  color: var(--white);
+}
+.program-btn.apply:hover {
+  background: var(--red-light);
+}
+.program-btn.pending {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  cursor: default;
+}
+.program-btn.enrolled {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #10B981;
+  cursor: default;
+}
+
+/* Program Status Badge */
+.program-status {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+}
+.program-status.waitlist {
+  background: rgba(201, 149, 42, 0.2);
+  color: var(--gold);
+}
+.program-status.active {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10B981;
+}
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  text-align: center;
+}
+.stat-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.stat-value {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--white);
+}
+.credit-bureaus {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.bureau-score {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+}
+.bureau-score.eq { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+.bureau-score.ex { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+.bureau-score.tu { background: rgba(34, 197, 94, 0.2); color: #22C55E; }
+
+/* Dashboard Grid */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 1.5rem;
+}
+.dash-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.dash-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Panels */
+.dash-panel {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid var(--border);
+}
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--white);
+}
+.panel-action {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  color: var(--gold);
+  text-decoration: none;
+}
+.panel-action:hover {
+  text-decoration: underline;
+}
+.panel-body {
+  padding: 1rem 1.25rem;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--muted);
+}
+.empty-state-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+.empty-state-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* Course Items */
+.course-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.course-item:last-child {
+  border-bottom: none;
+}
+.course-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.course-info {
+  flex: 1;
+  min-width: 0;
+}
+.course-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 0.15rem;
+}
+.course-meta {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.course-progress {
+  width: 100px;
+  flex-shrink: 0;
+}
+.progress-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.3s;
+}
+.progress-text {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  text-align: right;
+}
+.course-btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.75rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.course-btn.continue {
+  background: var(--red);
+  color: var(--white);
+}
+.course-btn.waitlist {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* Dispute Items */
+.dispute-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.dispute-item:last-child {
+  border-bottom: none;
+}
+.dispute-info h4 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 0.15rem;
+}
+.dispute-meta {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.dispute-status {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.dispute-status.pending { background: rgba(201, 149, 42, 0.2); color: var(--gold); }
+.dispute-status.sent { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+.dispute-status.resolved { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+
+/* Counselor Card */
+.counselor-pending {
+  text-align: center;
+  padding: 1rem 0;
+}
+.counselor-pending .counselor-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+.counselor-pending h4 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.9rem;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+.counselor-pending p {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.counselor-card {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+.counselor-photo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.counselor-info h4 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 0.15rem;
+}
+.counselor-title {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.counselor-specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.specialty-tag {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.65rem;
+  background: rgba(201, 149, 42, 0.15);
+  color: var(--gold);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+}
+.counselor-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.counselor-btn {
+  flex: 1;
+  text-align: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.6rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.counselor-btn.primary {
+  background: var(--red);
+  color: var(--white);
+}
+.counselor-btn.secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+/* Messages */
+.message-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.message-item:last-child {
+  border-bottom: none;
+}
+.message-item.message-unread {
+  border-left: 2px solid var(--gold);
+  padding-left: 0.75rem;
+  margin-left: -1.25rem;
+  padding-right: 0.75rem;
+}
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+.message-from {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--white);
+}
+.message-time {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.message-preview {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.message-input-area {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.message-input {
+  flex: 1;
+  background: var(--navy);
+  border: 1px solid var(--border);
+  color: var(--white);
+  padding: 0.5rem 0.75rem;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+}
+.message-input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.message-send {
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+/* Quick Links */
+.quick-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(11, 18, 32, 0.5);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.quick-link:hover {
+  border-color: var(--gold);
+}
+.quick-link-icon {
+  font-size: 1rem;
+}
+.quick-link span:last-child {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* DD-214 Alert */
+.dd214-alert {
+  background: rgba(201, 149, 42, 0.1);
+  border: 1px solid rgba(201, 149, 42, 0.3);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+.dd214-alert.verified {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+.dd214-alert-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+.dd214-alert.verified .dd214-alert-title {
+  color: #10B981;
+}
+.dd214-alert-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.dd214-upload-area {
+  border: 2px dashed var(--border);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dd214-upload-area:hover {
+  border-color: var(--gold);
+}
+.dd214-upload-area.dragover {
+  border-color: var(--gold);
+  background: rgba(201, 149, 42, 0.05);
+}
+.dd214-upload-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.dd214-upload-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.dd214-upload-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+.dd214-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(11, 18, 32, 0.5);
+}
+.dd214-status-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+  .program-cards {
+    grid-template-columns: 1fr;
+  }
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .dash-nav {
+    padding: 0 1rem;
+  }
+  .dash-nav-links {
+    display: none;
+  }
+  .dash-content {
+    padding: 70px 1rem 2rem;
+  }
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
 </head>
 <body>
-<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
 <div class="dash-wrapper">
+
 <nav class="dash-nav">
-<div class="dash-nav-logo">
-<img src="images/logo.png" alt="Silent Honor" onerror="this.style.display='none'">
-<span>Silent Honor</span>
-</div>
-<div class="dash-nav-links">
-<a href="dashboard.html" class="dash-nav-link active">Dashboard</a>
-<a href="counselor.html" class="dash-nav-link">Counselor</a>
-<a href="messages.html" class="dash-nav-link">Messages</a>
-<a href="dispute-tracker.html" class="dash-nav-link">Disputes</a>
-<a href="credit-tracker.html" class="dash-nav-link">Credit</a>
-</div>
-<div class="dash-nav-user">
-<div class="user-avatar" id="user-avatar">--</div>
-<span class="user-name" id="user-name">Loading...</span>
-<button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-</div>
+  <div class="dash-nav-logo">
+    <span>SILENT</span><span>HONOR</span>
+  </div>
+  <div class="dash-nav-links">
+    <a href="dashboard.html" class="dash-nav-link active">Dashboard</a>
+    <a href="member-courses.html" class="dash-nav-link">Courses</a>
+    <a href="counselor.html" class="dash-nav-link">Counselor</a>
+    <a href="messages.html" class="dash-nav-link">Messages</a>
+    <a href="dispute-tracker.html" class="dash-nav-link">Disputes</a>
+    <a href="credit-tracker.html" class="dash-nav-link">Credit</a>
+  </div>
+  <div class="dash-nav-user">
+    <div class="user-avatar" id="user-avatar">--</div>
+    <span class="user-name" id="user-name">Loading...</span>
+    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+  </div>
 </nav>
 
 <div class="dash-content">
-<div class="loading-state" id="loading-state">
-<div class="loading-spinner"></div>
-<p style="color:var(--muted);">Loading your dashboard...</p>
+
+  <!-- Loading State -->
+  <div class="loading-state" id="loading-state">
+    <div class="loading-spinner"></div>
+    <p style="color:var(--muted);">Loading your dashboard...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div id="dashboard-content" style="display:none;">
+
+    <!-- Header -->
+    <div class="dash-header">
+      <h1 class="dash-welcome">Welcome back, <em id="welcome-name">Member</em></h1>
+      <p class="dash-subtitle">Your path to financial freedom continues here.</p>
+      <div id="pipeline-status"></div>
+    </div>
+
+    <!-- Announcements -->
+    <div class="announcements-section" id="announcements-section" style="display:none;"></div>
+
+    <!-- DD-214 Alert -->
+    <div class="dd214-alert" id="dd214-alert" style="display:none;">
+      <div class="dd214-alert-title">DD-214 Verification Required</div>
+      <div class="dd214-alert-text">Upload your DD-214 to unlock all member benefits. Your document is encrypted and stored securely.</div>
+      <div class="dd214-upload-area" id="dd214-upload">
+        <div class="dd214-upload-icon">&#128196;</div>
+        <div class="dd214-upload-text">Click to upload or drag and drop</div>
+        <div class="dd214-upload-hint">PDF, JPG, or PNG up to 10MB</div>
+      </div>
+      <input type="file" id="dd214-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
+      <div class="dd214-status" id="dd214-pending" style="display:none;">
+        <span style="color:var(--gold);font-size:1.2rem">&#9888;</span>
+        <span class="dd214-status-text">DD-214 uploaded and awaiting admin verification.</span>
+      </div>
+      <div class="dd214-status" id="dd214-verified" style="display:none;">
+        <span style="color:#10B981;font-size:1.2rem">&#10003;</span>
+        <span class="dd214-status-text">DD-214 verified! You have full access to all member benefits.</span>
+      </div>
+    </div>
+
+    <!-- Programs Section -->
+    <div class="programs-section" id="programs-section">
+      <div class="section-header">
+        <h2 class="section-title">Available Programs</h2>
+      </div>
+      <div class="program-cards">
+        <!-- Credit Repair -->
+        <div class="program-card credit-repair" id="credit-repair-card">
+          <div class="program-status" id="cr-status" style="display:none;"></div>
+          <div class="program-icon">&#128179;</div>
+          <div class="program-title">Credit Repair Program</div>
+          <div class="program-desc">Work with a certified counselor to dispute inaccurate items on your credit reports using certified mail and build positive credit history.</div>
+          <ul class="program-features">
+            <li>Full credit report analysis</li>
+            <li>Dispute letters via certified mail</li>
+            <li>Score tracking and monitoring</li>
+            <li>1-on-1 counselor guidance</li>
+          </ul>
+          <a href="credit-repair-application.html" class="program-btn apply" id="cr-btn">Apply Now</a>
+        </div>
+        <!-- Financial Counseling -->
+        <div class="program-card financial" id="financial-card">
+          <div class="program-status" id="fc-status" style="display:none;"></div>
+          <div class="program-icon">&#128176;</div>
+          <div class="program-title">Financial Counseling</div>
+          <div class="program-desc">Get personalized financial guidance to create a budget, manage debt, build savings, and achieve your financial goals.</div>
+          <ul class="program-features">
+            <li>Personalized financial plan</li>
+            <li>Budget analysis and coaching</li>
+            <li>Debt management strategies</li>
+            <li>Ongoing support and check-ins</li>
+          </ul>
+          <a href="financial-counseling-application.html" class="program-btn apply" id="fc-btn">Apply Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Courses Active</div>
+        <div class="stat-value" id="stat-courses">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Disputes Filed</div>
+        <div class="stat-value" id="stat-disputes">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Credit Score</div>
+        <div class="stat-value" id="stat-credit">--</div>
+        <div class="credit-bureaus" id="credit-bureaus"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Member Since</div>
+        <div class="stat-value" id="stat-member-since">--</div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="dash-grid">
+      <div class="dash-main">
+        <!-- Courses Panel -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Your Courses</h3>
+            <a href="member-courses.html" class="panel-action">View All</a>
+          </div>
+          <div class="panel-body" id="courses-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">&#128218;</div>
+              <div class="empty-state-text">Loading courses...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disputes Panel -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Active Disputes</h3>
+            <a href="dispute-tracker.html" class="panel-action">Manage Disputes</a>
+          </div>
+          <div class="panel-body" id="disputes-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">&#128203;</div>
+              <div class="empty-state-text">No active disputes. Work with your counselor to file disputes via certified mail.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-sidebar">
+        <!-- Counselor Panel -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Your Counselor</h3>
+          </div>
+          <div class="panel-body" id="counselor-section">
+            <div class="counselor-pending" id="counselor-pending">
+              <div class="counselor-icon">&#128100;</div>
+              <h4>Counselor Assignment Pending</h4>
+              <p>Apply to a program to be assigned a certified financial counselor who will guide your journey.</p>
+            </div>
+            <div class="counselor-card" id="counselor-card" style="display:none;">
+              <div class="counselor-photo">&#128100;</div>
+              <div class="counselor-info">
+                <h4 id="counselor-name">-</h4>
+                <div class="counselor-title" id="counselor-title">Certified Financial Counselor</div>
+                <div class="counselor-specialties" id="counselor-specialties"></div>
+              </div>
+            </div>
+            <div class="counselor-actions" id="counselor-actions" style="display:none;">
+              <a href="counselor.html" class="counselor-btn primary">View Profile</a>
+              <a href="messages.html" class="counselor-btn secondary">Message</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages Panel -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Recent Messages</h3>
+            <a href="messages.html" class="panel-action">View All</a>
+          </div>
+          <div class="panel-body" id="messages-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">&#128172;</div>
+              <div class="empty-state-text">No messages yet.</div>
+            </div>
+          </div>
+          <div class="message-input-area" id="message-input-area" style="display:none;">
+            <input type="text" class="message-input" id="quick-message" placeholder="Quick message...">
+            <button class="message-send" id="send-quick-msg">Send</button>
+          </div>
+        </div>
+
+        <!-- Quick Links Panel -->
+        <div class="dash-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Quick Links</h3>
+          </div>
+          <div class="panel-body">
+            <div class="quick-links">
+              <a href="credit-tracker.html" class="quick-link">
+                <span class="quick-link-icon">&#128200;</span>
+                <span>Track Credit</span>
+              </a>
+              <a href="dispute-tracker.html" class="quick-link">
+                <span class="quick-link-icon">&#128221;</span>
+                <span>File Dispute</span>
+              </a>
+              <a href="counselor.html" class="quick-link">
+                <span class="quick-link-icon">&#128197;</span>
+                <span>Schedule Call</span>
+              </a>
+              <a href="member-courses.html" class="quick-link">
+                <span class="quick-link-icon">&#127891;</span>
+                <span>All Courses</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<div id="dashboard-content" style="display:none;">
-<div class="dash-header">
-<h1 class="dash-welcome">Welcome back, <em id="welcome-name">Member</em></h1>
-<p class="dash-subtitle">Your path to financial freedom continues here.</p>
-<div class="pipeline-status" id="pipeline-status"></div>
 </div>
 
-<!-- DD-214 Alert -->
-<div class="dd214-alert" id="dd214-alert" style="display:none;">
-<div class="dd214-alert-title">DD-214 Verification Required</div>
-<div class="dd214-alert-text">Upload your DD-214 to unlock all member benefits. Your document is encrypted and stored securely.</div>
-<div class="dd214-upload-area" id="dd214-upload">
-<div class="dd214-upload-icon">&#128196;</div>
-<div class="dd214-upload-text">Click to upload or drag and drop</div>
-<div class="dd214-upload-hint">PDF, JPG, or PNG up to 10MB</div>
-</div>
-<input type="file" id="dd214-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
-<div class="dd214-status pending" id="dd214-pending" style="display:none;">
-<span style="color:var(--gold);font-size:1.2rem">&#9888;</span>
-<span class="dd214-status-text">DD-214 uploaded and awaiting admin verification.</span>
-</div>
-<div class="dd214-status verified" id="dd214-verified" style="display:none;">
-<span style="color:#10B981;font-size:1.2rem">&#10003;</span>
-<span class="dd214-status-text">DD-214 verified! You have full access to all member benefits.</span>
-</div>
-</div>
-
-<!-- Stats Row -->
-<div class="stats-row">
-<div class="stat-card">
-<div class="stat-label">Courses Active</div>
-<div class="stat-value" id="stat-courses">0</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">Disputes Filed</div>
-<div class="stat-value" id="stat-disputes">0</div>
-</div>
-<div class="stat-card credit-card">
-<div class="stat-label">Credit Score</div>
-<div class="stat-value" id="stat-credit">--</div>
-<div class="credit-bureaus" id="credit-bureaus"></div>
-</div>
-<div class="stat-card">
-<div class="stat-label">Member Since</div>
-<div class="stat-value" id="stat-member-since">--</div>
-</div>
-</div>
-
-<!-- Main Grid -->
-<div class="dash-grid">
-<div class="dash-main">
-<!-- Courses Panel -->
-<div class="dash-panel">
-<div class="panel-header">
-<h3 class="panel-title">Your Courses</h3>
-<a href="#" class="panel-action">View All</a>
-</div>
-<div class="panel-body" id="courses-list">
-<div class="empty-state">
-<div class="empty-state-icon">&#128218;</div>
-<div class="empty-state-text">Loading courses...</div>
-</div>
-</div>
-</div>
-
-<!-- Disputes Panel -->
-<div class="dash-panel">
-<div class="panel-header">
-<h3 class="panel-title">Active Disputes</h3>
-<a href="dispute-tracker.html" class="panel-action">Manage Disputes</a>
-</div>
-<div class="panel-body" id="disputes-list">
-<div class="empty-state">
-<div class="empty-state-icon">&#128203;</div>
-<div class="empty-state-text">No active disputes. Work with your counselor to file disputes via certified mail.</div>
-</div>
-</div>
-</div>
-</div>
-
-<div class="dash-sidebar">
-<!-- Counselor Panel -->
-<div class="dash-panel">
-<div class="panel-header">
-<h3 class="panel-title">Your Counselor</h3>
-</div>
-<div class="panel-body" id="counselor-section">
-<div class="counselor-pending" id="counselor-pending">
-<div class="counselor-icon">&#128100;</div>
-<h4>Counselor Assignment Pending</h4>
-<p>Once your DD-214 is verified, a certified financial counselor will be assigned to guide your credit repair journey.</p>
-</div>
-<div class="counselor-card" id="counselor-card" style="display:none;">
-<div class="counselor-photo">&#128100;</div>
-<div class="counselor-info">
-<h4 id="counselor-name">—</h4>
-<div class="counselor-title" id="counselor-title">Certified Financial Counselor</div>
-<div class="counselor-specialties" id="counselor-specialties"></div>
-<div class="counselor-status">
-<span class="counselor-status-dot"></span>
-<span>Available</span>
-</div>
-</div>
-</div>
-<div class="counselor-actions" id="counselor-actions" style="display:none;">
-<a href="counselor.html" class="counselor-btn primary">View Profile</a>
-<a href="messages.html" class="counselor-btn secondary">Send Message</a>
-</div>
-</div>
-</div>
-
-<!-- Messages Panel -->
-<div class="dash-panel">
-<div class="panel-header">
-<h3 class="panel-title">Recent Messages</h3>
-<a href="messages.html" class="panel-action">View All</a>
-</div>
-<div class="panel-body" id="messages-list">
-<div class="empty-state">
-<div class="empty-state-icon">&#128172;</div>
-<div class="empty-state-text">No messages yet. Messages will appear here once you have a counselor assigned.</div>
-</div>
-</div>
-<div class="message-input-area" id="message-input-area" style="display:none;">
-<input type="text" class="message-input" id="quick-message" placeholder="Quick message to counselor...">
-<button class="message-send" id="send-quick-msg">Send</button>
-</div>
-</div>
-
-<!-- Quick Links Panel -->
-<div class="dash-panel">
-<div class="panel-header">
-<h3 class="panel-title">Quick Links</h3>
-</div>
-<div class="panel-body">
-<div class="quick-links">
-<a href="credit-tracker.html" class="quick-link">
-<span class="quick-link-icon">&#128200;</span>
-<span>Track Credit Scores</span>
-</a>
-<a href="dispute-tracker.html" class="quick-link">
-<span class="quick-link-icon">&#128221;</span>
-<span>File New Dispute</span>
-</a>
-<a href="counselor.html" class="quick-link">
-<span class="quick-link-icon">&#128197;</span>
-<span>Schedule Appointment</span>
-</a>
-<a href="course.html?id=credit-education" class="quick-link">
-<span class="quick-link-icon">&#127891;</span>
-<span>Credit Education Course</span>
-</a>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
-let currentUser = null;
-let hasCounselor = false;
+var currentUser = null;
+var hasCounselor = false;
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener("DOMContentLoaded", async function() {
   try {
-    const response = await fetch(`${window.API_BASE}/api/auth/me`, { credentials: 'include' });
+    var response = await fetch(window.API_BASE + "/api/auth/me", { credentials: "include" });
     if (!response.ok) {
-      window.location.href = 'login.html';
+      window.location.href = "login.html";
       return;
     }
     currentUser = await response.json();
-    if (currentUser.role === 'admin') {
-      window.location.href = 'admin.html';
+
+    // Role-based redirects
+    if (currentUser.role === "admin" || currentUser.role === "staff") {
+      window.location.href = "admin.html";
       return;
     }
-    if (currentUser.role === 'counselor') {
-      window.location.href = 'counselor-portal.html';
+    if (currentUser.role === "counselor") {
+      window.location.href = "counselor-portal.html";
       return;
     }
+
+    // Check if verified
+    if (!currentUser.verified) {
+      window.location.href = "pending.html";
+      return;
+    }
+
     initDashboard(currentUser);
   } catch (e) {
-    console.error('Auth check failed:', e);
-    window.location.href = 'login.html';
+    console.error("Auth check failed:", e);
+    window.location.href = "login.html";
   }
 });
 
 function initDashboard(user) {
-  document.getElementById('loading-state').style.display = 'none';
-  document.getElementById('dashboard-content').style.display = 'block';
+  document.getElementById("loading-state").style.display = "none";
+  document.getElementById("dashboard-content").style.display = "block";
 
   // Set user info
-  const initials = (user.first_name ? user.first_name.charAt(0) : '') + (user.last_name ? user.last_name.charAt(0) : '');
-  document.getElementById('user-avatar').textContent = initials.toUpperCase() || '??';
-  document.getElementById('user-name').textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-  document.getElementById('welcome-name').textContent = user.first_name || 'Member';
+  var initials = (user.first_name ? user.first_name.charAt(0) : "") + (user.last_name ? user.last_name.charAt(0) : "");
+  document.getElementById("user-avatar").textContent = initials.toUpperCase() || "??";
+  document.getElementById("user-name").textContent = (user.first_name || "") + " " + (user.last_name || "");
+  document.getElementById("welcome-name").textContent = user.first_name || "Member";
 
   // Member since
   if (user.created_at) {
-    const d = new Date(user.created_at);
-    document.getElementById('stat-member-since').textContent = d.toLocaleString('default', { month: 'short' }) + ' ' + d.getFullYear();
+    var d = new Date(user.created_at);
+    document.getElementById("stat-member-since").textContent = d.toLocaleString("default", { month: "short" }) + " " + d.getFullYear();
   }
 
   // Pipeline status
@@ -247,8 +1127,14 @@ function initDashboard(user) {
   // DD-214 status
   handleDD214Status(user);
 
-  // Load dashboard data
+  // Load data
+  loadAnnouncements();
+  loadProgramStatus();
   loadDashboardData();
+  loadCourses();
+  loadDisputes();
+  loadCounselor();
+  loadMessages();
 
   // Setup interactions
   setupDD214Upload();
@@ -256,404 +1142,428 @@ function initDashboard(user) {
 }
 
 function showPipelineStatus(stage) {
-  const statusEl = document.getElementById('pipeline-status');
-  const stages = {
-    'applied': { label: 'Application Received', color: 'var(--gold)' },
-    'dd214_pending': { label: 'DD-214 Upload Pending', color: 'var(--gold)' },
-    'dd214_review': { label: 'DD-214 Under Review', color: 'var(--gold)' },
-    'approved': { label: 'Verified Member', color: '#10B981' },
-    'counselor_assigned': { label: 'Counselor Assigned', color: '#10B981' },
-    'intake_complete': { label: 'Intake Complete', color: '#10B981' },
-    'active': { label: 'Active Member', color: '#10B981' },
-    'graduated': { label: 'Program Graduate', color: '#3B82F6' }
+  var statusEl = document.getElementById("pipeline-status");
+  var stages = {
+    "applied": { label: "Application Received", color: "var(--gold)" },
+    "dd214_pending": { label: "DD-214 Upload Pending", color: "var(--gold)" },
+    "dd214_review": { label: "DD-214 Under Review", color: "var(--gold)" },
+    "approved": { label: "Verified Member", color: "#10B981" },
+    "active": { label: "Active Member", color: "#10B981" },
+    "cr_waitlist": { label: "Credit Repair - Waitlist", color: "var(--gold)" },
+    "cr_consultation": { label: "Credit Repair - Consultation", color: "#3B82F6" },
+    "cr_dispute_1": { label: "Credit Repair - Round 1", color: "#3B82F6" },
+    "fc_waitlist": { label: "Financial Counseling - Waitlist", color: "var(--gold)" },
+    "fc_consultation": { label: "Financial Counseling - Consultation", color: "#3B82F6" },
+    "graduated": { label: "Program Graduate", color: "#10B981" }
   };
-
-  const info = stages[stage] || { label: 'Member', color: 'var(--muted)' };
-  statusEl.innerHTML = `<span class="pipeline-badge" style="background: ${info.color}20; color: ${info.color}; border: 1px solid ${info.color}50;">${info.label}</span>`;
+  var info = stages[stage] || { label: "Member", color: "var(--muted)" };
+  statusEl.innerHTML = '<span class="pipeline-badge" style="background:' + info.color + '20;color:' + info.color + ';border:1px solid ' + info.color + '50;">' + info.label + '</span>';
 }
 
 function handleDD214Status(user) {
-  const alertEl = document.getElementById('dd214-alert');
-  const uploadEl = document.getElementById('dd214-upload');
-  const pendingEl = document.getElementById('dd214-pending');
-  const verifiedEl = document.getElementById('dd214-verified');
+  var alertEl = document.getElementById("dd214-alert");
+  var uploadEl = document.getElementById("dd214-upload");
+  var pendingEl = document.getElementById("dd214-pending");
+  var verifiedEl = document.getElementById("dd214-verified");
 
-  if (user.verified || user.dd214_status === 'verified') {
-    // Fully verified
-    alertEl.style.display = 'block';
-    alertEl.className = 'dd214-alert verified';
-    alertEl.querySelector('.dd214-alert-title').textContent = 'Verification Complete';
-    alertEl.querySelector('.dd214-alert-text').style.display = 'none';
-    uploadEl.style.display = 'none';
-    pendingEl.style.display = 'none';
-    verifiedEl.style.display = 'flex';
-  } else if (user.dd214_file || user.dd214_status === 'pending_review') {
-    // Uploaded but pending
-    alertEl.style.display = 'block';
-    alertEl.querySelector('.dd214-alert-title').textContent = 'DD-214 Under Review';
-    alertEl.querySelector('.dd214-alert-text').textContent = 'Your DD-214 has been submitted and is awaiting admin verification. This usually takes 1-2 business days.';
-    uploadEl.style.display = 'none';
-    pendingEl.style.display = 'flex';
-    verifiedEl.style.display = 'none';
-  } else if (user.dd214_status === 'rejected') {
-    // Rejected - allow re-upload
-    alertEl.style.display = 'block';
-    alertEl.className = 'dd214-alert rejected';
-    alertEl.querySelector('.dd214-alert-title').textContent = 'DD-214 Requires Re-submission';
-    alertEl.querySelector('.dd214-alert-text').textContent = 'Your previous DD-214 submission could not be verified. Please upload a clearer copy of your DD-214 document.';
-    uploadEl.style.display = 'block';
-    pendingEl.style.display = 'none';
-    verifiedEl.style.display = 'none';
+  if (user.verified || user.dd214_status === "verified") {
+    // Hide DD-214 section entirely for verified users
+    alertEl.style.display = "none";
+  } else if (user.dd214_file || user.dd214_status === "pending_review") {
+    alertEl.style.display = "block";
+    alertEl.querySelector(".dd214-alert-title").textContent = "DD-214 Under Review";
+    alertEl.querySelector(".dd214-alert-text").textContent = "Your DD-214 has been submitted and is awaiting admin verification.";
+    uploadEl.style.display = "none";
+    pendingEl.style.display = "flex";
   } else {
-    // No upload yet
-    alertEl.style.display = 'block';
-    uploadEl.style.display = 'block';
-    pendingEl.style.display = 'none';
-    verifiedEl.style.display = 'none';
+    alertEl.style.display = "block";
+    uploadEl.style.display = "block";
+    pendingEl.style.display = "none";
+  }
+}
+
+async function loadAnnouncements() {
+  try {
+    var r = await fetch(window.API_BASE + "/api/announcements", { credentials: "include" });
+    if (r.ok) {
+      var announcements = await r.json();
+      if (announcements && announcements.length > 0) {
+        var section = document.getElementById("announcements-section");
+        section.style.display = "block";
+        section.innerHTML = announcements.map(function(a) {
+          return '<div class="announcement-card">' +
+            '<div class="announcement-icon">' + (a.type === "urgent" ? "&#9888;" : "&#128227;") + '</div>' +
+            '<div class="announcement-content">' +
+              '<div class="announcement-title">' + escapeHtml(a.title) + '</div>' +
+              '<div class="announcement-text">' + escapeHtml(a.content) + '</div>' +
+              '<div class="announcement-meta">Posted ' + formatDate(a.created_at) + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join("");
+      }
+    }
+  } catch (e) { console.error("Announcements error:", e); }
+}
+
+async function loadProgramStatus() {
+  try {
+    var r = await fetch(window.API_BASE + "/api/member/programs", { credentials: "include" });
+    if (r.ok) {
+      var data = await r.json();
+      updateProgramCard("credit_repair", data.credit_repair);
+      updateProgramCard("financial_counseling", data.financial_counseling);
+    }
+  } catch (e) { console.error("Programs error:", e); }
+}
+
+function updateProgramCard(program, status) {
+  var btnId = program === "credit_repair" ? "cr-btn" : "fc-btn";
+  var statusId = program === "credit_repair" ? "cr-status" : "fc-status";
+  var btn = document.getElementById(btnId);
+  var statusEl = document.getElementById(statusId);
+  var appUrl = program === "credit_repair" ? "credit-repair-application.html" : "financial-counseling-application.html";
+
+  if (!status || status.status === "none") {
+    // No application - show apply button
+    btn.href = appUrl;
+    btn.className = "program-btn apply";
+    btn.textContent = "Apply Now";
+    statusEl.style.display = "none";
+  } else if (status.status === "pending" || status.status === "waitlist") {
+    // Application pending
+    btn.href = "#";
+    btn.className = "program-btn pending";
+    btn.textContent = "Application Pending";
+    btn.onclick = function(e) { e.preventDefault(); };
+    statusEl.textContent = "Waitlist";
+    statusEl.className = "program-status waitlist";
+    statusEl.style.display = "block";
+  } else if (status.status === "approved" || status.status === "active") {
+    // Enrolled
+    btn.href = program === "credit_repair" ? "dispute-tracker.html" : "counselor.html";
+    btn.className = "program-btn enrolled";
+    btn.textContent = "Enrolled";
+    statusEl.textContent = "Active";
+    statusEl.className = "program-status active";
+    statusEl.style.display = "block";
+
+    // Show counselor if assigned
+    if (status.counselor_assigned) {
+      hasCounselor = true;
+    }
   }
 }
 
 async function loadDashboardData() {
-  // Load dashboard summary
   try {
-    const r = await fetch(`${window.API_BASE}/api/member/dashboard`, { credentials: 'include' });
+    var r = await fetch(window.API_BASE + "/api/member/dashboard", { credentials: "include" });
     if (r.ok) {
-      const data = await r.json();
+      var data = await r.json();
+      document.getElementById("stat-courses").textContent = (data.courses?.in_progress || 0) + (data.courses?.completed || 0);
+      document.getElementById("stat-disputes").textContent = data.disputes?.total || 0;
 
-      // Courses
-      document.getElementById('stat-courses').textContent = (data.courses?.in_progress || 0) + (data.courses?.completed || 0);
-
-      // Disputes
-      document.getElementById('stat-disputes').textContent = data.disputes?.total || 0;
-
-      // Credit scores
       if (data.credit_scores && (data.credit_scores.equifax || data.credit_scores.experian || data.credit_scores.transunion)) {
-        const scores = [data.credit_scores.equifax, data.credit_scores.experian, data.credit_scores.transunion].filter(s => s);
-        const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-        document.getElementById('stat-credit').textContent = avg;
+        var scores = [data.credit_scores.equifax, data.credit_scores.experian, data.credit_scores.transunion].filter(function(s) { return s; });
+        var avg = Math.round(scores.reduce(function(a, b) { return a + b; }, 0) / scores.length);
+        document.getElementById("stat-credit").textContent = avg;
 
-        let bureausHtml = '';
-        if (data.credit_scores.equifax) bureausHtml += `<span class="bureau-score eq">EQ: ${data.credit_scores.equifax}</span>`;
-        if (data.credit_scores.experian) bureausHtml += `<span class="bureau-score ex">EX: ${data.credit_scores.experian}</span>`;
-        if (data.credit_scores.transunion) bureausHtml += `<span class="bureau-score tu">TU: ${data.credit_scores.transunion}</span>`;
-        document.getElementById('credit-bureaus').innerHTML = bureausHtml;
+        var bureausHtml = "";
+        if (data.credit_scores.equifax) bureausHtml += '<span class="bureau-score eq">EQ: ' + data.credit_scores.equifax + '</span>';
+        if (data.credit_scores.experian) bureausHtml += '<span class="bureau-score ex">EX: ' + data.credit_scores.experian + '</span>';
+        if (data.credit_scores.transunion) bureausHtml += '<span class="bureau-score tu">TU: ' + data.credit_scores.transunion + '</span>';
+        document.getElementById("credit-bureaus").innerHTML = bureausHtml;
       }
 
-      // Counselor status
       hasCounselor = data.counselor_assigned;
       if (hasCounselor) {
-        document.getElementById('message-input-area').style.display = 'flex';
+        document.getElementById("message-input-area").style.display = "flex";
       }
     }
-  } catch (e) { console.error('Dashboard data error:', e); }
-
-  // Load courses
-  loadCourses();
-
-  // Load disputes
-  loadDisputes();
-
-  // Load counselor
-  loadCounselor();
-
-  // Load messages
-  loadMessages();
+  } catch (e) { console.error("Dashboard data error:", e); }
 }
 
 async function loadCourses() {
   try {
-    const r = await fetch(`${window.API_BASE}/api/member/courses`, { credentials: 'include' });
+    var r = await fetch(window.API_BASE + "/api/member/courses", { credentials: "include" });
     if (r.ok) {
-      const courses = await r.json();
+      var courses = await r.json();
       renderCourses(courses);
     }
-  } catch (e) { console.error('Courses error:', e); }
+  } catch (e) { console.error("Courses error:", e); }
 }
 
 function renderCourses(courses) {
-  const container = document.getElementById('courses-list');
+  var container = document.getElementById("courses-list");
   if (!courses || courses.length === 0) {
-    container.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon">&#128218;</div>
-      <div class="empty-state-text">No courses available yet. Check back soon!</div>
-    </div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128218;</div><div class="empty-state-text">No courses available yet. Check back soon!</div></div>';
     return;
   }
 
-  const icons = { 'credit': '&#128179;', 'finance': '&#128176;', 'va': '&#127968;', 'default': '&#128218;' };
-
-  container.innerHTML = courses.slice(0, 4).map(c => {
-    const icon = icons[c.category?.toLowerCase()] || icons.default;
-    const progressPct = c.progress || 0;
-    const isLive = c.status === 'live';
-
-    return `<div class="course-item">
-      <div class="course-icon">${icon}</div>
-      <div class="course-info">
-        <div class="course-title">${c.title}</div>
-        <div class="course-meta">${c.total_lessons} Lessons ${c.status === 'coming_soon' ? '- Coming Soon' : ''}</div>
-      </div>
-      <div class="course-progress">
-        <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
-        <div class="progress-text">${progressPct > 0 ? progressPct + '% Complete' : 'Not Started'}</div>
-      </div>
-      ${isLive
-        ? `<a href="course.html?id=${c.id}" class="course-btn continue">${progressPct > 0 ? 'Continue' : 'Start'}</a>`
-        : `<button class="course-btn waitlist" onclick="joinWaitlist('${c.id}')">Join Waitlist</button>`
-      }
-    </div>`;
-  }).join('');
+  container.innerHTML = courses.slice(0, 4).map(function(c) {
+    var progressPct = c.progress || 0;
+    var isLive = c.status === "live";
+    return '<div class="course-item">' +
+      '<div class="course-icon">&#128218;</div>' +
+      '<div class="course-info">' +
+        '<div class="course-title">' + escapeHtml(c.title) + '</div>' +
+        '<div class="course-meta">' + c.total_lessons + ' Lessons</div>' +
+      '</div>' +
+      '<div class="course-progress">' +
+        '<div class="progress-bar"><div class="progress-fill" style="width:' + progressPct + '%"></div></div>' +
+        '<div class="progress-text">' + (progressPct > 0 ? progressPct + '%' : 'Not Started') + '</div>' +
+      '</div>' +
+      (isLive
+        ? '<a href="course.html?id=' + c.id + '" class="course-btn continue">' + (progressPct > 0 ? 'Continue' : 'Start') + '</a>'
+        : '<button class="course-btn waitlist" onclick="joinWaitlist(\'' + c.id + '\')">Waitlist</button>'
+      ) +
+    '</div>';
+  }).join("");
 }
 
 async function loadDisputes() {
   try {
-    const r = await fetch(`${window.API_BASE}/api/disputes`, { credentials: 'include' });
+    var r = await fetch(window.API_BASE + "/api/disputes", { credentials: "include" });
     if (r.ok) {
-      const disputes = await r.json();
+      var disputes = await r.json();
       renderDisputes(disputes);
     }
-  } catch (e) { console.error('Disputes error:', e); }
+  } catch (e) { console.error("Disputes error:", e); }
 }
 
 function renderDisputes(disputes) {
-  const container = document.getElementById('disputes-list');
+  var container = document.getElementById("disputes-list");
   if (!disputes || disputes.length === 0) {
-    container.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon">&#128203;</div>
-      <div class="empty-state-text">No active disputes. Work with your counselor to file disputes via certified mail.</div>
-    </div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128203;</div><div class="empty-state-text">No active disputes.</div></div>';
     return;
   }
 
-  container.innerHTML = disputes.slice(0, 3).map(d => {
-    const statusClass = d.status?.toLowerCase().replace(/\s+/g, '-') || 'pending';
-    return `<div class="dispute-item">
-      <div class="dispute-info">
-        <h4>${d.account_name || d.creditor || 'Unknown Account'}</h4>
-        <div class="dispute-meta">${d.bureau || 'All Bureaus'} - Filed ${formatDate(d.created_at || d.date_sent)}</div>
-      </div>
-      <span class="dispute-status ${statusClass}">${d.status || 'Pending'}</span>
-    </div>`;
-  }).join('');
+  container.innerHTML = disputes.slice(0, 3).map(function(d) {
+    var statusClass = (d.status || "pending").toLowerCase().replace(/\s+/g, "-");
+    return '<div class="dispute-item">' +
+      '<div class="dispute-info">' +
+        '<h4>' + escapeHtml(d.account_name || d.creditor || "Unknown") + '</h4>' +
+        '<div class="dispute-meta">' + (d.bureau || "All") + ' - ' + formatDate(d.created_at) + '</div>' +
+      '</div>' +
+      '<span class="dispute-status ' + statusClass + '">' + (d.status || "Pending") + '</span>' +
+    '</div>';
+  }).join("");
 }
 
 async function loadCounselor() {
   try {
-    const r = await fetch(`${window.API_BASE}/api/member/counselor`, { credentials: 'include' });
+    var r = await fetch(window.API_BASE + "/api/member/counselor", { credentials: "include" });
     if (r.ok) {
-      const data = await r.json();
+      var data = await r.json();
       if (data && data.id) {
         hasCounselor = true;
-        document.getElementById('counselor-pending').style.display = 'none';
-        document.getElementById('counselor-card').style.display = 'flex';
-        document.getElementById('counselor-actions').style.display = 'flex';
-        document.getElementById('message-input-area').style.display = 'flex';
+        document.getElementById("counselor-pending").style.display = "none";
+        document.getElementById("counselor-card").style.display = "flex";
+        document.getElementById("counselor-actions").style.display = "flex";
+        document.getElementById("message-input-area").style.display = "flex";
 
-        document.getElementById('counselor-name').textContent = data.name;
-        document.getElementById('counselor-title').textContent = data.title || 'Certified Financial Counselor';
+        document.getElementById("counselor-name").textContent = data.name;
+        document.getElementById("counselor-title").textContent = data.title || "Certified Financial Counselor";
 
         if (data.specialties && data.specialties.length) {
-          document.getElementById('counselor-specialties').innerHTML = data.specialties.map(s =>
-            `<span class="specialty-tag">${s}</span>`
-          ).join('');
+          document.getElementById("counselor-specialties").innerHTML = data.specialties.map(function(s) {
+            return '<span class="specialty-tag">' + escapeHtml(s) + '</span>';
+          }).join("");
         }
       }
     }
-  } catch (e) { console.error('Counselor error:', e); }
+  } catch (e) { console.error("Counselor error:", e); }
 }
 
 async function loadMessages() {
   try {
-    const r = await fetch(`${window.API_BASE}/api/messages`, { credentials: 'include' });
+    var r = await fetch(window.API_BASE + "/api/messages", { credentials: "include" });
     if (r.ok) {
-      const messages = await r.json();
+      var messages = await r.json();
       renderMessages(messages.slice(0, 3));
     }
-  } catch (e) { console.error('Messages error:', e); }
+  } catch (e) { console.error("Messages error:", e); }
 }
 
 function renderMessages(messages) {
-  const container = document.getElementById('messages-list');
+  var container = document.getElementById("messages-list");
   if (!messages || messages.length === 0) {
-    container.innerHTML = `<div class="empty-state">
-      <div class="empty-state-icon">&#128172;</div>
-      <div class="empty-state-text">${hasCounselor ? 'No messages yet. Send a message to your counselor!' : 'Messages will appear here once you have a counselor assigned.'}</div>
-    </div>`;
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128172;</div><div class="empty-state-text">No messages yet.</div></div>';
     return;
   }
 
-  container.innerHTML = messages.map(m => {
-    const unreadClass = m.read ? '' : 'message-unread';
-    return `<div class="message-item ${unreadClass}">
-      <div class="message-header">
-        <span class="message-from">${m.from_name || 'Counselor'}</span>
-        <span class="message-time">${formatTime(m.created_at)}</span>
-      </div>
-      <div class="message-preview">${truncate(m.content, 80)}</div>
-    </div>`;
-  }).join('');
+  container.innerHTML = messages.map(function(m) {
+    var unreadClass = m.read ? "" : "message-unread";
+    return '<div class="message-item ' + unreadClass + '" onclick="window.location.href=\'messages.html\'">' +
+      '<div class="message-header">' +
+        '<span class="message-from">' + escapeHtml(m.from_name || "Counselor") + '</span>' +
+        '<span class="message-time">' + formatTime(m.created_at) + '</span>' +
+      '</div>' +
+      '<div class="message-preview">' + escapeHtml(truncate(m.content, 80)) + '</div>' +
+    '</div>';
+  }).join("");
 }
 
 function formatDate(s) {
-  if (!s) return 'Unknown';
-  return new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (!s) return "Unknown";
+  return new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 function formatTime(s) {
-  if (!s) return '';
-  const d = new Date(s);
-  const n = new Date();
-  const diff = Math.floor((n - d) / (1000 * 60 * 60 * 24));
-  if (diff === 0) return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  if (diff === 1) return 'Yesterday';
-  if (diff < 7) return d.toLocaleDateString('en-US', { weekday: 'short' });
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (!s) return "";
+  var d = new Date(s);
+  var n = new Date();
+  var diff = Math.floor((n - d) / (1000 * 60 * 60 * 24));
+  if (diff === 0) return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  if (diff === 1) return "Yesterday";
+  if (diff < 7) return d.toLocaleDateString("en-US", { weekday: "short" });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 function truncate(s, l) {
-  if (!s) return '';
-  return s.length > l ? s.substring(0, l) + '...' : s;
+  if (!s) return "";
+  return s.length > l ? s.substring(0, l) + "..." : s;
+}
+
+function escapeHtml(s) {
+  if (!s) return "";
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function setupDD214Upload() {
-  const input = document.getElementById('dd214-input');
-  const upload = document.getElementById('dd214-upload');
+  var input = document.getElementById("dd214-input");
+  var upload = document.getElementById("dd214-upload");
   if (!input || !upload) return;
 
-  upload.addEventListener('click', () => input.click());
-  input.addEventListener('change', async (e) => {
-    const f = e.target.files[0];
+  upload.addEventListener("click", function() { input.click(); });
+  input.addEventListener("change", async function(e) {
+    var f = e.target.files[0];
     if (f) await uploadDD214(f);
   });
 
-  upload.addEventListener('dragover', (e) => {
+  upload.addEventListener("dragover", function(e) {
     e.preventDefault();
-    upload.classList.add('dragover');
+    upload.classList.add("dragover");
   });
-  upload.addEventListener('dragleave', () => upload.classList.remove('dragover'));
-  upload.addEventListener('drop', async (e) => {
+  upload.addEventListener("dragleave", function() { upload.classList.remove("dragover"); });
+  upload.addEventListener("drop", async function(e) {
     e.preventDefault();
-    upload.classList.remove('dragover');
-    const f = e.dataTransfer.files[0];
+    upload.classList.remove("dragover");
+    var f = e.dataTransfer.files[0];
     if (f) await uploadDD214(f);
   });
 }
 
 async function uploadDD214(file) {
-  const upload = document.getElementById('dd214-upload');
-  const pending = document.getElementById('dd214-pending');
+  var upload = document.getElementById("dd214-upload");
+  var pending = document.getElementById("dd214-pending");
 
-  // Validate file type
-  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+  var allowedTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
   if (!allowedTypes.includes(file.type)) {
-    alert('Invalid file type. Please upload a PDF, JPG, or PNG file.');
+    alert("Invalid file type. Please upload a PDF, JPG, or PNG file.");
     return;
   }
-
-  // Validate file size (10MB)
   if (file.size > 10 * 1024 * 1024) {
-    alert('File too large. Maximum size is 10MB.');
+    alert("File too large. Maximum size is 10MB.");
     return;
   }
 
-  const fd = new FormData();
-  fd.append('file', file);
-
+  var fd = new FormData();
+  fd.append("file", file);
   upload.innerHTML = '<div class="dd214-upload-text">Uploading securely...</div>';
 
   try {
-    const r = await fetch(`${window.API_BASE}/api/member/upload/dd214`, {
-      method: 'POST',
-      credentials: 'include',
+    var r = await fetch(window.API_BASE + "/api/member/dd214", {
+      method: "POST",
+      credentials: "include",
       body: fd
     });
 
     if (r.ok) {
-      upload.style.display = 'none';
-      pending.style.display = 'flex';
-      document.querySelector('.dd214-alert-title').textContent = 'DD-214 Under Review';
-      document.querySelector('.dd214-alert-text').textContent = 'Your DD-214 has been submitted and is awaiting admin verification. This usually takes 1-2 business days.';
+      upload.style.display = "none";
+      pending.style.display = "flex";
+      document.querySelector(".dd214-alert-title").textContent = "DD-214 Under Review";
+      document.querySelector(".dd214-alert-text").textContent = "Your DD-214 has been submitted and is awaiting admin verification.";
     } else {
-      const err = await r.json();
-      alert(err.detail || 'Upload failed. Please try again.');
+      var err = await r.json();
+      alert(err.detail || "Upload failed. Please try again.");
       resetDD214Upload();
     }
   } catch (e) {
-    alert('Connection error. Please try again.');
+    alert("Connection error. Please try again.");
     resetDD214Upload();
   }
 }
 
 function resetDD214Upload() {
-  const upload = document.getElementById('dd214-upload');
-  upload.innerHTML = `<div class="dd214-upload-icon">&#128196;</div>
-    <div class="dd214-upload-text">Click to upload or drag and drop</div>
-    <div class="dd214-upload-hint">PDF, JPG, or PNG up to 10MB</div>`;
+  var upload = document.getElementById("dd214-upload");
+  upload.innerHTML = '<div class="dd214-upload-icon">&#128196;</div>' +
+    '<div class="dd214-upload-text">Click to upload or drag and drop</div>' +
+    '<div class="dd214-upload-hint">PDF, JPG, or PNG up to 10MB</div>';
 }
 
 function setupEventListeners() {
-  const sendBtn = document.getElementById('send-quick-msg');
-  if (sendBtn) sendBtn.addEventListener('click', sendQuickMessage);
+  var sendBtn = document.getElementById("send-quick-msg");
+  if (sendBtn) sendBtn.addEventListener("click", sendQuickMessage);
 
-  const msgInput = document.getElementById('quick-message');
-  if (msgInput) msgInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendQuickMessage();
+  var msgInput = document.getElementById("quick-message");
+  if (msgInput) msgInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendQuickMessage();
   });
 }
 
 async function joinWaitlist(courseId) {
   try {
-    const r = await fetch(`${window.API_BASE}/api/courses/${courseId}/waitlist`, {
-      method: 'POST',
-      credentials: 'include'
+    var r = await fetch(window.API_BASE + "/api/courses/" + courseId + "/waitlist", {
+      method: "POST",
+      credentials: "include"
     });
     if (r.ok) {
-      alert('You have been added to the waitlist! We will notify you when the course becomes available.');
+      alert("You have been added to the waitlist!");
     } else {
-      alert('Could not join waitlist. You may already be on the list.');
+      alert("Could not join waitlist. You may already be on the list.");
     }
   } catch (e) {
-    alert('Connection error. Please try again.');
+    alert("Connection error. Please try again.");
   }
 }
 
 async function sendQuickMessage() {
-  const input = document.getElementById('quick-message');
-  const content = input.value.trim();
+  var input = document.getElementById("quick-message");
+  var content = input.value.trim();
   if (!content) return;
   if (!hasCounselor) {
-    alert('You need a counselor assigned before sending messages.');
+    alert("You need a counselor assigned before sending messages.");
     return;
   }
 
   try {
-    const r = await fetch(`${window.API_BASE}/api/messages`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content })
+    var r = await fetch(window.API_BASE + "/api/messages", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: content })
     });
 
     if (r.ok) {
-      input.value = '';
+      input.value = "";
       loadMessages();
     } else {
-      alert('Could not send message. Please try again.');
+      alert("Could not send message. Please try again.");
     }
   } catch (e) {
-    alert('Connection error. Please try again.');
+    alert("Connection error. Please try again.");
   }
 }
 
 async function signOut() {
   try {
-    await fetch(`${window.API_BASE}/api/auth/logout`, {
-      method: 'POST',
-      credentials: 'include'
+    await fetch(window.API_BASE + "/api/auth/logout", {
+      method: "POST",
+      credentials: "include"
     });
   } catch (e) {}
-  localStorage.removeItem('sh_user');
-  window.location.href = 'login.html';
+  localStorage.removeItem("sh_user");
+  window.location.href = "login.html";
 }
 </script>
 </body>
