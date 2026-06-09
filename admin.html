@@ -463,7 +463,10 @@ input,select,textarea{font-family:inherit;font-size:14px;}
 <div id="view-messages" class="view">
   <div class="page-header">
     <div class="page-title">Messages</div>
-    <button class="btn btn-outline btn-sm" onclick="loadMessages()">&#8635; Refresh</button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary btn-sm" onclick="openNewMessageModal()">+ New Message</button>
+      <button class="btn btn-outline btn-sm" onclick="loadMessages()">&#8635; Refresh</button>
+    </div>
   </div>
   <div class="messages-layout">
     <div class="convo-list" id="convo-list">
@@ -736,6 +739,32 @@ input,select,textarea{font-family:inherit;font-size:14px;}
   </div>
 </div>
 
+<div id="new-msg-modal" class="modal-backdrop">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <span class="modal-title">New Message</span>
+      <button class="modal-close" onclick="closeModal('new-msg-modal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">To</label>
+        <input id="new-msg-search" class="form-input" placeholder="Search staff or members..." oninput="searchMsgRecipients(this.value)" autocomplete="off">
+        <div id="new-msg-results" style="display:none;border:1px solid var(--border);border-radius:6px;margin-top:4px;max-height:160px;overflow-y:auto;background:var(--bg-card);position:relative;z-index:10;"></div>
+        <input type="hidden" id="new-msg-to-id">
+        <div id="new-msg-to-label" style="display:none;margin-top:6px;font-size:12px;color:var(--gold);font-weight:600;"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea id="new-msg-content" class="form-textarea" rows="4" placeholder="Type your message..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('new-msg-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="sendNewMessage()">Send Message</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -745,6 +774,7 @@ let currentMemberId = null;
 let currentMemberData = null;
 let currentPipelineType = 'onboarding';
 let currentCourseId = null;
+let currentCourseData = null;
 let lessonEditContext = null;
 let manualApproveTarget = null;
 let staffEditId = null;
@@ -1271,9 +1301,9 @@ async function savePanelOverview() {
 function renderPanelCR(m) {
   const crStages = ['cr_waitlist','cr_consultation','cr_documents','cr_dispute_1','cr_dispute_2','cr_dispute_3','cr_monitoring','cr_complete'];
   const crLabels = {cr_waitlist:'Waitlist',cr_consultation:'Consultation',cr_documents:'Documents',cr_dispute_1:'Dispute Rd 1',cr_dispute_2:'Dispute Rd 2',cr_dispute_3:'Dispute Rd 3',cr_monitoring:'Monitoring',cr_complete:'Complete'};
-  const stageOpts = crStages.map(s => `<option value="${s}" ${crStage===s?'selected':''}>${crLabels[s]}</option>`).join('');
   const notEnrolled = !m.cr_stage && !m.credit_repair_stage;
   const crStage = m.cr_stage || m.credit_repair_stage;
+  const stageOpts = crStages.map(s => `<option value="${s}" ${crStage===s?'selected':''}>${crLabels[s]}</option>`).join('');
   document.getElementById('panel-cr-content').innerHTML = notEnrolled ? `
     <div class="empty-state"><div class="empty-state-icon">&#128203;</div><div>Not enrolled in Credit Repair program</div></div>
     <div style="text-align:center;margin-top:12px;">
@@ -1311,9 +1341,9 @@ async function saveCrStage() {
 function renderPanelFC(m) {
   const fcStages = ['fc_waitlist','fc_consultation','fc_documents','fc_gameplan','fc_working','fc_complete'];
   const fcLabels = {fc_waitlist:'Waitlist',fc_consultation:'Consultation',fc_documents:'Documents',fc_gameplan:'Game Plan',fc_working:'Working Plan',fc_complete:'Complete'};
-  const stageOpts = fcStages.map(s => `<option value="${s}" ${fcStage===s?'selected':''}>${fcLabels[s]}</option>`).join('');
   const notEnrolled = !m.fc_stage && !m.financial_counseling_stage;
   const fcStage = m.fc_stage || m.financial_counseling_stage;
+  const stageOpts = fcStages.map(s => `<option value="${s}" ${fcStage===s?'selected':''}>${fcLabels[s]}</option>`).join('');
   document.getElementById('panel-fc-content').innerHTML = notEnrolled ? `
     <div class="empty-state"><div class="empty-state-icon">&#128203;</div><div>Not enrolled in Financial Counseling program</div></div>
     <div style="text-align:center;margin-top:12px;">
@@ -1640,6 +1670,78 @@ function onMsgKeydown(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); }
 }
 
+let allMsgRecipients = [];
+
+async function openNewMessageModal() {
+  document.getElementById('new-msg-search').value = '';
+  document.getElementById('new-msg-to-id').value = '';
+  document.getElementById('new-msg-to-label').style.display = 'none';
+  document.getElementById('new-msg-to-label').textContent = '';
+  document.getElementById('new-msg-results').style.display = 'none';
+  document.getElementById('new-msg-content').value = '';
+  allMsgRecipients = [];
+  try {
+    const r = await fetch(`${API}/api/admin/staff`, {credentials:'include'});
+    if (r.ok) {
+      const staff = await r.json();
+      staff.forEach(s => allMsgRecipients.push({id:s.id, name:s.name||s.email, role:s.role||'staff', email:s.email}));
+    }
+  } catch(e) {}
+  if (allMembers.length) {
+    allMembers.forEach(m => {
+      if (!allMsgRecipients.find(r => r.id === m.id)) {
+        allMsgRecipients.push({id:m.id, name:m.name||m.email, role:'member', email:m.email});
+      }
+    });
+  }
+  document.getElementById('new-msg-modal').classList.add('open');
+}
+
+function searchMsgRecipients(q) {
+  const res = document.getElementById('new-msg-results');
+  if (!q.trim()) { res.style.display = 'none'; return; }
+  const matches = allMsgRecipients.filter(r =>
+    (r.name||'').toLowerCase().includes(q.toLowerCase()) ||
+    (r.email||'').toLowerCase().includes(q.toLowerCase())
+  ).slice(0, 10);
+  if (!matches.length) { res.style.display = 'none'; return; }
+  res.style.display = 'block';
+  res.innerHTML = matches.map(r =>
+    `<div style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;" onmousedown="selectMsgRecipient('${r.id}','${(r.name||r.email).replace(/'/g,"\\'")}','${r.role}')" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+      <strong>${r.name||r.email}</strong> <span style="color:var(--text-muted);font-size:11px;margin-left:6px;">${r.role}</span>
+    </div>`
+  ).join('');
+}
+
+function selectMsgRecipient(id, name, role) {
+  document.getElementById('new-msg-to-id').value = id;
+  document.getElementById('new-msg-search').value = name;
+  document.getElementById('new-msg-results').style.display = 'none';
+  document.getElementById('new-msg-to-label').textContent = `Recipient: ${name} (${role})`;
+  document.getElementById('new-msg-to-label').style.display = 'block';
+}
+
+async function sendNewMessage() {
+  const toId = document.getElementById('new-msg-to-id').value;
+  const content = document.getElementById('new-msg-content').value.trim();
+  if (!toId) { toast('Select a recipient first', 'error'); return; }
+  if (!content) { toast('Message cannot be empty', 'error'); return; }
+  try {
+    const r = await fetch(`${API}/api/messages`, {
+      method:'POST', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({to_user_id: toId, content})
+    });
+    if (r.ok) {
+      toast('Message sent', 'success');
+      closeModal('new-msg-modal');
+      await loadMessages();
+    } else {
+      const e = await r.json();
+      toast(e.detail||'Failed to send', 'error');
+    }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
 // ===== COURSES =====
 let allCourses = [];
 
@@ -1676,6 +1778,7 @@ async function openCourseBuilder(courseId) {
     const r = await fetch(`${API}/api/admin/courses/${courseId}`, {credentials:'include'});
     if (!r.ok) throw new Error();
     const c = await r.json();
+    currentCourseData = c;
     renderCourseEditor(c);
   } catch(e) { editor.innerHTML = '<div style="padding:20px;color:var(--text-muted);">Error loading course</div>'; }
 }
@@ -1790,7 +1893,15 @@ function openLessonModal(lessonId, courseId, moduleId) {
 }
 
 function findLesson(lessonId) {
-  if (!currentCourseId) return null;
+  if (!currentCourseData) return null;
+  for (const l of (currentCourseData.flat_lessons||[])) {
+    if (l.id === lessonId) return l;
+  }
+  for (const mod of (currentCourseData.modules||[])) {
+    for (const l of (mod.lessons||[])) {
+      if (l.id === lessonId) return l;
+    }
+  }
   return null;
 }
 
