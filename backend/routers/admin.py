@@ -276,6 +276,41 @@ async def delete_member_note(request: Request, member_id: str, note_id: str):
     await db.intake_notes.delete_one({"_id": ObjectId(note_id), "member_id": ObjectId(member_id)})
     return {"message": "Note deleted"}
 
+@router.patch("/members/{member_id}")
+async def patch_member(request: Request, member_id: str):
+    """Update member fields: pipeline_stage, assigned_counselor_id, admin_notes"""
+    admin = await get_current_admin(request)
+    data = await request.json()
+
+    allowed = ["pipeline_stage", "assigned_counselor_id", "admin_notes"]
+    update_data = {k: v for k, v in data.items() if k in allowed and v is not None}
+
+    if "pipeline_stage" in update_data and update_data["pipeline_stage"] not in PIPELINE_STAGES:
+        raise HTTPException(status_code=400, detail=f"Invalid stage. Must be one of: {PIPELINE_STAGES}")
+
+    if not update_data:
+        return {"message": "Nothing to update"}
+
+    update_data["updated_at"] = datetime.now(timezone.utc)
+
+    result = await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": update_data}
+    )
+
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    await log_audit_event(
+        action=AUDIT_ACTIONS.get("MEMBER_UPDATED", "MEMBER_UPDATED"),
+        entity_type="user",
+        entity_id=member_id,
+        user_email=admin.get("email"),
+        details={k: v for k, v in update_data.items() if k != "updated_at"}
+    )
+
+    return {"message": "Member updated"}
+
 @router.get("/contacts")
 async def get_contacts(request: Request):
     """Get all contact form submissions"""

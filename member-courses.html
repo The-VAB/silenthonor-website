@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courses - Silent Honor Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+<style>
+.dash-wrapper {
+  min-height: 100vh;
+  background: var(--navy-dark);
+}
+.dash-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(11, 18, 32, 0.98);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  z-index: 100;
+}
+.dash-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--white);
+}
+.dash-nav-logo span:last-child { color: var(--red-light); }
+.dash-nav-links { display: flex; gap: 0.25rem; }
+.dash-nav-link {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.dash-nav-link:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+.dash-nav-link.active { color: var(--gold); background: rgba(201, 149, 42, 0.1); }
+.dash-nav-user { display: flex; align-items: center; gap: 0.75rem; }
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--red);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Oswald', sans-serif; font-size: 0.8rem; font-weight: 600; color: var(--white);
+}
+.user-name { font-family: 'Barlow', sans-serif; font-size: 0.9rem; color: var(--white); }
+.sign-out-btn {
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+  font-family: 'Barlow', sans-serif; font-size: 0.8rem;
+  padding: 0.4rem 0.75rem; cursor: pointer; transition: all 0.2s;
+}
+.sign-out-btn:hover { border-color: var(--red); color: var(--red-light); }
+
+.page-content {
+  padding: 80px 2rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+.page-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+.page-subtitle {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.loading-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 50vh; gap: 1rem;
+}
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border); border-top-color: var(--gold);
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.course-card {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.course-card:hover { border-color: rgba(201, 149, 42, 0.4); }
+.course-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--red-light));
+}
+.course-card.coming-soon::before {
+  background: linear-gradient(90deg, var(--gold), #D4A84B);
+}
+
+.course-card-body { padding: 1.5rem; flex: 1; }
+.course-card-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.course-category {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.course-card-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+.course-card-desc {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.course-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+.course-meta-item {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.progress-wrap { flex: 1; }
+.progress-label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  display: flex;
+  justify-content: space-between;
+}
+.progress-bar {
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.progress-fill.complete { background: #10B981; }
+
+.course-btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 1.25rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.course-btn.start { background: var(--red); color: var(--white); }
+.course-btn.start:hover { background: var(--red-light); }
+.course-btn.continue { background: var(--gold); color: var(--navy-dark); }
+.course-btn.continue:hover { background: #D4A84B; }
+.course-btn.waitlist {
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+.course-btn.waitlist:hover { background: rgba(201, 149, 42, 0.1); }
+.course-btn.waitlisted {
+  background: rgba(201, 149, 42, 0.15);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  cursor: default;
+}
+
+.coming-soon-badge {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  background: rgba(201, 149, 42, 0.15);
+  border: 1px solid rgba(201, 149, 42, 0.4);
+  color: var(--gold);
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(17, 24, 39, 0.5);
+  border: 1px dashed var(--border);
+}
+.empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+.empty-state-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+.empty-state-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .dash-nav-links { display: none; }
+  .page-content { padding: 70px 1rem 2rem; }
+  .courses-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="dash-wrapper">
+
+<nav class="dash-nav">
+  <div class="dash-nav-logo">
+    <span>SILENT</span><span>HONOR</span>
+  </div>
+  <div class="dash-nav-links">
+    <a href="dashboard.html" class="dash-nav-link">Dashboard</a>
+    <a href="member-courses.html" class="dash-nav-link active">Courses</a>
+    <a href="counselor.html" class="dash-nav-link">Counselor</a>
+    <a href="messages.html" class="dash-nav-link">Messages</a>
+    <a href="dispute-tracker.html" class="dash-nav-link">Disputes</a>
+    <a href="credit-tracker.html" class="dash-nav-link">Credit</a>
+  </div>
+  <div class="dash-nav-user">
+    <div class="user-avatar" id="user-avatar">--</div>
+    <span class="user-name" id="user-name">Loading...</span>
+    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="page-content">
+
+  <div class="loading-state" id="loading-state">
+    <div class="loading-spinner"></div>
+    <p style="color:var(--muted);">Loading courses...</p>
+  </div>
+
+  <div id="page-content" style="display:none;">
+    <div class="page-header">
+      <h1 class="page-title">Your Courses</h1>
+      <p class="page-subtitle">Financial education designed for veterans, at your own pace.</p>
+    </div>
+    <div class="courses-grid" id="courses-grid"></div>
+  </div>
+
+</div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+var CATEGORY_ICONS = {
+  "credit": "&#128179;",
+  "finance": "&#128200;",
+  "budget": "&#128181;",
+  "debt": "&#128196;",
+  "home": "&#127968;",
+  "va": "&#127919;",
+  "default": "&#127891;"
+};
+
+document.addEventListener("DOMContentLoaded", async function() {
+  try {
+    var res = await fetch(window.API_BASE + "/api/auth/me", { credentials: "include" });
+    if (!res.ok) { window.location.href = "login.html"; return; }
+    var user = await res.json();
+
+    if (user.role === "admin" || user.role === "staff") { window.location.href = "admin.html"; return; }
+    if (user.role === "counselor") { window.location.href = "counselor-portal.html"; return; }
+    if (!user.verified) { window.location.href = "pending.html"; return; }
+
+    var initials = ((user.first_name || "").charAt(0) + (user.last_name || "").charAt(0)).toUpperCase() || "??";
+    document.getElementById("user-avatar").textContent = initials;
+    document.getElementById("user-name").textContent = (user.first_name || "") + " " + (user.last_name || "");
+
+    await loadCourses();
+  } catch (e) {
+    window.location.href = "login.html";
+  }
+});
+
+async function loadCourses() {
+  try {
+    var res = await fetch(window.API_BASE + "/api/member/courses", { credentials: "include" });
+    if (!res.ok) throw new Error("Failed to load courses");
+    var courses = await res.json();
+    renderCourses(courses);
+  } catch (e) {
+    console.error("Courses error:", e);
+    renderCourses([]);
+  } finally {
+    document.getElementById("loading-state").style.display = "none";
+    document.getElementById("page-content").style.display = "block";
+  }
+}
+
+function getCategoryIcon(course) {
+  var cat = (course.category || course.title || "").toLowerCase();
+  if (cat.includes("credit")) return CATEGORY_ICONS.credit;
+  if (cat.includes("financ") || cat.includes("literac")) return CATEGORY_ICONS.finance;
+  if (cat.includes("budget")) return CATEGORY_ICONS.budget;
+  if (cat.includes("debt")) return CATEGORY_ICONS.debt;
+  if (cat.includes("home") || cat.includes("loan")) return CATEGORY_ICONS.home;
+  if (cat.includes("va") || cat.includes("veteran")) return CATEGORY_ICONS.va;
+  return CATEGORY_ICONS.default;
+}
+
+function renderCourses(courses) {
+  var grid = document.getElementById("courses-grid");
+
+  if (!courses || courses.length === 0) {
+    grid.innerHTML = '<div class="empty-state">' +
+      '<div class="empty-state-icon">&#127891;</div>' +
+      '<div class="empty-state-title">No Courses Available Yet</div>' +
+      '<div class="empty-state-text">Check back soon — new courses are being added regularly.<br>All courses are designed specifically for veterans.</div>' +
+      '</div>';
+    return;
+  }
+
+  grid.innerHTML = courses.map(function(c) {
+    var isLive = c.status === "live" || c.status === "published";
+    var pct = c.progress || 0;
+    var icon = getCategoryIcon(c);
+    var cardClass = isLive ? "course-card" : "course-card coming-soon";
+
+    var progressHtml = '<div class="progress-wrap">' +
+      '<div class="progress-label">' +
+        '<span>Progress</span>' +
+        '<span>' + (pct > 0 ? pct + "%" : "Not Started") + '</span>' +
+      '</div>' +
+      '<div class="progress-bar">' +
+        '<div class="progress-fill' + (pct >= 100 ? ' complete' : '') + '" style="width:' + pct + '%"></div>' +
+      '</div>' +
+    '</div>';
+
+    var btnHtml;
+    if (isLive) {
+      var btnLabel = pct >= 100 ? "Review" : (pct > 0 ? "Continue" : "Start");
+      var btnClass = pct > 0 ? "course-btn continue" : "course-btn start";
+      btnHtml = '<a href="course.html?id=' + encodeURIComponent(c.id) + '" class="' + btnClass + '">' + btnLabel + '</a>';
+    } else {
+      btnHtml = '<button class="course-btn waitlist" id="waitlist-btn-' + escapeAttr(c.id) + '" onclick="joinWaitlist(' + "'" + escapeAttr(c.id) + "'" + ')">Join Waitlist</button>';
+    }
+
+    return '<div class="' + cardClass + '">' +
+      (!isLive ? '<div class="coming-soon-badge">Coming Soon</div>' : '') +
+      '<div class="course-card-body">' +
+        '<div class="course-category">' + icon + ' ' + (c.category || "Education") + '</div>' +
+        '<div class="course-card-title">' + escapeHtml(c.title) + '</div>' +
+        '<div class="course-meta-row">' +
+          '<span class="course-meta-item">&#128218; ' + (c.total_lessons || 0) + ' Lessons</span>' +
+          (c.duration ? '<span class="course-meta-item">&#128336; ' + escapeHtml(c.duration) + '</span>' : '') +
+        '</div>' +
+        (c.description ? '<div class="course-card-desc">' + escapeHtml(c.description) + '</div>' : '') +
+      '</div>' +
+      '<div class="course-card-footer">' +
+        (isLive ? progressHtml : '<span style="font-family:\'Barlow\',sans-serif;font-size:0.8rem;color:var(--muted);">Be the first to know when this launches</span>') +
+        btnHtml +
+      '</div>' +
+    '</div>';
+  }).join("");
+}
+
+async function joinWaitlist(courseId) {
+  var btn = document.getElementById("waitlist-btn-" + courseId);
+  if (btn) { btn.disabled = true; btn.textContent = "Joining..."; }
+  try {
+    var res = await fetch(window.API_BASE + "/api/courses/" + encodeURIComponent(courseId) + "/waitlist", {
+      method: "POST",
+      credentials: "include"
+    });
+    if (res.ok) {
+      if (btn) { btn.className = "course-btn waitlisted"; btn.textContent = "On Waitlist"; btn.onclick = null; }
+    } else {
+      if (btn) { btn.disabled = false; btn.textContent = "Join Waitlist"; }
+      alert("You may already be on the waitlist for this course.");
+    }
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = "Join Waitlist"; }
+    alert("Connection error. Please try again.");
+  }
+}
+
+function escapeHtml(s) {
+  if (!s) return "";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function escapeAttr(s) {
+  if (!s) return "";
+  return String(s).replace(/'/g, "\\'").replace(/"/g, "&quot;");
+}
+
+async function signOut() {
+  try {
+    await fetch(window.API_BASE + "/api/auth/logout", { method: "POST", credentials: "include" });
+  } catch (e) {}
+  localStorage.removeItem("sh_user");
+  window.location.href = "login.html";
+}
+</script>
+</body>
+</html>
