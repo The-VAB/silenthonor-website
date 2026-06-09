@@ -5,7 +5,7 @@ from bson import ObjectId
 
 from middleware.auth_middleware import get_current_user, get_current_admin
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
-from utils.validators import CourseRequest, LessonRequest
+from utils.validators import CourseRequest, LessonRequest, ModuleRequest
 
 router = APIRouter(prefix="/api", tags=["Courses"])
 
@@ -197,13 +197,35 @@ async def create_course(request: Request, data: CourseRequest):
 
 @router.get("/admin/courses/{course_id}")
 async def get_course(request: Request, course_id: str):
-    """Get course with lessons (admin only)"""
+    """Get course with modules and lessons (admin only)"""
     await get_current_admin(request)
     course = await db.courses.find_one({"_id": ObjectId(course_id)})
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
 
-    lessons = await db.lessons.find({"course_id": course_id}).sort("order", 1).to_list(100)
+    modules = await db.modules.find({"course_id": course_id}).sort("order", 1).to_list(100)
+    module_list = []
+    for m in modules:
+        lessons = await db.lessons.find({"module_id": str(m["_id"])}).sort("order", 1).to_list(100)
+        module_list.append({
+            "id": str(m["_id"]),
+            "title": m.get("title", ""),
+            "description": m.get("description", ""),
+            "order": m.get("order", 0),
+            "lessons": [{
+                "id": str(l["_id"]),
+                "title": l.get("title", ""),
+                "content": l.get("content", ""),
+                "lesson_type": l.get("lesson_type", "text"),
+                "order": l.get("order", 0),
+                "video_url": l.get("video_url"),
+                "resource_url": l.get("resource_url"),
+                "duration": l.get("duration")
+            } for l in lessons]
+        })
+
+    # Also include unmodularized lessons for backward compat
+    flat_lessons = await db.lessons.find({"course_id": course_id, "module_id": None}).sort("order", 1).to_list(100)
 
     return {
         "id": str(course["_id"]),
@@ -212,14 +234,17 @@ async def get_course(request: Request, course_id: str):
         "status": course.get("status", "draft"),
         "category": course.get("category"),
         "thumbnail": course.get("thumbnail"),
-        "lessons": [{
+        "modules": module_list,
+        "flat_lessons": [{
             "id": str(l["_id"]),
             "title": l.get("title", ""),
             "content": l.get("content", ""),
+            "lesson_type": l.get("lesson_type", "text"),
             "order": l.get("order", 0),
             "video_url": l.get("video_url"),
+            "resource_url": l.get("resource_url"),
             "duration": l.get("duration")
-        } for l in lessons]
+        } for l in flat_lessons]
     }
 
 @router.put("/admin/courses/{course_id}")
@@ -307,3 +332,139 @@ async def delete_lesson(request: Request, lesson_id: str):
     await get_current_admin(request)
     await db.lessons.delete_one({"_id": ObjectId(lesson_id)})
     return {"message": "Lesson deleted"}
+
+
+# Module Management
+@router.get("/admin/courses/{course_id}/modules")
+async def get_modules(request: Request, course_id: str):
+    await get_current_admin(request)
+    modules = await db.modules.find({"course_id": course_id}).sort("order", 1).to_list(100)
+    result = []
+    for m in modules:
+        lesson_count = await db.lessons.count_documents({"module_id": str(m["_id"])})
+        result.append({
+            "id": str(m["_id"]),
+            "title": m.get("title", ""),
+            "description": m.get("description", ""),
+            "order": m.get("order", 0),
+            "lesson_count": lesson_count
+        })
+    return result
+
+
+@router.post("/admin/courses/{course_id}/modules")
+async def create_module(request: Request, course_id: str):
+    await get_current_admin(request)
+    course = await db.courses.find_one({"_id": ObjectId(course_id)})
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    data = await request.json()
+    module_doc = {
+        "course_id": course_id,
+        "title": data.get("title", "New Module"),
+        "description": data.get("description", ""),
+        "order": data.get("order", 0),
+        "created_at": datetime.now(timezone.utc)
+    }
+    result = await db.modules.insert_one(module_doc)
+    return {"id": str(result.inserted_id), "message": "Module created"}
+
+
+@router.put("/admin/modules/{module_id}")
+async def update_module(request: Request, module_id: str):
+    await get_current_admin(request)
+    data = await request.json()
+    allowed = ["title", "description", "order"]
+    update_data = {k: v for k, v in data.items() if k in allowed}
+    update_data["updated_at"] = datetime.now(timezone.utc)
+    result = await db.modules.update_one({"_id": ObjectId(module_id)}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Module not found")
+    return {"message": "Module updated"}
+
+
+@router.delete("/admin/modules/{module_id}")
+async def delete_module(request: Request, module_id: str):
+    await get_current_admin(request)
+    await db.modules.delete_one({"_id": ObjectId(module_id)})
+    await db.lessons.delete_many({"module_id": module_id})
+    return {"message": "Module and its lessons deleted"}
+
+
+@router.get("/admin/modules/{module_id}/lessons")
+async def get_module_lessons(request: Request, module_id: str):
+    await get_current_admin(request)
+    lessons = await db.lessons.find({"module_id": module_id}).sort("order", 1).to_list(100)
+    return [{
+        "id": str(l["_id"]),
+        "title": l.get("title", ""),
+        "content": l.get("content", ""),
+        "lesson_type": l.get("lesson_type", "text"),
+        "order": l.get("order", 0),
+        "video_url": l.get("video_url"),
+        "resource_url": l.get("resource_url"),
+        "duration": l.get("duration")
+    } for l in lessons]
+
+
+@router.post("/admin/modules/{module_id}/lessons")
+async def create_module_lesson(request: Request, module_id: str):
+    await get_current_admin(request)
+    module = await db.modules.find_one({"_id": ObjectId(module_id)})
+    if not module:
+        raise HTTPException(status_code=404, detail="Module not found")
+    data = await request.json()
+    lesson_doc = {
+        "course_id": module["course_id"],
+        "module_id": module_id,
+        "title": data.get("title", "New Lesson"),
+        "content": data.get("content", ""),
+        "lesson_type": data.get("lesson_type", "text"),
+        "order": data.get("order", 0),
+        "video_url": data.get("video_url"),
+        "resource_url": data.get("resource_url"),
+        "duration": data.get("duration"),
+        "created_at": datetime.now(timezone.utc)
+    }
+    result = await db.lessons.insert_one(lesson_doc)
+    return {"id": str(result.inserted_id), "message": "Lesson created"}
+
+
+@router.put("/admin/modules/{module_id}/lessons/{lesson_id}")
+async def update_module_lesson(request: Request, module_id: str, lesson_id: str):
+    await get_current_admin(request)
+    data = await request.json()
+    allowed = ["title", "content", "lesson_type", "order", "video_url", "resource_url", "duration"]
+    update_data = {k: v for k, v in data.items() if k in allowed}
+    update_data["updated_at"] = datetime.now(timezone.utc)
+    result = await db.lessons.update_one({"_id": ObjectId(lesson_id), "module_id": module_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    return {"message": "Lesson updated"}
+
+
+# Member-facing courses list
+@router.get("/member/courses")
+async def get_member_courses(request: Request):
+    """Get all published courses for members with their progress"""
+    user = await get_current_user(request)
+    courses = await db.courses.find({"status": "published"}).sort("created_at", -1).to_list(100)
+    result = []
+    for c in courses:
+        lesson_count = await db.lessons.count_documents({"course_id": str(c["_id"])})
+        progress = await db.course_progress.find_one({
+            "user_id": ObjectId(user["_id"]),
+            "course_id": str(c["_id"])
+        })
+        result.append({
+            "id": str(c["_id"]),
+            "title": c.get("title", ""),
+            "description": c.get("description", ""),
+            "category": c.get("category"),
+            "thumbnail": c.get("thumbnail"),
+            "total_lessons": lesson_count,
+            "percent_complete": progress.get("percent_complete", 0) if progress else 0,
+            "enrolled": progress is not None,
+            "status": c.get("status", "draft")
+        })
+    return result

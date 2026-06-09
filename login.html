@@ -263,9 +263,13 @@ async function handleLogin() {
 
     if (response.ok) {
       localStorage.setItem('sh_user', JSON.stringify(data));
-      
-      if (data.role === 'admin') {
+
+      if (data.role === 'admin' || data.role === 'staff') {
         window.location.href = 'admin.html';
+      } else if (data.role === 'counselor') {
+        window.location.href = 'counselor-portal.html';
+      } else if (!data.verified) {
+        window.location.href = 'pending.html';
       } else {
         window.location.href = 'dashboard.html';
       }
@@ -291,8 +295,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     if (response.ok) {
       const user = await response.json();
-      if (user.role === 'admin') {
+      if (user.role === 'admin' || user.role === 'staff') {
         window.location.href = 'admin.html';
+      } else if (user.role === 'counselor') {
+        window.location.href = 'counselor-portal.html';
+      } else if (!user.verified) {
+        window.location.href = 'pending.html';
       } else {
         window.location.href = 'dashboard.html';
       }

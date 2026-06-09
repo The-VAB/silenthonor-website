@@ -4,1705 +4,2174 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Portal — Silent Honor Foundation</title>
-<link rel="stylesheet" href="css/global.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <style>
-.admin-wrapper {
-  min-height: 100vh;
-  padding: 120px 3.5rem 4rem;
-  position: relative;
-  z-index: 1;
-  max-width: 1600px;
-  margin: 0 auto;
-}
-
-.admin-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.admin-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.admin-title em { font-style: normal; color: var(--red-light); }
-
-.admin-sub {
-  font-family: 'Lora', serif;
-  font-style: italic;
-  color: var(--muted);
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
-}
-
-.logout-btn {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border);
-  padding: 0.55rem 1.2rem;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.logout-btn:hover { color: var(--white); border-color: var(--red); }
-
-/* Tabs */
-.tab-nav {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
-
-.tab-btn {
-  background: transparent;
-  color: var(--muted);
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 1rem 1.25rem;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.tab-btn.active { color: var(--white); border-bottom-color: var(--red); }
-.tab-btn:hover { color: var(--white); }
-
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* Stats */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: rgba(17, 24, 39, 0.85);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-left: 3px solid var(--red);
-  padding: 1.5rem;
-}
-
-.stat-value {
-  font-family: 'Oswald', sans-serif;
-  font-size: 2.2rem;
-  font-weight: 700;
-  line-height: 1;
-  margin-bottom: 0.35rem;
-}
-
-.stat-label {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-/* Tables */
-.data-table {
-  width: 100%;
-  background: rgba(17, 24, 39, 0.85);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-collapse: collapse;
-}
-
-.data-table th, .data-table td {
-  padding: 0.9rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.85rem;
-}
-
-.data-table th {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  background: rgba(0,0,0,0.2);
-}
-
-.data-table tr:hover { background: rgba(255,255,255,0.02); }
-
-.status-badge {
-  display: inline-block;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.6rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  padding: 0.25rem 0.6rem;
-  font-weight: 600;
-}
-
-.status-verified { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-.status-pending { background: rgba(201, 149, 42, 0.12); color: var(--gold-light); border: 1px solid rgba(201, 149, 42, 0.3); }
-.status-rejected { background: rgba(185, 28, 28, 0.12); color: var(--red-light); border: 1px solid rgba(185, 28, 28, 0.3); }
-.status-info { background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-
-.action-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--white);
-  padding: 0.35rem 0.75rem;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.6rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  cursor: pointer;
-  margin-right: 0.35rem;
-  transition: all 0.2s;
-}
-
-.action-btn.primary { border-color: var(--red); color: var(--red-light); }
-.action-btn.primary:hover { background: var(--red); color: var(--white); }
-.action-btn.success { border-color: #22c55e; color: #4ade80; }
-.action-btn.success:hover { background: #22c55e; color: var(--white); }
-.action-btn.danger { border-color: #b91c1c; color: var(--red-light); }
-.action-btn.danger:hover { background: #b91c1c; color: var(--white); }
-
-/* Forms / Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  z-index: 100;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.modal-overlay.open { display: flex; }
-
-.modal-card {
-  background: var(--navy-mid);
-  border: 1px solid var(--border);
-  padding: 2rem;
-  max-width: 600px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-card.wide { max-width: 900px; }
-
-.modal-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.form-group { margin-bottom: 1rem; }
-
-.form-label {
-  display: block;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 0.4rem;
-}
-
-.form-input, .form-textarea, .form-select {
-  width: 100%;
-  background: var(--navy);
-  border: 1px solid var(--border);
-  color: var(--white);
-  padding: 0.7rem 0.9rem;
-  font-size: 0.88rem;
-  font-family: inherit;
-}
-
-.form-textarea { min-height: 120px; resize: vertical; }
-
-.form-input:focus, .form-textarea:focus, .form-select:focus {
-  outline: none;
-  border-color: var(--red);
-}
-
-.modal-actions {
-  display: flex;
-  gap: 0.6rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.section-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.05rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.empty-state {
-  padding: 3rem 1rem;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.9rem;
-  background: rgba(17, 24, 39, 0.6);
-  border: 1px dashed var(--border);
-}
-
-/* Pipeline Kanban */
-.pipeline-board {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-}
-
-.pipeline-column {
-  background: rgba(17, 24, 39, 0.6);
-  border: 1px solid var(--border);
-  min-height: 400px;
-}
-
-.pipeline-header {
-  padding: 0.75rem 1rem;
-  background: rgba(0,0,0,0.3);
-  border-bottom: 1px solid var(--border);
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.pipeline-count {
-  background: var(--red);
-  color: white;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.6rem;
-  border-radius: 2px;
-}
-
-.pipeline-cards {
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.pipeline-card {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid var(--border);
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.pipeline-card:hover {
-  border-color: var(--red);
-  background: rgba(185, 28, 28, 0.1);
-}
-
-.pipeline-card-name {
-  font-weight: 600;
-  font-size: 0.85rem;
-  margin-bottom: 0.25rem;
-}
-
-.pipeline-card-email {
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-.pipeline-card-branch {
-  font-size: 0.65rem;
-  color: var(--gold);
-  margin-top: 0.35rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-/* Report Cards */
-.report-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.report-card {
-  background: rgba(17, 24, 39, 0.85);
-  border: 1px solid var(--border);
-  padding: 1.5rem;
-}
-
-.report-card-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.report-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  font-size: 0.85rem;
-}
-
-.report-row:last-child { border-bottom: none; }
-
-.report-label { color: var(--muted); }
-.report-value { font-weight: 600; }
-
-/* Audit Log */
-.audit-entry {
-  padding: 1rem;
-  background: rgba(17, 24, 39, 0.6);
-  border: 1px solid var(--border);
-  margin-bottom: 0.5rem;
-  display: grid;
-  grid-template-columns: 150px 1fr auto;
-  gap: 1rem;
-  align-items: center;
-}
-
-.audit-timestamp {
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-.audit-action {
-  font-size: 0.85rem;
-}
-
-.audit-action strong {
-  color: var(--red-light);
-}
-
-.audit-user {
-  font-size: 0.75rem;
-  color: var(--gold);
-  text-align: right;
-}
-
-@media (max-width: 1000px) {
-  .pipeline-board {
-    grid-template-columns: repeat(3, minmax(180px, 1fr));
-  }
-}
-
-@media (max-width: 800px) {
-  .admin-wrapper { padding: 100px 1.5rem 3rem; }
-  .data-table { font-size: 0.78rem; }
-  .data-table th, .data-table td { padding: 0.6rem 0.5rem; }
-  .pipeline-board {
-    grid-template-columns: repeat(2, minmax(160px, 1fr));
-  }
-  .audit-entry {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-  .audit-user { text-align: left; }
-}
+:root{--navy:#0B1220;--navy2:#14203a;--red:#B91C1C;--gold:#C9952A;--gold-light:#f0c55a;--sidebar-w:240px;--bg:#f0f2f5;--white:#ffffff;--text:#1a202c;--text-muted:#6b7280;--border:#e2e8f0;--radius:8px;--shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.15);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Barlow',sans-serif;font-size:14px;color:var(--text);background:var(--bg);}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:inherit;font-size:14px;}
+input,select,textarea{font-family:inherit;font-size:14px;}
+#app{display:flex;min-height:100vh;}
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;overflow-x:hidden;}
+#sidebar::-webkit-scrollbar{width:4px;}
+#sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px;}
+.sidebar-logo{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-logo-text{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;color:var(--gold);letter-spacing:.04em;}
+.sidebar-logo-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
+.sidebar-user{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;}
+.sidebar-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;color:var(--navy);flex-shrink:0;}
+.sidebar-user-name{color:#fff;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-user-role{color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase;letter-spacing:.06em;}
+.sidebar-nav{flex:1;padding:8px 0;}
+.sidebar-section{margin-bottom:4px;}
+.sidebar-section-label{padding:10px 16px 4px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 16px;color:rgba(255,255,255,.65);cursor:pointer;transition:background .15s,color .15s;position:relative;user-select:none;}
+.sidebar-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.9);}
+.sidebar-item.active{background:rgba(201,149,42,.12);color:var(--gold);}
+.sidebar-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 2px 2px 0;}
+.sidebar-item-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
+.sidebar-item-label{font-size:13px;font-weight:500;flex:1;}
+.sidebar-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center;}
+.sidebar-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,.08);}
+.btn-logout{width:100%;padding:9px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);color:rgba(255,255,255,.6);font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,color .15s;}
+.btn-logout:hover{background:rgba(185,28,28,.2);border-color:var(--red);color:#fff;}
+#main{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column;}
+.view{display:none;flex:1;flex-direction:column;padding:24px;animation:fadeIn .2s ease;}
+.view.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap;}
+.page-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:500;color:var(--navy);letter-spacing:.02em;}
+.page-subtitle{color:var(--text-muted);font-size:13px;margin-top:2px;}
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 20px;}
+.card-title{font-family:'Oswald',sans-serif;font-size:15px;font-weight:500;color:var(--navy);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:20px;}
+.kpi-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;border-left:4px solid var(--gold);}
+.kpi-card.red{border-left-color:var(--red);}
+.kpi-card.navy{border-left-color:var(--navy);}
+.kpi-card.green{border-left-color:#16a34a;}
+.kpi-card.blue{border-left-color:#2563eb;}
+.kpi-value{font-family:'Oswald',sans-serif;font-size:28px;font-weight:600;color:var(--navy);line-height:1;}
+.kpi-label{font-size:12px;color:var(--text-muted);margin-top:4px;font-weight:500;}
+.kpi-sub{font-size:11px;color:var(--text-muted);margin-top:3px;}
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;}
+.charts-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.chart-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 20px;}
+.chart-card-title{font-family:'Oswald',sans-serif;font-size:14px;font-weight:500;color:var(--navy);margin-bottom:12px;}
+.chart-wrap{position:relative;height:220px;}
+.chart-wrap-sm{position:relative;height:180px;}
+.action-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.action-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius);border-left:3px solid var(--gold);}
+.action-item.urgent{border-left-color:var(--red);}
+.action-item-text{flex:1;font-size:13px;}
+.action-item-actions{display:flex;gap:6px;flex-shrink:0;}
+.table-wrap{overflow-x:auto;border-radius:var(--radius);background:var(--white);box-shadow:var(--shadow);}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);background:#f8fafc;border-bottom:1px solid var(--border);white-space:nowrap;}
+.data-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tbody tr:hover{background:#f8fafc;}
+.data-table tbody tr{cursor:pointer;transition:background .1s;}
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.search-input{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--white);font-size:13px;min-width:220px;transition:border-color .15s;}
+.search-input:focus{outline:none;border-color:var(--gold);}
+.filter-select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--white);font-size:13px;cursor:pointer;}
+.filter-select:focus{outline:none;border-color:var(--gold);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;border:none;transition:opacity .15s,transform .1s;white-space:nowrap;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--navy);color:#fff;}
+.btn-primary:hover{opacity:.85;}
+.btn-gold{background:var(--gold);color:#fff;}
+.btn-gold:hover{opacity:.85;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-red:hover{opacity:.85;}
+.btn-green{background:#16a34a;color:#fff;}
+.btn-green:hover{opacity:.85;}
+.btn-outline{background:transparent;color:var(--navy);border:1px solid var(--border);}
+.btn-outline:hover{background:var(--bg);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-xs{padding:3px 8px;font-size:11px;}
+.spacer{flex:1;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;letter-spacing:.03em;}
+.badge-gold{background:#fef3c7;color:#92400e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-green{background:#dcfce7;color:#166534;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-gray{background:#f1f5f9;color:#475569;}
+.kanban-wrap{flex:1;overflow-x:auto;overflow-y:hidden;padding-bottom:8px;}
+.kanban-board{display:flex;gap:12px;height:calc(100vh - 210px);min-height:400px;align-items:flex-start;width:max-content;padding-bottom:4px;}
+.kanban-col{width:240px;min-width:240px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;max-height:100%;}
+.kanban-col-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.kanban-col-title{font-size:12px;font-weight:600;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;}
+.kanban-col-count{background:var(--bg);color:var(--text-muted);font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;}
+.kanban-cards{flex:1;overflow-y:auto;padding:8px;min-height:60px;}
+.kanban-cards::-webkit-scrollbar{width:3px;}
+.kanban-cards::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.kanban-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px 12px;margin-bottom:6px;cursor:grab;transition:box-shadow .15s,transform .1s;user-select:none;}
+.kanban-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.kanban-card:active{cursor:grabbing;}
+.kanban-card-name{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.kanban-card-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.kanban-card-days{font-size:11px;color:var(--text-muted);}
+.pipeline-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border);}
+.pipeline-tab{padding:8px 20px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;}
+.pipeline-tab:hover{color:var(--navy);}
+.pipeline-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+#panel-backdrop{display:none;position:fixed;inset:0;background:rgba(11,18,32,.5);z-index:200;opacity:0;transition:opacity .2s;}
+#panel-backdrop.open{display:block;opacity:1;}
+#member-panel{position:fixed;top:0;right:0;bottom:0;width:620px;background:var(--white);z-index:201;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.15);transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
+#member-panel.open{transform:translateX(0);}
+.panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;background:var(--navy);color:#fff;}
+.panel-close{margin-left:auto;background:rgba(255,255,255,.1);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.panel-close:hover{background:rgba(255,255,255,.2);}
+.panel-avatar{width:40px;height:40px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;color:var(--navy);flex-shrink:0;}
+.panel-name{font-family:'Oswald',sans-serif;font-size:18px;font-weight:500;}
+.panel-meta{font-size:12px;color:rgba(255,255,255,.6);margin-top:1px;}
+.panel-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;}
+.panel-tabs::-webkit-scrollbar{height:0;}
+.panel-tab{padding:10px 16px;font-size:12px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;}
+.panel-tab:hover{color:var(--navy);}
+.panel-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.panel-content{flex:1;overflow-y:auto;padding:16px 20px;}
+.panel-content::-webkit-scrollbar{width:4px;}
+.panel-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.panel-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group.span-2{grid-column:span 2;}
+.form-label{font-size:12px;font-weight:500;color:var(--text-muted);}
+.form-input{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--white);transition:border-color .15s;width:100%;}
+.form-input:focus{outline:none;border-color:var(--gold);}
+.form-select{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--white);cursor:pointer;width:100%;}
+.form-select:focus{outline:none;border-color:var(--gold);}
+.form-textarea{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--white);resize:vertical;min-height:80px;width:100%;font-family:inherit;transition:border-color .15s;}
+.form-textarea:focus{outline:none;border-color:var(--gold);}
+.field-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.field-label{font-size:12px;font-weight:500;color:var(--text-muted);}
+.field-value{font-size:14px;color:var(--text);}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--white);border-radius:12px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:modalIn .2s ease;}
+.modal-lg{max-width:700px;}
+@keyframes modalIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:none;}}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:'Oswald',sans-serif;font-size:17px;font-weight:500;color:var(--navy);}
+.modal-close{background:none;border:none;font-size:20px;color:var(--text-muted);cursor:pointer;line-height:1;padding:2px;}
+.modal-close:hover{color:var(--text);}
+.modal-body{padding:20px;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+.messages-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;flex:1;min-height:0;height:calc(100vh - 140px);}
+.convo-list{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow-y:auto;display:flex;flex-direction:column;}
+.convo-item{padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;display:flex;gap:10px;align-items:center;}
+.convo-item:hover{background:#f8fafc;}
+.convo-item.active{background:#fffbeb;}
+.convo-avatar{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.convo-info{flex:1;min-width:0;}
+.convo-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.convo-preview{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.convo-time{font-size:11px;color:var(--text-muted);flex-shrink:0;}
+.convo-unread{background:var(--red);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.thread-wrap{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:0;}
+.thread-header{padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:600;flex-shrink:0;}
+.thread-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.msg-bubble{max-width:75%;display:flex;flex-direction:column;gap:2px;}
+.msg-bubble.mine{align-self:flex-end;align-items:flex-end;}
+.msg-bubble.theirs{align-self:flex-start;align-items:flex-start;}
+.msg-text{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;}
+.msg-bubble.mine .msg-text{background:var(--navy);color:#fff;border-bottom-right-radius:4px;}
+.msg-bubble.theirs .msg-text{background:var(--bg);color:var(--text);border-bottom-left-radius:4px;}
+.msg-time{font-size:11px;color:var(--text-muted);}
+.thread-compose{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+.thread-input{flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:20px;font-size:13px;resize:none;max-height:80px;font-family:inherit;}
+.thread-input:focus{outline:none;border-color:var(--gold);}
+.builder-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;flex:1;min-height:0;}
+.builder-list{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow-y:auto;display:flex;flex-direction:column;}
+.course-list-item{padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.course-list-item:hover{background:#f8fafc;}
+.course-list-item.active{background:#fffbeb;border-left:3px solid var(--gold);}
+.course-list-item-title{font-size:13px;font-weight:600;}
+.course-list-item-meta{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.builder-editor{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:20px;}
+.module-block{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.module-header{padding:10px 14px;background:#f8fafc;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+.module-title-input{flex:1;border:none;background:transparent;font-size:14px;font-weight:600;color:var(--navy);font-family:inherit;}
+.module-title-input:focus{outline:none;}
+.module-body{padding:10px 14px;display:flex;flex-direction:column;gap:6px;}
+.lesson-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border-radius:6px;border:1px solid var(--border);}
+.lesson-row-title{flex:1;font-size:13px;}
+.lesson-row-type{font-size:11px;color:var(--text-muted);}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px;}
+.progress-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .3s;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;color:var(--text-muted);text-align:center;gap:8px;}
+.empty-state-icon{font-size:40px;opacity:.4;}
+.empty-state-text{font-size:14px;}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow-md);z-index:999;transform:translateY(80px);opacity:0;transition:transform .25s,opacity .25s;max-width:320px;}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.success{border-left:3px solid #16a34a;}
+#toast.error{border-left:3px solid var(--red);}
+.feed-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.feed-item:last-child{border-bottom:none;}
+.feed-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:3px;}
+.feed-text{flex:1;line-height:1.5;}
+.feed-time{color:var(--text-muted);flex-shrink:0;}
+.dd214-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.dd214-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;border-top:3px solid var(--gold);}
+.dd214-card-name{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.dd214-card-meta{font-size:12px;color:var(--text-muted);margin-bottom:12px;}
+.dd214-card-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.overview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;}
+.report-section{margin-bottom:24px;}
+.report-section-title{font-family:'Oswald',sans-serif;font-size:16px;font-weight:500;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--border);}
 </style>
 </head>
 <body>
-<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
-<div id="nav-placeholder"></div>
-
-<div class="admin-wrapper page-content">
-  <div class="admin-header">
+<div id="app">
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-text">SILENT HONOR</div>
+    <div class="sidebar-logo-sub">Foundation Admin</div>
+  </div>
+  <div class="sidebar-user">
+    <div class="sidebar-avatar" id="sidebar-avatar">A</div>
     <div>
-      <div class="admin-title"><em>Admin</em> Portal</div>
-      <div class="admin-sub" id="admin-email">Silent Honor Foundation</div>
-    </div>
-    <button class="logout-btn" onclick="handleLogout()" data-testid="admin-logout-btn">Sign Out</button>
-  </div>
-
-  <!-- Tab Nav -->
-  <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('overview')" data-testid="tab-overview">Overview</button>
-    <button class="tab-btn" onclick="switchTab('pipeline')" data-testid="tab-pipeline">Pipeline</button>
-    <button class="tab-btn" onclick="switchTab('members')" data-testid="tab-members">Members</button>
-    <button class="tab-btn" onclick="switchTab('dd214')" data-testid="tab-dd214">DD-214</button>
-    <button class="tab-btn" onclick="switchTab('courses')" data-testid="tab-courses">Courses</button>
-    <button class="tab-btn" onclick="switchTab('disputes')" data-testid="tab-disputes">Disputes</button>
-    <button class="tab-btn" onclick="switchTab('counselors')" data-testid="tab-counselors">Counselors</button>
-    <button class="tab-btn" onclick="switchTab('staff')" data-testid="tab-staff">Staff</button>
-    <button class="tab-btn" onclick="switchTab('contacts')" data-testid="tab-contacts">Contacts</button>
-    <button class="tab-btn" onclick="switchTab('reports')" data-testid="tab-reports">Reports</button>
-    <button class="tab-btn" onclick="switchTab('audit')" data-testid="tab-audit">Audit Log</button>
-  </div>
-
-  <!-- OVERVIEW -->
-  <div id="tab-overview" class="tab-content active">
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-value" id="stat-members" data-testid="stat-members">—</div><div class="stat-label">Total Members</div></div>
-      <div class="stat-card"><div class="stat-value" id="stat-verified" data-testid="stat-verified">—</div><div class="stat-label">Verified</div></div>
-      <div class="stat-card" style="border-left-color: var(--gold);"><div class="stat-value" id="stat-pending" data-testid="stat-pending">—</div><div class="stat-label">Pending Review</div></div>
-      <div class="stat-card" style="border-left-color: #3b82f6;"><div class="stat-value" id="stat-counselors" data-testid="stat-counselors">—</div><div class="stat-label">Counselors</div></div>
-      <div class="stat-card" style="border-left-color: #22c55e;"><div class="stat-value" id="stat-courses" data-testid="stat-courses">—</div><div class="stat-label">Courses</div></div>
-      <div class="stat-card" style="border-left-color: rgba(255,255,255,0.3);"><div class="stat-value" id="stat-contacts" data-testid="stat-contacts">—</div><div class="stat-label">Contacts</div></div>
-    </div>
-    <div class="section-title">Pipeline Overview</div>
-    <div class="stats-grid" id="pipeline-stats"></div>
-  </div>
-
-  <!-- PIPELINE -->
-  <div id="tab-pipeline" class="tab-content">
-    <div class="section-title">Member Pipeline</div>
-    <div class="pipeline-board" id="pipeline-board"></div>
-  </div>
-
-  <!-- MEMBERS -->
-  <div id="tab-members" class="tab-content">
-    <div class="section-title">All Members</div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="members-table">
-        <thead>
-          <tr>
-            <th>Name</th><th>Email</th><th>Branch</th><th>Stage</th><th>DD-214</th><th>Counselor</th><th>Joined</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="members-tbody"></tbody>
-      </table>
+      <div class="sidebar-user-name" id="sidebar-name">Admin</div>
+      <div class="sidebar-user-role" id="sidebar-role">Administrator</div>
     </div>
   </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">
+      <div class="sidebar-item active" onclick="showView('overview')" data-view="overview">
+        <span class="sidebar-item-icon">&#8962;</span>
+        <span class="sidebar-item-label">Overview</span>
+        <span class="sidebar-badge" id="badge-overview" style="display:none">0</span>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Programs</div>
+      <div class="sidebar-item" onclick="showView('pipeline')" data-view="pipeline">
+        <span class="sidebar-item-icon">&#9783;</span>
+        <span class="sidebar-item-label">Pipeline</span>
+      </div>
+      <div class="sidebar-item" onclick="showView('applications')" data-view="applications">
+        <span class="sidebar-item-icon">&#128203;</span>
+        <span class="sidebar-item-label">Applications</span>
+        <span class="sidebar-badge" id="badge-applications" style="display:none">0</span>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Members</div>
+      <div class="sidebar-item" onclick="showView('members')" data-view="members">
+        <span class="sidebar-item-icon">&#128101;</span>
+        <span class="sidebar-item-label">All Members</span>
+      </div>
+      <div class="sidebar-item" onclick="showView('dd214')" data-view="dd214">
+        <span class="sidebar-item-icon">&#128737;</span>
+        <span class="sidebar-item-label">DD-214 Review</span>
+        <span class="sidebar-badge" id="badge-dd214" style="display:none">0</span>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Content</div>
+      <div class="sidebar-item" onclick="showView('courses')" data-view="courses">
+        <span class="sidebar-item-icon">&#128218;</span>
+        <span class="sidebar-item-label">Courses</span>
+      </div>
+      <div class="sidebar-item" onclick="showView('announcements')" data-view="announcements">
+        <span class="sidebar-item-icon">&#128226;</span>
+        <span class="sidebar-item-label">Announcements</span>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Operations</div>
+      <div class="sidebar-item" onclick="showView('messages')" data-view="messages">
+        <span class="sidebar-item-icon">&#128172;</span>
+        <span class="sidebar-item-label">Messages</span>
+        <span class="sidebar-badge" id="badge-messages" style="display:none">0</span>
+      </div>
+      <div class="sidebar-item" onclick="showView('contacts')" data-view="contacts">
+        <span class="sidebar-item-icon">&#128231;</span>
+        <span class="sidebar-item-label">Inquiries</span>
+      </div>
+      <div class="sidebar-item" onclick="showView('staff')" data-view="staff">
+        <span class="sidebar-item-icon">&#128100;</span>
+        <span class="sidebar-item-label">Staff</span>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Insights</div>
+      <div class="sidebar-item" onclick="showView('reports')" data-view="reports">
+        <span class="sidebar-item-icon">&#128200;</span>
+        <span class="sidebar-item-label">Reports</span>
+      </div>
+      <div class="sidebar-item" onclick="showView('audit')" data-view="audit">
+        <span class="sidebar-item-icon">&#128196;</span>
+        <span class="sidebar-item-label">Audit Log</span>
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="handleLogout()">&#8594; Sign Out</button>
+  </div>
+</nav>
+<main id="main">
+<!-- ===== OVERVIEW ===== -->
+<div id="view-overview" class="view active">
+  <div class="page-header">
+    <div><div class="page-title">Dashboard Overview</div><div class="page-subtitle">Silent Honor Foundation — Member Portal</div></div>
+    <button class="btn btn-outline btn-sm" onclick="loadOverview()">&#8635; Refresh</button>
+  </div>
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card"><div class="kpi-value" id="kpi-total">—</div><div class="kpi-label">Total Members</div></div>
+    <div class="kpi-card green"><div class="kpi-value" id="kpi-verified">—</div><div class="kpi-label">Verified Members</div></div>
+    <div class="kpi-card blue"><div class="kpi-value" id="kpi-new">—</div><div class="kpi-label">New This Month</div></div>
+    <div class="kpi-card red"><div class="kpi-value" id="kpi-dd214">—</div><div class="kpi-label">Pending DD-214</div></div>
+    <div class="kpi-card"><div class="kpi-value" id="kpi-courses">—</div><div class="kpi-label">Active Courses</div></div>
+    <div class="kpi-card navy"><div class="kpi-value" id="kpi-counselors">—</div><div class="kpi-label">Counselors</div></div>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card"><div class="chart-card-title">Member Growth (6 Months)</div><div class="chart-wrap"><canvas id="growthChart"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Pipeline Distribution</div><div class="chart-wrap"><canvas id="pipelineChart"></canvas></div></div>
+  </div>
+  <div class="charts-grid-2" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;">
+    <div class="chart-card"><div class="chart-card-title">Branch of Service</div><div class="chart-wrap-sm"><canvas id="branchChart"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">DD-214 Status</div><div class="chart-wrap-sm"><canvas id="dd214Chart"></canvas></div></div>
+    <div class="chart-card"><div class="chart-card-title">Action Required</div><div id="action-required-list" style="font-size:13px;"><div class="empty-state" style="padding:20px;"><div class="empty-state-icon">&#10003;</div><div>All clear!</div></div></div></div>
+  </div>
+  <div class="card"><div class="card-title">Recent Activity</div><div id="activity-feed"></div></div>
+</div>
 
-  <!-- DD-214 Review -->
-  <div id="tab-dd214" class="tab-content">
-    <div class="section-title">DD-214 Verification Queue</div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="dd214-table">
-        <thead>
-          <tr>
-            <th>Name</th><th>Email</th><th>Branch</th><th>Status</th><th>File</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="dd214-tbody"></tbody>
-      </table>
+<!-- ===== PIPELINE ===== -->
+<div id="view-pipeline" class="view">
+  <div class="page-header">
+    <div><div class="page-title">Pipeline</div><div class="page-subtitle">Drag members between stages</div></div>
+  </div>
+  <div class="pipeline-tabs">
+    <div class="pipeline-tab active" onclick="switchPipelineTab('onboarding')">Onboarding</div>
+    <div class="pipeline-tab" onclick="switchPipelineTab('credit-repair')">Credit Repair</div>
+    <div class="pipeline-tab" onclick="switchPipelineTab('financial-counseling')">Financial Counseling</div>
+  </div>
+  <div class="kanban-wrap"><div class="kanban-board" id="kanban-board"></div></div>
+</div>
+
+<!-- ===== APPLICATIONS ===== -->
+<div id="view-applications" class="view">
+  <div class="page-header">
+    <div class="page-title">Program Applications</div>
+  </div>
+  <div class="toolbar">
+    <select id="app-filter-type" class="filter-select" onchange="loadApplications()">
+      <option value="">All Programs</option>
+      <option value="credit_repair">Credit Repair</option>
+      <option value="financial_counseling">Financial Counseling</option>
+    </select>
+    <select id="app-filter-status" class="filter-select" onchange="loadApplications()">
+      <option value="pending">Pending</option>
+      <option value="">All Statuses</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Member</th><th>Program</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="apps-tbody"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== MEMBERS ===== -->
+<div id="view-members" class="view">
+  <div class="page-header">
+    <div class="page-title">All Members</div>
+  </div>
+  <div class="toolbar">
+    <input type="search" id="member-search" class="search-input" placeholder="Search by name or email..." oninput="filterMembers()">
+    <select id="member-filter-branch" class="filter-select" onchange="filterMembers()">
+      <option value="">All Branches</option>
+      <option>Army</option><option>Navy</option><option>Air Force</option><option>Marine Corps</option><option>Coast Guard</option><option>Space Force</option><option>National Guard</option>
+    </select>
+    <select id="member-filter-stage" class="filter-select" onchange="filterMembers()">
+      <option value="">All Stages</option>
+      <option value="applied">Applied</option><option value="dd214_pending">DD-214 Pending</option><option value="dd214_review">DD-214 Review</option><option value="approved">Approved</option><option value="active">Active</option><option value="graduated">Graduated</option><option value="inactive">Inactive</option>
+    </select>
+    <select id="member-filter-verified" class="filter-select" onchange="filterMembers()">
+      <option value="">All Members</option>
+      <option value="true">Verified</option>
+      <option value="false">Unverified</option>
+    </select>
+    <div class="spacer"></div>
+    <span id="member-count" style="font-size:13px;color:var(--text-muted);"></span>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Email</th><th>Branch</th><th>Stage</th><th>DD-214</th><th>Verified</th><th>Joined</th></tr></thead>
+      <tbody id="members-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== DD-214 REVIEW ===== -->
+<div id="view-dd214" class="view">
+  <div class="page-header">
+    <div><div class="page-title">DD-214 Review</div><div class="page-subtitle">Pending verification queue</div></div>
+    <button class="btn btn-outline btn-sm" onclick="loadDd214()">&#8635; Refresh</button>
+  </div>
+  <div class="dd214-grid" id="dd214-grid">
+    <div class="empty-state"><div class="empty-state-icon">&#128737;</div><div>Loading...</div></div>
+  </div>
+</div>
+
+<!-- ===== COURSES ===== -->
+<div id="view-courses" class="view">
+  <div class="page-header">
+    <div class="page-title">Courses</div>
+    <button class="btn btn-primary" onclick="openNewCourseModal()">+ New Course</button>
+  </div>
+  <div class="builder-layout" style="height:calc(100vh - 150px);">
+    <div class="builder-list">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;">
+        <input type="search" id="course-search" class="search-input" placeholder="Search courses..." style="flex:1;min-width:0;" oninput="filterCourses()">
+      </div>
+      <div id="course-list-items"></div>
+    </div>
+    <div class="builder-editor" id="course-editor">
+      <div class="empty-state"><div class="empty-state-icon">&#128218;</div><div class="empty-state-text">Select a course to edit, or create a new one</div></div>
     </div>
   </div>
+</div>
 
-  <!-- COURSES -->
-  <div id="tab-courses" class="tab-content">
-    <div class="section-title">
-      <span>Course Manager</span>
-      <button class="action-btn primary" onclick="openCourseModal()" data-testid="new-course-btn">+ New Course</button>
-    </div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="courses-table">
-        <thead>
-          <tr><th>Title</th><th>Category</th><th>Status</th><th>Lessons</th><th>Actions</th></tr>
-        </thead>
-        <tbody id="courses-tbody"></tbody>
-      </table>
-    </div>
+<!-- ===== ANNOUNCEMENTS ===== -->
+<div id="view-announcements" class="view">
+  <div class="page-header">
+    <div class="page-title">Announcements</div>
+    <button class="btn btn-primary" onclick="openAnnouncementModal()">+ New Announcement</button>
   </div>
-
-  <!-- DISPUTES -->
-  <div id="tab-disputes" class="tab-content">
-    <div class="section-title">All Member Disputes</div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="disputes-table">
-        <thead>
-          <tr><th>Member</th><th>Bureau</th><th>Account</th><th>Reason</th><th>Status</th><th>Date Sent</th><th>Tracking #</th></tr>
-        </thead>
-        <tbody id="disputes-tbody"></tbody>
-      </table>
-    </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Title</th><th>Type</th><th>Created</th><th>Expires</th><th>Active</th><th>Actions</th></tr></thead>
+      <tbody id="announcements-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
+    </table>
   </div>
+</div>
 
-  <!-- COUNSELORS -->
-  <div id="tab-counselors" class="tab-content">
-    <div class="section-title">
-      <span>Counselor Management</span>
-      <button class="action-btn primary" onclick="openCounselorModal()" data-testid="new-counselor-btn">+ Add Counselor</button>
+<!-- ===== MESSAGES ===== -->
+<div id="view-messages" class="view">
+  <div class="page-header">
+    <div class="page-title">Messages</div>
+    <button class="btn btn-outline btn-sm" onclick="loadMessages()">&#8635; Refresh</button>
+  </div>
+  <div class="messages-layout">
+    <div class="convo-list" id="convo-list">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Conversations</div>
+      <div id="convo-items"></div>
     </div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="counselors-table">
-        <thead>
-          <tr><th>Name</th><th>Email</th><th>Title</th><th>Specialties</th><th>Assigned</th><th>Status</th><th>Actions</th></tr>
-        </thead>
-        <tbody id="counselors-tbody"></tbody>
-      </table>
-    </div>
-    <div style="margin-top: 2rem;">
-      <div class="section-title">Member-Counselor Assignments</div>
-      <div style="overflow-x: auto;">
-        <table class="data-table" data-testid="assignments-table">
-          <thead>
-            <tr><th>Member</th><th>Stage</th><th>Assigned Counselor</th><th>Actions</th></tr>
-          </thead>
-          <tbody id="assignments-tbody"></tbody>
-        </table>
+    <div class="thread-wrap">
+      <div class="thread-header" id="thread-header">Select a conversation</div>
+      <div class="thread-messages" id="thread-messages">
+        <div class="empty-state"><div class="empty-state-icon">&#128172;</div><div>No conversation selected</div></div>
+      </div>
+      <div class="thread-compose" id="thread-compose" style="display:none;">
+        <textarea id="msg-reply-input" class="thread-input" rows="1" placeholder="Type a message..." onkeydown="onMsgKeydown(event)"></textarea>
+        <button class="btn btn-primary btn-sm" onclick="sendReply()">Send</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- STAFF -->
-  <div id="tab-staff" class="tab-content">
-    <div class="section-title">
-      <span>Staff Management</span>
-      <button class="action-btn primary" onclick="openStaffModal()" data-testid="new-staff-btn">+ Add Staff</button>
-    </div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="staff-table">
-        <thead>
-          <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr>
-        </thead>
-        <tbody id="staff-tbody"></tbody>
-      </table>
-    </div>
+<!-- ===== CONTACTS / INQUIRIES ===== -->
+<div id="view-contacts" class="view">
+  <div class="page-header">
+    <div class="page-title">Inquiries</div>
+    <button class="btn btn-outline btn-sm" onclick="loadContacts()">&#8635; Refresh</button>
   </div>
-
-  <!-- CONTACTS -->
-  <div id="tab-contacts" class="tab-content">
-    <div class="section-title">Contact Submissions</div>
-    <div style="overflow-x: auto;">
-      <table class="data-table" data-testid="contacts-table">
-        <thead>
-          <tr><th>Name</th><th>Email</th><th>Topic</th><th>Message</th><th>Received</th><th>Status</th><th>Actions</th></tr>
-        </thead>
-        <tbody id="contacts-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- REPORTS -->
-  <div id="tab-reports" class="tab-content">
-    <div class="section-title">Reports & Analytics</div>
-    <div class="report-grid" id="reports-container"></div>
-  </div>
-
-  <!-- AUDIT LOG -->
-  <div id="tab-audit" class="tab-content">
-    <div class="section-title">Audit Log</div>
-    <div id="audit-log-container"></div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Email</th><th>Topic</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="contacts-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
+    </table>
   </div>
 </div>
 
-<!-- Course Modal -->
-<div class="modal-overlay" id="course-modal">
-  <div class="modal-card">
-    <div class="modal-title" id="course-modal-title">New Course</div>
-    <input type="hidden" id="course-id">
-    <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="course-title" data-testid="course-title-input"></div>
-    <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="course-description" data-testid="course-description-input"></textarea></div>
-    <div class="form-group"><label class="form-label">Category</label><input class="form-input" id="course-category" placeholder="e.g. Credit, Finance"></div>
-    <div class="form-group">
-      <label class="form-label">Status</label>
-      <select class="form-select" id="course-status" data-testid="course-status-select">
-        <option value="draft">Draft</option>
-        <option value="live">Live</option>
-        <option value="coming_soon">Coming Soon</option>
-        <option value="archived">Archived</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      <button class="action-btn" onclick="closeCourseModal()">Cancel</button>
-      <button class="action-btn primary" onclick="saveCourse()" data-testid="save-course-btn">Save Course</button>
-    </div>
+<!-- ===== STAFF ===== -->
+<div id="view-staff" class="view">
+  <div class="page-header">
+    <div class="page-title">Staff & Counselors</div>
+    <button class="btn btn-primary" onclick="openStaffModal()">+ Add Staff</button>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Role</th><th>Title</th><th>Email</th><th>Clients</th><th>Active</th><th>Actions</th></tr></thead>
+      <tbody id="staff-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
+    </table>
   </div>
 </div>
 
-<!-- Verify Member Modal -->
-<div class="modal-overlay" id="verify-modal">
-  <div class="modal-card">
-    <div class="modal-title">Verify Member DD-214</div>
-    <div id="verify-member-info" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
-    <div id="dd214-preview" style="margin-bottom: 1rem;"></div>
-    <div class="form-group">
-      <label class="form-label">Verification Notes (Optional)</label>
-      <textarea class="form-textarea" id="verify-notes" placeholder="Add notes about the verification..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="action-btn" onclick="closeVerifyModal()">Cancel</button>
-      <button class="action-btn danger" onclick="verifyMember('rejected')" data-testid="reject-member-btn">Reject</button>
-      <button class="action-btn success" onclick="verifyMember('verified')" data-testid="approve-member-btn">Approve</button>
-    </div>
+<!-- ===== REPORTS ===== -->
+<div id="view-reports" class="view">
+  <div class="page-header">
+    <div class="page-title">Reports & Analytics</div>
+    <button class="btn btn-outline btn-sm" onclick="loadReports()">&#8635; Refresh</button>
+  </div>
+  <div id="reports-content">
+    <div class="empty-state"><div class="empty-state-icon">&#128200;</div><div>Loading reports...</div></div>
   </div>
 </div>
 
-<!-- Counselor Modal -->
-<div class="modal-overlay" id="counselor-modal">
-  <div class="modal-card">
-    <div class="modal-title" id="counselor-modal-title">Add Counselor</div>
-    <input type="hidden" id="counselor-id">
-    <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="counselor-first-name"></div>
-    <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="counselor-last-name"></div>
-    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="counselor-email" type="email"></div>
-    <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="counselor-title" placeholder="e.g. Certified Financial Counselor"></div>
-    <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea" id="counselor-bio" placeholder="Brief description..."></textarea></div>
-    <div class="form-group"><label class="form-label">Specialties (comma-separated)</label><input class="form-input" id="counselor-specialties" placeholder="Credit Repair, Debt Management"></div>
-    <div class="modal-actions">
-      <button class="action-btn" onclick="closeCounselorModal()">Cancel</button>
-      <button class="action-btn primary" onclick="saveCounselor()">Save Counselor</button>
+<!-- ===== AUDIT LOG ===== -->
+<div id="view-audit" class="view">
+  <div class="page-header">
+    <div class="page-title">Audit Log</div>
+    <button class="btn btn-outline btn-sm" onclick="loadAudit()">&#8635; Refresh</button>
+  </div>
+  <div class="toolbar">
+    <input type="search" id="audit-search" class="search-input" placeholder="Search log..." oninput="filterAudit()">
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Entity</th><th>IP</th></tr></thead>
+      <tbody id="audit-tbody"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Course New/Edit Modal -->
+<div id="course-modal" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="course-modal-title">New Course</span>
+      <button class="modal-close" onclick="closeModal('course-modal')">&#x2715;</button>
     </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="form-group"><label class="form-label">Course Title *</label><input type="text" id="course-title-input" class="form-input" placeholder="Course title"></div>
+        <div class="form-group"><label class="form-label">Description *</label><textarea id="course-desc-input" class="form-textarea" rows="3" placeholder="Course description..."></textarea></div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Category</label>
+            <select id="course-cat-input" class="form-select">
+              <option value="">Select category</option>
+              <option value="credit">Credit</option>
+              <option value="financial">Financial Planning</option>
+              <option value="benefits">VA Benefits</option>
+              <option value="housing">Housing</option>
+              <option value="career">Career</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Status</label>
+            <select id="course-status-input" class="form-select">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="coming_soon">Coming Soon</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Thumbnail URL (optional)</label><input type="url" id="course-thumb-input" class="form-input" placeholder="https://..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('course-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCourse()">Save Course</button>
+    </div>
+  </div>
+</div>
+</main>
+</div>
+
+<!-- Member Detail Panel -->
+<div id="panel-backdrop" onclick="closeMemberPanel()"></div>
+<div id="member-panel">
+  <div class="panel-header">
+    <div class="panel-avatar" id="panel-avatar">?</div>
+    <div>
+      <div class="panel-name" id="panel-name">Member</div>
+      <div class="panel-meta" id="panel-meta"></div>
+    </div>
+    <button class="panel-close" onclick="closeMemberPanel()">&#x2715;</button>
+  </div>
+  <div class="panel-tabs">
+    <div class="panel-tab active" onclick="switchPanelTab('overview')">Overview</div>
+    <div class="panel-tab" onclick="switchPanelTab('credit-repair')">Credit Repair</div>
+    <div class="panel-tab" onclick="switchPanelTab('financial-counseling')">Fin. Counseling</div>
+    <div class="panel-tab" onclick="switchPanelTab('courses')">Courses</div>
+    <div class="panel-tab" onclick="switchPanelTab('documents')">Documents</div>
+    <div class="panel-tab" onclick="switchPanelTab('notes')">Notes</div>
+  </div>
+  <div class="panel-content">
+    <div id="panel-tab-overview" class="tab-pane active"><div id="panel-overview-content"></div></div>
+    <div id="panel-tab-credit-repair" class="tab-pane"><div id="panel-cr-content"></div></div>
+    <div id="panel-tab-financial-counseling" class="tab-pane"><div id="panel-fc-content"></div></div>
+    <div id="panel-tab-courses" class="tab-pane"><div id="panel-courses-content"></div></div>
+    <div id="panel-tab-documents" class="tab-pane"><div id="panel-docs-content"></div></div>
+    <div id="panel-tab-notes" class="tab-pane"><div id="panel-notes-content"></div></div>
+  </div>
+  <div class="panel-footer">
+    <button class="btn btn-outline btn-sm" onclick="closeMemberPanel()">Close</button>
+    <div class="spacer"></div>
+    <button class="btn btn-primary btn-sm" onclick="savePanelOverview()">Save Changes</button>
   </div>
 </div>
 
 <!-- Staff Modal -->
-<div class="modal-overlay" id="staff-modal">
-  <div class="modal-card">
-    <div class="modal-title" id="staff-modal-title">Add Staff</div>
-    <input type="hidden" id="staff-id">
-    <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="staff-first-name"></div>
-    <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="staff-last-name"></div>
-    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="staff-email" type="email"></div>
-    <div class="form-group">
-      <label class="form-label">Role</label>
-      <select class="form-select" id="staff-role">
-        <option value="staff">Staff</option>
-        <option value="admin">Admin</option>
-        <option value="counselor">Counselor</option>
-      </select>
+<div id="staff-modal" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="staff-modal-title">Add Staff Member</span>
+      <button class="modal-close" onclick="closeModal('staff-modal')">&#x2715;</button>
     </div>
-    <div class="modal-actions">
-      <button class="action-btn" onclick="closeStaffModal()">Cancel</button>
-      <button class="action-btn primary" onclick="saveStaff()">Save Staff</button>
-    </div>
-  </div>
-</div>
-
-<!-- Assign Counselor Modal -->
-<div class="modal-overlay" id="assign-modal">
-  <div class="modal-card">
-    <div class="modal-title">Assign Counselor</div>
-    <input type="hidden" id="assign-member-id">
-    <div id="assign-member-info" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
-    <div class="form-group">
-      <label class="form-label">Select Counselor</label>
-      <select class="form-select" id="assign-counselor-select"></select>
-    </div>
-    <div class="modal-actions">
-      <button class="action-btn" onclick="closeAssignModal()">Cancel</button>
-      <button class="action-btn primary" onclick="confirmAssign()">Assign</button>
-    </div>
-  </div>
-</div>
-
-<!-- Member Notes Modal -->
-<div class="modal-overlay" id="notes-modal">
-  <div class="modal-card">
-    <div class="modal-title">Intake Notes</div>
-    <input type="hidden" id="notes-member-id">
-    <div id="notes-member-info" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
-    <div id="notes-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 1rem;"></div>
-    <div class="form-group">
-      <label class="form-label">Add Note</label>
-      <textarea class="form-textarea" id="new-note-content" placeholder="Enter intake note..."></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Note Type</label>
-      <select class="form-select" id="new-note-type">
-        <option value="general">General</option>
-        <option value="intake">Intake</option>
-        <option value="progress">Progress</option>
-        <option value="followup">Follow-up</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      <button class="action-btn" onclick="closeNotesModal()">Close</button>
-      <button class="action-btn primary" onclick="saveNote()">Add Note</button>
-    </div>
-  </div>
-</div>
-
-<!-- Member Detail Modal -->
-<div class="modal-overlay" id="member-modal">
-  <div class="modal-card wide">
-    <div class="modal-title">Member Details</div>
-    <div id="member-detail-content"></div>
-    <div class="modal-actions">
-      <button class="action-btn" onclick="closeMemberModal()">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- Stage Change Modal -->
-<div class="modal-overlay" id="stage-modal">
-  <div class="modal-card">
-    <div class="modal-title">Change Pipeline Stage</div>
-    <input type="hidden" id="stage-member-id">
-    <div id="stage-member-info" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
-    <div class="form-group">
-      <label class="form-label">Select New Stage</label>
-      <select class="form-select" id="stage-select">
-        <option value="applied">Applied</option>
-        <option value="dd214_pending">DD-214 Pending</option>
-        <option value="dd214_review">DD-214 Review</option>
-        <option value="approved">Approved</option>
-        <option value="counselor_assigned">Counselor Assigned</option>
-        <option value="intake_complete">Intake Complete</option>
-        <option value="active">Active</option>
-        <option value="graduated">Graduated</option>
-        <option value="inactive">Inactive</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      <button class="action-btn" onclick="closeStageModal()">Cancel</button>
-      <button class="action-btn primary" onclick="confirmStageChange()">Update Stage</button>
-    </div>
-  </div>
-</div>
-
-<div id="footer-placeholder"></div>
-<script src="js/components.js"></script>
-<script src="js/main.js"></script>
-<script>
-// Pipeline stages
-const PIPELINE_STAGES = [
-  { id: 'applied', label: 'Applied' },
-  { id: 'dd214_pending', label: 'DD-214 Pending' },
-  { id: 'dd214_review', label: 'DD-214 Review' },
-  { id: 'approved', label: 'Approved' },
-  { id: 'counselor_assigned', label: 'Counselor Assigned' },
-  { id: 'intake_complete', label: 'Intake Complete' },
-  { id: 'active', label: 'Active' },
-  { id: 'graduated', label: 'Graduated' },
-  { id: 'inactive', label: 'Inactive' }
-];
-
-let currentAdmin = null;
-let currentVerifyMemberId = null;
-let membersList = [];
-let counselorsList = [];
-
-async function loadAdmin() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/auth/me`, { credentials: 'include' });
-    if (!res.ok) {
-      window.location.href = 'login.html';
-      return;
-    }
-    currentAdmin = await res.json();
-    if (currentAdmin.role !== 'admin') {
-      window.location.href = 'dashboard.html';
-      return;
-    }
-    document.getElementById('admin-email').textContent = currentAdmin.email;
-    loadStats();
-    loadMembers();
-    loadCourses();
-    loadContacts();
-    loadDisputes();
-    loadCounselors();
-    loadStaff();
-    loadPipeline();
-    loadReports();
-    loadAuditLog();
-  } catch (err) {
-    window.location.href = 'login.html';
-  }
-}
-
-function switchTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById(`tab-${tab}`).classList.add('active');
-}
-
-async function loadStats() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/stats`, { credentials: 'include' });
-    const data = await res.json();
-    document.getElementById('stat-members').textContent = data.total_members;
-    document.getElementById('stat-verified').textContent = data.verified_members;
-    document.getElementById('stat-pending').textContent = data.pending_verification;
-    document.getElementById('stat-counselors').textContent = data.total_counselors;
-    document.getElementById('stat-courses').textContent = data.total_courses;
-    document.getElementById('stat-contacts').textContent = data.total_contacts;
-
-    // Pipeline stats
-    if (data.pipeline) {
-      const statsContainer = document.getElementById('pipeline-stats');
-      let html = '';
-      for (const stage of PIPELINE_STAGES) {
-        const count = data.pipeline[stage.id] || 0;
-        html += `<div class="stat-card" style="border-left-color: var(--gold);">
-          <div class="stat-value">${count}</div>
-          <div class="stat-label">${stage.label}</div>
-        </div>`;
-      }
-      statsContainer.innerHTML = html;
-    }
-  } catch (e) { console.error('Stats error:', e); }
-}
-
-async function loadPipeline() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/pipeline`, { credentials: 'include' });
-    const pipeline = await res.json();
-    const board = document.getElementById('pipeline-board');
-
-    let html = '';
-    for (const stage of PIPELINE_STAGES) {
-      const members = pipeline[stage.id] || [];
-      html += `<div class="pipeline-column">
-        <div class="pipeline-header">
-          <span>${stage.label}</span>
-          <span class="pipeline-count">${members.length}</span>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">First Name *</label><input type="text" id="staff-first-name" class="form-input" placeholder="First name"></div>
+        <div class="form-group"><label class="form-label">Last Name *</label><input type="text" id="staff-last-name" class="form-input" placeholder="Last name"></div>
+        <div class="form-group"><label class="form-label">Email *</label><input type="email" id="staff-email" class="form-input" placeholder="email@example.com"></div>
+        <div class="form-group"><label class="form-label">Role *</label>
+          <select id="staff-role" class="form-select"><option value="counselor">Counselor</option><option value="staff">Staff</option><option value="admin">Admin</option></select>
         </div>
-        <div class="pipeline-cards">`;
+        <div class="form-group"><label class="form-label">Title</label><input type="text" id="staff-title" class="form-input" placeholder="e.g. Financial Counselor"></div>
+        <div class="form-group"><label class="form-label">Credentials</label><input type="text" id="staff-credentials" class="form-input" placeholder="e.g. AFC, NFEC"></div>
+        <div class="form-group span-2"><label class="form-label">Specialties (comma separated)</label><input type="text" id="staff-specialties" class="form-input" placeholder="Credit Repair, Budgeting, VA Benefits"></div>
+        <div class="form-group span-2"><label class="form-label">Bio</label><textarea id="staff-bio" class="form-textarea" rows="3" placeholder="Brief bio..."></textarea></div>
+      </div>
+      <div id="staff-temp-pass-display" style="display:none;margin-top:12px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;">
+        <div style="font-size:12px;color:#166534;font-weight:600;margin-bottom:4px;">TEMPORARY PASSWORD (shown once):</div>
+        <div id="staff-temp-pass-value" style="font-size:16px;font-family:monospace;color:#166534;font-weight:700;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('staff-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStaff()">Create Account</button>
+    </div>
+  </div>
+</div>
 
-      for (const m of members) {
-        html += `<div class="pipeline-card" onclick="openMemberModal('${m.id}')">
-          <div class="pipeline-card-name">${m.name || 'Unknown'}</div>
-          <div class="pipeline-card-email">${m.email}</div>
-          ${m.branch ? `<div class="pipeline-card-branch">${m.branch}</div>` : ''}
-        </div>`;
-      }
+<!-- Announcement Modal -->
+<div id="announcement-modal" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="ann-modal-title">New Announcement</span>
+      <button class="modal-close" onclick="closeModal('announcement-modal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="form-group"><label class="form-label">Title *</label><input type="text" id="ann-title" class="form-input" placeholder="Announcement title"></div>
+        <div class="form-group"><label class="form-label">Content *</label><textarea id="ann-content" class="form-textarea" rows="4" placeholder="Announcement content..."></textarea></div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Type</label><select id="ann-type" class="form-select"><option value="info">Info</option><option value="success">Success</option><option value="warning">Warning</option></select></div>
+          <div class="form-group"><label class="form-label">Expires (optional)</label><input type="date" id="ann-expires" class="form-input"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('announcement-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAnnouncement()">Publish</button>
+    </div>
+  </div>
+</div>
 
-      if (members.length === 0) {
-        html += `<div style="padding: 1rem; text-align: center; color: var(--muted); font-size: 0.8rem;">No members</div>`;
-      }
+<!-- Lesson Modal -->
+<div id="lesson-modal" class="modal-backdrop">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="lesson-modal-title">Add Lesson</span>
+      <button class="modal-close" onclick="closeModal('lesson-modal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="form-group"><label class="form-label">Lesson Title *</label><input type="text" id="lesson-title" class="form-input" placeholder="Lesson title"></div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Type</label>
+            <select id="lesson-type" class="form-select" onchange="onLessonTypeChange()">
+              <option value="text">Text / Reading</option>
+              <option value="video">Video</option>
+              <option value="resource">Resource / Download</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Duration</label><input type="text" id="lesson-duration" class="form-input" placeholder="10 min"></div>
+        </div>
+        <div id="lesson-video-field" style="display:none" class="form-group"><label class="form-label">Video URL</label><input type="url" id="lesson-video-url" class="form-input" placeholder="https://youtu.be/..."></div>
+        <div id="lesson-resource-field" style="display:none" class="form-group"><label class="form-label">Resource URL</label><input type="url" id="lesson-resource-url" class="form-input" placeholder="https://..."></div>
+        <div id="lesson-content-field" class="form-group"><label class="form-label">Content</label><textarea id="lesson-content" class="form-textarea" rows="6" placeholder="Lesson content or description..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('lesson-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLessonModal()">Save Lesson</button>
+    </div>
+  </div>
+</div>
 
-      html += `</div></div>`;
-    }
-    board.innerHTML = html;
-  } catch (e) { console.error('Pipeline error:', e); }
+<!-- Manual DD-214 Approve Modal -->
+<div id="dd214-manual-modal" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Manual DD-214 Approval</span>
+      <button class="modal-close" onclick="closeModal('dd214-manual-modal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Approve this member without requiring a DD-214 upload. This will verify the member and move them to Approved status.</p>
+      <div class="form-group"><label class="form-label">Approval Notes (optional)</label><textarea id="dd214-manual-notes" class="form-textarea" rows="3" placeholder="e.g. Verified via phone call..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('dd214-manual-modal')">Cancel</button>
+      <button class="btn btn-green" onclick="submitManualApprove()">Approve Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- Application Detail Modal -->
+<div id="app-detail-modal" class="modal-backdrop">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title">Program Application</span>
+      <button class="modal-close" onclick="closeModal('app-detail-modal')">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="app-detail-body">Loading...</div>
+    <div class="modal-footer" id="app-detail-footer">
+      <button class="btn btn-outline" onclick="closeModal('app-detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'https://api.srv1077820.hstgr.cloud';
+let currentAdmin = null;
+let currentMemberId = null;
+let currentMemberData = null;
+let currentPipelineType = 'onboarding';
+let currentCourseId = null;
+let lessonEditContext = null;
+let manualApproveTarget = null;
+let staffEditId = null;
+let announcementEditId = null;
+let messagesPollInterval = null;
+let activeConvoId = null;
+let charts = {};
+
+// ===== INIT =====
+async function init() {
+  try {
+    const r = await fetch(`${API}/api/auth/me`, {credentials:'include'});
+    if (!r.ok) { window.location.href = 'login.html'; return; }
+    currentAdmin = await r.json();
+    if (!['admin','staff'].includes(currentAdmin.role)) { window.location.href = 'login.html'; return; }
+    const initials = ((currentAdmin.first_name||'A')[0] + (currentAdmin.last_name||'D')[0]).toUpperCase();
+    document.getElementById('sidebar-avatar').textContent = initials;
+    document.getElementById('sidebar-name').textContent = `${currentAdmin.first_name||''} ${currentAdmin.last_name||''}`.trim();
+    document.getElementById('sidebar-role').textContent = currentAdmin.role;
+    loadOverview();
+    loadBadges();
+    setInterval(loadBadges, 60000);
+  } catch(e) { window.location.href = 'login.html'; }
 }
+
+async function loadBadges() {
+  try {
+    const r = await fetch(`${API}/api/admin/stats`, {credentials:'include'});
+    if (!r.ok) return;
+    const d = await r.json();
+    const p = d.pending_verification || 0;
+    setBadge('badge-dd214', p);
+    setBadge('badge-overview', p);
+  } catch(e) {}
+}
+
+function setBadge(id, n) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (n > 0) { el.textContent = n; el.style.display = ''; }
+  else el.style.display = 'none';
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  const v = document.getElementById(`view-${name}`);
+  if (v) v.classList.add('active');
+  document.querySelectorAll(`[data-view="${name}"]`).forEach(i => i.classList.add('active'));
+  if (messagesPollInterval) { clearInterval(messagesPollInterval); messagesPollInterval = null; }
+  if (name === 'overview') loadOverview();
+  else if (name === 'pipeline') loadPipeline(currentPipelineType);
+  else if (name === 'applications') loadApplications();
+  else if (name === 'members') loadMembers();
+  else if (name === 'dd214') loadDd214();
+  else if (name === 'courses') loadCourseList();
+  else if (name === 'announcements') loadAnnouncements();
+  else if (name === 'messages') { loadMessages(); messagesPollInterval = setInterval(loadMessages, 30000); }
+  else if (name === 'contacts') loadContacts();
+  else if (name === 'staff') loadStaff();
+  else if (name === 'reports') loadReports();
+  else if (name === 'audit') loadAudit();
+}
+
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + (type||'');
+  setTimeout(() => t.className = type||'', 3000);
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+}
+function fmtTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('en-US', {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+function daysAgo(iso) {
+  if (!iso) return '';
+  const d = Math.floor((Date.now() - new Date(iso)) / 86400000);
+  return d === 0 ? 'Today' : d === 1 ? '1 day ago' : `${d} days ago`;
+}
+function stageBadge(stage) {
+  const map = {
+    applied:'badge-gold', dd214_pending:'badge-gold', dd214_review:'badge-gold',
+    approved:'badge-green', active:'badge-blue', graduated:'badge-green',
+    inactive:'badge-gray', manual_approved:'badge-green',
+    pending_review:'badge-gold', rejected:'badge-red', pending:'badge-gray'
+  };
+  return `<span class="badge ${map[stage]||'badge-gray'}">${(stage||'').replace(/_/g,' ')}</span>`;
+}
+function roleBadge(role) {
+  const map = {admin:'badge-red',counselor:'badge-blue',staff:'badge-navy'};
+  return `<span class="badge ${map[role]||'badge-gray'}">${role||''}</span>`;
+}
+
+// ===== OVERVIEW =====
+async function loadOverview() {
+  try {
+    const r = await fetch(`${API}/api/admin/analytics`, {credentials:'include'});
+    if (!r.ok) return;
+    const d = await r.json();
+    const k = d.kpis || {};
+    document.getElementById('kpi-total').textContent = k.total_members ?? '—';
+    document.getElementById('kpi-verified').textContent = k.verified_members ?? '—';
+    document.getElementById('kpi-new').textContent = k.new_this_month ?? '—';
+    document.getElementById('kpi-dd214').textContent = k.pending_dd214 ?? '—';
+    document.getElementById('kpi-courses').textContent = k.active_courses ?? '—';
+    document.getElementById('kpi-counselors').textContent = k.total_counselors ?? '—';
+    drawGrowthChart(d.monthly_members || []);
+    drawPipelineChart(d.pipeline || {});
+    drawBranchChart(d.branches || {});
+    drawDD214Chart(d.dd214 || {});
+    renderActionRequired(k);
+    loadActivityFeed();
+  } catch(e) { console.error(e); }
+}
+
+function drawGrowthChart(monthly) {
+  const ctx = document.getElementById('growthChart');
+  if (!ctx) return;
+  if (charts.growth) charts.growth.destroy();
+  charts.growth = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: monthly.map(m => m.month),
+      datasets: [{
+        label: 'New Members',
+        data: monthly.map(m => m.count),
+        borderColor: '#C9952A',
+        backgroundColor: 'rgba(201,149,42,.12)',
+        fill: true,
+        tension: .4,
+        pointBackgroundColor: '#C9952A',
+        pointRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#e2e8f0' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function drawPipelineChart(pipeline) {
+  const ctx = document.getElementById('pipelineChart');
+  if (!ctx) return;
+  if (charts.pipeline) charts.pipeline.destroy();
+  const stages = Object.keys(pipeline).filter(s => pipeline[s] > 0);
+  const colors = ['#C9952A','#0B1220','#B91C1C','#2563eb','#16a34a','#7c3aed','#db2777','#0891b2'];
+  charts.pipeline = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: stages.map(s => s.replace(/_/g,' ')),
+      datasets: [{ data: stages.map(s => pipeline[s]), backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } },
+      cutout: '60%'
+    }
+  });
+}
+
+function drawBranchChart(branches) {
+  const ctx = document.getElementById('branchChart');
+  if (!ctx) return;
+  if (charts.branch) charts.branch.destroy();
+  const labels = Object.keys(branches);
+  charts.branch = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ data: Object.values(branches), backgroundColor: '#0B1220', borderRadius: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } }
+    }
+  });
+}
+
+function drawDD214Chart(dd214) {
+  const ctx = document.getElementById('dd214Chart');
+  if (!ctx) return;
+  if (charts.dd214) charts.dd214.destroy();
+  const labels = { pending:'Pending', pending_review:'Under Review', approved:'Approved', rejected:'Rejected', manual_approved:'Manual Approved' };
+  const colors = { pending:'#e2e8f0', pending_review:'#fef3c7', approved:'#dcfce7', rejected:'#fee2e2', manual_approved:'#dbeafe' };
+  const keys = Object.keys(dd214).filter(k => dd214[k] > 0);
+  charts.dd214 = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: keys.map(k => labels[k] || k),
+      datasets: [{ data: keys.map(k => dd214[k]), backgroundColor: keys.map(k => colors[k] || '#ccc'), borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } },
+      cutout: '55%'
+    }
+  });
+}
+
+function renderActionRequired(kpis) {
+  const el = document.getElementById('action-required-list');
+  const items = [];
+  if (kpis.pending_dd214 > 0) items.push(`<div class="action-item urgent"><span class="action-item-text"><strong>${kpis.pending_dd214}</strong> DD-214(s) awaiting review</span><button class="btn btn-red btn-xs" onclick="showView('dd214')">Review</button></div>`);
+  if (!items.length) { el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px;">&#10003; No immediate actions required</div>'; return; }
+  el.innerHTML = `<div class="action-list">${items.join('')}</div>`;
+}
+
+async function loadActivityFeed() {
+  try {
+    const r = await fetch(`${API}/api/admin/audit-log`, {credentials:'include'});
+    if (!r.ok) return;
+    const logs = await r.json();
+    const el = document.getElementById('activity-feed');
+    if (!logs.length) { el.innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:13px;">No recent activity</div>'; return; }
+    el.innerHTML = logs.slice(0,10).map(l => `
+      <div class="feed-item">
+        <div class="feed-dot"></div>
+        <div class="feed-text"><strong>${l.user_email||'System'}</strong> — ${(l.action||'').replace(/_/g,' ')} ${l.entity_type ? `(${l.entity_type})` : ''}</div>
+        <div class="feed-time">${fmtTime(l.timestamp)}</div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+// ===== PIPELINE =====
+const PIPELINE_CONFIGS = {
+  onboarding: {
+    dataKey: 'onboarding',
+    patch: (id, stage) => fetch(`${API}/api/admin/members/${id}/stage`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({pipeline_type:'onboarding',stage})}),
+    stages: ['applied','dd214_pending','dd214_review','approved','active','inactive','graduated'],
+    labels: {applied:'Applied',dd214_pending:'DD-214 Pending',dd214_review:'DD-214 Review',approved:'Approved',active:'Active',inactive:'Inactive',graduated:'Graduated'}
+  },
+  'credit-repair': {
+    dataKey: 'credit_repair',
+    patch: (id, stage) => fetch(`${API}/api/admin/members/${id}/stage`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({pipeline_type:'credit_repair',stage})}),
+    stages: ['cr_waitlist','cr_consultation','cr_documents','cr_dispute_1','cr_dispute_2','cr_dispute_3','cr_monitoring','cr_complete'],
+    labels: {cr_waitlist:'Waitlist',cr_consultation:'Consultation',cr_documents:'Documents',cr_dispute_1:'Dispute Rd 1',cr_dispute_2:'Dispute Rd 2',cr_dispute_3:'Dispute Rd 3',cr_monitoring:'Monitoring',cr_complete:'Complete'}
+  },
+  'financial-counseling': {
+    dataKey: 'financial_counseling',
+    patch: (id, stage) => fetch(`${API}/api/admin/members/${id}/stage`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({pipeline_type:'financial_counseling',stage})}),
+    stages: ['fc_waitlist','fc_consultation','fc_documents','fc_gameplan','fc_working','fc_complete'],
+    labels: {fc_waitlist:'Waitlist',fc_consultation:'Consultation',fc_documents:'Documents',fc_gameplan:'Game Plan',fc_working:'Working Plan',fc_complete:'Complete'}
+  }
+};
+
+function switchPipelineTab(type) {
+  currentPipelineType = type;
+  document.querySelectorAll('.pipeline-tab').forEach((t,i) => {
+    const types = ['onboarding','credit-repair','financial-counseling'];
+    t.classList.toggle('active', types[i] === type);
+  });
+  loadPipeline(type);
+}
+
+async function loadPipeline(type) {
+  const cfg = PIPELINE_CONFIGS[type];
+  if (!cfg) return;
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = '<div style="padding:24px;color:var(--text-muted);">Loading pipeline...</div>';
+  try {
+    const r = await fetch(`${API}/api/admin/pipeline`, {credentials:'include'});
+    if (!r.ok) { board.innerHTML = '<div style="padding:24px;color:var(--text-muted);">Failed to load pipeline</div>'; return; }
+    const allData = await r.json();
+    const stageData = allData[cfg.dataKey] || {};
+    board.innerHTML = '';
+    cfg.stages.forEach(stage => {
+      const members = stageData[stage] || [];
+      const col = document.createElement('div');
+      col.className = 'kanban-col';
+      col.innerHTML = `
+        <div class="kanban-col-header">
+          <span class="kanban-col-title">${cfg.labels[stage]||stage}</span>
+          <span class="kanban-col-count">${members.length}</span>
+        </div>
+        <div class="kanban-cards" id="kc-${stage}" data-stage="${stage}" data-type="${type}"></div>`;
+      const cardsEl = col.querySelector('.kanban-cards');
+      members.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'kanban-card';
+        card.dataset.id = m.id;
+        card.innerHTML = `<div class="kanban-card-name">${m.name||m.email}</div><div class="kanban-card-meta">${m.branch ? `<span class="badge badge-navy" style="font-size:10px;">${m.branch}</span>` : ''}<span class="kanban-card-days">${daysAgo(m.created_at)}</span></div>`;
+        card.addEventListener('click', () => openMemberPanel(m.id));
+        cardsEl.appendChild(card);
+      });
+      board.appendChild(col);
+      Sortable.create(cardsEl, {
+        group: `pipeline-${type}`,
+        animation: 150,
+        ghostClass: 'kanban-card-ghost',
+        onEnd: async function(evt) {
+          const memberId = evt.item.dataset.id;
+          const newStage = evt.to.dataset.stage;
+          const oldStage = evt.from.dataset.stage;
+          if (newStage === oldStage) return;
+          try {
+            const resp = await cfg.patch(memberId, newStage);
+            if (resp.ok) {
+              evt.to.querySelector('.kanban-col-count') && updateColCount(evt.to, newStage);
+              toast(`Moved to ${cfg.labels[newStage]||newStage}`, 'success');
+              updateKanbanCounts();
+            } else {
+              toast('Failed to update stage', 'error');
+              evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
+            }
+          } catch(e) {
+            toast('Error updating stage', 'error');
+          }
+        }
+      });
+    });
+  } catch(e) { board.innerHTML = '<div style="padding:24px;color:var(--text-muted);">Error loading pipeline</div>'; }
+}
+
+function updateKanbanCounts() {
+  document.querySelectorAll('.kanban-cards').forEach(col => {
+    const hdr = col.closest('.kanban-col').querySelector('.kanban-col-count');
+    if (hdr) hdr.textContent = col.children.length;
+  });
+}
+
+// ===== MEMBERS =====
+let allMembers = [];
 
 async function loadMembers() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members`, { credentials: 'include' });
-    membersList = await res.json();
-    const tbody = document.getElementById('members-tbody');
-    const dd214Tbody = document.getElementById('dd214-tbody');
+    const r = await fetch(`${API}/api/admin/members`, {credentials:'include'});
+    if (!r.ok) return;
+    allMembers = await r.json();
+    filterMembers();
+  } catch(e) {}
+}
 
-    if (!membersList.length) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--muted);">No members yet.</td></tr>';
-      dd214Tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted);">No pending reviews.</td></tr>';
-      return;
-    }
+function filterMembers() {
+  const search = (document.getElementById('member-search')?.value || '').toLowerCase();
+  const branch = document.getElementById('member-filter-branch')?.value || '';
+  const stage = document.getElementById('member-filter-stage')?.value || '';
+  const verified = document.getElementById('member-filter-verified')?.value || '';
+  let list = allMembers.filter(m => {
+    const name = `${m.first_name||''} ${m.last_name||''} ${m.email||''}`.toLowerCase();
+    return (!search || name.includes(search))
+      && (!branch || m.branch === branch)
+      && (!stage || m.pipeline_stage === stage)
+      && (!verified || String(m.verified) === verified);
+  });
+  const count = document.getElementById('member-count');
+  if (count) count.textContent = `${list.length} members`;
+  const tbody = document.getElementById('members-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">No members found</td></tr>'; return; }
+  tbody.innerHTML = list.map(m => `
+    <tr onclick="openMemberPanel('${m.id}')">
+      <td><strong>${m.first_name||''} ${m.last_name||''}</strong></td>
+      <td style="color:var(--text-muted)">${m.email}</td>
+      <td>${m.branch ? `<span class="badge badge-navy">${m.branch}</span>` : '—'}</td>
+      <td>${stageBadge(m.pipeline_stage)}</td>
+      <td>${stageBadge(m.dd214_status)}</td>
+      <td>${m.verified ? '<span class="badge badge-green">&#10003; Yes</span>' : '<span class="badge badge-gray">No</span>'}</td>
+      <td style="color:var(--text-muted)">${fmtDate(m.created_at)}</td>
+    </tr>`).join('');
+}
 
-    tbody.innerHTML = membersList.map(m => `
-      <tr style="cursor:pointer;" onclick="openMemberModal('${m.id}')">
-        <td><strong>${m.first_name} ${m.last_name}</strong></td>
-        <td>${m.email}</td>
-        <td>${m.branch || '—'}</td>
-        <td><span class="status-badge status-info">${formatStage(m.pipeline_stage)}</span></td>
-        <td><span class="status-badge ${m.verified ? 'status-verified' : m.dd214_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${m.dd214_status || 'pending'}</span></td>
-        <td>${m.has_counselor ? '<span style="color: #4ade80;">Yes</span>' : '<span style="color: var(--muted);">No</span>'}</td>
-        <td>${m.created_at ? new Date(m.created_at).toLocaleDateString() : '—'}</td>
-        <td>
-          <button class="action-btn" onclick="openMemberModal('${m.id}')">View</button>
-          <button class="action-btn" onclick="openStageModal('${m.id}', '${m.first_name} ${m.last_name}', '${m.pipeline_stage || 'applied'}')">Stage</button>
-        </td>
-      </tr>
-    `).join('');
-
-    const pending = membersList.filter(m => m.dd214_file && m.dd214_status !== 'verified');
+// ===== DD-214 =====
+async function loadDd214() {
+  try {
+    const r = await fetch(`${API}/api/admin/members`, {credentials:'include'});
+    if (!r.ok) return;
+    const all = await r.json();
+    const pending = all.filter(m => m.dd214_status === 'pending_review');
+    const grid = document.getElementById('dd214-grid');
     if (!pending.length) {
-      dd214Tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted);">No DD-214 submissions awaiting review.</td></tr>';
-    } else {
-      dd214Tbody.innerHTML = pending.map(m => `
-        <tr>
-          <td>${m.first_name} ${m.last_name}</td>
-          <td>${m.email}</td>
-          <td>${m.branch || '—'}</td>
-          <td><span class="status-badge ${m.verified ? 'status-verified' : m.dd214_status === 'rejected' ? 'status-rejected' : 'status-pending'}">${m.dd214_status || 'pending'}</span></td>
-          <td><a href="${window.API_BASE}/api/admin/dd214/${m.dd214_file}" target="_blank" style="color: var(--red-light); font-size: 0.8rem;" data-testid="view-dd214-${m.id}">View</a></td>
-          <td>
-            <button class="action-btn primary" onclick="openVerifyModal('${m.id}', '${m.first_name} ${m.last_name}', '${m.email}', '${m.dd214_file}')" data-testid="review-${m.id}">Review</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-  } catch (e) { console.error('Members error:', e); }
-}
-
-function formatStage(stage) {
-  const found = PIPELINE_STAGES.find(s => s.id === stage);
-  return found ? found.label : stage || 'Applied';
-}
-
-async function loadCourses() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/courses`, { credentials: 'include' });
-    const courses = await res.json();
-    const tbody = document.getElementById('courses-tbody');
-    if (!courses.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--muted);">No courses yet. Create your first course.</td></tr>';
+      grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128737;</div><div class="empty-state-text">No pending DD-214 reviews</div></div>';
       return;
     }
-    tbody.innerHTML = courses.map(c => `
-      <tr>
-        <td><strong>${c.title}</strong><div style="font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem;">${c.description ? c.description.slice(0, 80) + (c.description.length > 80 ? '...' : '') : ''}</div></td>
-        <td>${c.category || '—'}</td>
-        <td><span class="status-badge ${c.status === 'live' ? 'status-verified' : 'status-pending'}">${c.status}</span></td>
-        <td>${c.total_lessons}</td>
-        <td>
-          <button class="action-btn" onclick='editCourse(${JSON.stringify(c).replace(/'/g, "&#39;")})' data-testid="edit-course-${c.id}">Edit</button>
-          <button class="action-btn danger" onclick="deleteCourse('${c.id}')" data-testid="delete-course-${c.id}">Delete</button>
-        </td>
-      </tr>
-    `).join('');
-  } catch (e) { console.error('Courses error:', e); }
-}
-
-async function loadContacts() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/contacts`, { credentials: 'include' });
-    const contacts = await res.json();
-    const tbody = document.getElementById('contacts-tbody');
-    if (!contacts.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--muted);">No contact submissions yet.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = contacts.map(c => `
-      <tr>
-        <td>${c.first_name} ${c.last_name}</td>
-        <td><a href="mailto:${c.email}" style="color: var(--red-light);">${c.email}</a></td>
-        <td>${c.topic || '—'}</td>
-        <td style="max-width: 250px; white-space: normal;">${(c.message || '').slice(0, 150)}${(c.message || '').length > 150 ? '...' : ''}</td>
-        <td>${c.created_at ? new Date(c.created_at).toLocaleString() : '—'}</td>
-        <td><span class="status-badge ${c.responded ? 'status-verified' : 'status-pending'}">${c.responded ? 'Responded' : 'New'}</span></td>
-        <td>
-          <button class="action-btn ${c.responded ? '' : 'success'}" onclick="toggleContactResponse('${c.id}', ${!c.responded})">${c.responded ? 'Reopen' : 'Mark Done'}</button>
-          <button class="action-btn danger" onclick="deleteContact('${c.id}')">Delete</button>
-        </td>
-      </tr>
-    `).join('');
-  } catch (e) { console.error('Contacts error:', e); }
-}
-
-async function toggleContactResponse(id, responded) {
-  try {
-    await fetch(`${window.API_BASE}/api/admin/contacts/${id}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ responded })
-    });
-    loadContacts();
-  } catch (e) { console.error('Contact update error:', e); }
-}
-
-async function deleteContact(id) {
-  if (!confirm('Delete this contact submission?')) return;
-  try {
-    await fetch(`${window.API_BASE}/api/admin/contacts/${id}`, {
-      method: 'DELETE',
-      credentials: 'include'
-    });
-    loadContacts();
-  } catch (e) { console.error('Contact delete error:', e); }
-}
-
-async function loadDisputes() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/disputes`, { credentials: 'include' });
-    const disputes = await res.json();
-    const tbody = document.getElementById('disputes-tbody');
-    if (!disputes.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--muted);">No disputes yet.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = disputes.map(d => {
-      const statusClass = d.status === 'resolved' ? 'status-verified' : d.status === 'rejected' ? 'status-rejected' : 'status-pending';
-      return `<tr>
-        <td>${d.user_name || 'Unknown'}<br><span style="font-size: 0.75rem; color: var(--muted);">${d.user_email || ''}</span></td>
-        <td>${d.bureau || '—'}</td>
-        <td>${d.account_name || '—'}</td>
-        <td>${d.reason || '—'}</td>
-        <td><span class="status-badge ${statusClass}">${d.status}</span></td>
-        <td>${d.date_sent ? new Date(d.date_sent).toLocaleDateString() : '—'}</td>
-        <td style="font-size: 0.75rem;">${d.tracking_number || '—'}</td>
-      </tr>`;
-    }).join('');
-  } catch (e) { console.error('Disputes error:', e); }
-}
-
-async function loadCounselors() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/counselors`, { credentials: 'include' });
-    counselorsList = await res.json();
-    const tbody = document.getElementById('counselors-tbody');
-
-    if (!counselorsList.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--muted);">No counselors yet. Add your first counselor.</td></tr>';
-    } else {
-      tbody.innerHTML = counselorsList.map(c => `
-        <tr>
-          <td><strong>${c.name}</strong></td>
-          <td>${c.email}</td>
-          <td>${c.title || '—'}</td>
-          <td style="font-size: 0.8rem;">${c.specialties && c.specialties.length ? c.specialties.join(', ') : '—'}</td>
-          <td>${c.assigned_members}</td>
-          <td><span class="status-badge ${c.active ? 'status-verified' : 'status-rejected'}">${c.active ? 'Active' : 'Inactive'}</span></td>
-          <td>
-            <button class="action-btn" onclick='editCounselorById("${c.id}")'>Edit</button>
-            <button class="action-btn danger" onclick='deactivateCounselor("${c.id}")'>${c.active ? 'Deactivate' : 'Activate'}</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    loadMemberAssignments();
-  } catch (e) { console.error('Counselors error:', e); }
-}
-
-async function loadMemberAssignments() {
-  try {
-    const tbody = document.getElementById('assignments-tbody');
-    if (!membersList.length) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: var(--muted);">No members to assign.</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = membersList.map(m => {
-      const counselor = counselorsList.find(c => c.id === m.assigned_counselor_id);
-      const counselorName = counselor ? counselor.name : '<span style="color: var(--muted);">Not assigned</span>';
-      return `<tr>
-        <td>${m.first_name} ${m.last_name}<br><span style="font-size: 0.75rem; color: var(--muted);">${m.email}</span></td>
-        <td><span class="status-badge status-info">${formatStage(m.pipeline_stage)}</span></td>
-        <td>${counselorName}</td>
-        <td>
-          <button class="action-btn primary" onclick='openAssignModal("${m.id}", "${m.first_name} ${m.last_name}")'>Assign</button>
-          <button class="action-btn" onclick='openNotesModal("${m.id}", "${m.first_name} ${m.last_name}")'>Notes</button>
-        </td>
-      </tr>`;
-    }).join('');
-  } catch (e) { console.error('Assignments error:', e); }
-}
-
-async function loadStaff() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/staff`, { credentials: 'include' });
-    const staff = await res.json();
-    const tbody = document.getElementById('staff-tbody');
-
-    if (!staff.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted);">No staff members yet.</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = staff.map(s => `
-      <tr>
-        <td><strong>${s.first_name || ''} ${s.last_name || ''}</strong></td>
-        <td>${s.email}</td>
-        <td><span class="status-badge ${s.role === 'admin' ? 'status-verified' : 'status-info'}">${s.role}</span></td>
-        <td><span class="status-badge ${s.active ? 'status-verified' : 'status-rejected'}">${s.active ? 'Active' : 'Inactive'}</span></td>
-        <td>${s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'}</td>
-        <td>
-          <button class="action-btn" onclick='editStaff(${JSON.stringify(s).replace(/'/g, "&#39;")})'>Edit</button>
-          <button class="action-btn danger" onclick='toggleStaffStatus("${s.id}", ${!s.active})'>${s.active ? 'Deactivate' : 'Activate'}</button>
-        </td>
-      </tr>
-    `).join('');
-  } catch (e) { console.error('Staff error:', e); }
-}
-
-async function loadReports() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/reports/overview`, { credentials: 'include' });
-    const data = await res.json();
-    const container = document.getElementById('reports-container');
-
-    container.innerHTML = `
-      <div class="report-card">
-        <div class="report-card-title">Member Summary</div>
-        <div class="report-row"><span class="report-label">Total Members</span><span class="report-value">${data.total_members || 0}</span></div>
-        <div class="report-row"><span class="report-label">Verified Members</span><span class="report-value">${data.verified_members || 0}</span></div>
-        <div class="report-row"><span class="report-label">Pending Verification</span><span class="report-value">${data.pending_verification || 0}</span></div>
-        <div class="report-row"><span class="report-label">Active Members</span><span class="report-value">${data.active_members || 0}</span></div>
-      </div>
-      <div class="report-card">
-        <div class="report-card-title">Staff & Counselors</div>
-        <div class="report-row"><span class="report-label">Total Counselors</span><span class="report-value">${data.total_counselors || 0}</span></div>
-        <div class="report-row"><span class="report-label">Total Staff</span><span class="report-value">${data.total_staff || 0}</span></div>
-        <div class="report-row"><span class="report-label">Avg Members/Counselor</span><span class="report-value">${data.avg_members_per_counselor || '—'}</span></div>
-      </div>
-      <div class="report-card">
-        <div class="report-card-title">Courses & Progress</div>
-        <div class="report-row"><span class="report-label">Total Courses</span><span class="report-value">${data.total_courses || 0}</span></div>
-        <div class="report-row"><span class="report-label">Live Courses</span><span class="report-value">${data.live_courses || 0}</span></div>
-        <div class="report-row"><span class="report-label">Total Lessons</span><span class="report-value">${data.total_lessons || 0}</span></div>
-      </div>
-      <div class="report-card">
-        <div class="report-card-title">Activity</div>
-        <div class="report-row"><span class="report-label">Total Disputes</span><span class="report-value">${data.total_disputes || 0}</span></div>
-        <div class="report-row"><span class="report-label">Pending Disputes</span><span class="report-value">${data.pending_disputes || 0}</span></div>
-        <div class="report-row"><span class="report-label">Contact Submissions</span><span class="report-value">${data.total_contacts || 0}</span></div>
-      </div>
-    `;
-  } catch (e) {
-    console.error('Reports error:', e);
-    document.getElementById('reports-container').innerHTML = '<div class="empty-state">Failed to load reports.</div>';
-  }
-}
-
-async function loadAuditLog() {
-  try {
-    const res = await fetch(`${window.API_BASE}/api/admin/audit-log`, { credentials: 'include' });
-    const logs = await res.json();
-    const container = document.getElementById('audit-log-container');
-
-    if (!logs.length) {
-      container.innerHTML = '<div class="empty-state">No audit log entries yet.</div>';
-      return;
-    }
-
-    container.innerHTML = logs.map(l => `
-      <div class="audit-entry">
-        <div class="audit-timestamp">${l.timestamp ? new Date(l.timestamp).toLocaleString() : '—'}</div>
-        <div class="audit-action">
-          <strong>${l.action}</strong> on ${l.entity_type}
-          ${l.details ? `<span style="color: var(--muted);"> — ${JSON.stringify(l.details).slice(0, 100)}</span>` : ''}
+    grid.innerHTML = pending.map(m => `
+      <div class="dd214-card">
+        <div class="dd214-card-name">${m.first_name||''} ${m.last_name||''}</div>
+        <div class="dd214-card-meta">${m.branch||'Unknown Branch'} &bull; Joined ${fmtDate(m.created_at)}</div>
+        ${m.dd214_file ? `<div style="margin-bottom:10px;"><a href="${API}/api/admin/dd214/${m.dd214_file}" target="_blank" class="btn btn-outline btn-xs">&#128065; View DD-214</a></div>` : '<div style="margin-bottom:10px;font-size:12px;color:var(--text-muted);">No file uploaded</div>'}
+        <div class="dd214-card-actions">
+          <button class="btn btn-green btn-sm" onclick="approveDd214('${m.id}','verified')">&#10003; Approve</button>
+          <button class="btn btn-red btn-sm" onclick="approveDd214('${m.id}','rejected')">&#10007; Reject</button>
+          <button class="btn btn-outline btn-sm" onclick="openManualApprove('${m.id}')">Manual</button>
+          <button class="btn btn-outline btn-sm" onclick="openMemberPanel('${m.id}')">Details</button>
         </div>
-        <div class="audit-user">${l.user_email || 'System'}</div>
-      </div>
-    `).join('');
-  } catch (e) {
-    console.error('Audit log error:', e);
-    document.getElementById('audit-log-container').innerHTML = '<div class="empty-state">Failed to load audit log.</div>';
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function approveDd214(memberId, status) {
+  if (!confirm(`${status === 'verified' ? 'Approve' : 'Reject'} this member's DD-214?`)) return;
+  try {
+    const r = await fetch(`${API}/api/admin/members/${memberId}/verify`, {
+      method:'POST', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({status, notes: ''})
+    });
+    if (r.ok) { toast(`Member ${status === 'verified' ? 'approved' : 'rejected'}`, 'success'); loadDd214(); loadBadges(); }
+    else { const e = await r.json(); toast(e.detail || 'Error', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+function openManualApprove(memberId) {
+  manualApproveTarget = memberId;
+  document.getElementById('dd214-manual-notes').value = '';
+  document.getElementById('dd214-manual-modal').classList.add('open');
+}
+
+async function submitManualApprove() {
+  if (!manualApproveTarget) return;
+  const notes = document.getElementById('dd214-manual-notes').value.trim();
+  try {
+    const r = await fetch(`${API}/api/admin/members/${manualApproveTarget}/approve-dd214`, {
+      method:'POST', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({notes})
+    });
+    if (r.ok) { toast('Member manually approved', 'success'); closeModal('dd214-manual-modal'); loadDd214(); loadBadges(); }
+    else { const e = await r.json(); toast(e.detail || 'Error', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+// ===== MEMBER DETAIL PANEL =====
+async function openMemberPanel(memberId) {
+  currentMemberId = memberId;
+  document.getElementById('panel-backdrop').classList.add('open');
+  document.getElementById('member-panel').classList.add('open');
+  document.getElementById('panel-name').textContent = 'Loading...';
+  document.getElementById('panel-meta').textContent = '';
+  switchPanelTab('overview');
+  try {
+    const r = await fetch(`${API}/api/admin/members/${memberId}/full`, {credentials:'include'});
+    if (!r.ok) throw new Error('Failed');
+    currentMemberData = await r.json();
+    renderMemberPanel(currentMemberData);
+  } catch(e) {
+    document.getElementById('panel-overview-content').innerHTML = '<div class="empty-state"><div>Error loading member data</div></div>';
   }
 }
 
-// Course CRUD
-function openCourseModal(course) {
-  document.getElementById('course-modal-title').textContent = course ? 'Edit Course' : 'New Course';
-  document.getElementById('course-id').value = course?.id || '';
-  document.getElementById('course-title').value = course?.title || '';
-  document.getElementById('course-description').value = course?.description || '';
-  document.getElementById('course-category').value = course?.category || '';
-  document.getElementById('course-status').value = course?.status || 'draft';
+function renderMemberPanel(m) {
+  const initials = ((m.first_name||'?')[0] + (m.last_name||'?')[0]).toUpperCase();
+  document.getElementById('panel-avatar').textContent = initials;
+  document.getElementById('panel-name').textContent = `${m.first_name||''} ${m.last_name||''}`.trim();
+  document.getElementById('panel-meta').textContent = `${m.branch||''} ${m.service_status ? '· '+m.service_status : ''} · Joined ${fmtDate(m.created_at)}`;
+  renderPanelOverview(m);
+  renderPanelCR(m);
+  renderPanelFC(m);
+  renderPanelCourses(m);
+  renderPanelDocs(m);
+  renderPanelNotes(m);
+}
+
+async function loadCounselorOptions() {
+  try {
+    const r = await fetch(`${API}/api/admin/staff/counselors`, {credentials:'include'});
+    if (!r.ok) return [];
+    return await r.json();
+  } catch(e) { return []; }
+}
+
+async function renderPanelOverview(m) {
+  const counselors = await loadCounselorOptions();
+  const counselorOpts = counselors.map(c => `<option value="${c.id}" ${m.assigned_counselor_id === c.id ? 'selected' : ''}>${c.name}</option>`).join('');
+  document.getElementById('panel-overview-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div style="display:flex;gap:6px;align-items:center;">${stageBadge(m.pipeline_stage)}<span style="font-size:12px;color:var(--text-muted);">Pipeline</span></div>
+      <div style="display:flex;gap:6px;align-items:center;">${m.verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-gold">Unverified</span>'}<span style="font-size:12px;color:var(--text-muted);">Status</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="field-row"><div class="field-label">First Name</div><input class="form-input" id="edit-first-name" value="${m.first_name||''}"></div>
+      <div class="field-row"><div class="field-label">Last Name</div><input class="form-input" id="edit-last-name" value="${m.last_name||''}"></div>
+      <div class="field-row"><div class="field-label">Email</div><input class="form-input" id="edit-email" value="${m.email||''}"></div>
+      <div class="field-row"><div class="field-label">Phone</div><input class="form-input" id="edit-phone" value="${m.phone||''}"></div>
+      <div class="field-row"><div class="field-label">State</div><input class="form-input" id="edit-state" value="${m.state||''}"></div>
+      <div class="field-row"><div class="field-label">DOB</div><input class="form-input" id="edit-dob" value="${m.dob||''}"></div>
+      <div class="field-row"><div class="field-label">Branch</div><input class="form-input" id="edit-branch" value="${m.branch||''}"></div>
+      <div class="field-row"><div class="field-label">Service Status</div><input class="form-input" id="edit-service-status" value="${m.service_status||''}"></div>
+      <div class="field-row"><div class="field-label">Years of Service</div><input class="form-input" id="edit-yos" type="number" value="${m.years_of_service||''}"></div>
+      <div class="field-row"><div class="field-label">Separation Year</div><input class="form-input" id="edit-sep-year" type="number" value="${m.separation_year||''}"></div>
+    </div>
+    <div class="field-row"><div class="field-label">Pipeline Stage</div>
+      <select class="form-select" id="edit-pipeline-stage">
+        ${['applied','dd214_pending','dd214_review','approved','active','inactive','graduated'].map(s => `<option value="${s}" ${m.pipeline_stage===s?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-row"><div class="field-label">Assigned Counselor</div>
+      <select class="form-select" id="edit-counselor">
+        <option value="">— None —</option>
+        ${counselorOpts}
+      </select>
+    </div>
+    <div class="field-row"><div class="field-label">Admin Notes</div>
+      <textarea class="form-textarea" id="edit-admin-notes" rows="3">${m.admin_notes||''}</textarea>
+    </div>
+    <div class="field-row"><div class="field-label">Member Needs / Background</div>
+      <div style="padding:8px;background:var(--bg);border-radius:6px;font-size:13px;">${m.challenges||m.notes||'—'}</div>
+    </div>`;
+}
+
+async function savePanelOverview() {
+  if (!currentMemberId) return;
+  const data = {
+    pipeline_stage: document.getElementById('edit-pipeline-stage')?.value,
+    assigned_counselor_id: document.getElementById('edit-counselor')?.value || null,
+    admin_notes: document.getElementById('edit-admin-notes')?.value
+  };
+  try {
+    const r = await fetch(`${API}/api/admin/members/${currentMemberId}`, {
+      method:'PATCH', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)
+    });
+    if (r.ok) toast('Member updated', 'success');
+    else { const e = await r.json(); toast(e.detail||'Error', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+function renderPanelCR(m) {
+  const crStages = ['cr_waitlist','cr_consultation','cr_documents','cr_dispute_1','cr_dispute_2','cr_dispute_3','cr_monitoring','cr_complete'];
+  const crLabels = {cr_waitlist:'Waitlist',cr_consultation:'Consultation',cr_documents:'Documents',cr_dispute_1:'Dispute Rd 1',cr_dispute_2:'Dispute Rd 2',cr_dispute_3:'Dispute Rd 3',cr_monitoring:'Monitoring',cr_complete:'Complete'};
+  const stageOpts = crStages.map(s => `<option value="${s}" ${crStage===s?'selected':''}>${crLabels[s]}</option>`).join('');
+  const notEnrolled = !m.cr_stage && !m.credit_repair_stage;
+  const crStage = m.cr_stage || m.credit_repair_stage;
+  document.getElementById('panel-cr-content').innerHTML = notEnrolled ? `
+    <div class="empty-state"><div class="empty-state-icon">&#128203;</div><div>Not enrolled in Credit Repair program</div></div>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="btn btn-primary btn-sm" onclick="enrollMember('cr','cr_waitlist')">Enroll in Credit Repair</button>
+    </div>` : `
+    <div class="field-row"><div class="field-label">Credit Repair Stage</div>
+      <select class="form-select" id="edit-cr-stage" onchange="saveCrStage()">
+        ${stageOpts}
+      </select>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div class="field-label" style="margin-bottom:6px;">Stage Progress</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        ${crStages.map((s,i) => `<div style="flex:1;min-width:60px;text-align:center;"><div style="height:4px;background:${crStages.indexOf(crStage)>=i?'var(--gold)':'var(--border)'};border-radius:2px;margin-bottom:3px;"></div><div style="font-size:10px;color:var(--text-muted);">${crLabels[s]}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="field-row"><div class="field-label">Disputes Filed</div>
+      ${(m.disputes && m.disputes.length) ? `<div class="table-wrap" style="margin-top:4px;"><table class="data-table"><thead><tr><th>Bureau</th><th>Account</th><th>Round</th><th>Status</th><th>Date</th></tr></thead><tbody>${m.disputes.map(d => `<tr><td>${d.bureau||'—'}</td><td>${d.account||'—'}</td><td>${d.round||'—'}</td><td>${stageBadge(d.status)}</td><td>${fmtDate(d.created_at)}</td></tr>`).join('')}</tbody></table></div>` : '<div style="font-size:13px;color:var(--text-muted);">No disputes on file</div>'}
+    </div>`;
+}
+
+async function saveCrStage() {
+  const stage = document.getElementById('edit-cr-stage')?.value;
+  if (!stage || !currentMemberId) return;
+  try {
+    const r = await fetch(`${API}/api/admin/members/${currentMemberId}/stage`, {
+      method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pipeline_type:'credit_repair', stage})
+    });
+    if (r.ok) toast('CR stage updated', 'success');
+    else toast('Error updating stage', 'error');
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+function renderPanelFC(m) {
+  const fcStages = ['fc_waitlist','fc_consultation','fc_documents','fc_gameplan','fc_working','fc_complete'];
+  const fcLabels = {fc_waitlist:'Waitlist',fc_consultation:'Consultation',fc_documents:'Documents',fc_gameplan:'Game Plan',fc_working:'Working Plan',fc_complete:'Complete'};
+  const stageOpts = fcStages.map(s => `<option value="${s}" ${fcStage===s?'selected':''}>${fcLabels[s]}</option>`).join('');
+  const notEnrolled = !m.fc_stage && !m.financial_counseling_stage;
+  const fcStage = m.fc_stage || m.financial_counseling_stage;
+  document.getElementById('panel-fc-content').innerHTML = notEnrolled ? `
+    <div class="empty-state"><div class="empty-state-icon">&#128203;</div><div>Not enrolled in Financial Counseling program</div></div>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="btn btn-primary btn-sm" onclick="enrollMember('fc','fc_waitlist')">Enroll in Financial Counseling</button>
+    </div>` : `
+    <div class="field-row"><div class="field-label">Financial Counseling Stage</div>
+      <select class="form-select" id="edit-fc-stage" onchange="saveFcStage()">
+        ${stageOpts}
+      </select>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div class="field-label" style="margin-bottom:6px;">Stage Progress</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        ${fcStages.map((s,i) => `<div style="flex:1;min-width:60px;text-align:center;"><div style="height:4px;background:${fcStages.indexOf(fcStage)>=i?'var(--gold)':'var(--border)'};border-radius:2px;margin-bottom:3px;"></div><div style="font-size:10px;color:var(--text-muted);">${fcLabels[s]}</div></div>`).join('')}
+      </div>
+    </div>`;
+}
+
+async function saveFcStage() {
+  const stage = document.getElementById('edit-fc-stage')?.value;
+  if (!stage || !currentMemberId) return;
+  try {
+    const r = await fetch(`${API}/api/admin/members/${currentMemberId}/stage`, {
+      method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pipeline_type:'financial_counseling', stage})
+    });
+    if (r.ok) toast('FC stage updated', 'success');
+    else toast('Error updating stage', 'error');
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function enrollMember(type, stage) {
+  if (!currentMemberId) return;
+  const pipelineType = type === 'cr' ? 'credit_repair' : 'financial_counseling';
+  try {
+    const r = await fetch(`${API}/api/admin/members/${currentMemberId}/stage`, {
+      method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pipeline_type: pipelineType, stage})
+    });
+    if (r.ok) {
+      toast('Member enrolled', 'success');
+      const updated = await fetch(`${API}/api/admin/members/${currentMemberId}/full`, {credentials:'include'});
+      if (updated.ok) { currentMemberData = await updated.json(); renderMemberPanel(currentMemberData); }
+    } else toast('Error enrolling', 'error');
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+function renderPanelCourses(m) {
+  const courses = m.courses || [];
+  document.getElementById('panel-courses-content').innerHTML = !courses.length
+    ? '<div class="empty-state"><div class="empty-state-icon">&#128218;</div><div>No courses enrolled</div></div>'
+    : courses.map(c => `
+        <div style="padding:10px 12px;background:var(--bg);border-radius:6px;margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px;">${c.title}</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${c.percent_complete}%"></div></div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">${c.percent_complete}% complete &bull; Last: ${fmtDate(c.last_accessed)}</div>
+        </div>`).join('');
+}
+
+function renderPanelDocs(m) {
+  const hasFile = !!m.dd214_file;
+  const status = m.dd214_status || 'pending';
+  document.getElementById('panel-docs-content').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div class="field-label" style="margin-bottom:8px;">DD-214 Status: ${stageBadge(status)}</div>
+      ${m.dd214_approved_by ? `<div style="font-size:12px;color:var(--text-muted);">Approved by: ${m.dd214_approved_by} on ${fmtDate(m.dd214_approved_at)}</div>` : ''}
+    </div>
+    ${hasFile ? `
+      <div style="margin-bottom:12px;">
+        <a href="${API}/api/admin/dd214/${m.dd214_file}" target="_blank" class="btn btn-outline btn-sm">&#128065; View DD-214 File</a>
+      </div>` : '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">No DD-214 file uploaded</div>'}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      ${status !== 'approved' && status !== 'manual_approved' ? `
+        <button class="btn btn-green btn-sm" onclick="approveDd214('${m.id}','verified')">&#10003; Approve DD-214</button>
+        <button class="btn btn-red btn-sm" onclick="approveDd214('${m.id}','rejected')">&#10007; Reject</button>
+        <button class="btn btn-outline btn-sm" onclick="openManualApprove('${m.id}')">Manual Approve</button>` : ''}
+    </div>`;
+}
+
+function renderPanelNotes(m) {
+  const notes = m.notes_history || [];
+  document.getElementById('panel-notes-content').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div class="field-label" style="margin-bottom:6px;">Add Note</div>
+      <textarea class="form-textarea" id="new-note-text" rows="3" placeholder="Add a note about this member..."></textarea>
+      <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="addNote()">Add Note</button>
+    </div>
+    <div>
+      <div class="field-label" style="margin-bottom:8px;">Note History</div>
+      ${notes.length ? notes.map(n => `
+        <div style="padding:10px 12px;background:var(--bg);border-radius:6px;margin-bottom:8px;border-left:3px solid var(--gold);">
+          <div style="font-size:13px;margin-bottom:4px;">${n.content}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${n.author||'Admin'} &bull; ${fmtTime(n.created_at)}</div>
+        </div>`).join('')
+      : '<div style="font-size:13px;color:var(--text-muted);">No notes yet</div>'}
+    </div>`;
+}
+
+async function addNote() {
+  const content = document.getElementById('new-note-text')?.value.trim();
+  if (!content || !currentMemberId) return;
+  try {
+    const r = await fetch(`${API}/api/admin/members/${currentMemberId}/notes`, {
+      method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({content})
+    });
+    if (r.ok) {
+      toast('Note added', 'success');
+      document.getElementById('new-note-text').value = '';
+      const updated = await fetch(`${API}/api/admin/members/${currentMemberId}/full`, {credentials:'include'});
+      if (updated.ok) { const md = await updated.json(); renderPanelNotes(md); }
+    } else toast('Error adding note', 'error');
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+function switchPanelTab(tab) {
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  const tabs = ['overview','credit-repair','financial-counseling','courses','documents','notes'];
+  const idx = tabs.indexOf(tab);
+  if (idx >= 0) {
+    document.querySelectorAll('.panel-tab')[idx]?.classList.add('active');
+    document.getElementById(`panel-tab-${tab}`)?.classList.add('active');
+  }
+  const saveBtn = document.getElementById('panel-save-btn');
+  if (saveBtn) saveBtn.style.display = tab === 'overview' ? '' : 'none';
+}
+
+function closeMemberPanel() {
+  document.getElementById('panel-backdrop').classList.remove('open');
+  document.getElementById('member-panel').classList.remove('open');
+  currentMemberId = null;
+  currentMemberData = null;
+}
+
+// ===== APPLICATIONS =====
+async function loadApplications() {
+  const type = document.getElementById('app-filter-type')?.value || '';
+  const status = document.getElementById('app-filter-status')?.value || 'pending';
+  try {
+    let url = `${API}/api/admin/applications?`;
+    if (type) url += `program_type=${type}&`;
+    if (status) url += `status=${status}`;
+    const r = await fetch(url, {credentials:'include'});
+    const tbody = document.getElementById('apps-tbody');
+    if (!r.ok) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">Failed to load applications</td></tr>'; return; }
+    const apps = await r.json();
+    if (!apps.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">No applications found</td></tr>'; return; }
+    tbody.innerHTML = apps.map(a => {
+      const prog = a.program_type === 'credit_repair' ? '<span class="badge badge-blue">Credit Repair</span>' : '<span class="badge badge-navy">Fin. Counseling</span>';
+      return `<tr onclick="openAppDetail('${a.id}')">
+        <td><strong>${a.member_name||'Member'}</strong><div style="font-size:12px;color:var(--text-muted);">${a.member_email||''}</div></td>
+        <td>${prog}</td>
+        <td>${fmtDate(a.applied_at)}</td>
+        <td>${stageBadge(a.status)}</td>
+        <td onclick="event.stopPropagation()" style="display:flex;gap:6px;">
+          ${a.status === 'pending' ? `
+            <button class="btn btn-green btn-xs" onclick="approveApp('${a.id}')">Approve</button>
+            <button class="btn btn-red btn-xs" onclick="rejectApp('${a.id}')">Reject</button>` : ''}
+          <button class="btn btn-outline btn-xs" onclick="openAppDetail('${a.id}')">View</button>
+        </td>
+      </tr>`;
+    }).join('');
+    setBadge('badge-applications', apps.filter(a => a.status === 'pending').length);
+  } catch(e) {}
+}
+
+async function approveApp(appId) {
+  const counselors = await loadCounselorOptions();
+  const opts = counselors.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  const counselorId = await promptSelect('Assign Counselor', `<select id="approve-counselor-select" class="form-select"><option value="">— No Counselor —</option>${opts}</select>`);
+  try {
+    const r = await fetch(`${API}/api/admin/applications/${appId}/approve`, {
+      method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({counselor_id: counselorId || null})
+    });
+    if (r.ok) { toast('Application approved', 'success'); loadApplications(); }
+    else { const e = await r.json(); toast(e.detail||'Error', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function rejectApp(appId) {
+  const reason = prompt('Reason for rejection (optional):');
+  if (reason === null) return;
+  try {
+    const r = await fetch(`${API}/api/admin/applications/${appId}/reject`, {
+      method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({reason})
+    });
+    if (r.ok) { toast('Application rejected', 'success'); loadApplications(); }
+    else { const e = await r.json(); toast(e.detail||'Error', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function openAppDetail(appId) {
+  document.getElementById('app-detail-modal').classList.add('open');
+  document.getElementById('app-detail-body').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Loading...</div>';
+  try {
+    const r = await fetch(`${API}/api/admin/applications/${appId}`, {credentials:'include'});
+    if (!r.ok) throw new Error('Failed');
+    const app = await r.json();
+    const data = app.application_data || {};
+    const rows = Object.entries(data).map(([k,v]) => `<tr><td style="font-weight:500;padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;">${k.replace(/_/g,' ')}</td><td style="padding:6px 10px;border-bottom:1px solid var(--border);">${Array.isArray(v) ? v.join(', ') : v||'—'}</td></tr>`).join('');
+    document.getElementById('app-detail-body').innerHTML = `
+      <div style="margin-bottom:12px;display:flex;gap:10px;align-items:center;">
+        <strong>${app.member_name||'Member'}</strong>
+        ${app.program_type === 'credit_repair' ? '<span class="badge badge-blue">Credit Repair</span>' : '<span class="badge badge-navy">Fin. Counseling</span>'}
+        ${stageBadge(app.status)}
+        <span style="color:var(--text-muted);font-size:12px;">Applied ${fmtDate(app.applied_at)}</span>
+      </div>
+      <div class="table-wrap"><table class="data-table"><tbody>${rows}</tbody></table></div>`;
+    const footer = document.getElementById('app-detail-footer');
+    footer.innerHTML = `<button class="btn btn-outline" onclick="closeModal('app-detail-modal')">Close</button>
+      ${app.status === 'pending' ? `<div class="spacer"></div><button class="btn btn-red btn-sm" onclick="rejectApp('${appId}');closeModal('app-detail-modal')">Reject</button><button class="btn btn-green btn-sm" onclick="approveApp('${appId}');closeModal('app-detail-modal')">Approve</button>` : ''}`;
+  } catch(e) { document.getElementById('app-detail-body').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Error loading application</div>'; }
+}
+
+function promptSelect(title, html) {
+  return new Promise(resolve => {
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;display:flex;align-items:center;justify-content:center;';
+    el.innerHTML = `<div style="background:#fff;border-radius:12px;padding:20px;min-width:280px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+      <div style="font-size:15px;font-weight:600;margin-bottom:12px;">${title}</div>
+      ${html}
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end;">
+        <button class="btn btn-outline btn-sm" id="psel-cancel">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="psel-ok">Confirm</button>
+      </div>
+    </div>`;
+    document.body.appendChild(el);
+    el.querySelector('#psel-cancel').onclick = () => { document.body.removeChild(el); resolve(null); };
+    el.querySelector('#psel-ok').onclick = () => {
+      const sel = el.querySelector('select');
+      document.body.removeChild(el);
+      resolve(sel ? sel.value : null);
+    };
+  });
+}
+
+// ===== MESSAGES =====
+let allMessages = [];
+
+async function loadMessages() {
+  try {
+    const r = await fetch(`${API}/api/messages/admin/all`, {credentials:'include'});
+    if (!r.ok) return;
+    allMessages = await r.json();
+    renderConvos();
+  } catch(e) {}
+}
+
+function renderConvos() {
+  const convos = {};
+  allMessages.forEach(m => {
+    const key = [m.from_user.id, m.to_user.id].sort().join('-');
+    if (!convos[key] || new Date(m.created_at) > new Date(convos[key].last_time)) {
+      const isAdmin = m.from_user.id === (currentAdmin?._id || currentAdmin?.id);
+      convos[key] = {
+        key, last_time: m.created_at, last_message: m.content,
+        member: isAdmin ? m.to_user : m.from_user,
+        unread: 0
+      };
+    }
+    if (!m.read && m.to_user.id === (currentAdmin?._id || currentAdmin?.id)) convos[key].unread++;
+  });
+  const sorted = Object.values(convos).sort((a,b) => new Date(b.last_time) - new Date(a.last_time));
+  const el = document.getElementById('convo-items');
+  if (!sorted.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">No messages yet</div>'; return; }
+  el.innerHTML = sorted.map(c => {
+    const init = (c.member.name||c.member.email||'?')[0].toUpperCase();
+    return `<div class="convo-item ${activeConvoId === c.member.id ? 'active' : ''}" onclick="openConvo('${c.member.id}','${c.member.name||c.member.email}')">
+      <div class="convo-avatar">${init}</div>
+      <div class="convo-info">
+        <div class="convo-name">${c.member.name||c.member.email}</div>
+        <div class="convo-preview">${c.last_message||''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <div class="convo-time">${fmtTime(c.last_time)}</div>
+        ${c.unread ? `<div class="convo-unread">${c.unread}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openConvo(memberId, memberName) {
+  activeConvoId = memberId;
+  document.getElementById('thread-header').textContent = memberName || 'Conversation';
+  document.getElementById('thread-compose').style.display = 'flex';
+  document.getElementById('msg-reply-input').dataset.to = memberId;
+  renderConvos();
+  const adminId = currentAdmin?._id || currentAdmin?.id;
+  const thread = allMessages.filter(m =>
+    (m.from_user.id === adminId && m.to_user.id === memberId) ||
+    (m.from_user.id === memberId && m.to_user.id === adminId)
+  ).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+  const el = document.getElementById('thread-messages');
+  if (!thread.length) { el.innerHTML = '<div class="empty-state"><div>No messages yet</div></div>'; return; }
+  el.innerHTML = thread.map(m => {
+    const mine = m.from_user.id === adminId;
+    return `<div class="msg-bubble ${mine?'mine':'theirs'}">
+      ${!mine ? `<div class="msg-sender">${m.from_user.name||m.from_user.email}</div>` : ''}
+      <div class="msg-text">${m.content}</div>
+      <div class="msg-time">${fmtTime(m.created_at)}</div>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendReply() {
+  const input = document.getElementById('msg-reply-input');
+  const toId = input?.dataset.to;
+  const content = input?.value.trim();
+  if (!toId || !content) return;
+  try {
+    const r = await fetch(`${API}/api/messages`, {
+      method:'POST', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({to_user_id: toId, content})
+    });
+    if (r.ok) { input.value = ''; loadMessages(); }
+    else toast('Failed to send', 'error');
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+function onMsgKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); }
+}
+
+// ===== COURSES =====
+let allCourses = [];
+
+async function loadCourseList() {
+  try {
+    const r = await fetch(`${API}/api/admin/courses`, {credentials:'include'});
+    if (!r.ok) return;
+    allCourses = await r.json();
+    renderCourseList(allCourses);
+  } catch(e) {}
+}
+
+function filterCourses() {
+  const q = (document.getElementById('course-search')?.value||'').toLowerCase();
+  renderCourseList(allCourses.filter(c => c.title.toLowerCase().includes(q)));
+}
+
+function renderCourseList(courses) {
+  const el = document.getElementById('course-list-items');
+  if (!courses.length) { el.innerHTML = '<div class="empty-state" style="padding:24px;"><div>No courses yet</div></div>'; return; }
+  el.innerHTML = courses.map(c => `
+    <div class="course-list-item ${c.id === currentCourseId ? 'active' : ''}" onclick="openCourseBuilder('${c.id}')">
+      <div class="course-list-item-title">${c.title}</div>
+      <div class="course-list-item-meta">${c.category||'Uncategorized'} &bull; ${c.total_lessons||0} lessons &bull; <span class="badge ${c.status==='published'?'badge-green':'badge-gray'}" style="font-size:10px;">${c.status}</span></div>
+    </div>`).join('');
+}
+
+async function openCourseBuilder(courseId) {
+  currentCourseId = courseId;
+  renderCourseList(allCourses);
+  const editor = document.getElementById('course-editor');
+  editor.innerHTML = '<div style="padding:20px;color:var(--text-muted);">Loading...</div>';
+  try {
+    const r = await fetch(`${API}/api/admin/courses/${courseId}`, {credentials:'include'});
+    if (!r.ok) throw new Error();
+    const c = await r.json();
+    renderCourseEditor(c);
+  } catch(e) { editor.innerHTML = '<div style="padding:20px;color:var(--text-muted);">Error loading course</div>'; }
+}
+
+function renderCourseEditor(c) {
+  const editor = document.getElementById('course-editor');
+  const modulesHtml = (c.modules || []).map(m => renderModuleBlock(m, c.id)).join('');
+  const flatHtml = (c.flat_lessons || []).map(l => renderLessonRow(l, null, c.id)).join('');
+  editor.innerHTML = `
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-family:'Oswald',sans-serif;font-size:18px;color:var(--navy);">${c.title}</h3>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="editCourseDetails('${c.id}','${c.title}','${(c.description||'').replace(/'/g,"\\'")}','${c.category||''}','${c.status}','${c.thumbnail||''}')">Edit Details</button>
+          <button class="btn btn-red btn-sm" onclick="deleteCourse('${c.id}')">Delete</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;">
+        <span class="badge ${c.status==='published'?'badge-green':'badge-gray'}">${c.status}</span>
+        <span style="font-size:12px;color:var(--text-muted);">${c.category||'No category'}</span>
+        <button class="btn btn-outline btn-xs" onclick="toggleCourseStatus('${c.id}','${c.status}','${c.title}','${(c.description||'').replace(/'/g,"\\'")}','${c.category||''}')">${c.status==='published'?'Unpublish':'Publish'}</button>
+      </div>
+    </div>
+    <div id="modules-container">
+      ${modulesHtml}
+      ${flatHtml ? `<div style="margin-top:8px;"><div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">UNASSIGNED LESSONS</div>${flatHtml}</div>` : ''}
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;">
+      <button class="btn btn-primary btn-sm" onclick="addModule('${c.id}')">+ Add Module</button>
+      <button class="btn btn-outline btn-sm" onclick="openLessonModal(null,'${c.id}',null)">+ Add Lesson (no module)</button>
+    </div>`;
+}
+
+function renderModuleBlock(m, courseId) {
+  const lessonsHtml = (m.lessons||[]).map(l => renderLessonRow(l, m.id, courseId)).join('');
+  return `<div class="module-block" id="module-${m.id}">
+    <div class="module-header">
+      <input class="module-title-input" value="${m.title}" onblur="saveModuleTitle('${m.id}',this.value)">
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-xs" onclick="openLessonModal(null,'${courseId}','${m.id}')">+ Lesson</button>
+        <button class="btn btn-red btn-xs" onclick="deleteModule('${m.id}','${courseId}')">Delete</button>
+      </div>
+    </div>
+    <div class="module-body" id="module-body-${m.id}">
+      ${lessonsHtml || '<div style="font-size:12px;color:var(--text-muted);padding:4px;">No lessons yet</div>'}
+    </div>
+  </div>`;
+}
+
+function renderLessonRow(l, moduleId, courseId) {
+  const icons = {video:'&#9654;',text:'&#128196;',resource:'&#128190;'};
+  return `<div class="lesson-row" id="lesson-${l.id}">
+    <span style="font-size:14px;">${icons[l.lesson_type]||'&#128196;'}</span>
+    <span class="lesson-row-title">${l.title}</span>
+    <span class="lesson-row-type">${l.lesson_type||'text'} ${l.duration?'&bull; '+l.duration:''}</span>
+    <button class="btn btn-outline btn-xs" onclick="openLessonModal('${l.id}','${courseId}','${moduleId||''}')">Edit</button>
+    <button class="btn btn-red btn-xs" onclick="deleteLesson('${l.id}','${courseId}')">&#x2715;</button>
+  </div>`;
+}
+
+async function addModule(courseId) {
+  try {
+    const r = await fetch(`${API}/api/admin/courses/${courseId}/modules`, {
+      method:'POST', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({title:'New Module', order:0})
+    });
+    if (r.ok) { toast('Module added', 'success'); openCourseBuilder(courseId); }
+    else toast('Error adding module', 'error');
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function saveModuleTitle(moduleId, title) {
+  if (!title.trim()) return;
+  try {
+    await fetch(`${API}/api/admin/modules/${moduleId}`, {
+      method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({title})
+    });
+  } catch(e) {}
+}
+
+async function deleteModule(moduleId, courseId) {
+  if (!confirm('Delete this module and all its lessons?')) return;
+  try {
+    await fetch(`${API}/api/admin/modules/${moduleId}`, {method:'DELETE',credentials:'include'});
+    openCourseBuilder(courseId);
+  } catch(e) {}
+}
+
+function openLessonModal(lessonId, courseId, moduleId) {
+  lessonEditContext = {lessonId, courseId, moduleId};
+  document.getElementById('lesson-modal-title').textContent = lessonId ? 'Edit Lesson' : 'Add Lesson';
+  document.getElementById('lesson-title').value = '';
+  document.getElementById('lesson-content').value = '';
+  document.getElementById('lesson-video-url').value = '';
+  document.getElementById('lesson-resource-url').value = '';
+  document.getElementById('lesson-duration').value = '';
+  document.getElementById('lesson-type').value = 'text';
+  onLessonTypeChange();
+  if (lessonId) {
+    const lesson = findLesson(lessonId);
+    if (lesson) {
+      document.getElementById('lesson-title').value = lesson.title||'';
+      document.getElementById('lesson-content').value = lesson.content||'';
+      document.getElementById('lesson-video-url').value = lesson.video_url||'';
+      document.getElementById('lesson-resource-url').value = lesson.resource_url||'';
+      document.getElementById('lesson-duration').value = lesson.duration||'';
+      document.getElementById('lesson-type').value = lesson.lesson_type||'text';
+      onLessonTypeChange();
+    }
+  }
+  document.getElementById('lesson-modal').classList.add('open');
+}
+
+function findLesson(lessonId) {
+  if (!currentCourseId) return null;
+  return null;
+}
+
+function onLessonTypeChange() {
+  const type = document.getElementById('lesson-type').value;
+  document.getElementById('lesson-video-field').style.display = type === 'video' ? '' : 'none';
+  document.getElementById('lesson-resource-field').style.display = type === 'resource' ? '' : 'none';
+  document.getElementById('lesson-content-field').style.display = type === 'text' ? '' : 'none';
+}
+
+async function saveLessonModal() {
+  if (!lessonEditContext) return;
+  const {lessonId, courseId, moduleId} = lessonEditContext;
+  const title = document.getElementById('lesson-title').value.trim();
+  if (!title) { toast('Title required', 'error'); return; }
+  const data = {
+    title,
+    content: document.getElementById('lesson-content').value,
+    lesson_type: document.getElementById('lesson-type').value,
+    video_url: document.getElementById('lesson-video-url').value || null,
+    resource_url: document.getElementById('lesson-resource-url').value || null,
+    duration: document.getElementById('lesson-duration').value || null,
+    order: 0
+  };
+  try {
+    let r;
+    if (lessonId) {
+      if (moduleId) r = await fetch(`${API}/api/admin/modules/${moduleId}/lessons/${lessonId}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      else r = await fetch(`${API}/api/admin/lessons/${lessonId}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,course_id:courseId})});
+    } else {
+      if (moduleId) r = await fetch(`${API}/api/admin/modules/${moduleId}/lessons`, {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      else r = await fetch(`${API}/api/admin/lessons`, {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,course_id:courseId})});
+    }
+    if (r.ok) { toast('Lesson saved', 'success'); closeModal('lesson-modal'); openCourseBuilder(courseId); }
+    else { const e = await r.json(); toast(e.detail||'Error', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function deleteLesson(lessonId, courseId) {
+  if (!confirm('Delete this lesson?')) return;
+  try {
+    await fetch(`${API}/api/admin/lessons/${lessonId}`, {method:'DELETE',credentials:'include'});
+    openCourseBuilder(courseId);
+  } catch(e) {}
+}
+
+function openNewCourseModal() {
+  currentCourseId = null;
+  document.getElementById('course-modal-title').textContent = 'New Course';
+  document.getElementById('course-title-input').value = '';
+  document.getElementById('course-desc-input').value = '';
+  document.getElementById('course-cat-input').value = '';
+  document.getElementById('course-status-input').value = 'draft';
+  document.getElementById('course-thumb-input').value = '';
   document.getElementById('course-modal').classList.add('open');
 }
 
-function closeCourseModal() {
-  document.getElementById('course-modal').classList.remove('open');
+function editCourseDetails(id, title, desc, cat, status, thumb) {
+  currentCourseId = id;
+  document.getElementById('course-modal-title').textContent = 'Edit Course';
+  document.getElementById('course-title-input').value = title;
+  document.getElementById('course-desc-input').value = desc;
+  document.getElementById('course-cat-input').value = cat;
+  document.getElementById('course-status-input').value = status;
+  document.getElementById('course-thumb-input').value = thumb;
+  document.getElementById('course-modal').classList.add('open');
 }
 
-function editCourse(course) {
-  openCourseModal(course);
+async function toggleCourseStatus(id, currentStatus, title, desc, cat) {
+  const newStatus = currentStatus === 'published' ? 'draft' : 'published';
+  try {
+    const r = await fetch(`${API}/api/admin/courses/${id}`, {
+      method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({title, description:desc, category:cat, status:newStatus})
+    });
+    if (r.ok) { toast(`Course ${newStatus}`, 'success'); loadCourseList(); openCourseBuilder(id); }
+    else toast('Error', 'error');
+  } catch(e) { toast('Network error', 'error'); }
 }
 
 async function saveCourse() {
-  const id = document.getElementById('course-id').value;
-  const payload = {
-    title: document.getElementById('course-title').value,
-    description: document.getElementById('course-description').value,
-    category: document.getElementById('course-category').value,
-    status: document.getElementById('course-status').value
-  };
-
-  if (!payload.title || !payload.description) {
-    alert('Title and description are required.');
-    return;
-  }
-
-  const url = id ? `${window.API_BASE}/api/admin/courses/${id}` : `${window.API_BASE}/api/admin/courses`;
-  const method = id ? 'PUT' : 'POST';
-
+  const title = document.getElementById('course-title-input').value.trim();
+  const desc = document.getElementById('course-desc-input').value.trim();
+  if (!title || !desc) { toast('Title and description required', 'error'); return; }
+  const data = {title, description:desc, category:document.getElementById('course-cat-input').value, status:document.getElementById('course-status-input').value, thumbnail:document.getElementById('course-thumb-input').value||null};
   try {
-    const res = await fetch(url, {
-      method,
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (res.ok) {
-      closeCourseModal();
-      loadCourses();
-      loadStats();
-    } else {
-      alert('Failed to save course.');
-    }
-  } catch (e) {
-    alert('Connection error.');
-  }
+    let r;
+    if (currentCourseId) r = await fetch(`${API}/api/admin/courses/${currentCourseId}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    else r = await fetch(`${API}/api/admin/courses`, {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if (r.ok) {
+      toast('Course saved', 'success');
+      closeModal('course-modal');
+      const res = await r.json();
+      if (!currentCourseId) currentCourseId = res.id;
+      await loadCourseList();
+      if (currentCourseId) openCourseBuilder(currentCourseId);
+    } else { const e = await r.json(); toast(e.detail||'Error','error'); }
+  } catch(e) { toast('Network error', 'error'); }
 }
 
-async function deleteCourse(id) {
-  if (!confirm('Delete this course and all its lessons?')) return;
+async function deleteCourse(courseId) {
+  if (!confirm('Delete this course and all its content?')) return;
   try {
-    await fetch(`${window.API_BASE}/api/admin/courses/${id}`, {
-      method: 'DELETE',
-      credentials: 'include'
-    });
-    loadCourses();
-    loadStats();
-  } catch (e) {}
+    await fetch(`${API}/api/admin/courses/${courseId}`, {method:'DELETE',credentials:'include'});
+    toast('Course deleted', 'success');
+    currentCourseId = null;
+    await loadCourseList();
+    document.getElementById('course-editor').innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128218;</div><div class="empty-state-text">Select a course to edit</div></div>';
+  } catch(e) {}
 }
 
-// DD-214 Verification
-function openVerifyModal(memberId, name, email, file) {
-  currentVerifyMemberId = memberId;
-  document.getElementById('verify-member-info').innerHTML = `
-    <strong>${name}</strong><br>
-    <span style="color: var(--muted); font-size: 0.85rem;">${email}</span>
-  `;
-  document.getElementById('dd214-preview').innerHTML = `
-    <a href="${window.API_BASE}/api/admin/dd214/${file}" target="_blank" class="action-btn primary">Open DD-214 Document</a>
-  `;
-  document.getElementById('verify-notes').value = '';
-  document.getElementById('verify-modal').classList.add('open');
-}
-
-function closeVerifyModal() {
-  currentVerifyMemberId = null;
-  document.getElementById('verify-modal').classList.remove('open');
-}
-
-async function verifyMember(status) {
-  if (!currentVerifyMemberId) return;
-  const notes = document.getElementById('verify-notes').value;
+// ===== STAFF =====
+async function loadStaff() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members/${currentVerifyMemberId}/verify`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status, notes })
-    });
-    if (res.ok) {
-      closeVerifyModal();
-      loadMembers();
-      loadStats();
-      loadPipeline();
-    } else {
-      alert('Failed to update verification.');
-    }
-  } catch (e) {
-    alert('Connection error.');
-  }
+    const r = await fetch(`${API}/api/admin/staff`, {credentials:'include'});
+    if (!r.ok) return;
+    const staff = await r.json();
+    const tbody = document.getElementById('staff-tbody');
+    if (!staff.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">No staff members yet</td></tr>'; return; }
+    tbody.innerHTML = staff.map(s => `
+      <tr>
+        <td><strong>${s.name||s.email}</strong></td>
+        <td>${roleBadge(s.role)}</td>
+        <td>${s.title||'—'}</td>
+        <td style="color:var(--text-muted)">${s.email}</td>
+        <td>${s.client_count||0}</td>
+        <td>${s.active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
+        <td onclick="event.stopPropagation()" style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-xs" onclick="editStaff('${s.id}','${s.first_name}','${s.last_name}','${s.email}','${s.role}','${s.title||''}')">Edit</button>
+          <button class="btn ${s.active?'btn-red':'btn-green'} btn-xs" onclick="toggleStaffActive('${s.id}',${!s.active})">${s.active?'Deactivate':'Activate'}</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {}
 }
 
-// Counselor CRUD
-function openCounselorModal(counselor) {
-  document.getElementById('counselor-modal-title').textContent = counselor ? 'Edit Counselor' : 'Add Counselor';
-  document.getElementById('counselor-id').value = counselor ? counselor.id : '';
-  const nameParts = counselor && counselor.name ? counselor.name.split(' ') : ['', ''];
-  document.getElementById('counselor-first-name').value = nameParts[0] || '';
-  document.getElementById('counselor-last-name').value = nameParts.slice(1).join(' ') || '';
-  document.getElementById('counselor-email').value = counselor ? counselor.email : '';
-  document.getElementById('counselor-title').value = counselor ? counselor.title || '' : '';
-  document.getElementById('counselor-bio').value = counselor ? counselor.bio || '' : '';
-  document.getElementById('counselor-specialties').value = counselor && counselor.specialties ? counselor.specialties.join(', ') : '';
-  document.getElementById('counselor-modal').classList.add('open');
-}
-
-function closeCounselorModal() {
-  document.getElementById('counselor-modal').classList.remove('open');
-}
-
-function editCounselorById(id) {
-  const counselor = counselorsList.find(c => c.id === id);
-  if (counselor) openCounselorModal(counselor);
-}
-
-async function saveCounselor() {
-  const id = document.getElementById('counselor-id').value;
-  const payload = {
-    first_name: document.getElementById('counselor-first-name').value,
-    last_name: document.getElementById('counselor-last-name').value,
-    email: document.getElementById('counselor-email').value,
-    title: document.getElementById('counselor-title').value,
-    bio: document.getElementById('counselor-bio').value,
-    specialties: document.getElementById('counselor-specialties').value.split(',').map(s => s.trim()).filter(s => s)
-  };
-
-  if (!payload.email) {
-    alert('Email is required.');
-    return;
-  }
-
-  const url = id ? `${window.API_BASE}/api/admin/counselors/${id}` : `${window.API_BASE}/api/admin/counselors`;
-  const method = id ? 'PUT' : 'POST';
-
-  try {
-    const res = await fetch(url, {
-      method,
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (res.ok) {
-      closeCounselorModal();
-      loadCounselors();
-      loadStats();
-    } else {
-      alert('Failed to save counselor.');
-    }
-  } catch (e) {
-    alert('Connection error.');
-  }
-}
-
-async function deactivateCounselor(id) {
-  if (!confirm('Toggle counselor status?')) return;
-  try {
-    await fetch(`${window.API_BASE}/api/admin/counselors/${id}`, {
-      method: 'DELETE',
-      credentials: 'include'
-    });
-    loadCounselors();
-  } catch (e) {}
-}
-
-// Staff CRUD
-function openStaffModal(staff) {
-  document.getElementById('staff-modal-title').textContent = staff ? 'Edit Staff' : 'Add Staff';
-  document.getElementById('staff-id').value = staff ? staff.id : '';
-  const nameParts = staff && staff.name ? staff.name.split(' ') : ['', ''];
-  document.getElementById('staff-first-name').value = nameParts[0] || '';
-  document.getElementById('staff-last-name').value = nameParts.slice(1).join(' ') || '';
-  document.getElementById('staff-email').value = staff ? staff.email : '';
-  document.getElementById('staff-role').value = staff ? staff.role : 'staff';
+function openStaffModal() {
+  staffEditId = null;
+  document.getElementById('staff-modal-title').textContent = 'Add Staff Member';
+  ['staff-first-name','staff-last-name','staff-email','staff-title','staff-credentials','staff-specialties','staff-bio'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('staff-role').value = 'counselor';
+  document.getElementById('staff-temp-pass-display').style.display = 'none';
   document.getElementById('staff-modal').classList.add('open');
 }
 
-function closeStaffModal() {
-  document.getElementById('staff-modal').classList.remove('open');
-}
-
-function editStaff(staff) {
-  openStaffModal(staff);
+function editStaff(id, fn, ln, email, role, title) {
+  staffEditId = id;
+  document.getElementById('staff-modal-title').textContent = 'Edit Staff Member';
+  document.getElementById('staff-first-name').value = fn;
+  document.getElementById('staff-last-name').value = ln;
+  document.getElementById('staff-email').value = email;
+  document.getElementById('staff-role').value = role;
+  document.getElementById('staff-title').value = title;
+  document.getElementById('staff-temp-pass-display').style.display = 'none';
+  document.getElementById('staff-modal').classList.add('open');
 }
 
 async function saveStaff() {
-  const id = document.getElementById('staff-id').value;
-  const payload = {
-    first_name: document.getElementById('staff-first-name').value,
-    last_name: document.getElementById('staff-last-name').value,
-    email: document.getElementById('staff-email').value,
-    role: document.getElementById('staff-role').value
+  const fn = document.getElementById('staff-first-name').value.trim();
+  const ln = document.getElementById('staff-last-name').value.trim();
+  const email = document.getElementById('staff-email').value.trim();
+  const role = document.getElementById('staff-role').value;
+  if (!fn || !ln || !email) { toast('First name, last name, and email are required', 'error'); return; }
+  const data = {
+    first_name: fn, last_name: ln, email, role,
+    title: document.getElementById('staff-title').value,
+    credentials: document.getElementById('staff-credentials').value,
+    bio: document.getElementById('staff-bio').value,
+    specialties: document.getElementById('staff-specialties').value.split(',').map(s=>s.trim()).filter(Boolean)
   };
-
-  if (!payload.email) {
-    alert('Email is required.');
-    return;
-  }
-
-  const url = id ? `${window.API_BASE}/api/admin/staff/${id}` : `${window.API_BASE}/api/admin/staff`;
-  const method = id ? 'PUT' : 'POST';
-
   try {
-    const res = await fetch(url, {
-      method,
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (res.ok) {
-      closeStaffModal();
+    let r;
+    if (staffEditId) r = await fetch(`${API}/api/admin/staff/${staffEditId}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    else r = await fetch(`${API}/api/admin/staff`, {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if (r.ok) {
+      const result = await r.json();
+      if (!staffEditId && result.temp_password) {
+        document.getElementById('staff-temp-pass-value').textContent = result.temp_password;
+        document.getElementById('staff-temp-pass-display').style.display = 'block';
+        toast('Staff account created — save the temp password!', 'success');
+      } else { toast(staffEditId ? 'Staff updated' : 'Staff created', 'success'); closeModal('staff-modal'); }
       loadStaff();
-    } else {
-      alert('Failed to save staff member.');
-    }
-  } catch (e) {
-    alert('Connection error.');
-  }
+    } else { const e = await r.json(); toast(e.detail||'Error','error'); }
+  } catch(e) { toast('Network error', 'error'); }
 }
 
-async function toggleStaffStatus(id, active) {
+async function toggleStaffActive(id, active) {
   try {
-    await fetch(`${window.API_BASE}/api/admin/staff/${id}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ active })
-    });
+    await fetch(`${API}/api/admin/staff/${id}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({active})});
     loadStaff();
-  } catch (e) {}
+  } catch(e) {}
 }
 
-// Assignment Modal
-let assignMemberId = null;
-
-function openAssignModal(memberId, memberName) {
-  assignMemberId = memberId;
-  document.getElementById('assign-member-id').value = memberId;
-  document.getElementById('assign-member-info').innerHTML = '<strong>Assigning counselor to:</strong> ' + memberName;
-
-  const select = document.getElementById('assign-counselor-select');
-  let html = '<option value="">-- Select Counselor --</option>';
-  for (const c of counselorsList.filter(c => c.active)) {
-    html += `<option value="${c.id}">${c.name}</option>`;
-  }
-  select.innerHTML = html;
-
-  document.getElementById('assign-modal').classList.add('open');
-}
-
-function closeAssignModal() {
-  assignMemberId = null;
-  document.getElementById('assign-modal').classList.remove('open');
-}
-
-async function confirmAssign() {
-  const counselorId = document.getElementById('assign-counselor-select').value;
-  if (!counselorId || !assignMemberId) {
-    alert('Please select a counselor.');
-    return;
-  }
-
+// ===== ANNOUNCEMENTS =====
+async function loadAnnouncements() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/counselors/${counselorId}/assign/${assignMemberId}`, {
-      method: 'POST',
-      credentials: 'include'
-    });
-
-    if (res.ok) {
-      closeAssignModal();
-      loadCounselors();
-      loadMembers();
-      loadPipeline();
-    } else {
-      alert('Failed to assign counselor.');
-    }
-  } catch (e) {
-    alert('Connection error.');
-  }
+    const r = await fetch(`${API}/api/admin/announcements`, {credentials:'include'});
+    if (!r.ok) return;
+    const anns = await r.json();
+    const tbody = document.getElementById('announcements-tbody');
+    if (!anns.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">No announcements yet</td></tr>'; return; }
+    const typeBadge = t => ({info:'badge-blue',success:'badge-green',warning:'badge-gold'}[t]||'badge-gray');
+    tbody.innerHTML = anns.map(a => `
+      <tr>
+        <td><strong>${a.title}</strong></td>
+        <td><span class="badge ${typeBadge(a.type)}">${a.type||'info'}</span></td>
+        <td>${fmtDate(a.created_at)}</td>
+        <td>${fmtDate(a.expires_at)||'Never'}</td>
+        <td>${a.active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
+        <td onclick="event.stopPropagation()" style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-xs" onclick="editAnnouncement('${a.id}','${a.title.replace(/'/g,"\\'")}','${(a.content||'').replace(/'/g,"\\'")}','${a.type||'info'}','${a.expires_at||''}')">Edit</button>
+          <button class="btn btn-red btn-xs" onclick="deleteAnnouncement('${a.id}')">Delete</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {}
 }
 
-// Notes Modal
-let notesMemberId = null;
-let notesMemberName = '';
+function openAnnouncementModal() {
+  announcementEditId = null;
+  document.getElementById('ann-modal-title').textContent = 'New Announcement';
+  document.getElementById('ann-title').value = '';
+  document.getElementById('ann-content').value = '';
+  document.getElementById('ann-type').value = 'info';
+  document.getElementById('ann-expires').value = '';
+  document.getElementById('announcement-modal').classList.add('open');
+}
 
-async function openNotesModal(memberId, memberName) {
-  notesMemberId = memberId;
-  notesMemberName = memberName;
-  document.getElementById('notes-member-id').value = memberId;
-  document.getElementById('notes-member-info').innerHTML = '<strong>Notes for:</strong> ' + memberName;
-  document.getElementById('new-note-content').value = '';
+function editAnnouncement(id, title, content, type, expires) {
+  announcementEditId = id;
+  document.getElementById('ann-modal-title').textContent = 'Edit Announcement';
+  document.getElementById('ann-title').value = title;
+  document.getElementById('ann-content').value = content;
+  document.getElementById('ann-type').value = type;
+  document.getElementById('ann-expires').value = expires ? expires.substring(0,10) : '';
+  document.getElementById('announcement-modal').classList.add('open');
+}
 
+async function saveAnnouncement() {
+  const title = document.getElementById('ann-title').value.trim();
+  const content = document.getElementById('ann-content').value.trim();
+  if (!title || !content) { toast('Title and content required', 'error'); return; }
+  const data = {title, content, type:document.getElementById('ann-type').value, expires_at:document.getElementById('ann-expires').value||null, active:true};
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members/${memberId}/notes`, { credentials: 'include' });
-    const notes = await res.json();
-    const notesList = document.getElementById('notes-list');
-
-    if (!notes.length) {
-      notesList.innerHTML = '<div class="empty-state" style="padding: 1rem;">No notes yet.</div>';
-    } else {
-      notesList.innerHTML = notes.map(n => `
-        <div style="padding: 0.75rem; background: rgba(0,0,0,0.2); margin-bottom: 0.5rem; border-left: 2px solid var(--red);">
-          <div style="font-size: 0.7rem; color: var(--muted); margin-bottom: 0.25rem;">
-            ${new Date(n.created_at).toLocaleString()} — ${n.note_type} — ${n.created_by}
-          </div>
-          <div style="font-size: 0.85rem;">${n.content}</div>
-        </div>
-      `).join('');
-    }
-  } catch (e) {
-    document.getElementById('notes-list').innerHTML = '<div class="empty-state" style="padding: 1rem;">Failed to load notes.</div>';
-  }
-
-  document.getElementById('notes-modal').classList.add('open');
+    let r;
+    if (announcementEditId) r = await fetch(`${API}/api/admin/announcements/${announcementEditId}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    else r = await fetch(`${API}/api/admin/announcements`, {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if (r.ok) { toast('Announcement saved', 'success'); closeModal('announcement-modal'); loadAnnouncements(); }
+    else { const e = await r.json(); toast(e.detail||'Error','error'); }
+  } catch(e) { toast('Network error', 'error'); }
 }
 
-function closeNotesModal() {
-  notesMemberId = null;
-  document.getElementById('notes-modal').classList.remove('open');
-}
-
-async function saveNote() {
-  if (!notesMemberId) return;
-
-  const content = document.getElementById('new-note-content').value.trim();
-  const noteType = document.getElementById('new-note-type').value;
-
-  if (!content) {
-    alert('Please enter a note.');
-    return;
-  }
-
+async function deleteAnnouncement(id) {
+  if (!confirm('Delete this announcement?')) return;
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members/${notesMemberId}/notes`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content, note_type: noteType })
-    });
-
-    if (res.ok) {
-      document.getElementById('new-note-content').value = '';
-      openNotesModal(notesMemberId, notesMemberName);
-    } else {
-      alert('Failed to save note.');
-    }
-  } catch (e) {
-    alert('Connection error.');
-  }
+    await fetch(`${API}/api/admin/announcements/${id}`, {method:'DELETE',credentials:'include'});
+    loadAnnouncements();
+  } catch(e) {}
 }
 
-// Member Detail Modal
-async function openMemberModal(memberId) {
+// ===== REPORTS =====
+async function loadReports() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members/${memberId}`, { credentials: 'include' });
-    const member = await res.json();
-
-    // Build stage options
-    const stageOptions = PIPELINE_STAGES.map(s =>
-      `<option value="${s.id}" ${member.pipeline_stage === s.id ? 'selected' : ''}>${s.label}</option>`
-    ).join('');
-
-    // Build counselor options
-    const counselorOptions = '<option value="">— Not Assigned —</option>' +
-      counselorsList.filter(c => c.active).map(c =>
-        `<option value="${c.id}" ${member.counselor && member.counselor.id === c.id ? 'selected' : ''}>${c.name}</option>`
-      ).join('');
-
-    const content = document.getElementById('member-detail-content');
-    content.innerHTML = `
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-        <div>
-          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.2rem; margin-bottom: 1rem;">${member.first_name || ''} ${member.last_name || ''}</h3>
-          <div class="report-row"><span class="report-label">Email</span><span class="report-value">${member.email}</span></div>
-          <div class="report-row"><span class="report-label">Phone</span><span class="report-value">${member.phone || '—'}</span></div>
-          <div class="report-row"><span class="report-label">Branch</span><span class="report-value">${member.branch || '—'}</span></div>
-          <div class="report-row"><span class="report-label">Service Status</span><span class="report-value">${member.service_status || '—'}</span></div>
-          <div class="report-row"><span class="report-label">State</span><span class="report-value">${member.state || '—'}</span></div>
-          <div class="report-row"><span class="report-label">DD-214 Status</span><span class="report-value">${member.dd214_status || 'pending'}</span></div>
-          <div class="report-row"><span class="report-label">Joined</span><span class="report-value">${member.created_at ? new Date(member.created_at).toLocaleDateString() : '—'}</span></div>
-        </div>
-        <div>
-          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.2rem; margin-bottom: 1rem;">Manage</h3>
-          <div class="form-group">
-            <label class="form-label">Pipeline Stage</label>
-            <select class="form-select" id="modal-stage-select">${stageOptions}</select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Assigned Counselor</label>
-            <select class="form-select" id="modal-counselor-select">${counselorOptions}</select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Admin Notes</label>
-            <textarea class="form-textarea" id="modal-notes" style="min-height:80px;" placeholder="Add a note...">${member.admin_notes || ''}</textarea>
-          </div>
-          <button class="action-btn primary" onclick="saveMemberInline('${memberId}')">Save Changes</button>
-        </div>
+    const r = await fetch(`${API}/api/admin/analytics`, {credentials:'include'});
+    if (!r.ok) return;
+    const d = await r.json();
+    const k = d.kpis || {};
+    const el = document.getElementById('reports-content');
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:24px;">
+        <div class="kpi-card"><div class="kpi-value">${k.total_members||0}</div><div class="kpi-label">Total Members Served</div></div>
+        <div class="kpi-card green"><div class="kpi-value">${k.verified_members||0}</div><div class="kpi-label">Verified Members</div></div>
+        <div class="kpi-card blue"><div class="kpi-value">${k.new_this_month||0}</div><div class="kpi-label">New This Month</div></div>
+        <div class="kpi-card red"><div class="kpi-value">${k.pending_dd214||0}</div><div class="kpi-label">Pending DD-214</div></div>
+        <div class="kpi-card navy"><div class="kpi-value">${k.active_courses||0}</div><div class="kpi-label">Active Courses</div></div>
+        <div class="kpi-card"><div class="kpi-value">${k.total_counselors||0}</div><div class="kpi-label">Active Counselors</div></div>
       </div>
-    `;
-    document.getElementById('member-modal').classList.add('open');
-  } catch (e) {
-    console.error('Member detail error:', e);
-  }
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+        <div class="chart-card"><div class="chart-card-title">Member Growth (6 Months)</div><div style="height:200px;"><canvas id="rpt-growth"></canvas></div></div>
+        <div class="chart-card"><div class="chart-card-title">Branch of Service</div><div style="height:200px;"><canvas id="rpt-branch"></canvas></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+        <div class="chart-card"><div class="chart-card-title">Credit Repair Pipeline</div><div style="height:200px;"><canvas id="rpt-cr"></canvas></div></div>
+        <div class="chart-card"><div class="chart-card-title">Financial Counseling Pipeline</div><div style="height:200px;"><canvas id="rpt-fc"></canvas></div></div>
+      </div>
+      <div class="chart-card"><div class="chart-card-title">DD-214 Status Breakdown</div><div style="height:200px;"><canvas id="rpt-dd214"></canvas></div></div>`;
+    const cr = d.cr_pipeline || {};
+    const fc = d.fc_pipeline || {};
+    const crLabels = {cr_waitlist:'Waitlist',cr_consultation:'Consultation',cr_documents:'Documents',cr_dispute_1:'Dispute 1',cr_dispute_2:'Dispute 2',cr_dispute_3:'Dispute 3',cr_monitoring:'Monitoring',cr_complete:'Complete'};
+    const fcLabels = {fc_waitlist:'Waitlist',fc_consultation:'Consultation',fc_documents:'Documents',fc_gameplan:'Game Plan',fc_working:'Working Plan',fc_complete:'Complete'};
+    const dd214Labels = {pending:'Pending',pending_review:'Under Review',approved:'Approved',rejected:'Rejected',manual_approved:'Manual Approved'};
+    setTimeout(() => {
+      new Chart(document.getElementById('rpt-growth'), {type:'line',data:{labels:(d.monthly_members||[]).map(m=>m.month),datasets:[{label:'Members',data:(d.monthly_members||[]).map(m=>m.count),borderColor:'#C9952A',backgroundColor:'rgba(201,149,42,.12)',fill:true,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+      new Chart(document.getElementById('rpt-branch'), {type:'bar',data:{labels:Object.keys(d.branches||{}),datasets:[{data:Object.values(d.branches||{}),backgroundColor:'#0B1220',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+      new Chart(document.getElementById('rpt-cr'), {type:'bar',data:{labels:Object.keys(cr).map(k=>crLabels[k]||k),datasets:[{data:Object.values(cr),backgroundColor:'#2563eb',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+      new Chart(document.getElementById('rpt-fc'), {type:'bar',data:{labels:Object.keys(fc).map(k=>fcLabels[k]||k),datasets:[{data:Object.values(fc),backgroundColor:'#16a34a',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+      const dd214 = d.dd214 || {};
+      new Chart(document.getElementById('rpt-dd214'), {type:'doughnut',data:{labels:Object.keys(dd214).map(k=>dd214Labels[k]||k),datasets:[{data:Object.values(dd214),backgroundColor:['#e2e8f0','#fef3c7','#dcfce7','#fee2e2','#dbeafe'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right'}}}});
+    }, 100);
+  } catch(e) { document.getElementById('reports-content').innerHTML = '<div class="empty-state"><div>Error loading reports</div></div>'; }
 }
 
-async function saveMemberInline(memberId) {
-  const stage = document.getElementById('modal-stage-select').value;
-  const counselorId = document.getElementById('modal-counselor-select').value;
-  const notes = document.getElementById('modal-notes').value.trim();
+// ===== AUDIT LOG =====
+let allAudit = [];
 
-  const payload = { pipeline_stage: stage };
-  if (counselorId) payload.assigned_counselor_id = counselorId;
-  if (notes) payload.admin_notes = notes;
-
+async function loadAudit() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members/${memberId}`, {
-      method: 'PATCH',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (res.ok) {
-      closeMemberModal();
-      loadMembers();
-      loadPipeline();
-      loadStats();
-    } else {
-      alert('Failed to save changes.');
-    }
-  } catch (e) {
-    alert('Connection error.');
-  }
+    const r = await fetch(`${API}/api/admin/audit-log`, {credentials:'include'});
+    if (!r.ok) return;
+    allAudit = await r.json();
+    renderAudit(allAudit);
+  } catch(e) {}
 }
 
-function closeMemberModal() {
-  document.getElementById('member-modal').classList.remove('open');
+function filterAudit() {
+  const q = (document.getElementById('audit-search')?.value||'').toLowerCase();
+  renderAudit(allAudit.filter(l => (l.action||'').toLowerCase().includes(q) || (l.user_email||'').toLowerCase().includes(q) || (l.entity_type||'').toLowerCase().includes(q)));
 }
 
-// Stage Change Modal
-let stageMemberId = null;
-
-function openStageModal(memberId, memberName, currentStage) {
-  stageMemberId = memberId;
-  document.getElementById('stage-member-id').value = memberId;
-  document.getElementById('stage-member-info').innerHTML = '<strong>Changing stage for:</strong> ' + memberName;
-  document.getElementById('stage-select').value = currentStage;
-  document.getElementById('stage-modal').classList.add('open');
+function renderAudit(logs) {
+  const tbody = document.getElementById('audit-tbody');
+  if (!logs.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">No audit entries found</td></tr>'; return; }
+  tbody.innerHTML = logs.slice(0,200).map(l => `
+    <tr>
+      <td style="white-space:nowrap;color:var(--text-muted)">${fmtTime(l.timestamp)}</td>
+      <td>${l.user_email||'—'}</td>
+      <td><code style="font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;">${l.action||'—'}</code></td>
+      <td>${l.entity_type||'—'} ${l.entity_id ? `<span style="color:var(--text-muted);font-size:11px;">${l.entity_id.slice(-8)}</span>` : ''}</td>
+      <td>${l.ip_address||'—'}</td>
+    </tr>`).join('');
 }
 
-function closeStageModal() {
-  stageMemberId = null;
-  document.getElementById('stage-modal').classList.remove('open');
-}
-
-async function confirmStageChange() {
-  if (!stageMemberId) return;
-  const newStage = document.getElementById('stage-select').value;
-
+// ===== CONTACTS =====
+async function loadContacts() {
   try {
-    const res = await fetch(`${window.API_BASE}/api/admin/members/${stageMemberId}/stage`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stage: newStage })
-    });
+    const r = await fetch(`${API}/api/admin/contacts`, {credentials:'include'});
+    if (!r.ok) return;
+    const contacts = await r.json();
+    const tbody = document.getElementById('contacts-tbody');
+    if (!contacts.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">No inquiries yet</td></tr>'; return; }
+    tbody.innerHTML = contacts.map(c => `
+      <tr>
+        <td><strong>${c.first_name||''} ${c.last_name||''}</strong></td>
+        <td style="color:var(--text-muted)">${c.email}</td>
+        <td>${c.topic||'—'}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.message||''}</td>
+        <td>${fmtDate(c.created_at)}</td>
+        <td>${c.responded ? '<span class="badge badge-green">Responded</span>' : '<span class="badge badge-gold">New</span>'}</td>
+        <td onclick="event.stopPropagation()" style="display:flex;gap:6px;">
+          ${!c.responded ? `<button class="btn btn-outline btn-xs" onclick="markContacted('${c.id}')">Mark Responded</button>` : ''}
+          <button class="btn btn-red btn-xs" onclick="deleteContact('${c.id}')">&#x2715;</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {}
+}
 
-    if (res.ok) {
-      closeStageModal();
-      loadMembers();
-      loadPipeline();
-      loadStats();
-    } else {
-      alert('Failed to update stage.');
-    }
-  } catch (e) {
-    alert('Connection error.');
-  }
+async function markContacted(id) {
+  try {
+    await fetch(`${API}/api/admin/contacts/${id}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({responded:true})});
+    loadContacts();
+  } catch(e) {}
+}
+
+async function deleteContact(id) {
+  if (!confirm('Delete this inquiry?')) return;
+  try {
+    await fetch(`${API}/api/admin/contacts/${id}`, {method:'DELETE',credentials:'include'});
+    loadContacts();
+  } catch(e) {}
+}
+
+// ===== UTILITIES =====
+function closeModal(id) {
+  document.getElementById(id)?.classList.remove('open');
 }
 
 async function handleLogout() {
-  try {
-    await fetch(`${window.API_BASE}/api/auth/logout`, {
-      method: 'POST',
-      credentials: 'include'
-    });
-  } catch (e) {}
-  localStorage.removeItem('sh_user');
+  try { await fetch(`${API}/api/auth/logout`, {method:'POST',credentials:'include'}); } catch(e) {}
   window.location.href = 'login.html';
 }
 
-document.addEventListener('DOMContentLoaded', loadAdmin);
+// ===== BOOTSTRAP =====
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>

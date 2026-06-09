@@ -198,6 +198,7 @@ async def get_dashboard_data(request: Request):
     }
 
 # DD-214 Upload
+@router.post("/dd214")
 @router.post("/upload/dd214")
 async def upload_dd214(request: Request, file: UploadFile = File(...)):
     """Upload DD-214 document to Supabase or local storage"""

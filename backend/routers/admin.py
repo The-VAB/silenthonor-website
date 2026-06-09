@@ -373,3 +373,278 @@ async def get_audit_log(request: Request):
         "ip_address": l.get("ip_address"),
         "timestamp": l.get("timestamp").isoformat() if l.get("timestamp") else None
     } for l in logs]
+
+
+# Credit repair pipeline stages
+CR_STAGES = [
+    "cr_waitlist", "cr_consultation", "cr_documents",
+    "cr_dispute_1", "cr_dispute_2", "cr_dispute_3",
+    "cr_monitoring", "cr_complete"
+]
+
+CR_STAGE_LABELS = {
+    "cr_waitlist": "Waitlist", "cr_consultation": "Consultation",
+    "cr_documents": "Documents", "cr_dispute_1": "Dispute Round 1",
+    "cr_dispute_2": "Dispute Round 2", "cr_dispute_3": "Dispute Round 3",
+    "cr_monitoring": "Monitoring", "cr_complete": "Complete"
+}
+
+# Financial counseling pipeline stages
+FC_STAGES = [
+    "fc_waitlist", "fc_consultation", "fc_documents",
+    "fc_gameplan", "fc_working", "fc_complete"
+]
+
+FC_STAGE_LABELS = {
+    "fc_waitlist": "Waitlist", "fc_consultation": "Consultation",
+    "fc_documents": "Documents", "fc_gameplan": "Game Plan",
+    "fc_working": "Working the Plan", "fc_complete": "Complete"
+}
+
+
+@router.get("/analytics")
+async def get_analytics(request: Request):
+    """Comprehensive analytics for admin dashboard charts"""
+    await get_current_admin(request)
+
+    from datetime import timedelta
+    now = datetime.now(timezone.utc)
+
+    total_members = await db.users.count_documents({"role": "member"})
+    verified_members = await db.users.count_documents({"role": "member", "verified": True})
+    pending_dd214 = await db.users.count_documents({"role": "member", "dd214_status": "pending_review"})
+    total_counselors = await db.users.count_documents({"role": "counselor", "active": True})
+    active_courses = await db.courses.count_documents({"status": "published"})
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    new_this_month = await db.users.count_documents({"role": "member", "created_at": {"$gte": month_start}})
+
+    # Members by month (last 6 months)
+    monthly = []
+    for i in range(5, -1, -1):
+        ms = (now - timedelta(days=30 * i)).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        me = (ms.replace(day=28) + timedelta(days=4)).replace(day=1)
+        count = await db.users.count_documents({"role": "member", "created_at": {"$gte": ms, "$lt": me}})
+        monthly.append({"month": ms.strftime("%b %Y"), "count": count})
+
+    # Branch breakdown
+    branch_agg = await db.users.aggregate([
+        {"$match": {"role": "member"}},
+        {"$group": {"_id": "$branch", "count": {"$sum": 1}}}
+    ]).to_list(20)
+    branches = {(b["_id"] or "Not Specified"): b["count"] for b in branch_agg}
+
+    # Pipeline distributions
+    pipeline_dist = {s: await db.users.count_documents({"role": "member", "pipeline_stage": s}) for s in PIPELINE_STAGES}
+    cr_dist = {s: await db.users.count_documents({"role": "member", "credit_repair_stage": s}) for s in CR_STAGES}
+    fc_dist = {s: await db.users.count_documents({"role": "member", "financial_counseling_stage": s}) for s in FC_STAGES}
+
+    # DD-214 status
+    dd214_dist = {}
+    for status in ["pending", "pending_review", "approved", "rejected", "manual_approved"]:
+        dd214_dist[status] = await db.users.count_documents({"role": "member", "dd214_status": status})
+
+    return {
+        "kpis": {
+            "total_members": total_members,
+            "verified_members": verified_members,
+            "pending_dd214": pending_dd214,
+            "total_counselors": total_counselors,
+            "active_courses": active_courses,
+            "new_this_month": new_this_month
+        },
+        "monthly_members": monthly,
+        "branches": branches,
+        "pipeline": pipeline_dist,
+        "dd214": dd214_dist,
+        "cr_pipeline": cr_dist,
+        "fc_pipeline": fc_dist
+    }
+
+
+@router.get("/members/{member_id}/full")
+async def get_member_full(request: Request, member_id: str):
+    """Get complete member profile including courses, disputes, notes"""
+    await get_current_admin(request)
+
+    member = await db.users.find_one({"_id": ObjectId(member_id)})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    # Enrolled courses with progress
+    progress_docs = await db.course_progress.find({"user_id": ObjectId(member_id)}).to_list(50)
+    courses = []
+    for p in progress_docs:
+        cid = str(p.get("course_id", ""))
+        if len(cid) == 24:
+            course = await db.courses.find_one({"_id": ObjectId(cid)})
+            if course:
+                courses.append({
+                    "id": str(course["_id"]),
+                    "title": course.get("title", ""),
+                    "percent_complete": p.get("percent_complete", 0),
+                    "last_accessed": p.get("updated_at").isoformat() if p.get("updated_at") else None
+                })
+
+    # Disputes
+    disputes = await db.disputes.find({"user_id": ObjectId(member_id)}).sort("created_at", -1).to_list(50)
+    dispute_list = [{
+        "id": str(d["_id"]),
+        "bureau": d.get("bureau"),
+        "account": d.get("account"),
+        "status": d.get("status"),
+        "round": d.get("round"),
+        "created_at": d.get("created_at").isoformat() if d.get("created_at") else None
+    } for d in disputes]
+
+    # Notes
+    notes = await db.intake_notes.find({"member_id": ObjectId(member_id)}).sort("created_at", -1).to_list(50)
+    note_list = [{
+        "id": str(n["_id"]),
+        "content": n.get("content", ""),
+        "author": n.get("author", ""),
+        "created_at": n.get("created_at").isoformat() if n.get("created_at") else None
+    } for n in notes]
+
+    # Counselor name
+    counselor_name = None
+    if member.get("assigned_counselor_id"):
+        try:
+            c = await db.users.find_one({"_id": member["assigned_counselor_id"]})
+            if c:
+                counselor_name = f"{c.get('first_name', '')} {c.get('last_name', '')}".strip()
+        except:
+            pass
+
+    return {
+        "id": str(member["_id"]),
+        "email": member.get("email", ""),
+        "first_name": member.get("first_name", ""),
+        "last_name": member.get("last_name", ""),
+        "phone": member.get("phone", ""),
+        "state": member.get("state", ""),
+        "dob": member.get("dob", ""),
+        "branch": member.get("branch", ""),
+        "service_status": member.get("service_status", ""),
+        "years_of_service": member.get("years_of_service"),
+        "separation_year": member.get("separation_year"),
+        "challenges": member.get("challenges", ""),
+        "how_heard": member.get("how_heard", ""),
+        "notes": member.get("notes", ""),
+        "role": member.get("role", "member"),
+        "verified": member.get("verified", False),
+        "dd214_status": member.get("dd214_status", "pending"),
+        "dd214_file": member.get("dd214_file"),
+        "dd214_approved_by": member.get("dd214_approved_by"),
+        "dd214_approved_at": member.get("dd214_approved_at").isoformat() if member.get("dd214_approved_at") else None,
+        "pipeline_stage": member.get("pipeline_stage", "applied"),
+        "cr_stage": member.get("credit_repair_stage"),
+        "fc_stage": member.get("financial_counseling_stage"),
+        "assigned_counselor_id": str(member["assigned_counselor_id"]) if member.get("assigned_counselor_id") else None,
+        "assigned_counselor_name": counselor_name,
+        "admin_notes": member.get("admin_notes", ""),
+        "created_at": member.get("created_at").isoformat() if member.get("created_at") else None,
+        "courses": courses,
+        "disputes": dispute_list,
+        "notes_history": note_list
+    }
+
+
+@router.get("/pipeline/credit-repair")
+async def get_cr_pipeline(request: Request):
+    """Members organized by credit repair stage"""
+    await get_current_admin(request)
+    pipeline = {}
+    for stage in CR_STAGES:
+        members = await db.users.find(
+            {"role": "member", "credit_repair_stage": stage},
+            {"_id": 1, "email": 1, "first_name": 1, "last_name": 1, "branch": 1, "created_at": 1}
+        ).sort("created_at", -1).to_list(100)
+        pipeline[stage] = [{
+            "id": str(m["_id"]),
+            "name": f"{m.get('first_name', '')} {m.get('last_name', '')}".strip() or m["email"],
+            "branch": m.get("branch"),
+            "created_at": m.get("created_at").isoformat() if m.get("created_at") else None
+        } for m in members]
+    return {"stages": pipeline, "labels": CR_STAGE_LABELS}
+
+
+@router.get("/pipeline/financial-counseling")
+async def get_fc_pipeline(request: Request):
+    """Members organized by financial counseling stage"""
+    await get_current_admin(request)
+    pipeline = {}
+    for stage in FC_STAGES:
+        members = await db.users.find(
+            {"role": "member", "financial_counseling_stage": stage},
+            {"_id": 1, "email": 1, "first_name": 1, "last_name": 1, "branch": 1, "created_at": 1}
+        ).sort("created_at", -1).to_list(100)
+        pipeline[stage] = [{
+            "id": str(m["_id"]),
+            "name": f"{m.get('first_name', '')} {m.get('last_name', '')}".strip() or m["email"],
+            "branch": m.get("branch"),
+            "created_at": m.get("created_at").isoformat() if m.get("created_at") else None
+        } for m in members]
+    return {"stages": pipeline, "labels": FC_STAGE_LABELS}
+
+
+@router.patch("/members/{member_id}/cr-stage")
+async def update_cr_stage(request: Request, member_id: str):
+    admin = await get_current_admin(request)
+    data = await request.json()
+    new_stage = data.get("stage")
+    if new_stage not in CR_STAGES:
+        raise HTTPException(status_code=400, detail="Invalid CR stage")
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"credit_repair_stage": new_stage, "updated_at": datetime.now(timezone.utc)}}
+    )
+    await log_audit_event(action="CR_STAGE_UPDATED", entity_type="user", entity_id=member_id,
+                          user_email=admin.get("email"), details={"stage": new_stage})
+    return {"message": "CR stage updated"}
+
+
+@router.patch("/members/{member_id}/fc-stage")
+async def update_fc_stage(request: Request, member_id: str):
+    admin = await get_current_admin(request)
+    data = await request.json()
+    new_stage = data.get("stage")
+    if new_stage not in FC_STAGES:
+        raise HTTPException(status_code=400, detail="Invalid FC stage")
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"financial_counseling_stage": new_stage, "updated_at": datetime.now(timezone.utc)}}
+    )
+    await log_audit_event(action="FC_STAGE_UPDATED", entity_type="user", entity_id=member_id,
+                          user_email=admin.get("email"), details={"stage": new_stage})
+    return {"message": "FC stage updated"}
+
+
+@router.post("/members/{member_id}/approve-dd214")
+async def approve_dd214_manual(request: Request, member_id: str):
+    """Manually approve DD-214 without requiring document upload"""
+    admin = await get_current_admin(request)
+    data = await request.json()
+
+    member = await db.users.find_one({"_id": ObjectId(member_id)})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {
+            "dd214_status": "manual_approved",
+            "dd214_approved_by": admin.get("email"),
+            "dd214_approved_at": datetime.now(timezone.utc),
+            "dd214_approval_notes": data.get("notes", ""),
+            "verified": True,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+
+    await log_audit_event(action="DD214_MANUAL_APPROVED", entity_type="user", entity_id=member_id,
+                          user_email=admin.get("email"), details={"notes": data.get("notes", "")})
+
+    asyncio.create_task(send_dd214_approved_email(member.get("email"), member.get("first_name", "Member")))
+    return {"message": "DD-214 manually approved, member verified"}
+
+

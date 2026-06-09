@@ -98,6 +98,8 @@ async def create_indexes():
         await db.users.create_index("email", unique=True)
         await db.users.create_index("role")
         await db.users.create_index("pipeline_stage")
+        await db.users.create_index("credit_repair_stage")
+        await db.users.create_index("financial_counseling_stage")
         await db.users.create_index("assigned_counselor_id")
 
         # Token indexes

@@ -458,47 +458,49 @@ async def approve_application(request: Request, application_id: str):
     admin = await get_current_admin(request)
     data = await request.json()
 
-    counselor_id = data.get("counselor_id")
-    if not counselor_id:
-        raise HTTPException(status_code=400, detail="Counselor ID is required")
+    counselor_id = data.get("counselor_id") or None
 
     app = await db.program_applications.find_one({"_id": ObjectId(application_id)})
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
 
+    app_update = {
+        "status": "approved",
+        "reviewed_at": datetime.now(timezone.utc),
+        "reviewed_by": ObjectId(admin["_id"]),
+        "notes": data.get("notes", app.get("notes", ""))
+    }
+    if counselor_id:
+        app_update["counselor_id"] = ObjectId(counselor_id)
+
     # Update application
     await db.program_applications.update_one(
         {"_id": ObjectId(application_id)},
-        {"$set": {
-            "status": "approved",
-            "reviewed_at": datetime.now(timezone.utc),
-            "reviewed_by": ObjectId(admin["_id"]),
-            "counselor_id": ObjectId(counselor_id),
-            "notes": data.get("notes", app.get("notes", ""))
-        }}
+        {"$set": app_update}
     )
 
     # Update member's pipeline stage and counselor assignment
     program_type = app.get("program_type")
     member_id = app.get("member_id")
 
-    update_fields = {
-        "assigned_counselor_id": ObjectId(counselor_id)
-    }
+    update_fields = {}
+    if counselor_id:
+        update_fields["assigned_counselor_id"] = ObjectId(counselor_id)
 
     if program_type == "credit_repair":
         update_fields["credit_repair_stage"] = "cr_consultation"
     elif program_type == "financial_counseling":
         update_fields["financial_counseling_stage"] = "fc_consultation"
 
-    await db.users.update_one(
-        {"_id": member_id},
-        {"$set": update_fields}
-    )
+    if update_fields:
+        await db.users.update_one(
+            {"_id": member_id},
+            {"$set": update_fields}
+        )
 
     # Get member and counselor for email
     member = await db.users.find_one({"_id": member_id})
-    counselor = await db.users.find_one({"_id": ObjectId(counselor_id)})
+    counselor = await db.users.find_one({"_id": ObjectId(counselor_id)}) if counselor_id else None
 
     if member and counselor:
         counselor_name = f"{counselor.get('first_name', '')} {counselor.get('last_name', '')}".strip()
