@@ -311,6 +311,36 @@ async def patch_member(request: Request, member_id: str):
 
     return {"message": "Member updated"}
 
+@router.put("/members/{member_id}/password")
+async def set_member_password(request: Request, member_id: str):
+    """Set a member's password (admin override)"""
+    admin = await get_current_admin(request)
+    data = await request.json()
+
+    new_password = data.get("password", "").strip()
+    if not new_password or len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+
+    member = await db.users.find_one({"_id": ObjectId(member_id)})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"password_hash": hash_password(new_password), "updated_at": datetime.now(timezone.utc)}}
+    )
+
+    await log_audit_event(
+        action="ADMIN_SET_PASSWORD",
+        entity_type="user",
+        entity_id=member_id,
+        user_id=admin["_id"],
+        user_email=admin.get("email"),
+        ip_address=request.client.host if request.client else None
+    )
+
+    return {"message": "Password updated"}
+
 @router.get("/contacts")
 async def get_contacts(request: Request):
     """Get all contact form submissions"""
