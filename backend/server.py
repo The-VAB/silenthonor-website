@@ -78,6 +78,9 @@ async def startup_db():
     # Seed admin user
     await seed_admin()
 
+    # One-time migration: bring legacy static courses into the DB-managed course system
+    await migrate_legacy_courses()
+
     # Create required directories
     os.makedirs("/app/uploads/dd214", exist_ok=True)
     os.makedirs("/app/memory", exist_ok=True)
@@ -170,6 +173,90 @@ async def seed_admin():
             f.write("- ReDoc: /redoc\n")
     except Exception as e:
         logger.warning(f"Could not write test credentials: {e}")
+
+async def migrate_legacy_courses():
+    """One-time migration: move the old hardcoded member courses into db.courses
+    so they show up in the admin course manager and can be edited/deleted/published."""
+    marker = await db.migrations.find_one({"name": "legacy_courses_v1"})
+    if marker:
+        return
+
+    legacy_courses = [
+        {
+            "legacy_id": "credit-education",
+            "title": "Credit Education for Veterans",
+            "description": "Learn the fundamentals of credit scores, credit reports, and how to build and repair your credit as a veteran.",
+            "category": "credit",
+            "status": "published",
+            "lessons": [
+                {"title": "Understanding Your Credit Score", "duration": "15 min", "content": "<p>Your credit score is a three-digit number that represents your creditworthiness. Lenders use this score to determine whether to approve your loan applications and what interest rate to charge.</p><h3>Key Components</h3><ul><li><strong>Payment History (35%)</strong> - Your track record of paying bills on time</li><li><strong>Credit Utilization (30%)</strong> - How much of your available credit you use</li><li><strong>Length of Credit History (15%)</strong> - How long you have had credit accounts</li><li><strong>Credit Mix (10%)</strong> - The variety of credit types you have</li><li><strong>New Credit (10%)</strong> - Recent credit inquiries and new accounts</li></ul>"},
+                {"title": "Reading Your Credit Report", "duration": "20 min", "content": "<p>Your credit report contains detailed information about your credit history. Learning to read it is essential for maintaining good credit health.</p><h3>What to Look For</h3><ul><li>Personal information accuracy</li><li>Account statuses and payment history</li><li>Public records and collections</li><li>Credit inquiries</li></ul><p>You are entitled to one free credit report from each bureau annually at AnnualCreditReport.com.</p>"},
+                {"title": "Building Credit from Scratch", "duration": "18 min", "content": "<p>If you have no credit history, building it can seem challenging. Here are proven strategies to establish credit.</p><h3>Getting Started</h3><ul><li>Become an authorized user on a family member account</li><li>Apply for a secured credit card</li><li>Consider a credit-builder loan</li><li>Report rent payments to credit bureaus</li></ul>"},
+                {"title": "Common Credit Mistakes", "duration": "12 min", "content": "<p>Avoiding these common mistakes can save you from credit score damage.</p><h3>Mistakes to Avoid</h3><ul><li>Paying late or missing payments</li><li>Maxing out credit cards</li><li>Closing old accounts</li><li>Applying for too much credit at once</li><li>Ignoring your credit report</li></ul>"},
+                {"title": "Dispute Process Overview", "duration": "25 min", "content": "<p>If you find errors on your credit report, you have the right to dispute them. This lesson covers the dispute process.</p><h3>The Dispute Process</h3><ol><li>Identify the error on your report</li><li>Gather supporting documentation</li><li>Write a dispute letter via certified mail</li><li>Wait for investigation (30-45 days)</li><li>Review results and follow up if needed</li></ol><p><strong>Important:</strong> Always dispute via certified mail, never online. This preserves your legal rights under the Fair Credit Reporting Act.</p>"}
+            ]
+        },
+        {
+            "legacy_id": "financial-literacy",
+            "title": "Financial Literacy Foundations",
+            "description": "Build essential money management skills, including budgeting, saving, and planning for your financial future.",
+            "category": "financial",
+            "status": "published",
+            "lessons": []
+        },
+        {
+            "legacy_id": "money-mission",
+            "title": "Money Mission: Complete Financial Literacy",
+            "description": "A comprehensive financial literacy program covering budgeting, saving, investing, and long-term financial planning.",
+            "category": "financial",
+            "status": "coming_soon",
+            "lessons": []
+        },
+        {
+            "legacy_id": "va-loan",
+            "title": "VA Loan & Homeownership Prep",
+            "description": "Everything veterans need to know to use their VA home loan benefit and prepare for homeownership.",
+            "category": "housing",
+            "status": "coming_soon",
+            "lessons": [
+                {"title": "VA Loan Basics", "duration": "20 min", "content": "<p>VA loans are a powerful benefit for veterans, offering favorable terms not available with conventional mortgages.</p><h3>Key Benefits</h3><ul><li>No down payment required</li><li>No private mortgage insurance (PMI)</li><li>Competitive interest rates</li><li>Limited closing costs</li><li>No prepayment penalty</li></ul>"},
+                {"title": "Eligibility Requirements", "duration": "15 min", "content": "<p>Understanding VA loan eligibility is the first step to homeownership.</p><h3>Service Requirements</h3><ul><li>90 consecutive days active duty during wartime</li><li>181 days active duty during peacetime</li><li>6 years in the National Guard or Reserves</li><li>Surviving spouse of veteran who died in service</li></ul>"}
+            ]
+        }
+    ]
+
+    for lc in legacy_courses:
+        existing = await db.courses.find_one({"legacy_id": lc["legacy_id"]})
+        if existing:
+            continue
+        now = datetime.now(timezone.utc)
+        result = await db.courses.insert_one({
+            "legacy_id": lc["legacy_id"],
+            "title": lc["title"],
+            "description": lc["description"],
+            "category": lc["category"],
+            "status": lc["status"],
+            "thumbnail": None,
+            "created_at": now,
+            "updated_at": now
+        })
+        course_id = str(result.inserted_id)
+        for i, lesson in enumerate(lc["lessons"]):
+            await db.lessons.insert_one({
+                "course_id": course_id,
+                "module_id": None,
+                "title": lesson["title"],
+                "content": lesson["content"],
+                "lesson_type": "text",
+                "order": i,
+                "video_url": None,
+                "resource_url": None,
+                "duration": lesson["duration"],
+                "created_at": now
+            })
+
+    await db.migrations.insert_one({"name": "legacy_courses_v1", "applied_at": datetime.now(timezone.utc)})
+    logger.info("Legacy courses migrated into db.courses")
 
 # HTML page serving
 @app.get("/{page}.html")
