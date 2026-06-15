@@ -20,6 +20,7 @@ input,select,textarea{font-family:inherit;font-size:14px;}
 #sidebar::-webkit-scrollbar{width:4px;}
 #sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px;}
 .sidebar-logo{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-logo img{height:36px;width:auto;margin-bottom:8px;}
 .sidebar-logo-text{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;color:var(--gold);letter-spacing:.04em;}
 .sidebar-logo-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
 .sidebar-user{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;}
@@ -124,6 +125,14 @@ input,select,textarea{font-family:inherit;font-size:14px;}
 #panel-backdrop.open{display:block;opacity:1;}
 #member-panel{position:fixed;top:0;right:0;bottom:0;width:620px;background:var(--white);z-index:201;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.15);transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
 #member-panel.open{transform:translateX(0);}
+#staff-panel-backdrop{display:none;position:fixed;inset:0;background:rgba(11,18,32,.5);z-index:200;opacity:0;transition:opacity .2s;}
+#staff-panel-backdrop.open{display:block;opacity:1;}
+#staff-panel{position:fixed;top:0;right:0;bottom:0;width:620px;background:var(--white);z-index:201;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.15);transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
+#staff-panel.open{transform:translateX(0);}
+.client-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.client-row:hover{background:#f8fafc;}
+.activity-item{padding:10px 0;border-bottom:1px solid var(--border);}
+.activity-item:last-child{border-bottom:none;}
 .panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;background:var(--navy);color:#fff;}
 .panel-close{margin-left:auto;background:rgba(255,255,255,.1);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .panel-close:hover{background:rgba(255,255,255,.2);}
@@ -233,6 +242,7 @@ input,select,textarea{font-family:inherit;font-size:14px;}
 <div id="app">
 <nav id="sidebar">
   <div class="sidebar-logo">
+    <img src="images/silent-honor-logo.png" alt="Silent Honor">
     <div class="sidebar-logo-text">SILENT HONOR</div>
     <div class="sidebar-logo-sub">Foundation Admin</div>
   </div>
@@ -616,6 +626,32 @@ input,select,textarea{font-family:inherit;font-size:14px;}
     <button class="btn btn-outline btn-sm" onclick="closeMemberPanel()">Close</button>
     <div class="spacer"></div>
     <button class="btn btn-primary btn-sm" onclick="savePanelOverview()">Save Changes</button>
+  </div>
+</div>
+
+<!-- Staff Detail Panel -->
+<div id="staff-panel-backdrop" onclick="closeStaffPanel()"></div>
+<div id="staff-panel">
+  <div class="panel-header">
+    <div class="panel-avatar" id="staff-panel-avatar">?</div>
+    <div>
+      <div class="panel-name" id="staff-panel-name">Staff</div>
+      <div class="panel-meta" id="staff-panel-meta"></div>
+    </div>
+    <button class="panel-close" onclick="closeStaffPanel()">&#x2715;</button>
+  </div>
+  <div class="panel-tabs" id="staff-panel-tabs">
+    <div class="panel-tab active" onclick="switchStaffPanelTab('overview')">Overview</div>
+    <div class="panel-tab" id="staff-panel-tab-clients-btn" style="display:none;" onclick="switchStaffPanelTab('clients')">Clients</div>
+    <div class="panel-tab" id="staff-panel-tab-activity-btn" style="display:none;" onclick="switchStaffPanelTab('activity')">Activity</div>
+  </div>
+  <div class="panel-content">
+    <div id="staff-panel-tab-overview" class="tab-pane active"><div id="staff-panel-overview-content"></div></div>
+    <div id="staff-panel-tab-clients" class="tab-pane"><div id="staff-panel-clients-content"></div></div>
+    <div id="staff-panel-tab-activity" class="tab-pane"><div id="staff-panel-activity-content"></div></div>
+  </div>
+  <div class="panel-footer">
+    <button class="btn btn-outline btn-sm" onclick="closeStaffPanel()">Close</button>
   </div>
 </div>
 
@@ -2095,7 +2131,7 @@ async function loadStaff() {
     const tbody = document.getElementById('staff-tbody');
     if (!staff.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">No staff members yet</td></tr>'; return; }
     tbody.innerHTML = staff.map(s => `
-      <tr>
+      <tr onclick="openStaffPanel('${s.id}')" style="cursor:pointer;">
         <td><strong>${s.name||s.email}</strong></td>
         <td>${roleBadge(s.role)}</td>
         <td>${s.title||'—'}</td>
@@ -2178,6 +2214,95 @@ async function toggleStaffActive(id, active) {
     await fetch(`${API}/api/admin/staff/${id}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({active})});
     loadStaff();
   } catch(e) {}
+}
+
+// ===== STAFF DETAIL PANEL =====
+async function openStaffPanel(staffId) {
+  document.getElementById('staff-panel-backdrop').classList.add('open');
+  document.getElementById('staff-panel').classList.add('open');
+  document.getElementById('staff-panel-name').textContent = 'Loading...';
+  document.getElementById('staff-panel-meta').textContent = '';
+  switchStaffPanelTab('overview');
+  try {
+    const r = await fetch(`${API}/api/admin/staff/${staffId}/full`, {credentials:'include'});
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      document.getElementById('staff-panel-overview-content').innerHTML = `<div class="empty-state"><div>Error ${r.status}: ${body.detail || 'Failed to load staff member'}</div></div>`;
+      document.getElementById('staff-panel-name').textContent = 'Error';
+      return;
+    }
+    const s = await r.json();
+    renderStaffPanel(s);
+  } catch(e) {
+    document.getElementById('staff-panel-overview-content').innerHTML = `<div class="empty-state"><div>Network error: ${e.message}</div></div>`;
+    document.getElementById('staff-panel-name').textContent = 'Error';
+  }
+}
+
+function closeStaffPanel() {
+  document.getElementById('staff-panel-backdrop').classList.remove('open');
+  document.getElementById('staff-panel').classList.remove('open');
+}
+
+function switchStaffPanelTab(tab) {
+  document.querySelectorAll('#staff-panel-tabs .panel-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#staff-panel .tab-pane').forEach(p => p.classList.remove('active'));
+  const btn = document.getElementById(`staff-panel-tab-${tab}-btn`);
+  if (btn) btn.classList.add('active');
+  else document.querySelector('#staff-panel-tabs .panel-tab').classList.add('active');
+  document.getElementById(`staff-panel-tab-${tab}`).classList.add('active');
+}
+
+function renderStaffPanel(s) {
+  const initials = ((s.first_name||'?')[0] + (s.last_name||'?')[0]).toUpperCase();
+  document.getElementById('staff-panel-avatar').textContent = initials;
+  document.getElementById('staff-panel-name').textContent = `${s.first_name||''} ${s.last_name||''}`.trim() || s.email;
+  document.getElementById('staff-panel-meta').textContent = `${(s.role||'').toUpperCase()}${s.title ? ' · '+s.title : ''} · ${s.active ? 'Active' : 'Inactive'}`;
+
+  const isCounselor = s.role === 'counselor';
+  document.getElementById('staff-panel-tab-clients-btn').style.display = isCounselor ? '' : 'none';
+  document.getElementById('staff-panel-tab-activity-btn').style.display = isCounselor ? '' : 'none';
+
+  document.getElementById('staff-panel-overview-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="field-row"><div class="field-label">First Name</div><div>${s.first_name||'—'}</div></div>
+      <div class="field-row"><div class="field-label">Last Name</div><div>${s.last_name||'—'}</div></div>
+      <div class="field-row"><div class="field-label">Email</div><div>${s.email||'—'}</div></div>
+      <div class="field-row"><div class="field-label">Role</div><div>${roleBadge(s.role)}</div></div>
+      <div class="field-row"><div class="field-label">Title</div><div>${s.title||'—'}</div></div>
+      <div class="field-row"><div class="field-label">Credentials</div><div>${s.credentials||'—'}</div></div>
+      <div class="field-row"><div class="field-label">Status</div><div>${s.active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</div></div>
+      <div class="field-row"><div class="field-label">Joined</div><div>${fmtDate(s.created_at)||'—'}</div></div>
+      <div class="field-row"><div class="field-label">Last Active</div><div>${fmtDate(s.last_active)||'—'}</div></div>
+      ${s.calendly_url ? `<div class="field-row"><div class="field-label">Calendly</div><div><a href="${s.calendly_url}" target="_blank">${s.calendly_url}</a></div></div>` : ''}
+    </div>
+    <div class="field-row"><div class="field-label">Specialties</div><div>${(s.specialties||[]).length ? s.specialties.join(', ') : '—'}</div></div>
+    <div class="field-row"><div class="field-label">Bio</div><div style="white-space:pre-wrap;">${s.bio||'—'}</div></div>
+  `;
+
+  if (isCounselor) {
+    const clients = s.clients || [];
+    document.getElementById('staff-panel-clients-content').innerHTML = !clients.length
+      ? '<div class="empty-state"><div class="empty-state-icon">&#128101;</div><div>No clients assigned yet</div></div>'
+      : `<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">${clients.length} assigned client${clients.length===1?'':'s'}</div>` +
+        clients.map(c => `
+          <div class="client-row" onclick="closeStaffPanel();openMemberPanel('${c.id}')">
+            <div>
+              <div style="font-weight:600;font-size:13px;">${c.name||c.email}</div>
+              <div style="font-size:12px;color:var(--text-muted);">${c.email} · ${c.notes_count} note${c.notes_count===1?'':'s'} · ${c.disputes_count} dispute${c.disputes_count===1?'':'s'}</div>
+            </div>
+            <div>${stageBadge(c.pipeline_stage)}</div>
+          </div>`).join('');
+
+    const activity = s.recent_activity || [];
+    document.getElementById('staff-panel-activity-content').innerHTML = !activity.length
+      ? '<div class="empty-state"><div class="empty-state-icon">&#128203;</div><div>No activity logged yet</div></div>'
+      : activity.map(a => `
+          <div class="activity-item">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px;">${fmtDate(a.created_at)} · <strong>${a.member_name}</strong></div>
+            <div style="font-size:13px;">${a.content}</div>
+          </div>`).join('');
+  }
 }
 
 // ===== ANNOUNCEMENTS =====
