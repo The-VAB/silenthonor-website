@@ -77,37 +77,9 @@ async def get_courses(request: Request):
     ).to_list(100)
 
     # Get courses from database
-    db_courses = await db.courses.find({"status": {"$in": ["live", "published"]}}).to_list(100)
+    db_courses = await db.courses.find({"status": {"$in": ["live", "published", "coming_soon"]}}).sort("created_at", 1).to_list(100)
 
-    # Static courses for now
-    courses = [
-        {
-            "id": "credit-education",
-            "title": "Credit Education for Veterans",
-            "total_lessons": 7,
-            "status": "live"
-        },
-        {
-            "id": "financial-literacy",
-            "title": "Financial Literacy Foundations",
-            "total_lessons": 6,
-            "status": "live"
-        },
-        {
-            "id": "money-mission",
-            "title": "Money Mission: Complete Financial Literacy",
-            "total_lessons": 34,
-            "status": "coming_soon"
-        },
-        {
-            "id": "va-loan",
-            "title": "VA Loan & Homeownership Prep",
-            "total_lessons": 6,
-            "status": "coming_soon"
-        }
-    ]
-
-    # Add database courses
+    courses = []
     for c in db_courses:
         lesson_count = await db.lessons.count_documents({"course_id": str(c["_id"])})
         courses.append({
