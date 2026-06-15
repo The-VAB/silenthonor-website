@@ -320,7 +320,10 @@ async def send_staff_invite(request: Request, staff_id: str):
 
     first_name = staff.get("first_name", staff.get("email", "there"))
     role = staff.get("role", "counselor")
-    asyncio.create_task(send_staff_invite_email(staff["email"], first_name, role, token))
+    sent = await send_staff_invite_email(staff["email"], first_name, role, token)
+
+    if not sent:
+        raise HTTPException(status_code=502, detail="Failed to send invite email. Check email service configuration.")
 
     await log_audit_event(
         action="STAFF_INVITE_SENT",
@@ -332,6 +335,71 @@ async def send_staff_invite(request: Request, staff_id: str):
     )
 
     return {"message": f"Invite sent to {staff['email']}"}
+
+@router.get("/staff/{staff_id}/full")
+async def get_staff_full(request: Request, staff_id: str):
+    """Get complete staff/counselor profile, including their assigned clients and recent activity"""
+    await get_current_admin(request)
+
+    try:
+        oid = ObjectId(staff_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid staff ID")
+
+    staff = await db.users.find_one({"_id": oid, "role": {"$in": ["staff", "admin", "counselor"]}})
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff member not found")
+
+    result = {
+        "id": str(staff["_id"]),
+        "email": staff.get("email", ""),
+        "first_name": staff.get("first_name", ""),
+        "last_name": staff.get("last_name", ""),
+        "role": staff.get("role", ""),
+        "title": staff.get("title", ""),
+        "bio": staff.get("bio", ""),
+        "specialties": staff.get("specialties", []),
+        "credentials": staff.get("credentials", ""),
+        "calendly_url": staff.get("calendly_url"),
+        "active": staff.get("active", True),
+        "created_at": staff.get("created_at").isoformat() if staff.get("created_at") else None,
+        "last_active": staff.get("last_active").isoformat() if staff.get("last_active") else None
+    }
+
+    if staff.get("role") == "counselor":
+        clients = await db.users.find({"assigned_counselor_id": oid}).sort("created_at", -1).to_list(200)
+        client_list = []
+        for c in clients:
+            notes_count = await db.intake_notes.count_documents({"member_id": c["_id"], "created_by": oid})
+            disputes_count = await db.disputes.count_documents({"user_id": c["_id"]})
+            client_list.append({
+                "id": str(c["_id"]),
+                "name": f"{c.get('first_name', '')} {c.get('last_name', '')}".strip(),
+                "email": c.get("email", ""),
+                "pipeline_stage": c.get("pipeline_stage", "applied"),
+                "cr_stage": c.get("credit_repair_stage"),
+                "fc_stage": c.get("financial_counseling_stage"),
+                "notes_count": notes_count,
+                "disputes_count": disputes_count,
+                "created_at": c.get("created_at").isoformat() if c.get("created_at") else None
+            })
+        result["clients"] = client_list
+
+        # Recent activity: notes this counselor has logged across all their clients
+        notes = await db.intake_notes.find({"created_by": oid}).sort("created_at", -1).to_list(20)
+        activity = []
+        for n in notes:
+            member = await db.users.find_one({"_id": n["member_id"]})
+            activity.append({
+                "type": "note",
+                "member_id": str(n["member_id"]),
+                "member_name": f"{member.get('first_name', '')} {member.get('last_name', '')}".strip() if member else "Unknown",
+                "content": n.get("content", ""),
+                "created_at": n.get("created_at").isoformat() if n.get("created_at") else None
+            })
+        result["recent_activity"] = activity
+
+    return result
 
 @router.get("/contacts")
 async def get_contacts(request: Request):

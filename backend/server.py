@@ -41,6 +41,7 @@ app.add_middleware(RequestLoggingMiddleware)
 try:
     app.mount("/css", StaticFiles(directory="/app/css"), name="css")
     app.mount("/js", StaticFiles(directory="/app/js"), name="js")
+    app.mount("/images", StaticFiles(directory="/app/images"), name="images")
     app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 except Exception as e:
     logger.warning(f"Could not mount static files: {e}")
