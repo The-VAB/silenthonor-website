@@ -12,21 +12,44 @@
     <script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
     <script src="js/toast.js"></script>
     <style>
-        .counselor-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
-        .stat-card{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:1.5rem;text-align:center}
-        .stat-value{font-family:Oswald,sans-serif;font-size:2.5rem;font-weight:700;color:var(--white)}
-        .stat-value.highlight{color:var(--red-light)}
-        .stat-label{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:0.5rem}
-        .cta-section{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:2rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
-        .cta-text h3{font-family:Oswald,sans-serif;font-size:1.15rem;font-weight:700;text-transform:uppercase;margin-bottom:0.35rem}
-        .cta-text p{font-size:0.9rem;color:var(--muted)}
-        .cta-btn{font-family:Oswald,sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.75rem 1.5rem;background:var(--red);color:var(--white);text-decoration:none;white-space:nowrap;transition:background 0.2s;display:inline-block}
-        .cta-btn:hover{background:var(--red-light)}
-        .activity-placeholder{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:1.5rem}
-        .activity-title{font-family:Oswald,sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
-        .activity-notice{font-size:0.88rem;color:var(--muted);font-style:italic}
+        /* Stat cards */
+        .counselor-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem}
+        .stat-card{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:1.5rem;text-align:center;text-decoration:none;display:block;transition:border-color 0.2s,background 0.2s;cursor:pointer}
+        .stat-card:hover{border-color:rgba(185,28,28,0.5);background:rgba(17,24,39,0.85)}
+        .stat-value{font-family:Oswald,sans-serif;font-size:2.4rem;font-weight:700;color:var(--white);line-height:1}
+        .stat-value.highlight-red{color:#EF4444}
+        .stat-value.highlight-gold{color:#C9952A}
+        .stat-label{font-family:Oswald,sans-serif;font-size:0.68rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:0.5rem}
+        .stat-sub{font-family:Barlow,sans-serif;font-size:0.78rem;color:var(--muted);margin-top:0.35rem}
+
+        /* Quick-nav links */
+        .quick-nav{display:flex;gap:0.75rem;margin-bottom:1.75rem;flex-wrap:wrap}
+        .quick-nav-btn{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.55rem 1.1rem;background:transparent;border:1px solid var(--border);color:var(--white);text-decoration:none;transition:all 0.2s;white-space:nowrap}
+        .quick-nav-btn:hover{border-color:var(--red);color:var(--red-light)}
+        .quick-nav-btn.primary{background:var(--red);border-color:var(--red)}
+        .quick-nav-btn.primary:hover{background:transparent;color:var(--red-light)}
+
+        /* Activity feed */
+        .activity-panel{background:rgba(17,24,39,0.6);border:1px solid var(--border)}
+        .activity-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+        .activity-title-text{font-family:Oswald,sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+        .activity-list{padding:0}
+        .activity-item{display:flex;gap:0.85rem;padding:0.9rem 1.25rem;border-bottom:1px solid rgba(255,255,255,0.04);align-items:flex-start;text-decoration:none;transition:background 0.15s}
+        .activity-item:last-child{border-bottom:none}
+        .activity-item:hover{background:rgba(255,255,255,0.03)}
+        .activity-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px}
+        .ai-note{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.25);color:#3B82F6}
+        .ai-dispute{background:rgba(185,28,28,0.15);border:1px solid rgba(185,28,28,0.25);color:#EF4444}
+        .ai-task{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.25);color:#10B981}
+        .activity-body{flex:1;min-width:0}
+        .activity-type-label{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.15rem}
+        .activity-member{font-family:Oswald,sans-serif;font-size:0.88rem;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .activity-desc{font-size:0.8rem;color:var(--muted);margin-top:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .activity-time{font-size:0.72rem;color:var(--muted);white-space:nowrap;flex-shrink:0;padding-top:2px}
+        .activity-empty{padding:2.5rem 1.25rem;text-align:center;color:var(--muted);font-size:0.88rem;font-style:italic}
+
         @media(max-width:1200px){.counselor-stats{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:600px){.counselor-stats{grid-template-columns:1fr}.cta-section{flex-direction:column;align-items:flex-start}}
+        @media(max-width:600px){.counselor-stats{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
@@ -53,7 +76,7 @@
         <div class="dash-content">
             <div class="dash-header">
                 <h1 class="dash-welcome">Counselor <em>Dashboard</em></h1>
-                <p class="dash-subtitle">Your overview for today</p>
+                <p class="dash-subtitle" id="dash-subtitle">Your overview for today</p>
             </div>
 
             <div id="loading-state" class="loading-state">
@@ -62,42 +85,58 @@
             </div>
 
             <div id="portal-content" style="display:none;">
+
+                <!-- Stat cards -->
                 <div class="counselor-stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="stat-assigned">0</div>
-                        <div class="stat-label">Assigned Members</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="stat-active">0</div>
-                        <div class="stat-label">Active Members</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="stat-intake">0</div>
-                        <div class="stat-label">Pending Intake</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value highlight" id="stat-messages">0</div>
+                    <a href="counselor-caseload.html" class="stat-card">
+                        <div class="stat-value" id="stat-slots">—</div>
+                        <div class="stat-label">Open Caseload Slots</div>
+                        <div class="stat-sub" id="stat-slots-sub"></div>
+                    </a>
+                    <a href="counselor-waitlist.html" class="stat-card">
+                        <div class="stat-value" id="stat-waitlist">—</div>
+                        <div class="stat-label">Waiting for Counselor</div>
+                        <div class="stat-sub">Members unassigned</div>
+                    </a>
+                    <a href="counselor-tasks.html" class="stat-card">
+                        <div class="stat-value" id="stat-tasks">—</div>
+                        <div class="stat-label">Tasks Due</div>
+                        <div class="stat-sub">Overdue + due today</div>
+                    </a>
+                    <a href="messages.html" class="stat-card">
+                        <div class="stat-value" id="stat-messages">—</div>
                         <div class="stat-label">Unread Messages</div>
+                        <div class="stat-sub">From your members</div>
+                    </a>
+                </div>
+
+                <!-- Quick nav -->
+                <div class="quick-nav">
+                    <a href="counselor-caseload.html" class="quick-nav-btn primary">My Caseload &rarr;</a>
+                    <a href="counselor-waitlist.html" class="quick-nav-btn">Claim from Waitlist &rarr;</a>
+                    <a href="counselor-tasks.html" class="quick-nav-btn">View Tasks &rarr;</a>
+                    <a href="messages.html" class="quick-nav-btn">Messages &rarr;</a>
+                </div>
+
+                <!-- Activity feed -->
+                <div class="activity-panel">
+                    <div class="activity-header">
+                        <span class="activity-title-text">Recent Activity</span>
+                    </div>
+                    <div class="activity-list" id="activity-list">
+                        <div class="activity-empty">Loading activity...</div>
                     </div>
                 </div>
 
-                <div class="cta-section">
-                    <div class="cta-text">
-                        <h3>My Caseload</h3>
-                        <p>View and manage all your assigned members, update program tracks, and access member detail records.</p>
-                    </div>
-                    <a href="counselor-caseload.html" class="cta-btn">View My Caseload &rarr;</a>
-                </div>
-
-                <div class="activity-placeholder">
-                    <div class="activity-title">Recent Activity</div>
-                    <p class="activity-notice">Full activity feed — new documents, stage changes, dispute updates — is coming in a future update.</p>
-                </div>
             </div>
         </div>
     </div>
 
     <script>
+    var ICONS = {note: "&#9998;", dispute: "&#9993;", task_done: "&#10003;"};
+    var TYPE_LABELS = {note: "Note added", dispute: "Dispute", task_done: "Task completed"};
+    var TYPE_CLS = {note: "ai-note", dispute: "ai-dispute", task_done: "ai-task"};
+
     document.addEventListener("DOMContentLoaded", async function() {
         try {
             var r = await fetch(window.API_BASE + "/api/auth/me", {credentials: "include"});
@@ -120,16 +159,75 @@
             var r = await fetch(window.API_BASE + "/api/counselor/stats", {credentials: "include"});
             if (r.ok) {
                 var stats = await r.json();
-                document.getElementById("stat-assigned").textContent = stats.assigned_members || 0;
-                document.getElementById("stat-active").textContent = stats.active_members || 0;
-                document.getElementById("stat-intake").textContent = stats.intake_pending || 0;
-                document.getElementById("stat-messages").textContent = stats.unread_messages || 0;
+                renderStats(stats);
+                renderActivity(stats.recent_activity || []);
             }
         } catch(e) {
             console.error("Failed to load stats:", e);
         }
         document.getElementById("loading-state").style.display = "none";
         document.getElementById("portal-content").style.display = "block";
+    }
+
+    function renderStats(s) {
+        var slots = s.open_slots != null ? s.open_slots : "—";
+        var slotEl = document.getElementById("stat-slots");
+        slotEl.textContent = slots;
+        if (typeof slots === "number" && slots === 0) slotEl.className = "stat-value highlight-red";
+
+        document.getElementById("stat-slots-sub").textContent =
+            s.assigned_members != null ? s.assigned_members + " / " + s.max_caseload + " used" : "";
+
+        document.getElementById("stat-waitlist").textContent = s.waitlist_count != null ? s.waitlist_count : "—";
+
+        var taskEl = document.getElementById("stat-tasks");
+        taskEl.textContent = s.tasks_due != null ? s.tasks_due : "—";
+        if (s.tasks_due > 0) taskEl.className = "stat-value highlight-red";
+
+        var msgEl = document.getElementById("stat-messages");
+        msgEl.textContent = s.unread_messages != null ? s.unread_messages : "—";
+        if (s.unread_messages > 0) msgEl.className = "stat-value highlight-gold";
+    }
+
+    function renderActivity(items) {
+        var el = document.getElementById("activity-list");
+        if (!items.length) {
+            el.innerHTML = "<div class='activity-empty'>No recent activity yet — notes, disputes, and completed tasks will appear here.</div>";
+            return;
+        }
+        el.innerHTML = items.map(function(item) {
+            var iconCls = TYPE_CLS[item.type] || "ai-note";
+            var icon = ICONS[item.type] || "&#9998;";
+            var label = TYPE_LABELS[item.type] || "Activity";
+            var href = item.member_id ? "counselor-member.html?id=" + item.member_id : "#";
+            return "<a href='" + href + "' class='activity-item'>" +
+                "<div class='activity-icon " + iconCls + "'>" + icon + "</div>" +
+                "<div class='activity-body'>" +
+                    "<div class='activity-type-label'>" + label + (item.member_name ? " &middot; " + escHtml(item.member_name) : "") + "</div>" +
+                    "<div class='activity-desc'>" + escHtml(item.description) + "</div>" +
+                "</div>" +
+                "<div class='activity-time'>" + timeAgo(item.date) + "</div>" +
+            "</a>";
+        }).join("");
+    }
+
+    function timeAgo(iso) {
+        if (!iso) return "";
+        var d = new Date(iso);
+        var diffMs = Date.now() - d.getTime();
+        var mins = Math.floor(diffMs / 60000);
+        if (mins < 1) return "Just now";
+        if (mins < 60) return mins + "m ago";
+        var hrs = Math.floor(mins / 60);
+        if (hrs < 24) return hrs + "h ago";
+        var days = Math.floor(hrs / 24);
+        if (days < 7) return days + "d ago";
+        return d.toLocaleDateString("en-US", {month: "short", day: "numeric"});
+    }
+
+    function escHtml(str) {
+        if (!str) return "";
+        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
     }
 
     async function signOut() {
