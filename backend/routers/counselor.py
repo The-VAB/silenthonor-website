@@ -674,6 +674,252 @@ async def delete_counselor_task(request: Request, task_id: str):
     return {"message": "Task deleted"}
 
 
+ACCOUNT_TYPES = ["revolving", "installment", "collection", "mortgage", "auto", "other"]
+ACCOUNT_STATUSES = ["open", "closed", "collection"]
+GAME_PLAN_ACTIONS = ["dispute", "goodwill", "no_action", "debt_validation", "pay_for_delete", "cross_bureau_dispute"]
+
+
+def compute_game_plan_action(account, today):
+    """Rules engine: returns recommended action, rationale, and priority for one credit account."""
+    status = account.get("account_status", "open")
+    acct_type = account.get("account_type", "revolving")
+    has_late = account.get("has_late_payments", False)
+    late_date = account.get("late_payment_date")
+    inaccuracy = account.get("cross_bureau_inaccuracy", False)
+    override = account.get("counselor_action_override")
+
+    # Compute days since last late payment
+    days_since = None
+    if has_late and late_date:
+        try:
+            ld = late_date.date() if hasattr(late_date, "date") else datetime.fromisoformat(str(late_date)).date()
+            days_since = (today - ld).days
+        except Exception:
+            pass
+
+    # Rules (priority order)
+    if inaccuracy:
+        action, priority = "cross_bureau_dispute", "high"
+        rationale = ("Cross-bureau inaccuracy flagged. Dispute with all reporting bureaus simultaneously "
+                     "via certified mail — same account reported differently across bureaus is a clear FCRA violation.")
+    elif acct_type == "collection" or status == "collection":
+        action, priority = "debt_validation", "high"
+        rationale = ("Collection account: send a certified debt validation letter demanding proof the debt is yours and the amount is correct. "
+                     "⚠️ Verify the SOL for your state before making any payment — paying can reset the clock.")
+    elif status == "closed":
+        action, priority = "dispute", "medium"
+        rationale = ("Closed account: verify all reported information is accurate under the FCRA. "
+                     "Any inaccuracy — balance, payment history, dates — is disputable via certified mail.")
+    elif has_late and days_since is not None and days_since < 180:
+        action, priority = "goodwill", "medium"
+        rationale = (f"Open account with a late payment {days_since} days ago. "
+                     "Send a goodwill letter to the creditor requesting removal as a courtesy for your payment history.")
+    elif has_late and days_since is not None and days_since >= 180:
+        action, priority = "no_action", "low"
+        rationale = (f"Late payment is {days_since} days old — past the 180-day threshold. "
+                     "Allow it to age off naturally; intervention at this stage rarely improves the outcome.")
+    else:
+        action, priority = "pay_for_delete", "low"
+        rationale = ("No clear dispute grounds identified. If a balance remains, negotiate a pay-for-delete agreement in writing "
+                     "before making any payment — get the removal promise on paper first.")
+
+    return {
+        "recommended_action": action,
+        "rationale": rationale,
+        "priority": priority,
+        "final_action": override if override and override in GAME_PLAN_ACTIONS else action,
+        "is_overridden": bool(override and override in GAME_PLAN_ACTIONS and override != action)
+    }
+
+
+@router.get("/counselor/members/{member_id}/game-plan")
+async def get_member_game_plan(request: Request, member_id: str):
+    """Return credit accounts with auto-computed game plan recommendations"""
+    counselor = await get_current_counselor(request)
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    accounts = await db.credit_accounts.find(
+        {"member_id": ObjectId(member_id)}
+    ).sort("added_at", 1).to_list(200)
+
+    today = datetime.now(timezone.utc).date()
+    result = []
+    for a in accounts:
+        plan = compute_game_plan_action(a, today)
+        late_date = a.get("late_payment_date")
+        result.append({
+            "id": str(a["_id"]),
+            "creditor_name": a.get("creditor_name", ""),
+            "account_type": a.get("account_type", "other"),
+            "account_status": a.get("account_status", "open"),
+            "bureaus": a.get("bureaus", []),
+            "balance": a.get("balance"),
+            "has_late_payments": a.get("has_late_payments", False),
+            "late_payment_date": late_date.isoformat()[:10] if late_date else None,
+            "cross_bureau_inaccuracy": a.get("cross_bureau_inaccuracy", False),
+            "counselor_action_override": a.get("counselor_action_override"),
+            "notes": a.get("notes", ""),
+            **plan
+        })
+
+    return result
+
+
+@router.post("/counselor/members/{member_id}/credit-accounts")
+async def add_credit_account(request: Request, member_id: str):
+    """Add a credit account for game plan analysis"""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    creditor_name = (data.get("creditor_name") or "").strip()
+    if not creditor_name:
+        raise HTTPException(status_code=400, detail="creditor_name is required")
+
+    acct_type = data.get("account_type", "other")
+    if acct_type not in ACCOUNT_TYPES:
+        raise HTTPException(status_code=400, detail=f"account_type must be one of: {ACCOUNT_TYPES}")
+
+    acct_status = data.get("account_status", "open")
+    if acct_status not in ACCOUNT_STATUSES:
+        raise HTTPException(status_code=400, detail=f"account_status must be one of: {ACCOUNT_STATUSES}")
+
+    bureaus = [b for b in (data.get("bureaus") or []) if b in BUREAUS]
+
+    late_payment_date = None
+    if data.get("late_payment_date"):
+        try:
+            lpd = datetime.fromisoformat(str(data["late_payment_date"]))
+            late_payment_date = lpd if lpd.tzinfo else lpd.replace(tzinfo=timezone.utc)
+        except (ValueError, TypeError):
+            pass
+
+    try:
+        balance = float(data["balance"]) if data.get("balance") not in (None, "") else None
+    except (TypeError, ValueError):
+        balance = None
+
+    now = datetime.now(timezone.utc)
+    await db.credit_accounts.insert_one({
+        "member_id": ObjectId(member_id),
+        "counselor_id": ObjectId(counselor["_id"]),
+        "creditor_name": creditor_name,
+        "account_type": acct_type,
+        "account_status": acct_status,
+        "bureaus": bureaus,
+        "balance": balance,
+        "has_late_payments": bool(data.get("has_late_payments", False)),
+        "late_payment_date": late_payment_date,
+        "cross_bureau_inaccuracy": bool(data.get("cross_bureau_inaccuracy", False)),
+        "counselor_action_override": None,
+        "notes": (data.get("notes") or "").strip(),
+        "added_at": now
+    })
+
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"last_activity_date": now}}
+    )
+    return {"message": "Account added"}
+
+
+@router.patch("/counselor/credit-accounts/{account_id}")
+async def update_credit_account(request: Request, account_id: str):
+    """Update a credit account (fields or action override)"""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    try:
+        oid = ObjectId(account_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid account ID")
+
+    account = await db.credit_accounts.find_one({"_id": oid})
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    member = await db.users.find_one({
+        "_id": account["member_id"],
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=403, detail="Not authorized to update this account")
+
+    update_fields = {}
+    for field in ["creditor_name", "account_type", "account_status", "notes", "counselor_action_override"]:
+        if field in data:
+            update_fields[field] = data[field] or None if field == "counselor_action_override" else data[field]
+
+    if "bureaus" in data:
+        update_fields["bureaus"] = [b for b in (data["bureaus"] or []) if b in BUREAUS]
+
+    if "has_late_payments" in data:
+        update_fields["has_late_payments"] = bool(data["has_late_payments"])
+
+    if "cross_bureau_inaccuracy" in data:
+        update_fields["cross_bureau_inaccuracy"] = bool(data["cross_bureau_inaccuracy"])
+
+    if "balance" in data:
+        try:
+            update_fields["balance"] = float(data["balance"]) if data["balance"] not in (None, "") else None
+        except (TypeError, ValueError):
+            pass
+
+    if "late_payment_date" in data:
+        lpd = data.get("late_payment_date")
+        if lpd:
+            try:
+                d = datetime.fromisoformat(str(lpd))
+                update_fields["late_payment_date"] = d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+            except (ValueError, TypeError):
+                pass
+        else:
+            update_fields["late_payment_date"] = None
+
+    if update_fields:
+        update_fields["updated_at"] = datetime.now(timezone.utc)
+        await db.credit_accounts.update_one({"_id": oid}, {"$set": update_fields})
+
+    return {"message": "Account updated"}
+
+
+@router.delete("/counselor/credit-accounts/{account_id}")
+async def delete_credit_account(request: Request, account_id: str):
+    """Delete a credit account"""
+    counselor = await get_current_counselor(request)
+
+    try:
+        oid = ObjectId(account_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid account ID")
+
+    account = await db.credit_accounts.find_one({"_id": oid})
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    member = await db.users.find_one({
+        "_id": account["member_id"],
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this account")
+
+    await db.credit_accounts.delete_one({"_id": oid})
+    return {"message": "Account deleted"}
+
+
 @router.get("/counselor/members/{member_id}/disputes")
 async def get_member_disputes(request: Request, member_id: str):
     """List disputes for an assigned member"""

@@ -116,7 +116,40 @@
         .doc-btn.danger{border-color:rgba(185,28,28,0.4);color:var(--muted)}
         .doc-btn.danger:hover{border-color:var(--red);color:var(--red-light)}
         .doc-system-badge{font-family:Oswald,sans-serif;font-size:0.58rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.4rem;background:rgba(201,149,42,0.15);color:var(--gold);border:1px solid rgba(201,149,42,0.25);margin-left:0.4rem}
-        @media(max-width:900px){.credit-scores{grid-template-columns:1fr}.profile-grid{grid-template-columns:1fr 1fr}}
+        .gp-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);margin-bottom:0.5rem}
+        .gp-card-header{display:flex;align-items:center;justify-content:space-between;padding:0.85rem;gap:0.75rem;flex-wrap:wrap}
+        .gp-card-info{flex:1;min-width:0}
+        .gp-card-info h4{font-family:Oswald,sans-serif;font-size:0.95rem;font-weight:600;margin-bottom:0.2rem}
+        .gp-card-meta{font-size:0.75rem;color:var(--muted)}
+        .gp-card-badges{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;flex-shrink:0}
+        .gp-action-badge{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:0.3rem 0.65rem}
+        .gp-action-badge.dispute{background:rgba(59,130,246,0.2);color:#3B82F6}
+        .gp-action-badge.goodwill{background:rgba(16,185,129,0.2);color:#10B981}
+        .gp-action-badge.no_action{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.4)}
+        .gp-action-badge.debt_validation{background:rgba(185,28,28,0.2);color:var(--red-light)}
+        .gp-action-badge.pay_for_delete{background:rgba(249,115,22,0.2);color:#F97316}
+        .gp-action-badge.cross_bureau_dispute{background:rgba(139,92,246,0.2);color:#A78BFA}
+        .gp-priority-badge{font-family:Oswald,sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.45rem;border:1px solid transparent}
+        .gp-priority-badge.high{border-color:rgba(185,28,28,0.4);color:var(--red-light)}
+        .gp-priority-badge.medium{border-color:rgba(234,179,8,0.3);color:#EAB308}
+        .gp-priority-badge.low{border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.3)}
+        .gp-overridden-flag{font-size:0.62rem;color:var(--gold);font-family:Oswald,sans-serif;letter-spacing:0.06em;text-transform:uppercase}
+        .gp-rationale{padding:0 0.85rem 0.85rem;font-size:0.82rem;color:var(--muted);line-height:1.5;border-top:1px solid rgba(255,255,255,0.04);padding-top:0.6rem}
+        .gp-edit-panel{border-top:1px solid var(--border);padding:1rem;background:rgba(0,0,0,0.15)}
+        .gp-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem}
+        .gp-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.5rem;margin-bottom:1.25rem}
+        .gp-summary-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);padding:0.6rem 0.75rem;text-align:center}
+        .gp-summary-count{font-family:Oswald,sans-serif;font-size:1.6rem;font-weight:700}
+        .gp-summary-label{font-size:0.62rem;color:var(--muted);text-transform:uppercase;font-family:Oswald,sans-serif;letter-spacing:0.08em;margin-top:0.15rem}
+        .gp-bureau-tag{font-size:0.6rem;font-family:Oswald,sans-serif;letter-spacing:0.06em;text-transform:uppercase;padding:0.12rem 0.3rem;border:1px solid var(--border);color:var(--muted);display:inline-block;margin-left:0.25rem}
+        .gp-bureau-tag.equifax{border-color:rgba(239,68,68,0.35);color:#EF4444}
+        .gp-bureau-tag.experian{border-color:rgba(59,130,246,0.35);color:#3B82F6}
+        .gp-bureau-tag.transunion{border-color:rgba(16,185,129,0.35);color:#10B981}
+        .gp-override-select{background:rgba(11,18,32,0.9);border:1px solid rgba(201,149,42,0.4);color:var(--gold);padding:0.45rem 0.6rem;font-family:Barlow,sans-serif;font-size:0.85rem;cursor:pointer;width:100%}
+        .gp-override-select:focus{outline:none;border-color:var(--gold)}
+        .gp-check-row{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0.4rem}
+        .gp-check-label{font-size:0.85rem;display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer}
+        @media(max-width:900px){.credit-scores{grid-template-columns:1fr}.profile-grid{grid-template-columns:1fr 1fr}.gp-edit-grid{grid-template-columns:1fr}}
         @media(max-width:600px){.profile-grid{grid-template-columns:1fr}.doc-row{flex-wrap:wrap}}
     </style>
 </head>
@@ -302,11 +335,75 @@
 
                 <!-- Game Plan Tab -->
                 <div id="tab-game-plan" class="tab-panel">
-                    <div class="placeholder-notice">&#127919; The credit repair game plan builder is coming in a future update.</div>
-                    <div class="empty-state">
-                        <div class="empty-state-icon">&#127919;</div>
-                        <p>Game Plan builder coming in a future phase. The rules engine will auto-recommend actions per account type.</p>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                        <div class="section-title" style="margin:0">Credit Repair Game Plan</div>
+                        <button class="doc-btn" onclick="toggleAccountForm()">+ Add Account</button>
                     </div>
+
+                    <!-- Add Account form -->
+                    <div id="account-add-form" style="display:none;background:rgba(0,0,0,0.15);border:1px solid var(--border);padding:1rem;margin-bottom:1.25rem">
+                        <div class="gp-edit-grid">
+                            <div>
+                                <label class="form-label">Creditor Name *</label>
+                                <input type="text" id="new-acct-name" class="form-input" placeholder="e.g. Capital One">
+                            </div>
+                            <div>
+                                <label class="form-label">Account Type</label>
+                                <select id="new-acct-type" class="form-input">
+                                    <option value="revolving">Revolving (Credit Card)</option>
+                                    <option value="installment">Installment (Loan)</option>
+                                    <option value="collection">Collection</option>
+                                    <option value="mortgage">Mortgage</option>
+                                    <option value="auto">Auto Loan</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Account Status</label>
+                                <select id="new-acct-status" class="form-input">
+                                    <option value="open">Open</option>
+                                    <option value="closed">Closed</option>
+                                    <option value="collection">In Collections</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Balance ($)</label>
+                                <input type="number" id="new-acct-balance" class="form-input" placeholder="0.00" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div style="margin-bottom:0.75rem">
+                            <label class="form-label">Bureaus Reporting This Account</label>
+                            <div class="gp-check-row" style="margin-top:0.5rem">
+                                <label class="gp-check-label"><input type="checkbox" id="new-acct-eq" value="equifax"> Equifax</label>
+                                <label class="gp-check-label"><input type="checkbox" id="new-acct-ex" value="experian"> Experian</label>
+                                <label class="gp-check-label"><input type="checkbox" id="new-acct-tu" value="transunion"> TransUnion</label>
+                            </div>
+                        </div>
+                        <div class="gp-edit-grid" style="margin-bottom:0.75rem">
+                            <div>
+                                <label class="gp-check-label"><input type="checkbox" id="new-acct-late" onchange="toggleNewLateDate()"> Has Late Payments</label>
+                                <div id="new-late-date-wrap" style="display:none;margin-top:0.5rem">
+                                    <label class="form-label">Date of Most Recent Late Payment</label>
+                                    <input type="date" id="new-acct-late-date" class="form-input">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="gp-check-label"><input type="checkbox" id="new-acct-inaccuracy"> Cross-Bureau Inaccuracy</label>
+                                <div style="font-size:0.75rem;color:var(--muted);margin-top:0.3rem">Same account reported differently across bureaus</div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:0.75rem">
+                            <label class="form-label">Notes (optional)</label>
+                            <textarea id="new-acct-notes" class="form-input" rows="2" placeholder="Additional context from the credit report..."></textarea>
+                        </div>
+                        <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                            <button class="doc-btn" onclick="toggleAccountForm()">Cancel</button>
+                            <button class="form-submit" onclick="submitAccount()">Add Account</button>
+                        </div>
+                    </div>
+
+                    <div id="gp-summary" class="gp-summary" style="display:none"></div>
+                    <div id="game-plan-content"></div>
                 </div>
 
                 <!-- Notes Tab -->
@@ -754,6 +851,243 @@
         renderDisputeList(disputes);
     }
 
+    // ── Game Plan ───────────────────────────────────────────────────────────
+    var GP_ACTION_LABELS = {
+        dispute: "Dispute", goodwill: "Goodwill Letter", no_action: "No Action",
+        debt_validation: "Debt Validation", pay_for_delete: "Pay for Delete",
+        cross_bureau_dispute: "Cross-Bureau Dispute"
+    };
+
+    async function loadGamePlan() {
+        document.getElementById("game-plan-content").innerHTML = "<p style='color:var(--muted);font-size:0.85rem'>Loading...</p>";
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/game-plan", {credentials: "include"});
+            if (r.ok) { renderGamePlan(await r.json()); }
+            else { document.getElementById("game-plan-content").innerHTML = "<p style='color:var(--red-light)'>Failed to load game plan.</p>"; }
+        } catch(e) {
+            document.getElementById("game-plan-content").innerHTML = "<p style='color:var(--red-light)'>Error loading game plan.</p>";
+        }
+    }
+
+    function toggleAccountForm() {
+        var f = document.getElementById("account-add-form");
+        f.style.display = f.style.display === "none" || f.style.display === "" ? "block" : "none";
+    }
+
+    function toggleNewLateDate() {
+        var checked = document.getElementById("new-acct-late").checked;
+        document.getElementById("new-late-date-wrap").style.display = checked ? "block" : "none";
+    }
+
+    function toggleEditLateDate(id) {
+        var checked = document.getElementById("edit-acct-late-" + id).checked;
+        document.getElementById("edit-late-wrap-" + id).style.display = checked ? "block" : "none";
+    }
+
+    async function submitAccount() {
+        var name = document.getElementById("new-acct-name").value.trim();
+        if (!name) { showToast("Error", "Creditor name is required", "error"); return; }
+        var bureaus = [];
+        if (document.getElementById("new-acct-eq").checked) bureaus.push("equifax");
+        if (document.getElementById("new-acct-ex").checked) bureaus.push("experian");
+        if (document.getElementById("new-acct-tu").checked) bureaus.push("transunion");
+        var hasLate = document.getElementById("new-acct-late").checked;
+        var payload = {
+            creditor_name: name,
+            account_type: document.getElementById("new-acct-type").value,
+            account_status: document.getElementById("new-acct-status").value,
+            balance: document.getElementById("new-acct-balance").value || null,
+            bureaus: bureaus,
+            has_late_payments: hasLate,
+            late_payment_date: hasLate ? (document.getElementById("new-acct-late-date").value || null) : null,
+            cross_bureau_inaccuracy: document.getElementById("new-acct-inaccuracy").checked,
+            notes: document.getElementById("new-acct-notes").value.trim()
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/credit-accounts", {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                credentials: "include", body: JSON.stringify(payload)
+            });
+            if (r.ok) {
+                showToast("Added", "Account added to game plan", "success");
+                document.getElementById("account-add-form").style.display = "none";
+                ["new-acct-name","new-acct-balance","new-acct-notes","new-acct-late-date"].forEach(function(id){
+                    var el=document.getElementById(id); if(el) el.value="";
+                });
+                ["new-acct-eq","new-acct-ex","new-acct-tu","new-acct-late","new-acct-inaccuracy"].forEach(function(id){
+                    var el=document.getElementById(id); if(el) el.checked=false;
+                });
+                document.getElementById("new-late-date-wrap").style.display="none";
+                loadGamePlan();
+            } else {
+                var err = await r.json();
+                showToast("Error", err.detail || "Could not add account", "error");
+            }
+        } catch(e) { showToast("Error", "Could not add account", "error"); }
+    }
+
+    function toggleAccountEdit(id) {
+        var panel = document.getElementById("gpedit-" + id);
+        if (!panel) return;
+        panel.style.display = panel.style.display === "none" || panel.style.display === "" ? "block" : "none";
+    }
+
+    async function saveAccountEdit(id) {
+        var bureaus = Array.from(document.querySelectorAll(".gp-bureau-cb-" + id + ":checked")).map(function(el){return el.value;});
+        var hasLate = document.getElementById("edit-acct-late-" + id).checked;
+        var payload = {
+            creditor_name: document.getElementById("edit-acct-name-" + id).value.trim(),
+            account_type: document.getElementById("edit-acct-type-" + id).value,
+            account_status: document.getElementById("edit-acct-status-" + id).value,
+            balance: document.getElementById("edit-acct-balance-" + id).value || null,
+            bureaus: bureaus,
+            has_late_payments: hasLate,
+            late_payment_date: hasLate ? (document.getElementById("edit-acct-late-date-" + id).value || null) : null,
+            cross_bureau_inaccuracy: document.getElementById("edit-acct-inaccuracy-" + id).checked,
+            counselor_action_override: document.getElementById("edit-acct-override-" + id).value || null,
+            notes: document.getElementById("edit-acct-notes-" + id).value.trim()
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/credit-accounts/" + id, {
+                method: "PATCH", headers: {"Content-Type": "application/json"},
+                credentials: "include", body: JSON.stringify(payload)
+            });
+            if (r.ok) {
+                showToast("Saved", "Account updated", "success");
+                loadGamePlan();
+            } else {
+                var err = await r.json();
+                showToast("Error", err.detail || "Could not update account", "error");
+            }
+        } catch(e) { showToast("Error", "Could not update account", "error"); }
+    }
+
+    async function deleteAccount(id) {
+        if (!confirm("Remove this account from the game plan?")) return;
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/credit-accounts/" + id, {
+                method: "DELETE", credentials: "include"
+            });
+            if (r.ok) { showToast("Removed", "Account removed", "success"); loadGamePlan(); }
+            else { var err = await r.json(); showToast("Error", err.detail || "Could not remove account", "error"); }
+        } catch(e) { showToast("Error", "Could not remove account", "error"); }
+    }
+
+    function gpEditPanel(a) {
+        var id = a.id;
+        function selOpt(val, label, cur) { return "<option value=\"" + val + "\"" + (cur===val?" selected":"") + ">" + label + "</option>"; }
+        var bureauCbs = ["equifax","experian","transunion"].map(function(b){
+            var lbl = b==="transunion"?"TransUnion":b.charAt(0).toUpperCase()+b.slice(1);
+            var chk = (a.bureaus||[]).indexOf(b)>=0?" checked":"";
+            return "<label class=\"gp-check-label\"><input type=\"checkbox\" class=\"gp-bureau-cb-"+id+"\" value=\""+b+"\""+chk+"> "+lbl+"</label>";
+        }).join("");
+        var hasLate = a.has_late_payments;
+        var inaccuracy = a.cross_bureau_inaccuracy;
+        return [
+            "<div class=\"gp-edit-grid\">",
+            "<div><label class=\"form-label\">Creditor Name</label><input type=\"text\" id=\"edit-acct-name-"+id+"\" class=\"form-input\" value=\""+escHtml(a.creditor_name||"")+"\"></div>",
+            "<div><label class=\"form-label\">Account Type</label><select id=\"edit-acct-type-"+id+"\" class=\"form-input\">",
+            selOpt("revolving","Revolving (Credit Card)",a.account_type),
+            selOpt("installment","Installment (Loan)",a.account_type),
+            selOpt("collection","Collection",a.account_type),
+            selOpt("mortgage","Mortgage",a.account_type),
+            selOpt("auto","Auto Loan",a.account_type),
+            selOpt("other","Other",a.account_type),
+            "</select></div>",
+            "<div><label class=\"form-label\">Account Status</label><select id=\"edit-acct-status-"+id+"\" class=\"form-input\">",
+            selOpt("open","Open",a.account_status),
+            selOpt("closed","Closed",a.account_status),
+            selOpt("collection","In Collections",a.account_status),
+            "</select></div>",
+            "<div><label class=\"form-label\">Balance ($)</label><input type=\"number\" id=\"edit-acct-balance-"+id+"\" class=\"form-input\" value=\""+(a.balance!=null?a.balance:"")+"\" min=\"0\" step=\"0.01\"></div>",
+            "</div>",
+            "<div style=\"margin-bottom:0.75rem\"><label class=\"form-label\">Bureaus</label><div class=\"gp-check-row\" style=\"margin-top:0.4rem\">"+bureauCbs+"</div></div>",
+            "<div class=\"gp-edit-grid\" style=\"margin-bottom:0.75rem\">",
+            "<div>",
+            "<label class=\"gp-check-label\"><input type=\"checkbox\" id=\"edit-acct-late-"+id+"\""+(hasLate?" checked":"")+" onchange=\"toggleEditLateDate('"+id+"')\"> Has Late Payments</label>",
+            "<div id=\"edit-late-wrap-"+id+"\" style=\"display:"+(hasLate?"block":"none")+";margin-top:0.5rem\">",
+            "<label class=\"form-label\">Date of Most Recent Late Payment</label>",
+            "<input type=\"date\" id=\"edit-acct-late-date-"+id+"\" class=\"form-input\" value=\""+(a.late_payment_date||"")+"\">",
+            "</div></div>",
+            "<div><label class=\"gp-check-label\"><input type=\"checkbox\" id=\"edit-acct-inaccuracy-"+id+"\""+(inaccuracy?" checked":"")+"> Cross-Bureau Inaccuracy</label></div>",
+            "</div>",
+            "<div style=\"margin-bottom:0.75rem\"><label class=\"form-label\">Action Override <span style=\"color:var(--gold);font-size:0.75rem\">(blank = auto-recommended)</span></label>",
+            "<select id=\"edit-acct-override-"+id+"\" class=\"gp-override-select\">",
+            "<option value=\"\">Auto (recommended)</option>",
+            selOpt("dispute","Dispute",a.counselor_action_override),
+            selOpt("goodwill","Goodwill Letter",a.counselor_action_override),
+            selOpt("no_action","No Action",a.counselor_action_override),
+            selOpt("debt_validation","Debt Validation",a.counselor_action_override),
+            selOpt("pay_for_delete","Pay for Delete",a.counselor_action_override),
+            selOpt("cross_bureau_dispute","Cross-Bureau Dispute",a.counselor_action_override),
+            "</select></div>",
+            "<div style=\"margin-bottom:0.75rem\"><label class=\"form-label\">Notes</label>",
+            "<textarea id=\"edit-acct-notes-"+id+"\" class=\"form-input\" rows=\"2\">"+escHtml(a.notes||"")+"</textarea></div>",
+            "<div style=\"display:flex;gap:0.5rem;justify-content:flex-end\">",
+            "<button class=\"doc-btn\" onclick=\"toggleAccountEdit('"+id+"')\">Cancel</button>",
+            "<button class=\"form-submit\" onclick=\"saveAccountEdit('"+id+"')\">Save Changes</button>",
+            "</div>"
+        ].join("");
+    }
+
+    function renderGamePlan(accounts) {
+        var priority_order = {high:0, medium:1, low:2};
+        var sorted = (accounts||[]).slice().sort(function(a,b){
+            var diff = (priority_order[a.priority]||2) - (priority_order[b.priority]||2);
+            return diff !== 0 ? diff : (a.creditor_name||"").localeCompare(b.creditor_name||"");
+        });
+
+        // Summary counts
+        var summary = {};
+        sorted.forEach(function(a){ summary[a.final_action] = (summary[a.final_action]||0)+1; });
+        var summaryEl = document.getElementById("gp-summary");
+        if (sorted.length > 0) {
+            summaryEl.style.display = "grid";
+            summaryEl.innerHTML = Object.keys(summary).map(function(act){
+                return "<div class='gp-summary-card'><div class='gp-summary-count'>"+summary[act]+"</div><div class='gp-summary-label'>"+(GP_ACTION_LABELS[act]||act)+"</div></div>";
+            }).join("");
+        } else {
+            summaryEl.style.display = "none";
+            summaryEl.innerHTML = "";
+        }
+
+        var gpEl = document.getElementById("game-plan-content");
+        if (sorted.length === 0) {
+            gpEl.innerHTML = "<div class='empty-state'><div class='empty-state-icon'>&#127919;</div><p>No accounts added yet. Use \"+ Add Account\" to enter accounts from the member's credit report — the rules engine will auto-recommend an action for each.</p></div>";
+            return;
+        }
+
+        var html = "";
+        sorted.forEach(function(a) {
+            var bureauTags = (a.bureaus||[]).map(function(b){
+                var abbr = b==="equifax"?"EQ":b==="experian"?"EX":"TU";
+                return "<span class='gp-bureau-tag "+b+"'>"+abbr+"</span>";
+            }).join("");
+            var meta = [];
+            if (a.account_type) meta.push(a.account_type.charAt(0).toUpperCase()+a.account_type.slice(1));
+            if (a.account_status) meta.push(a.account_status);
+            if (a.balance != null && a.balance > 0) meta.push("$"+Number(a.balance).toLocaleString());
+            var actionLabel = GP_ACTION_LABELS[a.final_action] || a.final_action;
+            html += "<div class='gp-card' id='gpcard-"+a.id+"'>" +
+                "<div class='gp-card-header'>" +
+                    "<div class='gp-card-info'><h4>"+escHtml(a.creditor_name)+bureauTags+"</h4>" +
+                    "<div class='gp-card-meta'>"+escHtml(meta.join(" · "))+"</div></div>" +
+                    "<div class='gp-card-badges'>" +
+                        "<span class='gp-action-badge "+a.final_action+"'>"+actionLabel+"</span>" +
+                        "<span class='gp-priority-badge "+a.priority+"'>"+a.priority+"</span>" +
+                        (a.is_overridden?"<span class='gp-overridden-flag'>Overridden</span>":"") +
+                        "<button class='doc-btn' onclick='toggleAccountEdit(\""+a.id+"\")'>Edit</button>" +
+                        "<button class='doc-btn danger' onclick='deleteAccount(\""+a.id+"\")'>Delete</button>" +
+                    "</div>" +
+                "</div>" +
+                "<div class='gp-rationale'>"+escHtml(a.rationale)+(a.notes?" <em style='opacity:0.6'>— "+escHtml(a.notes)+"</em>":"")+"</div>" +
+                "<div class='gp-edit-panel' id='gpedit-"+a.id+"' style='display:none'>"+gpEditPanel(a)+"</div>" +
+            "</div>";
+        });
+        gpEl.innerHTML = html;
+    }
+    // ── End Game Plan ────────────────────────────────────────────────────────
+
     function renderNotes(notes) {
         var html = "";
         if (!notes || notes.length === 0) {
@@ -846,6 +1180,7 @@
         if (tabName === "documents") loadDocuments();
         if (tabName === "credit-scores") loadCreditScores();
         if (tabName === "disputes") loadDisputes();
+        if (tabName === "game-plan") loadGamePlan();
     }
 
     function showNoteForm() {
