@@ -15,6 +15,14 @@ router = APIRouter(prefix="/api", tags=["Counselor"])
 # Database reference
 db = None
 
+# Program track values for the counselor's caseload view (separate from the
+# 9-value intake pipeline_stage and the admin-managed cr_stage/fc_stage sub-stages)
+PROGRAM_TRACKS = ["onboarding", "credit_repair", "financial_counseling"]
+
+# NOTE (future phases): dispute_tracker, game_plan, and tasks collections are
+# Phase 4/6/8 additions. Caseload flags stub overdue_task/new_document as False
+# until those collections exist. waitlist_status is Phase 9.
+
 def set_db(database):
     global db
     db = database
@@ -67,6 +75,90 @@ async def get_counselor_members(request: Request):
         "pipeline_stage": m.get("pipeline_stage", "active"),
         "created_at": m.get("created_at").isoformat() if m.get("created_at") else None
     } for m in members]
+
+@router.get("/counselor/caseload")
+async def get_counselor_caseload(request: Request):
+    """Get all assigned members with program track, last activity, and computed flags"""
+    counselor = await get_current_counselor(request)
+    counselor_oid = ObjectId(counselor["_id"])
+
+    members = await db.users.find(
+        {"assigned_counselor_id": counselor_oid},
+        {"_id": 1, "first_name": 1, "last_name": 1, "email": 1, "branch": 1,
+         "program_track": 1, "credit_repair_stage": 1, "financial_counseling_stage": 1,
+         "last_activity_date": 1, "created_at": 1}
+    ).to_list(200)
+
+    if not members:
+        return []
+
+    member_ids = [m["_id"] for m in members]
+
+    # Single aggregation: count unread messages from each member to this counselor
+    pipeline = [
+        {"$match": {"to_user_id": counselor_oid, "from_user_id": {"$in": member_ids}, "read": False}},
+        {"$group": {"_id": "$from_user_id", "count": {"$sum": 1}}}
+    ]
+    unread_docs = await db.messages.aggregate(pipeline).to_list(200)
+    unread_map = {str(doc["_id"]): doc["count"] for doc in unread_docs}
+
+    result = []
+    for m in members:
+        mid = str(m["_id"])
+        last_activity = m.get("last_activity_date") or m.get("created_at")
+        result.append({
+            "id": mid,
+            "name": f"{m.get('first_name', '')} {m.get('last_name', '')}".strip(),
+            "email": m.get("email", ""),
+            "branch": m.get("branch"),
+            "program_track": m.get("program_track", "onboarding"),
+            "cr_stage": m.get("credit_repair_stage"),
+            "fc_stage": m.get("financial_counseling_stage"),
+            "last_activity": last_activity.isoformat() if last_activity else None,
+            "flags": {
+                "unread_message": unread_map.get(mid, 0) > 0,
+                "overdue_task": False,   # Phase 6: tasks collection not yet implemented
+                "new_document": False    # Phase 3: documents collection not yet implemented
+            }
+        })
+
+    result.sort(key=lambda x: x["last_activity"] or "", reverse=True)
+    return result
+
+
+@router.patch("/counselor/members/{member_id}/program-track")
+async def update_program_track(request: Request, member_id: str):
+    """Update a member's program track (onboarding/credit_repair/financial_counseling)"""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    new_track = data.get("program_track")
+    if new_track not in PROGRAM_TRACKS:
+        raise HTTPException(status_code=400, detail=f"program_track must be one of: {PROGRAM_TRACKS}")
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    })
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    now = datetime.now(timezone.utc)
+    update_fields = {
+        "program_track": new_track,
+        "last_activity_date": now,
+        "updated_at": now
+    }
+
+    # Initialize sub-stage to first value only if not already set
+    if new_track == "credit_repair" and not member.get("credit_repair_stage"):
+        update_fields["credit_repair_stage"] = "cr_waitlist"
+    if new_track == "financial_counseling" and not member.get("financial_counseling_stage"):
+        update_fields["financial_counseling_stage"] = "fc_waitlist"
+
+    await db.users.update_one({"_id": ObjectId(member_id)}, {"$set": update_fields})
+    return {"message": "Program track updated", "program_track": new_track}
+
 
 @router.get("/counselor/members/{member_id}")
 async def get_counselor_member_detail(request: Request, member_id: str):
@@ -149,6 +241,13 @@ async def add_counselor_note(request: Request, member_id: str):
     }
 
     result = await db.intake_notes.insert_one(note_doc)
+
+    # Bump last_activity_date on the member so caseload "Last Activity" column reflects counselor work
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"last_activity_date": datetime.now(timezone.utc)}}
+    )
+
     return {"id": str(result.inserted_id), "message": "Note added"}
 
 @router.get("/counselor/stats")
