@@ -1,6 +1,6 @@
 # Counselor router for Silent Honor Foundation
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException, Request
 from bson import ObjectId
 
@@ -95,14 +95,24 @@ async def get_counselor_caseload(request: Request):
         return []
 
     member_ids = [m["_id"] for m in members]
+    now = datetime.now(timezone.utc)
 
-    # Single aggregation: count unread messages from each member to this counselor
+    # Batch: unread messages from each member to this counselor
     pipeline = [
         {"$match": {"to_user_id": counselor_oid, "from_user_id": {"$in": member_ids}, "read": False}},
         {"$group": {"_id": "$from_user_id", "count": {"$sum": 1}}}
     ]
     unread_docs = await db.messages.aggregate(pipeline).to_list(200)
     unread_map = {str(doc["_id"]): doc["count"] for doc in unread_docs}
+
+    # Batch: overdue tasks per member
+    overdue_pipeline = [
+        {"$match": {"counselor_id": counselor_oid, "member_id": {"$in": member_ids},
+                    "due_date": {"$lt": now}, "completed": False}},
+        {"$group": {"_id": "$member_id", "count": {"$sum": 1}}}
+    ]
+    overdue_docs = await db.tasks.aggregate(overdue_pipeline).to_list(200)
+    overdue_map = {str(doc["_id"]): doc["count"] for doc in overdue_docs}
 
     result = []
     for m in members:
@@ -119,8 +129,8 @@ async def get_counselor_caseload(request: Request):
             "last_activity": last_activity.isoformat() if last_activity else None,
             "flags": {
                 "unread_message": unread_map.get(mid, 0) > 0,
-                "overdue_task": False,   # Phase 6: tasks collection not yet implemented
-                "new_document": False    # Phase 3: documents collection not yet implemented
+                "overdue_task": overdue_map.get(mid, 0) > 0,
+                "new_document": False  # Phase 8 placeholder
             }
         })
 
@@ -531,6 +541,139 @@ async def delete_member_document(request: Request, doc_id: str):
     return {"message": "Document deleted"}
 
 
+@router.get("/counselor/tasks")
+async def get_counselor_tasks(request: Request):
+    """Get all tasks for this counselor across the caseload"""
+    counselor = await get_current_counselor(request)
+    counselor_oid = ObjectId(counselor["_id"])
+
+    tasks = await db.tasks.find(
+        {"counselor_id": counselor_oid}
+    ).sort("due_date", 1).to_list(500)
+
+    # Batch-fetch member names
+    member_ids = list({t["member_id"] for t in tasks})
+    members = await db.users.find(
+        {"_id": {"$in": member_ids}},
+        {"_id": 1, "first_name": 1, "last_name": 1}
+    ).to_list(200)
+    member_map = {
+        str(m["_id"]): f"{m.get('first_name', '')} {m.get('last_name', '')}".strip()
+        for m in members
+    }
+
+    now = datetime.now(timezone.utc)
+    result = []
+    for t in tasks:
+        mid = str(t["member_id"])
+        due = t.get("due_date")
+        completed = t.get("completed", False)
+        overdue = not completed and due and due < now
+        result.append({
+            "id": str(t["_id"]),
+            "title": t.get("title", ""),
+            "task_type": t.get("task_type", "custom"),
+            "member_id": mid,
+            "member_name": member_map.get(mid, "Unknown"),
+            "dispute_id": str(t["dispute_id"]) if t.get("dispute_id") else None,
+            "due_date": due.isoformat() if due else None,
+            "completed": completed,
+            "completed_at": t.get("completed_at").isoformat() if t.get("completed_at") else None,
+            "overdue": overdue,
+            "created_at": t.get("created_at").isoformat() if t.get("created_at") else None
+        })
+
+    return result
+
+
+@router.post("/counselor/tasks")
+async def create_counselor_task(request: Request):
+    """Create a custom task for a member on this counselor's caseload"""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    member_id = data.get("member_id", "")
+    try:
+        member_oid = ObjectId(member_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid member_id")
+
+    member = await db.users.find_one({
+        "_id": member_oid,
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    title = (data.get("title") or "").strip()
+    if not title:
+        raise HTTPException(status_code=400, detail="title is required")
+
+    due_date_str = data.get("due_date")
+    try:
+        due_date = datetime.fromisoformat(str(due_date_str)) if due_date_str else datetime.now(timezone.utc)
+        if due_date.tzinfo is None:
+            due_date = due_date.replace(tzinfo=timezone.utc)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="due_date must be a valid date (YYYY-MM-DD)")
+
+    now = datetime.now(timezone.utc)
+    await db.tasks.insert_one({
+        "counselor_id": ObjectId(counselor["_id"]),
+        "member_id": member_oid,
+        "title": title,
+        "task_type": "custom",
+        "dispute_id": None,
+        "due_date": due_date,
+        "completed": False,
+        "completed_at": None,
+        "created_at": now
+    })
+
+    return {"message": "Task created"}
+
+
+@router.patch("/counselor/tasks/{task_id}/complete")
+async def toggle_task_complete(request: Request, task_id: str):
+    """Mark a task complete or incomplete"""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    try:
+        oid = ObjectId(task_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid task ID")
+
+    task = await db.tasks.find_one({"_id": oid, "counselor_id": ObjectId(counselor["_id"])})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    completed = bool(data.get("completed", True))
+    now = datetime.now(timezone.utc)
+    await db.tasks.update_one(
+        {"_id": oid},
+        {"$set": {"completed": completed, "completed_at": now if completed else None}}
+    )
+    return {"message": "Task updated", "completed": completed}
+
+
+@router.delete("/counselor/tasks/{task_id}")
+async def delete_counselor_task(request: Request, task_id: str):
+    """Delete a task"""
+    counselor = await get_current_counselor(request)
+
+    try:
+        oid = ObjectId(task_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid task ID")
+
+    result = await db.tasks.delete_one({"_id": oid, "counselor_id": ObjectId(counselor["_id"])})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return {"message": "Task deleted"}
+
+
 @router.get("/counselor/members/{member_id}/disputes")
 async def get_member_disputes(request: Request, member_id: str):
     """List disputes for an assigned member"""
@@ -585,7 +728,7 @@ async def create_member_dispute(request: Request, member_id: str):
         raise HTTPException(status_code=400, detail="account_name is required")
 
     now = datetime.now(timezone.utc)
-    await db.disputes.insert_one({
+    dispute_result = await db.disputes.insert_one({
         "user_id": ObjectId(member_id),
         "bureau": bureau,
         "account_name": account_name,
@@ -598,6 +741,20 @@ async def create_member_dispute(request: Request, member_id: str):
         "tracking_number": None,
         "notes": (data.get("notes") or "").strip(),
         "created_by_counselor": ObjectId(counselor["_id"]),
+        "created_at": now
+    })
+
+    # Auto-create a task: send certified dispute letter, due in 7 days
+    bureau_label = "TransUnion" if bureau == "transunion" else bureau.capitalize()
+    await db.tasks.insert_one({
+        "counselor_id": ObjectId(counselor["_id"]),
+        "member_id": ObjectId(member_id),
+        "title": f"Send certified dispute letter — {account_name} @ {bureau_label}",
+        "task_type": "dispute_letter",
+        "dispute_id": dispute_result.inserted_id,
+        "due_date": now + timedelta(days=7),
+        "completed": False,
+        "completed_at": None,
         "created_at": now
     })
 

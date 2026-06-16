@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks - Silent Honor Foundation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+    <script src="js/toast.js"></script>
+    <style>
+        .filter-chips{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+        .filter-chip{font-family:Oswald,sans-serif;font-size:0.68rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.4rem 0.9rem;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.15s}
+        .filter-chip:hover{border-color:var(--white);color:var(--white)}
+        .filter-chip.active{background:var(--red);border-color:var(--red);color:var(--white)}
+        .task-row{display:flex;align-items:flex-start;gap:1rem;padding:0.9rem 1rem;background:rgba(17,24,39,0.6);border:1px solid var(--border);margin-bottom:0.4rem;transition:background 0.15s}
+        .task-row:hover{background:rgba(17,24,39,0.8)}
+        .task-row.is-completed{opacity:0.5}
+        .task-checkbox{flex-shrink:0;width:18px;height:18px;border:2px solid var(--border);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all 0.15s}
+        .task-checkbox:hover{border-color:var(--red)}
+        .task-checkbox.checked{background:var(--red);border-color:var(--red)}
+        .task-checkbox.checked::after{content:"✓";color:var(--white);font-size:11px;font-weight:700}
+        .task-body{flex:1;min-width:0}
+        .task-title{font-family:Barlow,sans-serif;font-size:0.92rem;font-weight:500;color:var(--white);margin-bottom:0.2rem}
+        .task-row.is-completed .task-title{text-decoration:line-through;color:var(--muted)}
+        .task-sub{font-size:0.75rem;color:var(--muted);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap}
+        .task-member-link{color:var(--muted);text-decoration:none;border-bottom:1px dotted rgba(255,255,255,0.2)}
+        .task-member-link:hover{color:var(--white);border-color:var(--white)}
+        .task-type-badge{font-family:Oswald,sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.45rem;border:1px solid var(--border);color:var(--muted)}
+        .task-type-badge.dispute_letter{border-color:rgba(59,130,246,0.4);color:#3B82F6}
+        .task-right{display:flex;align-items:center;gap:0.75rem;flex-shrink:0}
+        .due-label{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap}
+        .due-overdue{color:#EF4444}
+        .due-today{color:#EAB308}
+        .due-soon{color:#10B981}
+        .due-upcoming{color:var(--muted)}
+        .due-done{color:var(--muted)}
+        .del-btn{font-family:Oswald,sans-serif;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.3rem 0.6rem;background:transparent;border:1px solid rgba(185,28,28,0.3);color:rgba(185,28,28,0.6);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+        .del-btn:hover{border-color:var(--red);color:var(--red-light)}
+        .add-task-bar{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:1rem;margin-bottom:1.5rem}
+        .add-task-grid{display:grid;grid-template-columns:1fr 2fr 1fr auto;gap:0.75rem;align-items:end}
+        .task-count-line{font-size:0.78rem;color:var(--muted);margin-bottom:0.75rem}
+        .empty-state{text-align:center;padding:3rem 2rem;color:var(--muted)}
+        .empty-state-icon{font-size:2.5rem;margin-bottom:0.75rem;opacity:0.4}
+        .add-toggle-btn{font-family:Oswald,sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.55rem 1.1rem;background:transparent;border:1px solid var(--border);color:var(--white);cursor:pointer;margin-bottom:1rem;transition:all 0.2s}
+        .add-toggle-btn:hover{border-color:var(--red);color:var(--red-light)}
+        @media(max-width:800px){.add-task-grid{grid-template-columns:1fr 1fr}.task-right{flex-direction:column;gap:0.4rem;align-items:flex-end}}
+        @media(max-width:500px){.add-task-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <div class="dash-wrapper">
+        <nav class="dash-nav">
+            <div class="dash-nav-logo">
+                <img src="images/silent-honor-logo.png" alt="Silent Honor">
+                <span>SILENT<span style="color:var(--red)">HONOR</span></span>
+            </div>
+            <div class="dash-nav-links">
+                <a href="counselor-portal.html" class="dash-nav-link">Dashboard</a>
+                <a href="counselor-caseload.html" class="dash-nav-link">My Caseload</a>
+                <a href="counselor-tasks.html" class="dash-nav-link active">Tasks</a>
+                <a href="messages.html" class="dash-nav-link">Messages</a>
+            </div>
+            <div class="dash-nav-user">
+                <div class="user-avatar" id="user-avatar">??</div>
+                <span class="user-name" id="user-name">Loading...</span>
+                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+            </div>
+        </nav>
+
+        <div class="dash-content">
+            <div class="dash-header">
+                <h1 class="dash-welcome">My <em>Tasks</em></h1>
+                <p class="dash-subtitle">Dispute letters and action items across your caseload</p>
+            </div>
+
+            <div id="loading-state" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading tasks...</p>
+            </div>
+
+            <div id="page-content" style="display:none">
+
+                <!-- Add Task toggle -->
+                <button class="add-toggle-btn" onclick="toggleAddForm()">+ Add Task</button>
+
+                <!-- Add Task form -->
+                <div id="add-task-form" style="display:none;margin-bottom:1.5rem">
+                    <div class="add-task-bar">
+                        <div class="add-task-grid">
+                            <div>
+                                <label class="form-label">Member *</label>
+                                <select id="task-member" class="form-input">
+                                    <option value="">Loading members...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Task *</label>
+                                <input type="text" id="task-title" class="form-input" placeholder="Describe the action item">
+                            </div>
+                            <div>
+                                <label class="form-label">Due Date *</label>
+                                <input type="date" id="task-due" class="form-input">
+                            </div>
+                            <button class="form-submit" onclick="submitTask()" style="margin:0">Add</button>
+                        </div>
+                        <div style="margin-top:0.5rem;display:flex;justify-content:flex-end">
+                            <button class="add-toggle-btn" onclick="toggleAddForm()" style="margin:0;font-size:0.65rem;padding:0.3rem 0.7rem">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-chips">
+                    <button class="filter-chip active" data-filter="all" onclick="setFilter('all')">All</button>
+                    <button class="filter-chip" data-filter="pending" onclick="setFilter('pending')">Pending</button>
+                    <button class="filter-chip" data-filter="overdue" onclick="setFilter('overdue')">Overdue</button>
+                    <button class="filter-chip" data-filter="completed" onclick="setFilter('completed')">Completed</button>
+                </div>
+
+                <div id="task-count-line" class="task-count-line"></div>
+                <div id="tasks-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    var _allTasks = [];
+    var _currentFilter = "all";
+    var _caseload = [];
+
+    document.addEventListener("DOMContentLoaded", async function() {
+        try {
+            var r = await fetch(window.API_BASE + "/api/auth/me", {credentials: "include"});
+            if (!r.ok) { window.location.href = "login.html"; return; }
+            var user = await r.json();
+            if (user.role !== "counselor" && user.role !== "admin") { window.location.href = "dashboard.html"; return; }
+            var initials = ((user.first_name || "").charAt(0) + (user.last_name || "").charAt(0)).toUpperCase() || "??";
+            document.getElementById("user-avatar").textContent = initials;
+            document.getElementById("user-name").textContent = (user.first_name || "") + " " + (user.last_name || "");
+        } catch(e) { window.location.href = "login.html"; return; }
+
+        await loadTasks();
+        document.getElementById("loading-state").style.display = "none";
+        document.getElementById("page-content").style.display = "block";
+    });
+
+    async function loadTasks() {
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/tasks", {credentials: "include"});
+            if (r.ok) {
+                _allTasks = await r.json();
+                renderTasks();
+            }
+        } catch(e) {
+            console.error("Failed to load tasks", e);
+        }
+    }
+
+    async function loadCaseloadForSelect() {
+        if (_caseload.length > 0) return;
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/caseload", {credentials: "include"});
+            if (r.ok) {
+                _caseload = await r.json();
+                var sel = document.getElementById("task-member");
+                sel.innerHTML = "<option value=''>Select member...</option>";
+                _caseload.forEach(function(m) {
+                    var opt = document.createElement("option");
+                    opt.value = m.id;
+                    opt.textContent = m.name;
+                    sel.appendChild(opt);
+                });
+            }
+        } catch(e) { console.error("Failed to load caseload", e); }
+    }
+
+    async function toggleAddForm() {
+        var f = document.getElementById("add-task-form");
+        var open = f.style.display === "none" || f.style.display === "";
+        f.style.display = open ? "block" : "none";
+        if (open) {
+            await loadCaseloadForSelect();
+            var today = new Date().toISOString().split("T")[0];
+            document.getElementById("task-due").value = today;
+        }
+    }
+
+    async function submitTask() {
+        var memberId = document.getElementById("task-member").value;
+        var title = document.getElementById("task-title").value.trim();
+        var due = document.getElementById("task-due").value;
+        if (!memberId) { showToast("Error", "Select a member", "error"); return; }
+        if (!title) { showToast("Error", "Task title is required", "error"); return; }
+        if (!due) { showToast("Error", "Due date is required", "error"); return; }
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/tasks", {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                credentials: "include",
+                body: JSON.stringify({member_id: memberId, title: title, due_date: due})
+            });
+            if (r.ok) {
+                showToast("Created", "Task added", "success");
+                document.getElementById("add-task-form").style.display = "none";
+                document.getElementById("task-title").value = "";
+                document.getElementById("task-member").value = "";
+                await loadTasks();
+            } else {
+                var err = await r.json();
+                showToast("Error", err.detail || "Could not create task", "error");
+            }
+        } catch(e) { showToast("Error", "Could not create task", "error"); }
+    }
+
+    async function toggleComplete(taskId, currentlyComplete) {
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/tasks/" + taskId + "/complete", {
+                method: "PATCH", headers: {"Content-Type": "application/json"},
+                credentials: "include",
+                body: JSON.stringify({completed: !currentlyComplete})
+            });
+            if (r.ok) {
+                await loadTasks();
+            } else {
+                showToast("Error", "Could not update task", "error");
+            }
+        } catch(e) { showToast("Error", "Could not update task", "error"); }
+    }
+
+    async function deleteTask(taskId) {
+        if (!confirm("Delete this task?")) return;
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/tasks/" + taskId, {
+                method: "DELETE", credentials: "include"
+            });
+            if (r.ok) {
+                showToast("Deleted", "Task removed", "success");
+                await loadTasks();
+            } else {
+                var err = await r.json();
+                showToast("Error", err.detail || "Could not delete task", "error");
+            }
+        } catch(e) { showToast("Error", "Could not delete task", "error"); }
+    }
+
+    function setFilter(filter) {
+        _currentFilter = filter;
+        document.querySelectorAll(".filter-chip").forEach(function(c) {
+            c.classList.toggle("active", c.dataset.filter === filter);
+        });
+        renderTasks();
+    }
+
+    function dueLabelClass(task) {
+        if (task.completed) return "due-done";
+        if (task.overdue) return "due-overdue";
+        if (!task.due_date) return "due-upcoming";
+        var due = new Date(task.due_date);
+        var now = new Date();
+        var diffDays = Math.ceil((due - now) / (1000*60*60*24));
+        if (diffDays <= 0) return "due-overdue";
+        if (diffDays === 1) return "due-today";
+        if (diffDays <= 5) return "due-soon";
+        return "due-upcoming";
+    }
+
+    function fmtDue(task) {
+        if (!task.due_date) return "No due date";
+        var due = new Date(task.due_date);
+        var now = new Date();
+        var diffDays = Math.ceil((due - now) / (1000*60*60*24));
+        if (task.completed) return "Done " + due.toLocaleDateString("en-US", {month:"short", day:"numeric"});
+        if (diffDays < 0) return "Overdue " + Math.abs(diffDays) + "d";
+        if (diffDays === 0) return "Due today";
+        if (diffDays === 1) return "Due tomorrow";
+        if (diffDays <= 6) return "Due in " + diffDays + "d";
+        return "Due " + due.toLocaleDateString("en-US", {month:"short", day:"numeric"});
+    }
+
+    function escHtml(str) {
+        return String(str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    function renderTasks() {
+        var filtered = _allTasks.filter(function(t) {
+            if (_currentFilter === "pending") return !t.completed && !t.overdue;
+            if (_currentFilter === "overdue") return t.overdue;
+            if (_currentFilter === "completed") return t.completed;
+            return true;
+        });
+
+        var countEl = document.getElementById("task-count-line");
+        var overdueCt = _allTasks.filter(function(t){ return t.overdue; }).length;
+        var pendingCt = _allTasks.filter(function(t){ return !t.completed && !t.overdue; }).length;
+        var doneCt = _allTasks.filter(function(t){ return t.completed; }).length;
+        countEl.innerHTML = "<span style='color:var(--white)'>" + _allTasks.length + " total</span>" +
+            (overdueCt > 0 ? " &nbsp;&bull;&nbsp; <span style='color:#EF4444'>" + overdueCt + " overdue</span>" : "") +
+            " &nbsp;&bull;&nbsp; <span style='color:var(--muted)'>" + pendingCt + " pending &nbsp;&bull;&nbsp; " + doneCt + " done</span>";
+
+        var listEl = document.getElementById("tasks-list");
+        if (filtered.length === 0) {
+            listEl.innerHTML = "<div class='empty-state'><div class='empty-state-icon'>&#10003;</div><p>No tasks in this view.</p></div>";
+            return;
+        }
+
+        var html = "";
+        for (var i = 0; i < filtered.length; i++) {
+            var t = filtered[i];
+            var dueClass = dueLabelClass(t);
+            var typeLabel = t.task_type === "dispute_letter" ? "Dispute Letter" : "Custom";
+            html += "<div class='task-row" + (t.completed ? " is-completed" : "") + "'>" +
+                "<div class='task-checkbox" + (t.completed ? " checked" : "") + "' onclick='toggleComplete(\"" + t.id + "\"," + t.completed + ")' title='" + (t.completed ? "Mark incomplete" : "Mark complete") + "'></div>" +
+                "<div class='task-body'>" +
+                    "<div class='task-title'>" + escHtml(t.title) + "</div>" +
+                    "<div class='task-sub'>" +
+                        "<a class='task-member-link' href='counselor-member.html?id=" + t.member_id + "'>" + escHtml(t.member_name) + "</a>" +
+                        (t.dispute_id ? " <span>·</span> <a class='task-member-link' href='counselor-member.html?id=" + t.member_id + "#disputes'>dispute</a>" : "") +
+                        " <span>·</span> <span class='task-type-badge " + escHtml(t.task_type) + "'>" + typeLabel + "</span>" +
+                    "</div>" +
+                "</div>" +
+                "<div class='task-right'>" +
+                    "<span class='due-label " + dueClass + "'>" + fmtDue(t) + "</span>" +
+                    "<button class='del-btn' onclick='deleteTask(\"" + t.id + "\")'>Delete</button>" +
+                "</div>" +
+            "</div>";
+        }
+        listEl.innerHTML = html;
+    }
+
+    async function signOut() {
+        try { await fetch(window.API_BASE + "/api/auth/logout", {method: "POST", credentials: "include"}); } catch(e) {}
+        window.location.href = "login.html";
+    }
+    </script>
+</body>
+</html>

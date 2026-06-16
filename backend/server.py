@@ -132,6 +132,11 @@ async def create_indexes():
         await db.credit_scores.create_index([("user_id", 1), ("date", -1)])
         await db.credit_scores.create_index([("member_id", 1), ("bureau", 1), ("date_pulled", -1)])
 
+        # Tasks
+        await db.tasks.create_index([("counselor_id", 1), ("due_date", 1)])
+        await db.tasks.create_index([("member_id", 1)])
+        await db.tasks.create_index([("dispute_id", 1)])
+
         # Course progress
         await db.course_progress.create_index([("user_id", 1), ("course_id", 1)])
 
