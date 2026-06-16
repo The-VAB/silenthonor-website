@@ -115,13 +115,10 @@
                 <!-- Toolbar -->
                 <div class="wl-toolbar">
                     <input type="text" id="wl-search" class="wl-search" placeholder="Search name or email..." oninput="applyFilters()">
-                    <select id="wl-stage-filter" class="wl-filter" onchange="applyFilters()">
-                        <option value="">All Stages</option>
-                        <option value="approved">Approved</option>
-                        <option value="intake_complete">Intake Complete</option>
-                        <option value="dd214_review">DD-214 Review</option>
-                        <option value="dd214_pending">DD-214 Pending</option>
-                        <option value="applied">Applied</option>
+                    <select id="wl-program-filter" class="wl-filter" onchange="applyFilters()">
+                        <option value="">All Programs</option>
+                        <option value="cr">Credit Repair</option>
+                        <option value="fc">Financial Counseling</option>
                     </select>
                     <span class="wl-count" id="wl-count"></span>
                 </div>
@@ -133,8 +130,8 @@
                             <th>Member</th>
                             <th>Branch</th>
                             <th>State</th>
-                            <th>Pipeline Stage</th>
-                            <th>Waiting Since</th>
+                            <th>Program Applied For</th>
+                            <th>Applied</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -143,7 +140,7 @@
 
                 <div id="wl-empty" class="empty-state" style="display:none;">
                     <div class="empty-state-icon">&#9989;</div>
-                    <p>No unassigned members — all veterans are currently with a counselor.</p>
+                    <p>No pending program applications — members appear here after applying for Credit Repair or Financial Counseling.</p>
                 </div>
             </div>
         </div>
@@ -152,18 +149,6 @@
     <script>
     var allMembers = [];
     var capacity = {current: 0, max: 12, available: 12};
-
-    var STAGE_LABELS = {
-        applied: "Applied",
-        dd214_pending: "DD-214 Pending",
-        dd214_review: "DD-214 Review",
-        approved: "Approved",
-        counselor_assigned: "Counselor Assigned",
-        intake_complete: "Intake Complete",
-        active: "Active",
-        graduated: "Graduated",
-        inactive: "Inactive"
-    };
 
     document.addEventListener("DOMContentLoaded", async function() {
         try {
@@ -222,10 +207,11 @@
 
     function applyFilters() {
         var q = (document.getElementById("wl-search").value || "").toLowerCase().trim();
-        var stage = document.getElementById("wl-stage-filter").value;
+        var prog = document.getElementById("wl-program-filter").value;
 
         var filtered = allMembers.filter(function(m) {
-            if (stage && m.pipeline_stage !== stage) return false;
+            if (prog === "cr" && !m.has_cr) return false;
+            if (prog === "fc" && !m.has_fc) return false;
             if (q) {
                 var name = (m.name || "").toLowerCase();
                 var email = (m.email || "").toLowerCase();
@@ -253,18 +239,14 @@
         document.getElementById("wl-empty").style.display = "none";
 
         tbody.innerHTML = list.map(function(m) {
-            var stageKey = m.pipeline_stage || "applied";
-            var stageLabel = STAGE_LABELS[stageKey] || stageKey;
-            var stageClass = "stage-" + stageKey;
-            if (!["applied","dd214_pending","dd214_review","approved","counselor_assigned","intake_complete","active"].includes(stageKey)) {
-                stageClass = "stage-default";
-            }
+            var progLabel = escHtml(m.program || "—");
+            var progCls = m.has_cr && m.has_fc ? "stage-active" : m.has_cr ? "stage-approved" : "stage-intake_complete";
 
             return "<tr id='row-" + m.id + "'>" +
                 "<td><div class='wl-name'>" + escHtml(m.name || "—") + "</div><div class='wl-email'>" + escHtml(m.email) + "</div></td>" +
                 "<td>" + escHtml(m.branch || "—") + "</td>" +
                 "<td>" + escHtml(m.state || "—") + "</td>" +
-                "<td><span class='stage-badge " + stageClass + "'>" + stageLabel + "</span></td>" +
+                "<td><span class='stage-badge " + progCls + "'>" + progLabel + "</span></td>" +
                 "<td style='color:var(--muted);font-size:0.82rem'>" + fmtDate(m.created_at) + "</td>" +
                 "<td><button class='claim-btn' id='claim-" + m.id + "' onclick='claimMember(\"" + m.id + "\",this)'" + (atCap ? " disabled title=\"You are at capacity\"" : "") + ">Claim</button></td>" +
             "</tr>";

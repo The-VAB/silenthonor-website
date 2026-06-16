@@ -29,6 +29,19 @@ def set_db(database):
     global db
     db = database
 
+
+def sanitize_doc(obj):
+    """Recursively convert ObjectId and datetime to JSON-safe types."""
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, dict):
+        return {k: sanitize_doc(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [sanitize_doc(i) for i in obj]
+    return obj
+
 # Member-facing endpoints
 @router.get("/member/counselor")
 @router.get("/counselor/assigned")
@@ -185,8 +198,8 @@ async def get_counselor_member_detail(request: Request, member_id: str):
     if not member:
         raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
 
-    member["_id"] = str(member["_id"])
     member.pop("password_hash", None)
+    member = sanitize_doc(member)
 
     # Get credit scores
     credit_scores = await db.credit_scores.find(
@@ -286,10 +299,13 @@ async def get_counselor_stats(request: Request):
         for m in member_docs
     }
 
-    # Waitlist count (no counselor assigned)
+    # Waitlist count: members who applied for a program and have no counselor yet
     waitlist_count = await db.users.count_documents({
         "role": "member",
-        "$or": [{"assigned_counselor_id": {"$exists": False}}, {"assigned_counselor_id": None}]
+        "$and": [
+            {"$or": [{"assigned_counselor_id": {"$exists": False}}, {"assigned_counselor_id": None}]},
+            {"$or": [{"credit_repair_stage": "cr_waitlist"}, {"financial_counseling_stage": "fc_waitlist"}]}
+        ]
     })
 
     # Tasks due today or overdue (not yet completed)
@@ -811,7 +827,7 @@ def compute_game_plan_action(account, today):
 
 @router.get("/counselor/waitlist")
 async def get_waitlist(request: Request):
-    """Get unassigned members available for self-assignment, plus this counselor's capacity"""
+    """Get members who have applied for a program and are awaiting counselor assignment"""
     counselor = await get_current_counselor(request)
     counselor_oid = ObjectId(counselor["_id"])
 
@@ -819,18 +835,26 @@ async def get_waitlist(request: Request):
     max_caseload = (counselor_doc or {}).get("max_caseload", 12)
     current_count = await db.users.count_documents({"assigned_counselor_id": counselor_oid, "role": "member"})
 
-    # Members with no counselor assigned (field absent or null)
+    # Only members who have applied for a program (cr_waitlist or fc_waitlist) and have no counselor yet
+    no_counselor = {"$or": [{"assigned_counselor_id": {"$exists": False}}, {"assigned_counselor_id": None}]}
+    has_application = {"$or": [
+        {"credit_repair_stage": "cr_waitlist"},
+        {"financial_counseling_stage": "fc_waitlist"}
+    ]}
     members = await db.users.find(
-        {
-            "role": "member",
-            "$or": [
-                {"assigned_counselor_id": {"$exists": False}},
-                {"assigned_counselor_id": None}
-            ]
-        },
+        {"role": "member", "$and": [no_counselor, has_application]},
         {"_id": 1, "first_name": 1, "last_name": 1, "email": 1, "branch": 1,
-         "pipeline_stage": 1, "program_track": 1, "dd214_status": 1, "state": 1, "created_at": 1}
+         "state": 1, "credit_repair_stage": 1, "financial_counseling_stage": 1, "created_at": 1}
     ).sort("created_at", 1).to_list(500)
+
+    def program_label(m):
+        has_cr = m.get("credit_repair_stage") == "cr_waitlist"
+        has_fc = m.get("financial_counseling_stage") == "fc_waitlist"
+        if has_cr and has_fc:
+            return "Credit Repair & Financial Counseling"
+        if has_cr:
+            return "Credit Repair"
+        return "Financial Counseling"
 
     return {
         "capacity": {
@@ -844,8 +868,9 @@ async def get_waitlist(request: Request):
             "email": m.get("email", ""),
             "branch": m.get("branch"),
             "state": m.get("state"),
-            "pipeline_stage": m.get("pipeline_stage", "applied"),
-            "dd214_status": m.get("dd214_status"),
+            "program": program_label(m),
+            "has_cr": m.get("credit_repair_stage") == "cr_waitlist",
+            "has_fc": m.get("financial_counseling_stage") == "fc_waitlist",
             "created_at": m.get("created_at").isoformat() if m.get("created_at") else None
         } for m in members]
     }
@@ -873,13 +898,21 @@ async def claim_member(request: Request, member_id: str):
     if member.get("assigned_counselor_id"):
         raise HTTPException(status_code=409, detail="This member was just claimed by another counselor")
 
+    # Derive program_track from which application is waiting
+    if member.get("credit_repair_stage") == "cr_waitlist":
+        program_track = "credit_repair"
+    elif member.get("financial_counseling_stage") == "fc_waitlist":
+        program_track = "financial_counseling"
+    else:
+        program_track = member.get("program_track") or "onboarding"
+
     now = datetime.now(timezone.utc)
     await db.users.update_one(
         {"_id": ObjectId(member_id)},
         {"$set": {
             "assigned_counselor_id": counselor_oid,
             "pipeline_stage": "counselor_assigned",
-            "program_track": member.get("program_track") or "onboarding",
+            "program_track": program_track,
             "last_activity_date": now
         }}
     )
