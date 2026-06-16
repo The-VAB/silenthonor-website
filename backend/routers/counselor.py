@@ -264,33 +264,110 @@ async def add_counselor_note(request: Request, member_id: str):
 
 @router.get("/counselor/stats")
 async def get_counselor_stats(request: Request):
-    """Get statistics for counselor dashboard"""
+    """Get statistics and recent activity for counselor dashboard"""
     counselor = await get_current_counselor(request)
+    counselor_oid = ObjectId(counselor["_id"])
+    now = datetime.now(timezone.utc)
 
-    assigned_count = await db.users.count_documents({"assigned_counselor_id": ObjectId(counselor["_id"])})
+    # Caseload capacity
+    counselor_doc = await db.users.find_one({"_id": counselor_oid}, {"max_caseload": 1})
+    max_caseload = (counselor_doc or {}).get("max_caseload", 12)
+    assigned_count = await db.users.count_documents({"assigned_counselor_id": counselor_oid, "role": "member"})
+    open_slots = max(0, max_caseload - assigned_count)
 
-    # Get members in different stages
-    intake_count = await db.users.count_documents({
-        "assigned_counselor_id": ObjectId(counselor["_id"]),
-        "pipeline_stage": "intake_complete"
+    # Build member ID list + name map for activity feed
+    member_docs = await db.users.find(
+        {"assigned_counselor_id": counselor_oid, "role": "member"},
+        {"_id": 1, "first_name": 1, "last_name": 1}
+    ).to_list(500)
+    member_ids = [m["_id"] for m in member_docs]
+    member_name_map = {
+        str(m["_id"]): f"{m.get('first_name', '')} {m.get('last_name', '')}".strip()
+        for m in member_docs
+    }
+
+    # Waitlist count (no counselor assigned)
+    waitlist_count = await db.users.count_documents({
+        "role": "member",
+        "$or": [{"assigned_counselor_id": {"$exists": False}}, {"assigned_counselor_id": None}]
     })
 
-    active_count = await db.users.count_documents({
-        "assigned_counselor_id": ObjectId(counselor["_id"]),
-        "pipeline_stage": "active"
+    # Tasks due today or overdue (not yet completed)
+    today_end = datetime(now.year, now.month, now.day, 23, 59, 59, tzinfo=timezone.utc)
+    tasks_due = await db.tasks.count_documents({
+        "counselor_id": counselor_oid,
+        "completed": False,
+        "due_date": {"$lte": today_end}
     })
 
-    # Get unread messages
-    unread = await db.messages.count_documents({
-        "to_user_id": ObjectId(counselor["_id"]),
-        "read": False
-    })
+    # Unread messages
+    unread = await db.messages.count_documents({"to_user_id": counselor_oid, "read": False})
+
+    # Recent activity — notes, disputes, completed tasks
+    activity = []
+
+    # Notes added by this counselor (created_by field)
+    recent_notes = await db.intake_notes.find(
+        {"created_by": counselor_oid},
+        {"member_id": 1, "content": 1, "created_at": 1}
+    ).sort("created_at", -1).limit(8).to_list(8)
+    for n in recent_notes:
+        mid = str(n.get("member_id", ""))
+        content = n.get("content", "")
+        preview = content[:60] + ("…" if len(content) > 60 else "")
+        dt = n.get("created_at")
+        activity.append({
+            "type": "note",
+            "member_id": mid,
+            "member_name": member_name_map.get(mid, "Member"),
+            "description": preview,
+            "date": dt.isoformat() if dt else None
+        })
+
+    # Disputes for counselor's members (disputes use user_id for member)
+    if member_ids:
+        recent_disputes = await db.disputes.find(
+            {"user_id": {"$in": member_ids}},
+            {"user_id": 1, "account_name": 1, "bureau": 1, "status": 1, "created_at": 1}
+        ).sort("created_at", -1).limit(8).to_list(8)
+        for d in recent_disputes:
+            mid = str(d.get("user_id", ""))
+            bureau_label = {"equifax": "Equifax", "experian": "Experian", "transunion": "TransUnion"}.get(d.get("bureau", ""), d.get("bureau", ""))
+            dt = d.get("created_at")
+            activity.append({
+                "type": "dispute",
+                "member_id": mid,
+                "member_name": member_name_map.get(mid, "Member"),
+                "description": f"{d.get('account_name', 'Account')} · {bureau_label} · {d.get('status', '')}",
+                "date": dt.isoformat() if dt else None
+            })
+
+    # Recently completed tasks by this counselor
+    recent_tasks = await db.tasks.find(
+        {"counselor_id": counselor_oid, "completed": True},
+        {"member_id": 1, "title": 1, "completed_at": 1}
+    ).sort("completed_at", -1).limit(5).to_list(5)
+    for t in recent_tasks:
+        mid = str(t.get("member_id", ""))
+        dt = t.get("completed_at")
+        activity.append({
+            "type": "task_done",
+            "member_id": mid,
+            "member_name": member_name_map.get(mid, "Member") if mid else "",
+            "description": t.get("title", ""),
+            "date": dt.isoformat() if dt else None
+        })
+
+    activity.sort(key=lambda x: x.get("date") or "", reverse=True)
 
     return {
         "assigned_members": assigned_count,
-        "intake_pending": intake_count,
-        "active_members": active_count,
-        "unread_messages": unread
+        "max_caseload": max_caseload,
+        "open_slots": open_slots,
+        "waitlist_count": waitlist_count,
+        "tasks_due": tasks_due,
+        "unread_messages": unread,
+        "recent_activity": activity[:15]
     }
 
 BUREAUS = ["equifax", "experian", "transunion"]
