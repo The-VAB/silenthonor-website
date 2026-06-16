@@ -284,6 +284,7 @@ async def get_counselor_stats(request: Request):
     }
 
 BUREAUS = ["equifax", "experian", "transunion"]
+DISPUTE_STATUSES = ["draft", "pending", "sent", "responded", "closed"]
 
 DOCUMENT_CATEGORIES = [
     "dd214", "credit_report", "dispute_letter", "goodwill_letter",
@@ -528,6 +529,175 @@ async def delete_member_document(request: Request, doc_id: str):
     await delete_document(doc["storage_key"], doc.get("storage_type", "local"))
     await db.documents.delete_one({"_id": oid})
     return {"message": "Document deleted"}
+
+
+@router.get("/counselor/members/{member_id}/disputes")
+async def get_member_disputes(request: Request, member_id: str):
+    """List disputes for an assigned member"""
+    counselor = await get_current_counselor(request)
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    disputes = await db.disputes.find(
+        {"user_id": ObjectId(member_id)}
+    ).sort("created_at", -1).to_list(100)
+
+    return [{
+        "id": str(d["_id"]),
+        "bureau": d.get("bureau", ""),
+        "account_name": d.get("account_name", ""),
+        "account_number": d.get("account_number", ""),
+        "dispute_reason": d.get("dispute_reason", ""),
+        "status": d.get("status", "draft"),
+        "date_sent": d.get("date_sent").isoformat() if d.get("date_sent") else None,
+        "date_response": d.get("date_response").isoformat() if d.get("date_response") else None,
+        "response_outcome": d.get("response_outcome"),
+        "tracking_number": d.get("tracking_number"),
+        "notes": d.get("notes", ""),
+        "created_at": d.get("created_at").isoformat() if d.get("created_at") else None
+    } for d in disputes]
+
+
+@router.post("/counselor/members/{member_id}/disputes")
+async def create_member_dispute(request: Request, member_id: str):
+    """Create a dispute on behalf of an assigned member"""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    bureau = data.get("bureau", "")
+    if bureau not in BUREAUS:
+        raise HTTPException(status_code=400, detail="bureau must be equifax, experian, or transunion")
+
+    account_name = (data.get("account_name") or "").strip()
+    if not account_name:
+        raise HTTPException(status_code=400, detail="account_name is required")
+
+    now = datetime.now(timezone.utc)
+    await db.disputes.insert_one({
+        "user_id": ObjectId(member_id),
+        "bureau": bureau,
+        "account_name": account_name,
+        "account_number": (data.get("account_number") or "").strip(),
+        "dispute_reason": data.get("dispute_reason", ""),
+        "status": "draft",
+        "date_sent": None,
+        "date_response": None,
+        "response_outcome": None,
+        "tracking_number": None,
+        "notes": (data.get("notes") or "").strip(),
+        "created_by_counselor": ObjectId(counselor["_id"]),
+        "created_at": now
+    })
+
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"last_activity_date": now}}
+    )
+
+    return {"message": "Dispute created"}
+
+
+@router.patch("/counselor/disputes/{dispute_id}")
+async def update_member_dispute(request: Request, dispute_id: str):
+    """Update a dispute. Hard rule: status=sent requires a tracking_number."""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    try:
+        oid = ObjectId(dispute_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid dispute ID")
+
+    dispute = await db.disputes.find_one({"_id": oid})
+    if not dispute:
+        raise HTTPException(status_code=404, detail="Dispute not found")
+
+    member = await db.users.find_one({
+        "_id": dispute["user_id"],
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=403, detail="Not authorized to update this dispute")
+
+    new_status = data.get("status")
+    if new_status and new_status not in DISPUTE_STATUSES:
+        raise HTTPException(status_code=400, detail=f"status must be one of: {DISPUTE_STATUSES}")
+
+    # Hard rule: certified mail tracking number required to mark as sent
+    incoming_tracking = (data.get("tracking_number") or "").strip()
+    existing_tracking = (dispute.get("tracking_number") or "").strip()
+    effective_tracking = incoming_tracking or existing_tracking
+    if new_status == "sent" and not effective_tracking:
+        raise HTTPException(
+            status_code=400,
+            detail="A certified mail tracking number is required before marking as Sent"
+        )
+
+    update_fields = {}
+    for field in ["bureau", "account_name", "account_number", "dispute_reason",
+                  "status", "tracking_number", "notes", "response_outcome"]:
+        if field in data:
+            update_fields[field] = data[field]
+
+    for date_field in ["date_sent", "date_response"]:
+        val = data.get(date_field)
+        if val:
+            try:
+                update_fields[date_field] = datetime.fromisoformat(val.replace("Z", "+00:00"))
+            except (ValueError, AttributeError):
+                pass
+
+    # Auto-stamp date_sent when status first moves to sent
+    if new_status == "sent" and not dispute.get("date_sent") and "date_sent" not in update_fields:
+        update_fields["date_sent"] = datetime.now(timezone.utc)
+
+    now = datetime.now(timezone.utc)
+    update_fields["updated_at"] = now
+    await db.disputes.update_one({"_id": oid}, {"$set": update_fields})
+
+    await db.users.update_one(
+        {"_id": dispute["user_id"]},
+        {"$set": {"last_activity_date": now}}
+    )
+
+    return {"message": "Dispute updated"}
+
+
+@router.delete("/counselor/disputes/{dispute_id}")
+async def delete_member_dispute(request: Request, dispute_id: str):
+    """Delete a dispute (counselor must be assigned to that member)"""
+    counselor = await get_current_counselor(request)
+
+    try:
+        oid = ObjectId(dispute_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid dispute ID")
+
+    dispute = await db.disputes.find_one({"_id": oid})
+    if not dispute:
+        raise HTTPException(status_code=404, detail="Dispute not found")
+
+    member = await db.users.find_one({
+        "_id": dispute["user_id"],
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this dispute")
+
+    await db.disputes.delete_one({"_id": oid})
+    return {"message": "Dispute deleted"}
 
 
 # Admin counselor management
