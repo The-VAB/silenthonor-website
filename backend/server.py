@@ -105,6 +105,8 @@ async def create_indexes():
         await db.users.create_index("credit_repair_stage")
         await db.users.create_index("financial_counseling_stage")
         await db.users.create_index("assigned_counselor_id")
+        await db.users.create_index("program_track")
+        await db.users.create_index("last_activity_date")
 
         # Token indexes
         await db.password_reset_tokens.create_index("expires_at", expireAfterSeconds=0)

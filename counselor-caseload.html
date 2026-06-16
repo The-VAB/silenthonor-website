@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Caseload - Silent Honor Foundation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+    <script src="js/toast.js"></script>
+    <style>
+        .filter-bar{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+        .filter-label{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+        .filter-select{background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--white);padding:0.5rem 0.75rem;font-family:Barlow,sans-serif;font-size:0.9rem;min-width:180px}
+        .filter-select:focus{outline:none;border-color:var(--red)}
+        .caseload-table{width:100%;border-collapse:collapse;background:rgba(17,24,39,0.6);border:1px solid var(--border)}
+        .caseload-table th{font-family:Oswald,sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:0.85rem 1rem;border-bottom:1px solid var(--border);text-align:left;background:rgba(0,0,0,0.2)}
+        .caseload-table th.sortable{cursor:pointer;user-select:none}
+        .caseload-table th.sortable:hover{color:var(--white)}
+        .sort-indicator{margin-left:0.4rem;opacity:0.6}
+        .caseload-table td{padding:0.9rem 1rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;font-size:0.9rem}
+        .caseload-table tr:hover td{background:rgba(255,255,255,0.02)}
+        .caseload-table tr:last-child td{border-bottom:none}
+        .member-name-cell{font-family:Oswald,sans-serif;font-weight:600;font-size:0.95rem}
+        .member-email-cell{font-size:0.78rem;color:var(--muted);margin-top:0.15rem}
+        .track-select{background:rgba(11,18,32,0.9);border:1px solid var(--border);color:var(--white);padding:0.4rem 0.6rem;font-family:Barlow,sans-serif;font-size:0.85rem;cursor:pointer;min-width:160px}
+        .track-select:focus{outline:none;border-color:var(--red)}
+        .flags-cell{display:flex;gap:0.35rem;flex-wrap:wrap}
+        .flag-badge{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.5rem;border-radius:2px}
+        .flag-unread{background:rgba(234,179,8,0.2);color:#EAB308;border:1px solid rgba(234,179,8,0.3)}
+        .flag-overdue{background:rgba(185,28,28,0.2);color:var(--red-light);border:1px solid rgba(185,28,28,0.3)}
+        .flag-doc{background:rgba(59,130,246,0.2);color:#3B82F6;border:1px solid rgba(59,130,246,0.3)}
+        .view-btn{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.4rem 0.85rem;background:transparent;border:1px solid var(--border);color:var(--white);cursor:pointer;text-decoration:none;display:inline-block;transition:all 0.2s;white-space:nowrap}
+        .view-btn:hover{border-color:var(--red);color:var(--red-light)}
+        .empty-state{text-align:center;padding:3rem 2rem;color:var(--muted)}
+        .empty-state-icon{font-size:2.5rem;margin-bottom:0.75rem;opacity:0.4}
+        .track-onboarding{color:#10B981}
+        .track-credit_repair{color:#3B82F6}
+        .track-financial_counseling{color:#C9952A}
+        .last-activity-muted{color:var(--muted);font-size:0.82rem}
+    </style>
+</head>
+<body>
+    <div class="dash-wrapper">
+        <nav class="dash-nav">
+            <div class="dash-nav-logo">
+                <img src="images/silent-honor-logo.png" alt="Silent Honor">
+                <span>SILENT<span style="color:var(--red)">HONOR</span></span>
+            </div>
+            <div class="dash-nav-links">
+                <a href="counselor-portal.html" class="dash-nav-link">Dashboard</a>
+                <a href="counselor-caseload.html" class="dash-nav-link active">My Caseload</a>
+                <a href="messages.html" class="dash-nav-link">Messages</a>
+            </div>
+            <div class="dash-nav-user">
+                <div class="user-avatar" id="user-avatar">??</div>
+                <span class="user-name" id="user-name">Loading...</span>
+                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+            </div>
+        </nav>
+
+        <div class="dash-content">
+            <div class="dash-header">
+                <h1 class="dash-welcome">My <em>Caseload</em></h1>
+                <p class="dash-subtitle">Manage your assigned members and track their progress</p>
+            </div>
+
+            <div id="loading-state" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading caseload...</p>
+            </div>
+
+            <div id="caseload-content" style="display:none;">
+                <div class="filter-bar">
+                    <span class="filter-label">Filter by Track:</span>
+                    <select id="track-filter" class="filter-select" onchange="applyFilter()">
+                        <option value="">All Tracks</option>
+                        <option value="onboarding">Onboarding</option>
+                        <option value="credit_repair">Credit Repair</option>
+                        <option value="financial_counseling">Financial Counseling</option>
+                    </select>
+                    <span id="member-count" style="font-size:0.85rem;color:var(--muted);margin-left:auto;"></span>
+                </div>
+
+                <table class="caseload-table" id="caseload-table">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Branch</th>
+                            <th>Program Track</th>
+                            <th class="sortable" id="sort-header" onclick="toggleSort()">Last Activity <span class="sort-indicator" id="sort-indicator">&#9660;</span></th>
+                            <th>Flags</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="caseload-tbody"></tbody>
+                </table>
+
+                <div id="empty-state" class="empty-state" style="display:none;">
+                    <div class="empty-state-icon">&#128100;</div>
+                    <p>No members assigned yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    var currentUser = null;
+    var caseload = [];
+    var sortAsc = false;
+
+    document.addEventListener("DOMContentLoaded", async function() {
+        try {
+            var r = await fetch(window.API_BASE + "/api/auth/me", {credentials: "include"});
+            if (!r.ok) { window.location.href = "login.html"; return; }
+            currentUser = await r.json();
+            if (currentUser.role !== "counselor" && currentUser.role !== "admin") {
+                window.location.href = "dashboard.html"; return;
+            }
+            var initials = ((currentUser.first_name || "").charAt(0) + (currentUser.last_name || "").charAt(0)).toUpperCase() || "??";
+            document.getElementById("user-avatar").textContent = initials;
+            document.getElementById("user-name").textContent = (currentUser.first_name || "") + " " + (currentUser.last_name || "");
+            loadCaseload();
+        } catch(e) {
+            window.location.href = "login.html";
+        }
+    });
+
+    async function loadCaseload() {
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/caseload", {credentials: "include"});
+            if (r.ok) {
+                caseload = await r.json();
+            }
+        } catch(e) {
+            console.error("Failed to load caseload:", e);
+        }
+        document.getElementById("loading-state").style.display = "none";
+        document.getElementById("caseload-content").style.display = "block";
+        applyFilter();
+    }
+
+    function applyFilter() {
+        var track = document.getElementById("track-filter").value;
+        var filtered = track ? caseload.filter(function(m) { return m.program_track === track; }) : caseload.slice();
+        sortAndRender(filtered);
+    }
+
+    function toggleSort() {
+        sortAsc = !sortAsc;
+        document.getElementById("sort-indicator").innerHTML = sortAsc ? "&#9650;" : "&#9660;";
+        applyFilter();
+    }
+
+    function sortAndRender(list) {
+        list.sort(function(a, b) {
+            var da = a.last_activity || "";
+            var db = b.last_activity || "";
+            return sortAsc ? da.localeCompare(db) : db.localeCompare(da);
+        });
+        renderCaseload(list);
+    }
+
+    function renderCaseload(list) {
+        var tbody = document.getElementById("caseload-tbody");
+        document.getElementById("member-count").textContent = list.length + " member" + (list.length === 1 ? "" : "s");
+
+        if (list.length === 0) {
+            tbody.innerHTML = "";
+            document.getElementById("caseload-table").style.display = "none";
+            document.getElementById("empty-state").style.display = "block";
+            return;
+        }
+
+        document.getElementById("caseload-table").style.display = "table";
+        document.getElementById("empty-state").style.display = "none";
+
+        tbody.innerHTML = list.map(function(m) {
+            var track = m.program_track || "onboarding";
+            var flags = "";
+            if (m.flags && m.flags.unread_message) flags += "<span class='flag-badge flag-unread'>Unread Msg</span>";
+            if (m.flags && m.flags.overdue_task) flags += "<span class='flag-badge flag-overdue'>Overdue Task</span>";
+            if (m.flags && m.flags.new_document) flags += "<span class='flag-badge flag-doc'>New Doc</span>";
+            if (!flags) flags = "<span style='color:var(--muted);font-size:0.8rem;'>—</span>";
+
+            return "<tr>" +
+                "<td><div class='member-name-cell'>" + escHtml(m.name || m.email) + "</div><div class='member-email-cell'>" + escHtml(m.email) + "</div></td>" +
+                "<td>" + escHtml(m.branch || "—") + "</td>" +
+                "<td><select class='track-select' data-member-id='" + m.id + "' data-prev='" + track + "' onchange='updateProgramTrack(this)'>" +
+                    "<option value='onboarding'" + (track === "onboarding" ? " selected" : "") + ">Onboarding</option>" +
+                    "<option value='credit_repair'" + (track === "credit_repair" ? " selected" : "") + ">Credit Repair</option>" +
+                    "<option value='financial_counseling'" + (track === "financial_counseling" ? " selected" : "") + ">Financial Counseling</option>" +
+                "</select></td>" +
+                "<td class='last-activity-muted'>" + fmtActivity(m.last_activity) + "</td>" +
+                "<td><div class='flags-cell'>" + flags + "</div></td>" +
+                "<td><a class='view-btn' href='counselor-member.html?id=" + m.id + "'>View</a></td>" +
+            "</tr>";
+        }).join("");
+    }
+
+    async function updateProgramTrack(selectEl) {
+        var memberId = selectEl.dataset.memberId;
+        var newTrack = selectEl.value;
+        var prevTrack = selectEl.dataset.prev;
+
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/program-track", {
+                method: "PATCH",
+                headers: {"Content-Type": "application/json"},
+                credentials: "include",
+                body: JSON.stringify({program_track: newTrack})
+            });
+            if (r.ok) {
+                selectEl.dataset.prev = newTrack;
+                // Update local cache
+                var member = caseload.find(function(m) { return m.id === memberId; });
+                if (member) {
+                    member.program_track = newTrack;
+                    member.last_activity = new Date().toISOString();
+                }
+                var labels = {onboarding: "Onboarding", credit_repair: "Credit Repair", financial_counseling: "Financial Counseling"};
+                showToast("Updated", "Program track set to " + labels[newTrack], "success");
+            } else {
+                selectEl.value = prevTrack;
+                var err = await r.json().catch(function() { return {}; });
+                showToast("Error", err.detail || "Could not update program track", "error");
+            }
+        } catch(e) {
+            selectEl.value = prevTrack;
+            showToast("Error", "Network error — could not update program track", "error");
+        }
+    }
+
+    function escHtml(str) {
+        if (!str) return "";
+        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    function fmtActivity(iso) {
+        if (!iso) return "Never";
+        var d = new Date(iso);
+        var now = new Date();
+        var diffMs = now - d;
+        var diffDays = Math.floor(diffMs / 86400000);
+        if (diffDays === 0) return "Today";
+        if (diffDays === 1) return "Yesterday";
+        if (diffDays < 30) return diffDays + "d ago";
+        return d.toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"});
+    }
+
+    async function signOut() {
+        try { await fetch(window.API_BASE + "/api/auth/logout", {method: "POST", credentials: "include"}); } catch(e) {}
+        window.location.href = "login.html";
+    }
+    </script>
+</body>
+</html>

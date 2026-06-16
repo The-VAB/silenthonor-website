@@ -3,101 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counselor Portal - Silent Honor Foundation</title>
+    <title>Counselor Dashboard - Silent Honor Foundation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+    <script src="js/toast.js"></script>
     <style>
         .counselor-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
         .stat-card{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:1.5rem;text-align:center}
         .stat-value{font-family:Oswald,sans-serif;font-size:2.5rem;font-weight:700;color:var(--white)}
         .stat-value.highlight{color:var(--red-light)}
         .stat-label{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:0.5rem}
-        .members-grid{display:grid;grid-template-columns:350px 1fr;gap:2rem}
-        .members-list{background:rgba(17,24,39,0.6);border:1px solid var(--border);max-height:calc(100vh - 280px);overflow-y:auto}
-        .member-detail{background:rgba(17,24,39,0.6);border:1px solid var(--border)}
-        .list-header{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-        .list-title{font-family:Oswald,sans-serif;font-size:0.85rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase}
-        .list-search{display:flex;gap:0.5rem}
-        .list-search input{background:var(--navy);border:1px solid var(--border);color:var(--white);padding:0.5rem 0.75rem;font-size:0.85rem;width:180px}
-        .list-search input:focus{outline:none;border-color:var(--red)}
-        .member-row{display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.2s}
-        .member-row:hover{background:rgba(255,255,255,0.02)}
-        .member-row.active{background:rgba(185,28,28,0.1);border-left:3px solid var(--red)}
-        .member-avatar{width:40px;height:40px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Oswald,sans-serif;font-size:0.85rem;font-weight:600;flex-shrink:0}
-        .member-info{flex:1;min-width:0}
-        .member-name{font-family:Oswald,sans-serif;font-size:0.95rem;font-weight:600;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .member-meta{font-size:0.75rem;color:var(--muted)}
-        .member-stage{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.5rem;border-radius:2px}
-        .member-stage.active{background:rgba(16,185,129,0.2);color:#10B981}
-        .member-stage.intake_complete{background:rgba(59,130,246,0.2);color:#3B82F6}
-        .member-stage.counselor_assigned{background:rgba(234,179,8,0.2);color:#EAB308}
-        .detail-header{padding:1.5rem;border-bottom:1px solid var(--border)}
-        .detail-name{font-family:Oswald,sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:0.25rem}
-        .detail-email{font-size:0.9rem;color:var(--muted);margin-bottom:1rem}
-        .detail-tags{display:flex;gap:0.5rem;flex-wrap:wrap}
-        .detail-tag{font-family:Oswald,sans-serif;font-size:0.65rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.3rem 0.6rem;background:rgba(255,255,255,0.05);border:1px solid var(--border)}
-        .detail-actions{display:flex;gap:0.5rem;margin-top:1rem}
-        .detail-btn{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.6rem 1rem;border:none;cursor:pointer;transition:all 0.2s}
-        .detail-btn.primary{background:var(--red);color:var(--white)}
-        .detail-btn.primary:hover{background:var(--red-light)}
-        .detail-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--white)}
-        .detail-tabs{display:flex;border-bottom:1px solid var(--border)}
-        .detail-tab{font-family:Oswald,sans-serif;font-size:0.75rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:1rem 1.5rem;background:none;border:none;color:var(--muted);cursor:pointer;transition:all 0.2s;position:relative}
-        .detail-tab:hover{color:var(--white)}
-        .detail-tab.active{color:var(--red-light)}
-        .detail-tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--red)}
-        .detail-content{padding:1.5rem;max-height:calc(100vh - 480px);overflow-y:auto}
-        .section-title{font-family:Oswald,sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1rem;color:var(--muted)}
-        .credit-scores{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
-        .credit-score-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);padding:1rem;text-align:center}
-        .credit-score-card.equifax{border-left:3px solid #EF4444}
-        .credit-score-card.experian{border-left:3px solid #3B82F6}
-        .credit-score-card.transunion{border-left:3px solid #10B981}
-        .bureau-name{font-family:Oswald,sans-serif;font-size:0.65rem;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem}
-        .score-value{font-family:Oswald,sans-serif;font-size:1.8rem;font-weight:700}
-        .score-value.poor{color:#EF4444}
-        .score-value.fair{color:#F59E0B}
-        .score-value.good{color:#10B981}
-        .score-value.excellent{color:#3B82F6}
-        .disputes-list,.notes-list{display:flex;flex-direction:column;gap:0.75rem}
-        .dispute-row{display:flex;align-items:center;justify-content:space-between;padding:0.75rem;background:rgba(0,0,0,0.2);border:1px solid var(--border)}
-        .dispute-info h4{font-family:Oswald,sans-serif;font-size:0.9rem;font-weight:600;margin-bottom:0.2rem}
-        .dispute-meta{font-size:0.75rem;color:var(--muted)}
-        .dispute-status{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:0.3rem 0.6rem}
-        .dispute-status.pending{background:rgba(234,179,8,0.2);color:#EAB308}
-        .dispute-status.sent{background:rgba(59,130,246,0.2);color:#3B82F6}
-        .dispute-status.resolved{background:rgba(16,185,129,0.2);color:#10B981}
-        .note-card{padding:1rem;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-left:3px solid var(--red)}
-        .note-header{display:flex;justify-content:space-between;margin-bottom:0.5rem}
-        .note-author{font-family:Oswald,sans-serif;font-size:0.8rem;font-weight:600}
-        .note-date{font-size:0.75rem;color:var(--muted)}
-        .note-content{font-size:0.9rem;line-height:1.6;color:var(--muted)}
-        .note-type{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.4rem;background:rgba(185,28,28,0.2);color:var(--red-light);margin-right:0.5rem}
-        .add-note-form{margin-top:1rem;padding:1rem;background:rgba(0,0,0,0.2);border:1px solid var(--border)}
-        .add-note-form textarea{width:100%;background:var(--navy);border:1px solid var(--border);color:var(--white);padding:0.75rem;font-size:0.9rem;min-height:80px;resize:vertical;margin-bottom:0.75rem}
-        .add-note-form textarea:focus{outline:none;border-color:var(--red)}
-        .add-note-row{display:flex;justify-content:space-between;align-items:center}
-        .note-type-select{background:var(--navy);border:1px solid var(--border);color:var(--white);padding:0.5rem;font-size:0.85rem}
-        .empty-state{text-align:center;padding:2rem;color:var(--muted)}
-        .empty-state-icon{font-size:2.5rem;margin-bottom:0.5rem;opacity:0.5}
-        .messages-preview{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem}
-        .message-preview{padding:0.75rem;background:rgba(0,0,0,0.2);border:1px solid var(--border)}
-        .message-preview.from-member{border-left:3px solid var(--gold)}
-        .message-preview.from-counselor{border-left:3px solid var(--red)}
-        .message-text{font-size:0.85rem;color:var(--muted);margin-bottom:0.25rem}
-        .message-time{font-size:0.7rem;color:var(--muted);opacity:0.7}
-        .quick-reply{display:flex;gap:0.5rem}
-        .quick-reply input{flex:1;background:var(--navy);border:1px solid var(--border);color:var(--white);padding:0.6rem 0.75rem;font-size:0.85rem}
-        .quick-reply input:focus{outline:none;border-color:var(--red)}
-        .no-selection{display:flex;flex-direction:column;align-items:center;justify-content:center;height:400px;color:var(--muted);text-align:center}
-        .no-selection-icon{font-size:4rem;margin-bottom:1rem;opacity:0.3}
-        .no-selection h3{font-family:Oswald,sans-serif;font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;color:var(--white)}
-        @media(max-width:1200px){.counselor-stats{grid-template-columns:repeat(2,1fr)}.members-grid{grid-template-columns:1fr}}
-        @media(max-width:768px){.counselor-stats{grid-template-columns:1fr}}
+        .cta-section{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:2rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+        .cta-text h3{font-family:Oswald,sans-serif;font-size:1.15rem;font-weight:700;text-transform:uppercase;margin-bottom:0.35rem}
+        .cta-text p{font-size:0.9rem;color:var(--muted)}
+        .cta-btn{font-family:Oswald,sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.75rem 1.5rem;background:var(--red);color:var(--white);text-decoration:none;white-space:nowrap;transition:background 0.2s;display:inline-block}
+        .cta-btn:hover{background:var(--red-light)}
+        .activity-placeholder{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:1.5rem}
+        .activity-title{font-family:Oswald,sans-serif;font-size:0.8rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+        .activity-notice{font-size:0.88rem;color:var(--muted);font-style:italic}
+        @media(max-width:1200px){.counselor-stats{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:600px){.counselor-stats{grid-template-columns:1fr}.cta-section{flex-direction:column;align-items:flex-start}}
     </style>
 </head>
 <body>
@@ -109,6 +38,7 @@
             </div>
             <div class="dash-nav-links">
                 <a href="counselor-portal.html" class="dash-nav-link active">Dashboard</a>
+                <a href="counselor-caseload.html" class="dash-nav-link">My Caseload</a>
                 <a href="messages.html" class="dash-nav-link">Messages</a>
             </div>
             <div class="dash-nav-user">
@@ -120,8 +50,8 @@
 
         <div class="dash-content">
             <div class="dash-header">
-                <h1 class="dash-welcome">Counselor <em>Portal</em></h1>
-                <p class="dash-subtitle">Manage your assigned members and track their progress</p>
+                <h1 class="dash-welcome">Counselor <em>Dashboard</em></h1>
+                <p class="dash-subtitle">Your overview for today</p>
             </div>
 
             <div id="loading-state" class="loading-state">
@@ -130,7 +60,6 @@
             </div>
 
             <div id="portal-content" style="display:none;">
-                <!-- Stats Row -->
                 <div class="counselor-stats">
                     <div class="stat-card">
                         <div class="stat-value" id="stat-assigned">0</div>
@@ -150,142 +79,43 @@
                     </div>
                 </div>
 
-                <!-- Members Grid -->
-                <div class="members-grid">
-                    <!-- Members List -->
-                    <div class="members-list">
-                        <div class="list-header">
-                            <span class="list-title">Your Members</span>
-                            <div class="list-search">
-                                <input type="text" id="member-search" placeholder="Search..." oninput="filterMembers()">
-                            </div>
-                        </div>
-                        <div id="members-container"></div>
+                <div class="cta-section">
+                    <div class="cta-text">
+                        <h3>My Caseload</h3>
+                        <p>View and manage all your assigned members, update program tracks, and access member detail records.</p>
                     </div>
+                    <a href="counselor-caseload.html" class="cta-btn">View My Caseload &rarr;</a>
+                </div>
 
-                    <!-- Member Detail -->
-                    <div class="member-detail">
-                        <div id="no-member-selected" class="no-selection">
-                            <div class="no-selection-icon">&#128100;</div>
-                            <h3>Select a Member</h3>
-                            <p>Choose a member from the list to view their details, credit scores, disputes, and add notes.</p>
-                        </div>
-                        <div id="member-detail-content" style="display:none;">
-                            <div class="detail-header">
-                                <h2 class="detail-name" id="detail-name">Member Name</h2>
-                                <p class="detail-email" id="detail-email">member@example.com</p>
-                                <div class="detail-tags" id="detail-tags"></div>
-                                <div class="detail-actions">
-                                    <a href="#" id="message-link" class="detail-btn primary">Send Message</a>
-                                    <button class="detail-btn secondary" onclick="showAddNoteForm()">Add Note</button>
-                                </div>
-                            </div>
-                            <div class="detail-tabs">
-                                <button class="detail-tab active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
-                                <button class="detail-tab" data-tab="disputes" onclick="switchTab('disputes')">Disputes</button>
-                                <button class="detail-tab" data-tab="notes" onclick="switchTab('notes')">Notes</button>
-                                <button class="detail-tab" data-tab="messages" onclick="switchTab('messages')">Messages</button>
-                            </div>
-                            <div class="detail-content">
-                                <!-- Overview Tab -->
-                                <div id="tab-overview" class="tab-panel">
-                                    <div class="section-title">Credit Scores</div>
-                                    <div class="credit-scores" id="credit-scores-container">
-                                        <div class="credit-score-card equifax">
-                                            <div class="bureau-name">Equifax</div>
-                                            <div class="score-value" id="score-eq">---</div>
-                                        </div>
-                                        <div class="credit-score-card experian">
-                                            <div class="bureau-name">Experian</div>
-                                            <div class="score-value" id="score-ex">---</div>
-                                        </div>
-                                        <div class="credit-score-card transunion">
-                                            <div class="bureau-name">TransUnion</div>
-                                            <div class="score-value" id="score-tu">---</div>
-                                        </div>
-                                    </div>
-                                    <div class="section-title">Member Info</div>
-                                    <div id="member-info-grid"></div>
-                                </div>
-                                <!-- Disputes Tab -->
-                                <div id="tab-disputes" class="tab-panel" style="display:none;">
-                                    <div class="section-title">Active Disputes</div>
-                                    <div id="disputes-container" class="disputes-list"></div>
-                                </div>
-                                <!-- Notes Tab -->
-                                <div id="tab-notes" class="tab-panel" style="display:none;">
-                                    <div class="section-title">Progress Notes</div>
-                                    <div id="notes-container" class="notes-list"></div>
-                                    <div id="add-note-form" class="add-note-form" style="display:none;">
-                                        <textarea id="note-content" placeholder="Add a progress note..."></textarea>
-                                        <div class="add-note-row">
-                                            <select id="note-type" class="note-type-select">
-                                                <option value="counselor">Counselor Note</option>
-                                                <option value="progress">Progress Update</option>
-                                                <option value="action">Action Item</option>
-                                                <option value="follow_up">Follow Up</option>
-                                            </select>
-                                            <div style="display:flex;gap:0.5rem;">
-                                                <button class="detail-btn secondary" onclick="hideAddNoteForm()">Cancel</button>
-                                                <button class="detail-btn primary" onclick="submitNote()">Save Note</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Messages Tab -->
-                                <div id="tab-messages" class="tab-panel" style="display:none;">
-                                    <div class="section-title">Recent Messages</div>
-                                    <div id="messages-container" class="messages-preview"></div>
-                                    <div class="quick-reply">
-                                        <input type="text" id="quick-reply-input" placeholder="Type a quick reply...">
-                                        <button class="detail-btn primary" onclick="sendQuickReply()">Send</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="activity-placeholder">
+                    <div class="activity-title">Recent Activity</div>
+                    <p class="activity-notice">Full activity feed — new documents, stage changes, dispute updates — is coming in a future update.</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-    var currentUser = null;
-    var members = [];
-    var selectedMemberId = null;
-    var selectedMemberData = null;
-
     document.addEventListener("DOMContentLoaded", async function() {
         try {
-            var response = await fetch(window.API_BASE + "/api/auth/me", { credentials: "include" });
-            if (!response.ok) {
-                window.location.href = "login.html";
-                return;
+            var r = await fetch(window.API_BASE + "/api/auth/me", {credentials: "include"});
+            if (!r.ok) { window.location.href = "login.html"; return; }
+            var user = await r.json();
+            if (user.role !== "counselor" && user.role !== "admin") {
+                window.location.href = "dashboard.html"; return;
             }
-            currentUser = await response.json();
-            if (currentUser.role !== "counselor" && currentUser.role !== "admin") {
-                window.location.href = "dashboard.html";
-                return;
-            }
-            initPortal(currentUser);
-        } catch (e) {
-            console.error("Auth check failed:", e);
+            var initials = ((user.first_name || "").charAt(0) + (user.last_name || "").charAt(0)).toUpperCase() || "??";
+            document.getElementById("user-avatar").textContent = initials;
+            document.getElementById("user-name").textContent = (user.first_name || "") + " " + (user.last_name || "");
+            loadStats();
+        } catch(e) {
             window.location.href = "login.html";
         }
     });
 
-    function initPortal(user) {
-        var initials = (user.first_name ? user.first_name.charAt(0) : "") + (user.last_name ? user.last_name.charAt(0) : "");
-        document.getElementById("user-avatar").textContent = initials.toUpperCase() || "??";
-        document.getElementById("user-name").textContent = user.first_name + " " + user.last_name;
-
-        loadStats();
-        loadMembers();
-    }
-
     async function loadStats() {
         try {
-            var r = await fetch(window.API_BASE + "/api/counselor/stats", { credentials: "include" });
+            var r = await fetch(window.API_BASE + "/api/counselor/stats", {credentials: "include"});
             if (r.ok) {
                 var stats = await r.json();
                 document.getElementById("stat-assigned").textContent = stats.assigned_members || 0;
@@ -293,316 +123,15 @@
                 document.getElementById("stat-intake").textContent = stats.intake_pending || 0;
                 document.getElementById("stat-messages").textContent = stats.unread_messages || 0;
             }
-        } catch (e) {
+        } catch(e) {
             console.error("Failed to load stats:", e);
-        }
-    }
-
-    async function loadMembers() {
-        try {
-            var r = await fetch(window.API_BASE + "/api/counselor/members", { credentials: "include" });
-            if (r.ok) {
-                members = await r.json();
-                renderMembers(members);
-            }
-        } catch (e) {
-            console.error("Failed to load members:", e);
         }
         document.getElementById("loading-state").style.display = "none";
         document.getElementById("portal-content").style.display = "block";
     }
 
-    function renderMembers(list) {
-        var html = "";
-        if (list.length === 0) {
-            html = "<div class='empty-state'><div class='empty-state-icon'>&#128100;</div><p>No members assigned yet</p></div>";
-        } else {
-            for (var i = 0; i < list.length; i++) {
-                var m = list[i];
-                var initials = getInitials(m.name);
-                var stage = m.pipeline_stage || "active";
-                var isActive = m.id === selectedMemberId ? " active" : "";
-                html += "<div class='member-row" + isActive + "' onclick='selectMember(\"" + m.id + "\")'>";
-                html += "<div class='member-avatar'>" + initials + "</div>";
-                html += "<div class='member-info'>";
-                html += "<div class='member-name'>" + (m.name || "Unknown") + "</div>";
-                html += "<div class='member-meta'>" + (m.branch || "Branch N/A") + "</div>";
-                html += "</div>";
-                html += "<span class='member-stage " + stage + "'>" + formatStage(stage) + "</span>";
-                html += "</div>";
-            }
-        }
-        document.getElementById("members-container").innerHTML = html;
-    }
-
-    function filterMembers() {
-        var search = document.getElementById("member-search").value.toLowerCase();
-        var filtered = members.filter(function(m) {
-            return (m.name && m.name.toLowerCase().indexOf(search) !== -1) ||
-                   (m.email && m.email.toLowerCase().indexOf(search) !== -1);
-        });
-        renderMembers(filtered);
-    }
-
-    async function selectMember(memberId) {
-        selectedMemberId = memberId;
-        renderMembers(members.filter(function(m) {
-            var search = document.getElementById("member-search").value.toLowerCase();
-            return !search || (m.name && m.name.toLowerCase().indexOf(search) !== -1);
-        }));
-
-        document.getElementById("no-member-selected").style.display = "none";
-        document.getElementById("member-detail-content").style.display = "block";
-
-        try {
-            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId, { credentials: "include" });
-            if (r.ok) {
-                selectedMemberData = await r.json();
-                renderMemberDetail(selectedMemberData);
-            }
-        } catch (e) {
-            console.error("Failed to load member detail:", e);
-        }
-    }
-
-    function renderMemberDetail(data) {
-        var member = data.member;
-        document.getElementById("detail-name").textContent = (member.first_name || "") + " " + (member.last_name || "");
-        document.getElementById("detail-email").textContent = member.email || "";
-        document.getElementById("message-link").href = "messages.html?to=" + member._id;
-
-        // Tags
-        var tagsHtml = "";
-        if (member.branch) tagsHtml += "<span class='detail-tag'>" + member.branch + "</span>";
-        if (member.service_status) tagsHtml += "<span class='detail-tag'>" + member.service_status + "</span>";
-        if (member.pipeline_stage) tagsHtml += "<span class='detail-tag'>" + formatStage(member.pipeline_stage) + "</span>";
-        document.getElementById("detail-tags").innerHTML = tagsHtml;
-
-        // Credit scores
-        if (data.credit_scores && data.credit_scores.length > 0) {
-            var latest = data.credit_scores[0];
-            renderScore("score-eq", latest.equifax);
-            renderScore("score-ex", latest.experian);
-            renderScore("score-tu", latest.transunion);
-        } else {
-            document.getElementById("score-eq").textContent = "---";
-            document.getElementById("score-ex").textContent = "---";
-            document.getElementById("score-tu").textContent = "---";
-        }
-
-        // Member info grid
-        var infoHtml = "<div style='display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;'>";
-        infoHtml += "<div class='detail-tag'>Phone: " + (member.phone || "N/A") + "</div>";
-        infoHtml += "<div class='detail-tag'>Joined: " + formatDate(member.created_at) + "</div>";
-        if (member.city) infoHtml += "<div class='detail-tag'>City: " + member.city + "</div>";
-        if (member.state) infoHtml += "<div class='detail-tag'>State: " + member.state + "</div>";
-        infoHtml += "</div>";
-        document.getElementById("member-info-grid").innerHTML = infoHtml;
-
-        // Disputes
-        renderDisputes(data.disputes || []);
-
-        // Notes
-        renderNotes(data.notes || []);
-
-        // Messages (load separately)
-        loadMemberMessages(member._id);
-
-        // Switch to overview tab
-        switchTab("overview");
-    }
-
-    function renderScore(elemId, score) {
-        var elem = document.getElementById(elemId);
-        if (!score) {
-            elem.textContent = "---";
-            elem.className = "score-value";
-            return;
-        }
-        elem.textContent = score;
-        if (score < 580) elem.className = "score-value poor";
-        else if (score < 670) elem.className = "score-value fair";
-        else if (score < 740) elem.className = "score-value good";
-        else elem.className = "score-value excellent";
-    }
-
-    function renderDisputes(disputes) {
-        var html = "";
-        if (disputes.length === 0) {
-            html = "<div class='empty-state'><div class='empty-state-icon'>&#128196;</div><p>No disputes on file</p></div>";
-        } else {
-            for (var i = 0; i < disputes.length; i++) {
-                var d = disputes[i];
-                html += "<div class='dispute-row'>";
-                html += "<div class='dispute-info'>";
-                html += "<h4>" + (d.account_name || "Unknown Account") + "</h4>";
-                html += "<div class='dispute-meta'>" + (d.bureau || "Bureau N/A") + " &bull; " + formatDate(d.created_at) + "</div>";
-                html += "</div>";
-                html += "<span class='dispute-status " + (d.status || "pending") + "'>" + (d.status || "Pending") + "</span>";
-                html += "</div>";
-            }
-        }
-        document.getElementById("disputes-container").innerHTML = html;
-    }
-
-    function renderNotes(notes) {
-        var html = "";
-        if (notes.length === 0) {
-            html = "<div class='empty-state'><div class='empty-state-icon'>&#128221;</div><p>No notes yet</p></div>";
-        } else {
-            for (var i = 0; i < notes.length; i++) {
-                var n = notes[i];
-                html += "<div class='note-card'>";
-                html += "<div class='note-header'>";
-                html += "<span><span class='note-type'>" + (n.note_type || "note") + "</span><span class='note-author'>" + (n.created_by || "Unknown") + "</span></span>";
-                html += "<span class='note-date'>" + formatDate(n.created_at) + "</span>";
-                html += "</div>";
-                html += "<div class='note-content'>" + (n.content || "") + "</div>";
-                html += "</div>";
-            }
-        }
-        document.getElementById("notes-container").innerHTML = html;
-    }
-
-    async function loadMemberMessages(memberId) {
-        try {
-            var r = await fetch(window.API_BASE + "/api/messages?conversation_id=" + memberId, { credentials: "include" });
-            if (r.ok) {
-                var messages = await r.json();
-                renderMessages(messages.slice(0, 5));
-            }
-        } catch (e) {
-            console.error("Failed to load messages:", e);
-            document.getElementById("messages-container").innerHTML = "<div class='empty-state'><p>Could not load messages</p></div>";
-        }
-    }
-
-    function renderMessages(messages) {
-        var html = "";
-        if (!messages || messages.length === 0) {
-            html = "<div class='empty-state'><div class='empty-state-icon'>&#128172;</div><p>No messages yet</p></div>";
-        } else {
-            for (var i = 0; i < messages.length; i++) {
-                var msg = messages[i];
-                var fromMember = msg.from_user_id === selectedMemberData.member._id;
-                html += "<div class='message-preview " + (fromMember ? "from-member" : "from-counselor") + "'>";
-                html += "<div class='message-text'>" + (msg.content || "").substring(0, 150) + "</div>";
-                html += "<div class='message-time'>" + formatDate(msg.created_at) + "</div>";
-                html += "</div>";
-            }
-        }
-        document.getElementById("messages-container").innerHTML = html;
-    }
-
-    function switchTab(tabName) {
-        var tabs = document.querySelectorAll(".detail-tab");
-        var panels = document.querySelectorAll(".tab-panel");
-        for (var i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove("active");
-            if (tabs[i].getAttribute("data-tab") === tabName) {
-                tabs[i].classList.add("active");
-            }
-        }
-        for (var j = 0; j < panels.length; j++) {
-            panels[j].style.display = "none";
-        }
-        document.getElementById("tab-" + tabName).style.display = "block";
-    }
-
-    function showAddNoteForm() {
-        document.getElementById("add-note-form").style.display = "block";
-        switchTab("notes");
-    }
-
-    function hideAddNoteForm() {
-        document.getElementById("add-note-form").style.display = "none";
-        document.getElementById("note-content").value = "";
-    }
-
-    async function submitNote() {
-        var content = document.getElementById("note-content").value.trim();
-        var noteType = document.getElementById("note-type").value;
-
-        if (!content) {
-            alert("Please enter note content.");
-            return;
-        }
-
-        try {
-            var r = await fetch(window.API_BASE + "/api/counselor/members/" + selectedMemberId + "/notes", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ content: content, note_type: noteType })
-            });
-
-            if (r.ok) {
-                hideAddNoteForm();
-                selectMember(selectedMemberId); // Refresh
-            } else {
-                alert("Failed to save note.");
-            }
-        } catch (e) {
-            console.error("Failed to add note:", e);
-            alert("Error saving note.");
-        }
-    }
-
-    async function sendQuickReply() {
-        var content = document.getElementById("quick-reply-input").value.trim();
-        if (!content || !selectedMemberId) return;
-
-        try {
-            var r = await fetch(window.API_BASE + "/api/messages", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ to_user_id: selectedMemberId, content: content })
-            });
-
-            if (r.ok) {
-                document.getElementById("quick-reply-input").value = "";
-                loadMemberMessages(selectedMemberId);
-            } else {
-                alert("Failed to send message.");
-            }
-        } catch (e) {
-            console.error("Failed to send message:", e);
-        }
-    }
-
-    function getInitials(name) {
-        if (!name) return "??";
-        var parts = name.trim().split(" ");
-        return parts.map(function(p) { return p.charAt(0); }).join("").toUpperCase().substring(0, 2);
-    }
-
-    function formatStage(stage) {
-        var map = {
-            "applied": "Applied",
-            "dd214_pending": "DD-214 Pending",
-            "dd214_review": "In Review",
-            "approved": "Approved",
-            "counselor_assigned": "Assigned",
-            "intake_complete": "Intake Done",
-            "active": "Active",
-            "graduated": "Graduated",
-            "inactive": "Inactive"
-        };
-        return map[stage] || stage;
-    }
-
-    function formatDate(dateStr) {
-        if (!dateStr) return "N/A";
-        var d = new Date(dateStr);
-        return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-    }
-
     async function signOut() {
-        try {
-            await fetch(window.API_BASE + "/api/auth/logout", { method: "POST", credentials: "include" });
-        } catch (e) {}
-        localStorage.removeItem("sh_user");
+        try { await fetch(window.API_BASE + "/api/auth/logout", {method: "POST", credentials: "include"}); } catch(e) {}
         window.location.href = "login.html";
     }
     </script>

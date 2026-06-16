@@ -111,7 +111,7 @@ async def update_staff(request: Request, staff_id: str):
     admin = await get_current_admin(request)
     data = await request.json()
 
-    allowed = ["first_name", "last_name", "email", "role", "title", "active", "bio", "specialties", "calendly_url", "credentials"]
+    allowed = ["first_name", "last_name", "email", "role", "title", "active", "bio", "specialties", "calendly_url", "credentials", "max_caseload"]  # max_caseload: int, default 12 if unset (see Phase 10 dashboard slots calc)
     update_data = {k: v for k, v in data.items() if k in allowed}
 
     if "role" in update_data and update_data["role"] not in STAFF_ROLES:
