@@ -55,11 +55,23 @@
         .dispute-info h4{font-family:Oswald,sans-serif;font-size:0.9rem;font-weight:600;margin-bottom:0.2rem}
         .dispute-meta{font-size:0.75rem;color:var(--muted)}
         .dispute-status-badge{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:0.3rem 0.6rem}
+        .dispute-status-badge.draft{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.5)}
         .dispute-status-badge.pending,.dispute-status-badge.drafted{background:rgba(234,179,8,0.2);color:#EAB308}
         .dispute-status-badge.sent{background:rgba(59,130,246,0.2);color:#3B82F6}
-        .dispute-status-badge.resolved{background:rgba(16,185,129,0.2);color:#10B981}
+        .dispute-status-badge.responded{background:rgba(139,92,246,0.2);color:#A78BFA}
+        .dispute-status-badge.resolved,.dispute-status-badge.closed{background:rgba(16,185,129,0.2);color:#10B981}
         .dispute-status-badge.awaiting_response{background:rgba(249,115,22,0.2);color:#F97316}
         .dispute-status-badge.escalated{background:rgba(185,28,28,0.2);color:var(--red-light)}
+        .dispute-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);margin-bottom:0.5rem}
+        .dispute-card-header{display:flex;align-items:center;justify-content:space-between;padding:0.85rem;gap:0.75rem}
+        .dispute-card-header .dispute-info{flex:1;min-width:0}
+        .dispute-card-header .dispute-info h4{font-family:Oswald,sans-serif;font-size:0.9rem;font-weight:600;margin-bottom:0.2rem}
+        .dispute-card-header .dispute-meta{font-size:0.75rem;color:var(--muted)}
+        .dispute-card-actions{display:flex;align-items:center;gap:0.5rem;flex-shrink:0}
+        .dispute-edit-panel{border-top:1px solid var(--border);padding:1rem;background:rgba(0,0,0,0.15)}
+        .dispute-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem}
+        .tracking-required-notice{font-size:0.78rem;color:#EAB308;margin-top:0.3rem;display:none}
+        @media(max-width:700px){.dispute-edit-grid{grid-template-columns:1fr}}
         .notes-list{display:flex;flex-direction:column;gap:0.75rem}
         .note-card{padding:1rem;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-left:3px solid var(--red)}
         .note-header{display:flex;justify-content:space-between;margin-bottom:0.5rem;align-items:baseline}
@@ -237,7 +249,53 @@
 
                 <!-- Disputes Tab -->
                 <div id="tab-disputes" class="tab-panel">
-                    <div class="placeholder-notice">&#9888; Full dispute tracker with certified-mail tracking is coming in a future update. Disputes shown below are read-only.</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                        <div class="section-title" style="margin:0">Dispute Tracker</div>
+                        <button class="doc-btn" onclick="toggleDisputeForm()">+ Add Dispute</button>
+                    </div>
+
+                    <!-- Add Dispute form -->
+                    <div id="dispute-add-form" style="display:none;background:rgba(0,0,0,0.15);border:1px solid var(--border);padding:1rem;margin-bottom:1.25rem">
+                        <div class="dispute-edit-grid">
+                            <div>
+                                <label class="form-label">Bureau *</label>
+                                <select id="new-d-bureau" class="form-input">
+                                    <option value="">Select...</option>
+                                    <option value="equifax">Equifax</option>
+                                    <option value="experian">Experian</option>
+                                    <option value="transunion">TransUnion</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Account Name *</label>
+                                <input type="text" id="new-d-account" class="form-input" placeholder="e.g. Capital One">
+                            </div>
+                            <div>
+                                <label class="form-label">Account Number</label>
+                                <input type="text" id="new-d-acct-num" class="form-input" placeholder="Last 4 or full">
+                            </div>
+                            <div>
+                                <label class="form-label">Dispute Reason</label>
+                                <select id="new-d-reason" class="form-input">
+                                    <option value="">Select...</option>
+                                    <option value="not_mine">Not Mine / Identity Theft</option>
+                                    <option value="incorrect_info">Incorrect Information</option>
+                                    <option value="paid">Already Paid</option>
+                                    <option value="outdated">Outdated (Past SOL)</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:0.75rem">
+                            <label class="form-label">Notes</label>
+                            <textarea id="new-d-notes" class="form-input" rows="2" placeholder="Additional details..."></textarea>
+                        </div>
+                        <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                            <button class="doc-btn" onclick="toggleDisputeForm()">Cancel</button>
+                            <button class="form-submit" onclick="submitDispute()">Add Dispute</button>
+                        </div>
+                    </div>
+
                     <div id="disputes-content"></div>
                 </div>
 
@@ -487,22 +545,212 @@
         "</div>";
     }
 
-    function renderDisputes(disputes) {
-        var html = "";
-        if (!disputes || disputes.length === 0) {
-            html = "<div class='empty-state'><div class='empty-state-icon'>&#128196;</div><p>No disputes on file.</p></div>";
-        } else {
-            for (var i = 0; i < disputes.length; i++) {
-                var d = disputes[i];
-                var status = d.status || "pending";
-                html += "<div class='dispute-row'>" +
-                    "<div class='dispute-info'><h4>" + escHtml(d.account_name || "Unknown Account") + "</h4>" +
-                    "<div class='dispute-meta'>" + escHtml(d.bureau || "—") + " &bull; " + fmtDate(d.created_at) + "</div></div>" +
-                    "<span class='dispute-status-badge " + escHtml(status) + "'>" + escHtml(status.replace(/_/g," ")) + "</span>" +
-                "</div>";
+    var _disputesCache = [];
+
+    async function loadDisputes() {
+        document.getElementById("disputes-content").innerHTML = "<p style='color:var(--muted);font-size:0.85rem'>Loading...</p>";
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/disputes", {credentials: "include"});
+            if (r.ok) {
+                _disputesCache = await r.json();
+                renderDisputeList(_disputesCache);
+            } else {
+                document.getElementById("disputes-content").innerHTML = "<p style='color:var(--red-light)'>Failed to load disputes.</p>";
             }
+        } catch(e) {
+            document.getElementById("disputes-content").innerHTML = "<p style='color:var(--red-light)'>Error loading disputes.</p>";
+        }
+    }
+
+    function toggleDisputeForm() {
+        var f = document.getElementById("dispute-add-form");
+        f.style.display = f.style.display === "none" || f.style.display === "" ? "block" : "none";
+    }
+
+    async function submitDispute() {
+        var bureau = document.getElementById("new-d-bureau").value;
+        var account = document.getElementById("new-d-account").value.trim();
+        if (!bureau) { showToast("Error", "Select a bureau", "error"); return; }
+        if (!account) { showToast("Error", "Account name is required", "error"); return; }
+        var payload = {
+            bureau: bureau,
+            account_name: account,
+            account_number: document.getElementById("new-d-acct-num").value.trim(),
+            dispute_reason: document.getElementById("new-d-reason").value,
+            notes: document.getElementById("new-d-notes").value.trim()
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/disputes", {
+                method: "POST", headers: {"Content-Type": "application/json"},
+                credentials: "include", body: JSON.stringify(payload)
+            });
+            if (r.ok) {
+                showToast("Created", "Dispute added", "success");
+                document.getElementById("dispute-add-form").style.display = "none";
+                ["new-d-bureau","new-d-account","new-d-acct-num","new-d-reason","new-d-notes"].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.value = "";
+                });
+                loadDisputes();
+            } else {
+                var err = await r.json();
+                showToast("Error", err.detail || "Could not create dispute", "error");
+            }
+        } catch(e) {
+            showToast("Error", "Could not create dispute", "error");
+        }
+    }
+
+    function toggleDisputeEdit(disputeId) {
+        var panel = document.getElementById("dedit-" + disputeId);
+        if (!panel) return;
+        panel.style.display = panel.style.display === "none" || panel.style.display === "" ? "block" : "none";
+    }
+
+    function onEditStatusChange(disputeId) {
+        var sel = document.getElementById("dstatus-" + disputeId);
+        var trackWrap = document.getElementById("dtrack-wrap-" + disputeId);
+        var notice = document.getElementById("dtrack-notice-" + disputeId);
+        if (!sel || !trackWrap) return;
+        var isSent = sel.value === "sent";
+        trackWrap.style.border = isSent ? "1px solid #EAB308" : "";
+        if (notice) notice.style.display = isSent ? "block" : "none";
+    }
+
+    async function saveDisputeEdit(disputeId) {
+        var status = document.getElementById("dstatus-" + disputeId).value;
+        var tracking = (document.getElementById("dtrack-" + disputeId).value || "").trim();
+        if (status === "sent" && !tracking) {
+            showToast("Required", "Enter a certified mail tracking number before marking as Sent", "error");
+            document.getElementById("dtrack-" + disputeId).focus();
+            return;
+        }
+        var payload = {
+            status: status,
+            tracking_number: tracking,
+            date_sent: document.getElementById("ddate-sent-" + disputeId).value || null,
+            date_response: document.getElementById("ddate-resp-" + disputeId).value || null,
+            response_outcome: document.getElementById("doutcome-" + disputeId).value.trim(),
+            notes: document.getElementById("dnotes-" + disputeId).value.trim()
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/disputes/" + disputeId, {
+                method: "PATCH", headers: {"Content-Type": "application/json"},
+                credentials: "include", body: JSON.stringify(payload)
+            });
+            if (r.ok) {
+                showToast("Saved", "Dispute updated", "success");
+                loadDisputes();
+            } else {
+                var err = await r.json();
+                showToast("Error", err.detail || "Could not update dispute", "error");
+            }
+        } catch(e) {
+            showToast("Error", "Could not update dispute", "error");
+        }
+    }
+
+    async function deleteDispute(disputeId) {
+        if (!confirm("Delete this dispute? This cannot be undone.")) return;
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/disputes/" + disputeId, {
+                method: "DELETE", credentials: "include"
+            });
+            if (r.ok) {
+                showToast("Deleted", "Dispute removed", "success");
+                loadDisputes();
+            } else {
+                var err = await r.json();
+                showToast("Error", err.detail || "Could not delete dispute", "error");
+            }
+        } catch(e) {
+            showToast("Error", "Could not delete dispute", "error");
+        }
+    }
+
+    var DISPUTE_REASON_LABELS = {
+        not_mine: "Not Mine / Identity Theft", incorrect_info: "Incorrect Information",
+        paid: "Already Paid", outdated: "Outdated (Past SOL)", other: "Other"
+    };
+
+    function renderDisputeList(disputes) {
+        if (!disputes || disputes.length === 0) {
+            document.getElementById("disputes-content").innerHTML =
+                "<div class='empty-state'><div class='empty-state-icon'>&#128196;</div><p>No disputes on file. Use the Add Dispute button above.</p></div>";
+            return;
+        }
+        var html = "";
+        for (var i = 0; i < disputes.length; i++) {
+            var d = disputes[i];
+            var id = d.id;
+            var status = d.status || "draft";
+            var bureau = d.bureau || "—";
+            var bureauLabel = bureau === "transunion" ? "TransUnion" : bureau.charAt(0).toUpperCase() + bureau.slice(1);
+            var reasonLabel = DISPUTE_REASON_LABELS[d.dispute_reason] || (d.dispute_reason || "");
+            var trackVal = d.tracking_number || "";
+            var isSent = status === "sent";
+            var trackBorder = isSent && !trackVal ? "border:1px solid #EAB308;" : "";
+
+            html += "<div class='dispute-card' id='dcard-" + id + "'>" +
+                "<div class='dispute-card-header'>" +
+                    "<div class='dispute-info'>" +
+                        "<h4>" + escHtml(d.account_name || "Unknown Account") + "</h4>" +
+                        "<div class='dispute-meta'>" + escHtml(bureauLabel) +
+                        (reasonLabel ? " &bull; " + escHtml(reasonLabel) : "") +
+                        " &bull; " + fmtDate(d.created_at) + "</div>" +
+                    "</div>" +
+                    "<div class='dispute-card-actions'>" +
+                        "<span class='dispute-status-badge " + escHtml(status) + "'>" + escHtml(status.replace(/_/g," ")) + "</span>" +
+                        "<button class='doc-btn' onclick='toggleDisputeEdit(\"" + id + "\")'>Edit</button>" +
+                        "<button class='doc-btn danger' onclick='deleteDispute(\"" + id + "\")'>Delete</button>" +
+                    "</div>" +
+                "</div>" +
+                "<div class='dispute-edit-panel' id='dedit-" + id + "' style='display:none'>" +
+                    "<div class='dispute-edit-grid'>" +
+                        "<div>" +
+                            "<label class='form-label'>Status</label>" +
+                            "<select id='dstatus-" + id + "' class='form-input' onchange='onEditStatusChange(\"" + id + "\")'>" +
+                                "<option value='draft'" + (status==="draft"?" selected":"") + ">Draft</option>" +
+                                "<option value='pending'" + (status==="pending"?" selected":"") + ">Pending</option>" +
+                                "<option value='sent'" + (status==="sent"?" selected":"") + ">Sent</option>" +
+                                "<option value='responded'" + (status==="responded"?" selected":"") + ">Responded</option>" +
+                                "<option value='closed'" + (status==="closed"?" selected":"") + ">Closed</option>" +
+                            "</select>" +
+                        "</div>" +
+                        "<div id='dtrack-wrap-" + id + "' style='" + trackBorder + "padding:" + (trackBorder?"0.5rem":"0") + ";'>" +
+                            "<label class='form-label'>Certified Mail Tracking #" + (isSent ? " <span style=\"color:#EAB308\">*</span>" : "") + "</label>" +
+                            "<input type='text' id='dtrack-" + id + "' class='form-input' value='" + escHtml(trackVal) + "' placeholder='USPS tracking number'>" +
+                            "<div id='dtrack-notice-" + id + "' class='tracking-required-notice'" + (isSent && !trackVal ? " style='display:block'" : "") + ">&#9888; Required to mark as Sent</div>" +
+                        "</div>" +
+                        "<div>" +
+                            "<label class='form-label'>Date Sent</label>" +
+                            "<input type='date' id='ddate-sent-" + id + "' class='form-input' value='" + (d.date_sent ? d.date_sent.slice(0,10) : "") + "'>" +
+                        "</div>" +
+                        "<div>" +
+                            "<label class='form-label'>Date Response Received</label>" +
+                            "<input type='date' id='ddate-resp-" + id + "' class='form-input' value='" + (d.date_response ? d.date_response.slice(0,10) : "") + "'>" +
+                        "</div>" +
+                    "</div>" +
+                    "<div style='margin-bottom:0.75rem'>" +
+                        "<label class='form-label'>Response Outcome</label>" +
+                        "<input type='text' id='doutcome-" + id + "' class='form-input' value='" + escHtml(d.response_outcome || "") + "' placeholder='e.g. Removed, Verified, Updated'>" +
+                    "</div>" +
+                    "<div style='margin-bottom:0.75rem'>" +
+                        "<label class='form-label'>Notes</label>" +
+                        "<textarea id='dnotes-" + id + "' class='form-input' rows='2'>" + escHtml(d.notes || "") + "</textarea>" +
+                    "</div>" +
+                    "<div style='display:flex;gap:0.5rem;justify-content:flex-end'>" +
+                        "<button class='doc-btn' onclick='toggleDisputeEdit(\"" + id + "\")'>Cancel</button>" +
+                        "<button class='form-submit' onclick='saveDisputeEdit(\"" + id + "\")'>Save Changes</button>" +
+                    "</div>" +
+                "</div>" +
+            "</div>";
         }
         document.getElementById("disputes-content").innerHTML = html;
+    }
+
+    function renderDisputes(disputes) {
+        renderDisputeList(disputes);
     }
 
     function renderNotes(notes) {
@@ -596,6 +844,7 @@
         if (tabName === "messages") loadMessages();
         if (tabName === "documents") loadDocuments();
         if (tabName === "credit-scores") loadCreditScores();
+        if (tabName === "disputes") loadDisputes();
     }
 
     function showNoteForm() {
