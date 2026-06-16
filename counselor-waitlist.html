@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waitlist - Silent Honor Foundation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script>window.API_BASE = "https://api.srv1077820.hstgr.cloud";</script>
+    <script src="js/toast.js"></script>
+    <style>
+        /* Capacity bar */
+        .capacity-bar-wrap{background:rgba(17,24,39,0.6);border:1px solid var(--border);padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+        .capacity-label{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+        .capacity-track{flex:1;min-width:200px;height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden}
+        .capacity-fill{height:100%;background:var(--red);border-radius:4px;transition:width 0.4s ease}
+        .capacity-fill.green{background:#10B981}
+        .capacity-fill.yellow{background:#EAB308}
+        .capacity-text{font-family:Oswald,sans-serif;font-size:0.95rem;font-weight:700;color:var(--white);white-space:nowrap}
+        .capacity-slots{font-family:Barlow,sans-serif;font-size:0.85rem;color:var(--muted);white-space:nowrap}
+        .at-capacity-banner{background:rgba(185,28,28,0.12);border:1px solid rgba(185,28,28,0.35);padding:0.75rem 1.25rem;margin-bottom:1rem;font-size:0.88rem;color:var(--red-light)}
+
+        /* Search + filter bar */
+        .wl-toolbar{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap}
+        .wl-search{flex:1;min-width:200px;background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--white);padding:0.5rem 0.85rem;font-family:Barlow,sans-serif;font-size:0.9rem}
+        .wl-search::placeholder{color:var(--muted)}
+        .wl-search:focus{outline:none;border-color:var(--red)}
+        .wl-filter{background:rgba(17,24,39,0.8);border:1px solid var(--border);color:var(--white);padding:0.5rem 0.75rem;font-family:Barlow,sans-serif;font-size:0.9rem;cursor:pointer;min-width:160px}
+        .wl-filter:focus{outline:none;border-color:var(--red)}
+        .wl-count{font-size:0.82rem;color:var(--muted);margin-left:auto;white-space:nowrap}
+
+        /* Table */
+        .wl-table{width:100%;border-collapse:collapse;background:rgba(17,24,39,0.6);border:1px solid var(--border)}
+        .wl-table th{font-family:Oswald,sans-serif;font-size:0.65rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:0.85rem 1rem;border-bottom:1px solid var(--border);text-align:left;background:rgba(0,0,0,0.2)}
+        .wl-table td{padding:0.85rem 1rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;font-size:0.9rem}
+        .wl-table tr:hover td{background:rgba(255,255,255,0.02)}
+        .wl-table tr:last-child td{border-bottom:none}
+
+        .wl-name{font-family:Oswald,sans-serif;font-weight:600;font-size:0.95rem}
+        .wl-email{font-size:0.78rem;color:var(--muted);margin-top:0.1rem}
+
+        /* Stage badge */
+        .stage-badge{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.55rem;display:inline-block}
+        .stage-applied{background:rgba(107,114,128,0.2);color:#9CA3AF;border:1px solid rgba(107,114,128,0.3)}
+        .stage-dd214_pending{background:rgba(234,179,8,0.15);color:#EAB308;border:1px solid rgba(234,179,8,0.25)}
+        .stage-dd214_review{background:rgba(251,146,60,0.15);color:#FB923C;border:1px solid rgba(251,146,60,0.25)}
+        .stage-approved{background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.25)}
+        .stage-counselor_assigned{background:rgba(59,130,246,0.15);color:#3B82F6;border:1px solid rgba(59,130,246,0.25)}
+        .stage-intake_complete{background:rgba(139,92,246,0.15);color:#8B5CF6;border:1px solid rgba(139,92,246,0.25)}
+        .stage-active{background:rgba(201,149,42,0.15);color:#C9952A;border:1px solid rgba(201,149,42,0.25)}
+        .stage-default{background:rgba(107,114,128,0.2);color:#9CA3AF;border:1px solid rgba(107,114,128,0.3)}
+
+        /* Claim button */
+        .claim-btn{font-family:Oswald,sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:0.45rem 1rem;background:var(--red);border:1px solid var(--red);color:var(--white);cursor:pointer;transition:all 0.2s;white-space:nowrap}
+        .claim-btn:hover:not(:disabled){background:transparent;color:var(--red-light)}
+        .claim-btn:disabled{opacity:0.35;cursor:not-allowed}
+        .claim-btn.claiming{opacity:0.6;cursor:default}
+
+        /* Empty state */
+        .empty-state{text-align:center;padding:3rem 2rem;color:var(--muted)}
+        .empty-state-icon{font-size:2.5rem;margin-bottom:0.75rem;opacity:0.4}
+        .empty-state p{margin:0;font-size:0.9rem}
+    </style>
+</head>
+<body>
+    <div class="dash-wrapper">
+        <nav class="dash-nav">
+            <div class="dash-nav-logo">
+                <img src="images/silent-honor-logo.png" alt="Silent Honor">
+                <span>SILENT<span style="color:var(--red)">HONOR</span></span>
+            </div>
+            <div class="dash-nav-links">
+                <a href="counselor-portal.html" class="dash-nav-link">Dashboard</a>
+                <a href="counselor-caseload.html" class="dash-nav-link">My Caseload</a>
+                <a href="counselor-tasks.html" class="dash-nav-link">Tasks</a>
+                <a href="counselor-waitlist.html" class="dash-nav-link active">Waitlist</a>
+                <a href="messages.html" class="dash-nav-link">Messages</a>
+            </div>
+            <div class="dash-nav-user">
+                <div class="user-avatar" id="user-avatar">??</div>
+                <span class="user-name" id="user-name">Loading...</span>
+                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+            </div>
+        </nav>
+
+        <div class="dash-content">
+            <div class="dash-header">
+                <h1 class="dash-welcome">Member <em>Waitlist</em></h1>
+                <p class="dash-subtitle">Veterans awaiting counselor assignment — claim members to add them to your caseload</p>
+            </div>
+
+            <div id="loading-state" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading waitlist...</p>
+            </div>
+
+            <div id="waitlist-content" style="display:none;">
+                <!-- Capacity bar -->
+                <div class="capacity-bar-wrap">
+                    <span class="capacity-label">Your Capacity</span>
+                    <div class="capacity-track">
+                        <div class="capacity-fill" id="cap-fill" style="width:0%"></div>
+                    </div>
+                    <span class="capacity-text" id="cap-text">0 / 12</span>
+                    <span class="capacity-slots" id="cap-slots">12 slots available</span>
+                </div>
+
+                <div id="at-capacity-banner" class="at-capacity-banner" style="display:none;">
+                    You are at your maximum caseload. Contact an admin to increase your limit before claiming additional members.
+                </div>
+
+                <!-- Toolbar -->
+                <div class="wl-toolbar">
+                    <input type="text" id="wl-search" class="wl-search" placeholder="Search name or email..." oninput="applyFilters()">
+                    <select id="wl-stage-filter" class="wl-filter" onchange="applyFilters()">
+                        <option value="">All Stages</option>
+                        <option value="approved">Approved</option>
+                        <option value="intake_complete">Intake Complete</option>
+                        <option value="dd214_review">DD-214 Review</option>
+                        <option value="dd214_pending">DD-214 Pending</option>
+                        <option value="applied">Applied</option>
+                    </select>
+                    <span class="wl-count" id="wl-count"></span>
+                </div>
+
+                <!-- Table -->
+                <table class="wl-table" id="wl-table">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Branch</th>
+                            <th>State</th>
+                            <th>Pipeline Stage</th>
+                            <th>Waiting Since</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wl-tbody"></tbody>
+                </table>
+
+                <div id="wl-empty" class="empty-state" style="display:none;">
+                    <div class="empty-state-icon">&#9989;</div>
+                    <p>No unassigned members — all veterans are currently with a counselor.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    var allMembers = [];
+    var capacity = {current: 0, max: 12, available: 12};
+
+    var STAGE_LABELS = {
+        applied: "Applied",
+        dd214_pending: "DD-214 Pending",
+        dd214_review: "DD-214 Review",
+        approved: "Approved",
+        counselor_assigned: "Counselor Assigned",
+        intake_complete: "Intake Complete",
+        active: "Active",
+        graduated: "Graduated",
+        inactive: "Inactive"
+    };
+
+    document.addEventListener("DOMContentLoaded", async function() {
+        try {
+            var r = await fetch(window.API_BASE + "/api/auth/me", {credentials: "include"});
+            if (!r.ok) { window.location.href = "login.html"; return; }
+            var user = await r.json();
+            if (user.role !== "counselor" && user.role !== "admin") {
+                window.location.href = "dashboard.html"; return;
+            }
+            var initials = ((user.first_name || "").charAt(0) + (user.last_name || "").charAt(0)).toUpperCase() || "??";
+            document.getElementById("user-avatar").textContent = initials;
+            document.getElementById("user-name").textContent = (user.first_name || "") + " " + (user.last_name || "");
+            loadWaitlist();
+        } catch(e) {
+            window.location.href = "login.html";
+        }
+    });
+
+    async function loadWaitlist() {
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/waitlist", {credentials: "include"});
+            if (r.ok) {
+                var data = await r.json();
+                capacity = data.capacity || capacity;
+                allMembers = data.members || [];
+            } else {
+                showToast("Error", "Could not load waitlist", "error");
+            }
+        } catch(e) {
+            showToast("Error", "Network error loading waitlist", "error");
+        }
+        renderCapacity();
+        document.getElementById("loading-state").style.display = "none";
+        document.getElementById("waitlist-content").style.display = "block";
+        applyFilters();
+    }
+
+    function renderCapacity() {
+        var cur = capacity.current;
+        var max = capacity.max;
+        var avail = capacity.available;
+        var pct = max > 0 ? Math.min(100, Math.round((cur / max) * 100)) : 0;
+
+        var fill = document.getElementById("cap-fill");
+        fill.style.width = pct + "%";
+        fill.className = "capacity-fill" + (pct >= 100 ? "" : pct >= 75 ? " yellow" : " green");
+
+        document.getElementById("cap-text").textContent = cur + " / " + max;
+        document.getElementById("cap-slots").textContent = avail === 0
+            ? "No slots available"
+            : avail + " slot" + (avail === 1 ? "" : "s") + " available";
+
+        var banner = document.getElementById("at-capacity-banner");
+        banner.style.display = avail <= 0 ? "block" : "none";
+    }
+
+    function applyFilters() {
+        var q = (document.getElementById("wl-search").value || "").toLowerCase().trim();
+        var stage = document.getElementById("wl-stage-filter").value;
+
+        var filtered = allMembers.filter(function(m) {
+            if (stage && m.pipeline_stage !== stage) return false;
+            if (q) {
+                var name = (m.name || "").toLowerCase();
+                var email = (m.email || "").toLowerCase();
+                if (!name.includes(q) && !email.includes(q)) return false;
+            }
+            return true;
+        });
+
+        document.getElementById("wl-count").textContent = filtered.length + " member" + (filtered.length === 1 ? "" : "s");
+        renderTable(filtered);
+    }
+
+    function renderTable(list) {
+        var tbody = document.getElementById("wl-tbody");
+        var atCap = capacity.available <= 0;
+
+        if (list.length === 0) {
+            tbody.innerHTML = "";
+            document.getElementById("wl-table").style.display = "none";
+            document.getElementById("wl-empty").style.display = "block";
+            return;
+        }
+
+        document.getElementById("wl-table").style.display = "table";
+        document.getElementById("wl-empty").style.display = "none";
+
+        tbody.innerHTML = list.map(function(m) {
+            var stageKey = m.pipeline_stage || "applied";
+            var stageLabel = STAGE_LABELS[stageKey] || stageKey;
+            var stageClass = "stage-" + stageKey;
+            if (!["applied","dd214_pending","dd214_review","approved","counselor_assigned","intake_complete","active"].includes(stageKey)) {
+                stageClass = "stage-default";
+            }
+
+            return "<tr id='row-" + m.id + "'>" +
+                "<td><div class='wl-name'>" + escHtml(m.name || "—") + "</div><div class='wl-email'>" + escHtml(m.email) + "</div></td>" +
+                "<td>" + escHtml(m.branch || "—") + "</td>" +
+                "<td>" + escHtml(m.state || "—") + "</td>" +
+                "<td><span class='stage-badge " + stageClass + "'>" + stageLabel + "</span></td>" +
+                "<td style='color:var(--muted);font-size:0.82rem'>" + fmtDate(m.created_at) + "</td>" +
+                "<td><button class='claim-btn' id='claim-" + m.id + "' onclick='claimMember(\"" + m.id + "\",this)'" + (atCap ? " disabled title=\"You are at capacity\"" : "") + ">Claim</button></td>" +
+            "</tr>";
+        }).join("");
+    }
+
+    async function claimMember(memberId, btn) {
+        if (capacity.available <= 0) {
+            showToast("At Capacity", "You cannot claim more members — increase your max caseload through an admin.", "error");
+            return;
+        }
+        btn.disabled = true;
+        btn.classList.add("claiming");
+        btn.textContent = "Claiming...";
+
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/waitlist/" + memberId + "/claim", {
+                method: "POST",
+                credentials: "include"
+            });
+            var data = await r.json().catch(function() { return {}; });
+
+            if (r.ok) {
+                showToast("Success", data.message || "Member added to your caseload", "success");
+                // Remove from local list and re-render; update capacity
+                allMembers = allMembers.filter(function(m) { return m.id !== memberId; });
+                capacity.current += 1;
+                capacity.available = Math.max(0, capacity.available - 1);
+                renderCapacity();
+                applyFilters();
+            } else if (r.status === 409) {
+                showToast("Already Claimed", data.detail || "This member was just claimed by another counselor", "error");
+                allMembers = allMembers.filter(function(m) { return m.id !== memberId; });
+                applyFilters();
+            } else {
+                showToast("Error", data.detail || "Could not claim member", "error");
+                btn.disabled = false;
+                btn.classList.remove("claiming");
+                btn.textContent = "Claim";
+            }
+        } catch(e) {
+            showToast("Error", "Network error — could not claim member", "error");
+            btn.disabled = false;
+            btn.classList.remove("claiming");
+            btn.textContent = "Claim";
+        }
+    }
+
+    function fmtDate(iso) {
+        if (!iso) return "—";
+        var d = new Date(iso);
+        return d.toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"});
+    }
+
+    function escHtml(str) {
+        if (!str) return "";
+        return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    async function signOut() {
+        try { await fetch(window.API_BASE + "/api/auth/logout", {method: "POST", credentials: "include"}); } catch(e) {}
+        window.location.href = "login.html";
+    }
+    </script>
+</body>
+</html>

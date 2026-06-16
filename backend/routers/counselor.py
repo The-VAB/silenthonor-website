@@ -732,6 +732,92 @@ def compute_game_plan_action(account, today):
     }
 
 
+@router.get("/counselor/waitlist")
+async def get_waitlist(request: Request):
+    """Get unassigned members available for self-assignment, plus this counselor's capacity"""
+    counselor = await get_current_counselor(request)
+    counselor_oid = ObjectId(counselor["_id"])
+
+    counselor_doc = await db.users.find_one({"_id": counselor_oid}, {"max_caseload": 1})
+    max_caseload = (counselor_doc or {}).get("max_caseload", 12)
+    current_count = await db.users.count_documents({"assigned_counselor_id": counselor_oid, "role": "member"})
+
+    # Members with no counselor assigned (field absent or null)
+    members = await db.users.find(
+        {
+            "role": "member",
+            "$or": [
+                {"assigned_counselor_id": {"$exists": False}},
+                {"assigned_counselor_id": None}
+            ]
+        },
+        {"_id": 1, "first_name": 1, "last_name": 1, "email": 1, "branch": 1,
+         "pipeline_stage": 1, "program_track": 1, "dd214_status": 1, "state": 1, "created_at": 1}
+    ).sort("created_at", 1).to_list(500)
+
+    return {
+        "capacity": {
+            "current": current_count,
+            "max": max_caseload,
+            "available": max(0, max_caseload - current_count)
+        },
+        "members": [{
+            "id": str(m["_id"]),
+            "name": f"{m.get('first_name', '')} {m.get('last_name', '')}".strip(),
+            "email": m.get("email", ""),
+            "branch": m.get("branch"),
+            "state": m.get("state"),
+            "pipeline_stage": m.get("pipeline_stage", "applied"),
+            "dd214_status": m.get("dd214_status"),
+            "created_at": m.get("created_at").isoformat() if m.get("created_at") else None
+        } for m in members]
+    }
+
+
+@router.post("/counselor/waitlist/{member_id}/claim")
+async def claim_member(request: Request, member_id: str):
+    """Self-assign an unassigned member from the waitlist"""
+    counselor = await get_current_counselor(request)
+    counselor_oid = ObjectId(counselor["_id"])
+
+    # Check capacity before claiming
+    counselor_doc = await db.users.find_one({"_id": counselor_oid}, {"max_caseload": 1})
+    max_caseload = (counselor_doc or {}).get("max_caseload", 12)
+    current_count = await db.users.count_documents({"assigned_counselor_id": counselor_oid, "role": "member"})
+    if current_count >= max_caseload:
+        raise HTTPException(
+            status_code=400,
+            detail=f"You are at your maximum caseload ({max_caseload} members). Contact an admin to increase your limit."
+        )
+
+    member = await db.users.find_one({"_id": ObjectId(member_id), "role": "member"})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    if member.get("assigned_counselor_id"):
+        raise HTTPException(status_code=409, detail="This member was just claimed by another counselor")
+
+    now = datetime.now(timezone.utc)
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {
+            "assigned_counselor_id": counselor_oid,
+            "pipeline_stage": "counselor_assigned",
+            "program_track": member.get("program_track") or "onboarding",
+            "last_activity_date": now
+        }}
+    )
+
+    # Notify member by email (fire-and-forget — same pattern as admin assign)
+    counselor_name = f"{counselor.get('first_name', '')} {counselor.get('last_name', '')}".strip()
+    asyncio.create_task(send_counselor_assigned_email(
+        member.get("email"),
+        member.get("first_name", "Member"),
+        counselor_name
+    ))
+
+    return {"message": f"{member.get('first_name', 'Member')} added to your caseload"}
+
+
 @router.get("/counselor/members/{member_id}/game-plan")
 async def get_member_game_plan(request: Request, member_id: str):
     """Return credit accounts with auto-computed game plan recommendations"""
