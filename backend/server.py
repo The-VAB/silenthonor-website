@@ -84,6 +84,7 @@ async def startup_db():
 
     # Create required directories
     os.makedirs("/app/uploads/dd214", exist_ok=True)
+    os.makedirs("/app/uploads/documents", exist_ok=True)
     os.makedirs("/app/memory", exist_ok=True)
 
     logger.info("API startup complete")
@@ -107,6 +108,10 @@ async def create_indexes():
         await db.users.create_index("assigned_counselor_id")
         await db.users.create_index("program_track")
         await db.users.create_index("last_activity_date")
+
+        # Documents collection
+        await db.documents.create_index("member_id")
+        await db.documents.create_index("uploaded_at")
 
         # Token indexes
         await db.password_reset_tokens.create_index("expires_at", expireAfterSeconds=0)
