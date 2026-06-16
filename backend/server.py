@@ -137,6 +137,10 @@ async def create_indexes():
         await db.tasks.create_index([("member_id", 1)])
         await db.tasks.create_index([("dispute_id", 1)])
 
+        # Credit accounts (game plan)
+        await db.credit_accounts.create_index([("member_id", 1)])
+        await db.credit_accounts.create_index([("counselor_id", 1)])
+
         # Course progress
         await db.course_progress.create_index([("user_id", 1), ("course_id", 1)])
 
