@@ -10,8 +10,9 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "dd214")
 
-# Local fallback directory
+# Local fallback directories
 LOCAL_STORAGE_PATH = "/app/uploads/dd214"
+LOCAL_DOCS_PATH = "/app/uploads/documents"
 
 def get_storage_headers():
     """Get headers for Supabase Storage API"""
@@ -168,6 +169,62 @@ async def get_dd214_url(filename: str, storage_type: str = "local") -> str:
         return await get_signed_url(filename)
     else:
         return f"/uploads/dd214/{filename}"
+
+# ── Generic document storage (non-DD-214) ──────────────────────────────────
+
+async def upload_document(file_content: bytes, original_filename: str, member_id: str) -> dict:
+    """
+    Upload a counselor-uploaded member document.
+    Stored under documents/ prefix in Supabase, or local /app/uploads/documents/.
+    Returns dict: success, storage_key, storage_type, error.
+    """
+    ext = original_filename.rsplit(".", 1)[-1].lower() if "." in original_filename else "pdf"
+    storage_key = f"documents/{member_id}_{uuid.uuid4()}.{ext}"
+
+    if SUPABASE_URL and SUPABASE_KEY:
+        try:
+            result = await upload_to_supabase(file_content, storage_key)
+            if result["success"]:
+                return {"success": True, "storage_key": storage_key, "storage_type": "supabase"}
+            logger.warning(f"Supabase document upload failed: {result.get('error')}, falling back to local")
+        except Exception as e:
+            logger.error(f"Supabase document upload error: {e}, falling back to local")
+
+    # Local fallback
+    try:
+        os.makedirs(LOCAL_DOCS_PATH, exist_ok=True)
+        local_filename = storage_key.replace("documents/", "")
+        filepath = os.path.join(LOCAL_DOCS_PATH, local_filename)
+        with open(filepath, "wb") as f:
+            f.write(file_content)
+        logger.info(f"Document saved to local storage: {local_filename}")
+        return {"success": True, "storage_key": storage_key, "storage_type": "local"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+async def get_document_url(storage_key: str, storage_type: str) -> str:
+    """Get a download URL for a counselor-uploaded document."""
+    if storage_type == "supabase":
+        return await get_signed_url(storage_key)
+    else:
+        # storage_key is "documents/filename.ext", local path strips the prefix
+        local_filename = storage_key.replace("documents/", "")
+        return f"/uploads/documents/{local_filename}"
+
+async def delete_document(storage_key: str, storage_type: str) -> bool:
+    """Delete a counselor-uploaded document from storage."""
+    if storage_type == "supabase":
+        return await delete_from_supabase(storage_key)
+    else:
+        local_filename = storage_key.replace("documents/", "")
+        filepath = os.path.join(LOCAL_DOCS_PATH, local_filename)
+        try:
+            if os.path.exists(filepath):
+                os.remove(filepath)
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting document: {e}")
+            return False
 
 async def migrate_to_supabase(filename: str) -> dict:
     """

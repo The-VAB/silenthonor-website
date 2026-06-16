@@ -6,9 +6,11 @@ from bson import ObjectId
 
 from middleware.auth_middleware import get_current_counselor, get_current_admin
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
+from fastapi import UploadFile, File, Form
 from utils.auth import hash_password
 from utils.validators import CounselorRequest
 from utils.email import send_counselor_assigned_email
+from utils.storage import get_dd214_url, upload_document, get_document_url, delete_document
 
 router = APIRouter(prefix="/api", tags=["Counselor"])
 
@@ -280,6 +282,146 @@ async def get_counselor_stats(request: Request):
         "active_members": active_count,
         "unread_messages": unread
     }
+
+DOCUMENT_CATEGORIES = [
+    "dd214", "credit_report", "dispute_letter", "goodwill_letter",
+    "validation_letter", "correspondence", "other"
+]
+ALLOWED_DOC_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png",
+                     "application/msword",
+                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+MAX_DOC_SIZE = 20 * 1024 * 1024  # 20 MB
+
+@router.get("/counselor/members/{member_id}/documents")
+async def get_member_documents(request: Request, member_id: str):
+    """List all documents for an assigned member, including synthetic DD-214 entry"""
+    counselor = await get_current_counselor(request)
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"dd214_file": 1, "dd214_storage_type": 1, "dd214_status": 1, "dd214_uploaded_at": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    docs = []
+
+    # Synthetic DD-214 entry from user doc fields
+    if member.get("dd214_file"):
+        dd214_url = await get_dd214_url(member["dd214_file"], member.get("dd214_storage_type", "local"))
+        docs.append({
+            "id": f"dd214-{member_id}",
+            "display_name": "DD-214",
+            "category": "dd214",
+            "storage_type": member.get("dd214_storage_type", "local"),
+            "uploaded_at": member.get("dd214_uploaded_at").isoformat() if member.get("dd214_uploaded_at") else None,
+            "uploaded_by": None,
+            "download_url": dd214_url,
+            "is_system": True,
+            "dd214_status": member.get("dd214_status")
+        })
+
+    # Counselor-uploaded documents from documents collection
+    cursor = db.documents.find({"member_id": ObjectId(member_id)}).sort("uploaded_at", -1)
+    async for doc in cursor:
+        url = await get_document_url(doc["storage_key"], doc.get("storage_type", "local"))
+        docs.append({
+            "id": str(doc["_id"]),
+            "display_name": doc.get("display_name", "Document"),
+            "category": doc.get("category", "other"),
+            "storage_type": doc.get("storage_type", "local"),
+            "file_size": doc.get("file_size"),
+            "uploaded_at": doc.get("uploaded_at").isoformat() if doc.get("uploaded_at") else None,
+            "uploaded_by": doc.get("uploaded_by_name"),
+            "download_url": url,
+            "is_system": False
+        })
+
+    return docs
+
+
+@router.post("/counselor/members/{member_id}/documents")
+async def upload_member_document(
+    request: Request,
+    member_id: str,
+    file: UploadFile = File(...),
+    category: str = Form(...),
+    display_name: str = Form("")
+):
+    """Upload a document for an assigned member"""
+    counselor = await get_current_counselor(request)
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    if category not in DOCUMENT_CATEGORIES:
+        raise HTTPException(status_code=400, detail=f"category must be one of: {DOCUMENT_CATEGORIES}")
+
+    if file.content_type not in ALLOWED_DOC_TYPES:
+        raise HTTPException(status_code=400, detail="Invalid file type. Allowed: PDF, JPG, PNG, DOC, DOCX")
+
+    contents = await file.read()
+    if len(contents) > MAX_DOC_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum 20 MB.")
+
+    result = await upload_document(contents, file.filename or "document", member_id)
+    if not result["success"]:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {result.get('error')}")
+
+    now = datetime.now(timezone.utc)
+    doc_name = display_name.strip() or (file.filename or "Document")
+
+    await db.documents.insert_one({
+        "member_id": ObjectId(member_id),
+        "display_name": doc_name,
+        "category": category,
+        "storage_key": result["storage_key"],
+        "storage_type": result["storage_type"],
+        "file_size": len(contents),
+        "original_filename": file.filename,
+        "uploaded_at": now,
+        "uploaded_by": ObjectId(counselor["_id"]),
+        "uploaded_by_name": f"{counselor.get('first_name', '')} {counselor.get('last_name', '')}".strip()
+    })
+
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"last_activity_date": now}}
+    )
+
+    return {"message": "Document uploaded successfully", "display_name": doc_name}
+
+
+@router.delete("/counselor/documents/{doc_id}")
+async def delete_member_document(request: Request, doc_id: str):
+    """Delete a counselor-uploaded document"""
+    counselor = await get_current_counselor(request)
+
+    try:
+        oid = ObjectId(doc_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid document ID")
+
+    doc = await db.documents.find_one({"_id": oid})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    # Confirm counselor is assigned to the member
+    member = await db.users.find_one({
+        "_id": doc["member_id"],
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this document")
+
+    await delete_document(doc["storage_key"], doc.get("storage_type", "local"))
+    await db.documents.delete_one({"_id": oid})
+    return {"message": "Document deleted"}
+
 
 # Admin counselor management
 @router.get("/admin/counselors")
