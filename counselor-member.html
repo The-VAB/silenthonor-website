@@ -206,7 +206,32 @@
 
                 <!-- Credit Scores Tab -->
                 <div id="tab-credit-scores" class="tab-panel">
-                    <div class="placeholder-notice">&#128202; Score entry coming in a future update. Current scores shown below are from existing records.</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                        <div class="section-title" style="margin:0">Credit Scores</div>
+                        <button class="doc-btn" onclick="toggleScoreForm()">+ Add Score</button>
+                    </div>
+                    <div id="score-form-wrap" style="display:none;background:rgba(0,0,0,0.15);border:1px solid var(--border);padding:1rem;margin-bottom:1.25rem">
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.75rem;align-items:end">
+                            <div>
+                                <label class="form-label">Bureau</label>
+                                <select id="score-bureau" class="form-input">
+                                    <option value="">Select bureau...</option>
+                                    <option value="equifax">Equifax</option>
+                                    <option value="experian">Experian</option>
+                                    <option value="transunion">TransUnion</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Score (300–850)</label>
+                                <input type="number" id="score-value" class="form-input" min="300" max="850" placeholder="e.g. 650">
+                            </div>
+                            <div>
+                                <label class="form-label">Date Pulled</label>
+                                <input type="date" id="score-date" class="form-input">
+                            </div>
+                            <button class="form-submit" onclick="submitScore()" style="margin:0">Save</button>
+                        </div>
+                    </div>
                     <div id="credit-scores-content"></div>
                 </div>
 
@@ -363,25 +388,86 @@
             "</div>";
     }
 
-    function renderCreditScores(scores) {
-        var html = "";
-        if (!scores || scores.length === 0) {
-            html = "<div class='empty-state'><div class='empty-state-icon'>&#128202;</div><p>No credit scores on record yet.</p></div>";
-        } else {
-            var latest = scores[0];
-            html += "<div class='credit-scores'>" +
-                scoreCard("equifax", "Equifax", latest.equifax, latest.date) +
-                scoreCard("experian", "Experian", latest.experian, latest.date) +
-                scoreCard("transunion", "TransUnion", latest.transunion, latest.date) +
-            "</div>";
-            if (scores.length > 1) {
-                html += "<div class='section-title'>Score History</div><div class='score-history'>";
-                for (var i = 1; i < Math.min(scores.length, 8); i++) {
-                    var s = scores[i];
-                    html += "<div class='score-history-row'><span>" + fmtDate(s.date) + "</span><span>EQ " + (s.equifax || "—") + " &nbsp; EX " + (s.experian || "—") + " &nbsp; TU " + (s.transunion || "—") + "</span></div>";
-                }
-                html += "</div>";
+    async function loadCreditScores() {
+        document.getElementById("credit-scores-content").innerHTML = "<p style='color:var(--muted);font-size:0.85rem'>Loading...</p>";
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/credit-scores", {credentials: "include"});
+            if (r.ok) {
+                renderCreditScores(await r.json());
+            } else {
+                document.getElementById("credit-scores-content").innerHTML = "<p style='color:var(--red-light)'>Failed to load scores.</p>";
             }
+        } catch(e) {
+            document.getElementById("credit-scores-content").innerHTML = "<p style='color:var(--red-light)'>Error loading scores.</p>";
+        }
+    }
+
+    function toggleScoreForm() {
+        var wrap = document.getElementById("score-form-wrap");
+        var open = wrap.style.display === "none" || wrap.style.display === "";
+        wrap.style.display = open ? "block" : "none";
+        if (open) {
+            document.getElementById("score-date").value = new Date().toISOString().split("T")[0];
+        }
+    }
+
+    async function submitScore() {
+        var bureau = document.getElementById("score-bureau").value;
+        var scoreVal = document.getElementById("score-value").value;
+        var datePulled = document.getElementById("score-date").value;
+        if (!bureau) { showToast("Error", "Select a bureau", "error"); return; }
+        var scoreInt = parseInt(scoreVal);
+        if (!scoreVal || isNaN(scoreInt) || scoreInt < 300 || scoreInt > 850) {
+            showToast("Error", "Score must be between 300 and 850", "error"); return;
+        }
+        if (!datePulled) { showToast("Error", "Date pulled is required", "error"); return; }
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/credit-scores", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                credentials: "include",
+                body: JSON.stringify({bureau: bureau, score: scoreInt, date_pulled: datePulled})
+            });
+            if (r.ok) {
+                showToast("Saved", "Credit score added", "success");
+                document.getElementById("score-form-wrap").style.display = "none";
+                document.getElementById("score-bureau").value = "";
+                document.getElementById("score-value").value = "";
+                loadCreditScores();
+            } else {
+                var err = await r.json();
+                showToast("Error", err.detail || "Could not save score", "error");
+            }
+        } catch(e) {
+            showToast("Error", "Could not save score", "error");
+        }
+    }
+
+    function renderCreditScores(data) {
+        var latest = data.latest || {};
+        var history = data.history || [];
+        var html = "<div class='credit-scores'>";
+        var bureauList = [{key:"equifax",label:"Equifax"},{key:"experian",label:"Experian"},{key:"transunion",label:"TransUnion"}];
+        for (var i = 0; i < bureauList.length; i++) {
+            var b = bureauList[i];
+            var info = latest[b.key];
+            if (info) {
+                html += scoreCard(b.key, b.label, info.score, info.date);
+            } else {
+                html += "<div class='credit-score-card " + b.key + "'><div class='bureau-name'>" + b.label + "</div><div class='score-value'>—</div><div class='score-date'>No data</div></div>";
+            }
+        }
+        html += "</div>";
+        if (history.length === 0) {
+            html += "<div class='empty-state'><div class='empty-state-icon'>&#128202;</div><p>No credit scores on record yet.</p></div>";
+        } else {
+            html += "<div class='section-title'>Score History</div><div class='score-history'>";
+            for (var j = 0; j < Math.min(history.length, 40); j++) {
+                var s = history[j];
+                var bl = s.bureau === "transunion" ? "TransUnion" : s.bureau.charAt(0).toUpperCase() + s.bureau.slice(1);
+                html += "<div class='score-history-row'><span>" + fmtDate(s.date_pulled) + "</span><span style='color:rgba(255,255,255,0.4);font-size:0.8rem'>" + bl + "</span><span>" + (s.score || "—") + "</span></div>";
+            }
+            html += "</div>";
         }
         document.getElementById("credit-scores-content").innerHTML = html;
     }
@@ -509,6 +595,7 @@
 
         if (tabName === "messages") loadMessages();
         if (tabName === "documents") loadDocuments();
+        if (tabName === "credit-scores") loadCreditScores();
     }
 
     function showNoteForm() {

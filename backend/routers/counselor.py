@@ -283,6 +283,8 @@ async def get_counselor_stats(request: Request):
         "unread_messages": unread
     }
 
+BUREAUS = ["equifax", "experian", "transunion"]
+
 DOCUMENT_CATEGORIES = [
     "dd214", "credit_report", "dispute_letter", "goodwill_letter",
     "validation_letter", "correspondence", "other"
@@ -394,6 +396,111 @@ async def upload_member_document(
     )
 
     return {"message": "Document uploaded successfully", "display_name": doc_name}
+
+
+@router.get("/counselor/members/{member_id}/credit-scores")
+async def get_member_credit_scores(request: Request, member_id: str):
+    """List credit scores normalizing old all-3-bureau schema and new per-bureau schema"""
+    counselor = await get_current_counselor(request)
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    oid = ObjectId(member_id)
+    # Query both old schema (user_id field) and new schema (member_id field)
+    docs = await db.credit_scores.find(
+        {"$or": [{"user_id": oid}, {"member_id": oid}]}
+    ).to_list(200)
+
+    history = []
+    for doc in docs:
+        bureau = doc.get("bureau")
+        if bureau:
+            # New per-bureau schema
+            date_val = doc.get("date_pulled") or doc.get("created_at")
+            history.append({
+                "id": str(doc["_id"]),
+                "bureau": bureau,
+                "score": doc.get("score"),
+                "date_pulled": date_val.isoformat() if date_val else None
+            })
+        else:
+            # Old all-3-bureau schema: expand each doc into up to 3 per-bureau entries
+            date_val = doc.get("date") or doc.get("created_at")
+            date_iso = date_val.isoformat() if date_val else None
+            for b in BUREAUS:
+                val = doc.get(b)
+                if val is not None:
+                    history.append({
+                        "id": str(doc["_id"]) + "_" + b,
+                        "bureau": b,
+                        "score": val,
+                        "date_pulled": date_iso
+                    })
+
+    history.sort(key=lambda x: x["date_pulled"] or "", reverse=True)
+
+    # First occurrence of each bureau in date-descending order = latest
+    latest = {}
+    for entry in history:
+        b = entry["bureau"]
+        if b not in latest:
+            latest[b] = {"score": entry["score"], "date": entry["date_pulled"]}
+
+    return {"latest": latest, "history": history}
+
+
+@router.post("/counselor/members/{member_id}/credit-scores")
+async def add_member_credit_score(request: Request, member_id: str):
+    """Add a single-bureau credit score entry for an assigned member"""
+    counselor = await get_current_counselor(request)
+    data = await request.json()
+
+    member = await db.users.find_one({
+        "_id": ObjectId(member_id),
+        "assigned_counselor_id": ObjectId(counselor["_id"])
+    }, {"_id": 1})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found or not assigned to you")
+
+    bureau = data.get("bureau")
+    if bureau not in BUREAUS:
+        raise HTTPException(status_code=400, detail=f"bureau must be one of: {BUREAUS}")
+
+    try:
+        score = int(data.get("score"))
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="score must be an integer")
+    if not (300 <= score <= 850):
+        raise HTTPException(status_code=400, detail="score must be between 300 and 850")
+
+    date_pulled_str = data.get("date_pulled")
+    try:
+        date_pulled = datetime.fromisoformat(str(date_pulled_str)) if date_pulled_str else datetime.now(timezone.utc)
+        if date_pulled.tzinfo is None:
+            date_pulled = date_pulled.replace(tzinfo=timezone.utc)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="date_pulled must be a valid date (YYYY-MM-DD)")
+
+    now = datetime.now(timezone.utc)
+    await db.credit_scores.insert_one({
+        "member_id": ObjectId(member_id),
+        "bureau": bureau,
+        "score": score,
+        "date_pulled": date_pulled,
+        "created_at": now
+    })
+
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {"last_activity_date": now}}
+    )
+
+    return {"message": "Credit score added"}
 
 
 @router.delete("/counselor/documents/{doc_id}")
