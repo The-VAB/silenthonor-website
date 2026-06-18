@@ -624,6 +624,8 @@ input,select,textarea{font-family:inherit;font-size:14px;}
   </div>
   <div class="panel-footer">
     <button class="btn btn-outline btn-sm" onclick="closeMemberPanel()">Close</button>
+    <button class="btn btn-outline btn-sm" style="color:var(--text-muted)" onclick="archiveMemberPanel()">Archive</button>
+    <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;" onclick="deleteMemberPanel()">Delete</button>
     <div class="spacer"></div>
     <button class="btn btn-primary btn-sm" onclick="savePanelOverview()">Save Changes</button>
   </div>
@@ -1212,6 +1214,8 @@ function filterMembers() {
       <td onclick="event.stopPropagation()" style="white-space:nowrap;">
         ${!m.verified ? `<button class="btn btn-green btn-xs" onclick="quickVerifyMember('${m.id}')">Verify</button> ` : ''}
         <button class="btn btn-outline btn-xs" onclick="openSetPasswordModal('${m.id}','${(m.first_name||'') + ' ' + (m.last_name||m.email)}')">Set PW</button>
+        ${m.pipeline_stage !== 'inactive' ? `<button class="btn btn-outline btn-xs" style="color:var(--text-muted)" onclick="archiveMember('${m.id}','${((m.first_name||'') + ' ' + (m.last_name||m.email)).trim().replace(/'/g,"\\'")}')">Archive</button> ` : ''}
+        <button class="btn btn-xs" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;" onclick="deleteMember('${m.id}','${((m.first_name||'') + ' ' + (m.last_name||m.email)).trim().replace(/'/g,"\\'")}')">Delete</button>
       </td>
     </tr>`).join('');
 }
@@ -1226,6 +1230,39 @@ async function quickVerifyMember(memberId) {
     if (r.ok) { toast('Member verified', 'success'); loadMembers(); }
     else { const e = await r.json(); toast(e.detail||'Error verifying', 'error'); }
   } catch(e) { toast('Network error', 'error'); }
+}
+
+async function archiveMember(memberId, memberName) {
+  if (!confirm(`Archive ${memberName}?\n\nThis marks them inactive and blocks login, but keeps all their data. You can change their pipeline stage later to reactivate.`)) return;
+  try {
+    const r = await fetch(`${API}/api/admin/members/${memberId}/archive`, {method:'PATCH', credentials:'include'});
+    if (r.ok) { toast(`${memberName} archived`, 'success'); loadMembers(); }
+    else { const e = await r.json(); toast(e.detail||'Error archiving', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function deleteMember(memberId, memberName) {
+  if (!confirm(`PERMANENTLY DELETE ${memberName}?\n\nThis removes the member and ALL their data — notes, disputes, tasks, credit scores, messages, and program applications.\n\nThis cannot be undone. Press OK only for test accounts.`)) return;
+  if (!confirm(`Final confirmation: delete ${memberName} forever?`)) return;
+  try {
+    const r = await fetch(`${API}/api/admin/members/${memberId}`, {method:'DELETE', credentials:'include'});
+    if (r.ok) { toast(`${memberName} permanently deleted`, 'success'); loadMembers(); }
+    else { const e = await r.json(); toast(e.detail||'Error deleting', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function archiveMemberPanel() {
+  if (!currentMemberId || !currentMemberData) return;
+  const name = `${currentMemberData.first_name||''} ${currentMemberData.last_name||''}`.trim() || currentMemberData.email;
+  await archiveMember(currentMemberId, name);
+  closeMemberPanel();
+}
+
+async function deleteMemberPanel() {
+  if (!currentMemberId || !currentMemberData) return;
+  const name = `${currentMemberData.first_name||''} ${currentMemberData.last_name||''}`.trim() || currentMemberData.email;
+  await deleteMember(currentMemberId, name);
+  closeMemberPanel();
 }
 
 function openSetPasswordModal(memberId, memberName) {
