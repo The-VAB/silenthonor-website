@@ -14,6 +14,29 @@ SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "dd214")
 LOCAL_STORAGE_PATH = "/app/uploads/dd214"
 LOCAL_DOCS_PATH = "/app/uploads/documents"
 
+# DD-214 local encryption — set DD214_ENCRYPTION_KEY env var to a Fernet key to enable.
+# Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+DD214_ENCRYPTION_KEY = os.environ.get("DD214_ENCRYPTION_KEY", "")
+
+def _get_fernet():
+    if not DD214_ENCRYPTION_KEY:
+        return None
+    try:
+        from cryptography.fernet import Fernet
+        key = DD214_ENCRYPTION_KEY.encode() if isinstance(DD214_ENCRYPTION_KEY, str) else DD214_ENCRYPTION_KEY
+        return Fernet(key)
+    except Exception as e:
+        logger.error(f"Invalid DD214_ENCRYPTION_KEY: {e}")
+        return None
+
+def encrypt_dd214(data: bytes) -> bytes:
+    f = _get_fernet()
+    return f.encrypt(data) if f else data
+
+def decrypt_dd214(data: bytes) -> bytes:
+    f = _get_fernet()
+    return f.decrypt(data) if f else data
+
 def get_storage_headers():
     """Get headers for Supabase Storage API"""
     return {
@@ -87,9 +110,13 @@ async def upload_to_supabase(file_content: bytes, filename: str) -> dict:
         return {"success": False, "error": str(e)}
 
 async def upload_to_local(file_content: bytes, filename: str) -> dict:
-    """Upload file to local storage"""
+    """Upload file to local storage, encrypting with AES-256 if DD214_ENCRYPTION_KEY is set."""
     try:
         os.makedirs(LOCAL_STORAGE_PATH, exist_ok=True)
+        fernet = _get_fernet()
+        if fernet:
+            file_content = fernet.encrypt(file_content)
+            filename = filename + ".enc"
         filepath = os.path.join(LOCAL_STORAGE_PATH, filename)
 
         with open(filepath, "wb") as f:

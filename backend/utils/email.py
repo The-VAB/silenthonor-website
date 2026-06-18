@@ -508,6 +508,167 @@ async def send_staff_welcome_email(to: str, first_name: str, role: str, temp_pas
 
     return await send_email(to, subject, html_content, text_content)
 
+async def send_program_approved_email(to: str, first_name: str, program_name: str, has_counselor: bool, counselor_name: str = None) -> bool:
+    """Notify member their program application was approved"""
+    subject = f"Your {program_name} Application Has Been Approved — Silent Honor Foundation"
+    counselor_block = f"""
+        <div style="background:rgba(201,149,42,0.1);border:1px solid #C9952A;padding:20px;margin:20px 0;text-align:center;">
+            <p style="color:#C9952A;margin-bottom:8px;">Your Assigned Counselor</p>
+            <p style="font-size:18px;color:#ffffff;font-weight:600;">{counselor_name}</p>
+        </div>
+        <p style="color:#9CA3AF;">Your counselor will reach out soon to schedule your first session.</p>
+    """ if has_counselor and counselor_name else """
+        <p style="color:#9CA3AF;">A counselor will be assigned to you shortly. You'll receive another email once that happens.</p>
+    """
+    html_content = f"""
+    <!DOCTYPE html><html><head><style>
+        body{{font-family:Arial,sans-serif;background:#0B1220;color:#fff;padding:40px;}}
+        .container{{max-width:600px;margin:0 auto;background:#111827;padding:40px;border:1px solid #374151;}}
+        .logo{{font-family:Oswald,sans-serif;font-size:28px;font-weight:700;text-align:center;margin-bottom:30px;}}
+        .logo-accent{{color:#B91C1C;}}
+        h1{{font-family:Oswald,sans-serif;color:#22C55E;}}
+        .btn{{display:inline-block;background:#B91C1C;color:#fff;padding:14px 28px;text-decoration:none;font-weight:600;margin-top:20px;}}
+        .footer{{margin-top:40px;padding-top:20px;border-top:1px solid #374151;text-align:center;font-size:12px;color:#6B7280;}}
+    </style></head><body>
+    <div class="container">
+        <div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+        <h1>Application Approved!</h1>
+        <p style="color:#9CA3AF;">Hi {first_name},</p>
+        <p style="color:#9CA3AF;">Great news — your <strong style="color:#fff;">{program_name}</strong> application has been approved.</p>
+        {counselor_block}
+        <p style="text-align:center;"><a href="https://silenthonor.org/dashboard.html" class="btn">Go to Dashboard</a></p>
+        <div class="footer"><p>Silent Honor Foundation | Veterans Helping Veterans</p></div>
+    </div></body></html>
+    """
+    text_content = f"Your {program_name} application has been approved, {first_name}! Visit https://silenthonor.org/dashboard.html"
+    return await send_email(to, subject, html_content, text_content)
+
+
+async def send_dispute_update_email(to: str, first_name: str, account_name: str, bureau: str, status: str) -> bool:
+    """Notify member of a significant dispute status change"""
+    status_labels = {
+        "sent": "Sent to Bureau",
+        "responded": "Bureau Responded",
+        "resolved": "Resolved",
+        "rejected": "Rejected by Bureau"
+    }
+    status_colors = {
+        "sent": "#3B82F6",
+        "responded": "#C9952A",
+        "resolved": "#22C55E",
+        "rejected": "#EF4444"
+    }
+    label = status_labels.get(status, status.replace("_", " ").title())
+    color = status_colors.get(status, "#9CA3AF")
+    subject = f"Dispute Update: {account_name} — {label}"
+    html_content = f"""
+    <!DOCTYPE html><html><head><style>
+        body{{font-family:Arial,sans-serif;background:#0B1220;color:#fff;padding:40px;}}
+        .container{{max-width:600px;margin:0 auto;background:#111827;padding:40px;border:1px solid #374151;}}
+        .logo{{font-family:Oswald,sans-serif;font-size:28px;font-weight:700;text-align:center;margin-bottom:30px;}}
+        .logo-accent{{color:#B91C1C;}}
+        h1{{font-family:Oswald,sans-serif;color:#ffffff;}}
+        .status-badge{{display:inline-block;background:{color};color:#fff;padding:6px 16px;font-weight:700;font-size:14px;}}
+        .btn{{display:inline-block;background:#B91C1C;color:#fff;padding:14px 28px;text-decoration:none;font-weight:600;margin-top:20px;}}
+        .footer{{margin-top:40px;padding-top:20px;border-top:1px solid #374151;text-align:center;font-size:12px;color:#6B7280;}}
+    </style></head><body>
+    <div class="container">
+        <div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+        <h1>Dispute Update</h1>
+        <p style="color:#9CA3AF;">Hi {first_name},</p>
+        <p style="color:#9CA3AF;">Your dispute for <strong style="color:#fff;">{account_name}</strong> with <strong style="color:#fff;">{bureau}</strong> has been updated.</p>
+        <p>New status: <span class="status-badge">{label}</span></p>
+        <p style="text-align:center;"><a href="https://silenthonor.org/dispute-tracker.html" class="btn">View Disputes</a></p>
+        <div class="footer"><p>Silent Honor Foundation | Veterans Helping Veterans</p></div>
+    </div></body></html>
+    """
+    text_content = f"Dispute update for {account_name} ({bureau}): {label}. View at https://silenthonor.org/dispute-tracker.html"
+    return await send_email(to, subject, html_content, text_content)
+
+
+async def send_task_reminder_email(to: str, first_name: str, overdue_tasks: list, due_today_tasks: list) -> bool:
+    """Send daily task reminder to a counselor"""
+    total = len(overdue_tasks) + len(due_today_tasks)
+    subject = f"Task Reminder: {total} task{'s' if total != 1 else ''} need attention"
+
+    def task_rows(tasks, label, color):
+        if not tasks:
+            return ""
+        rows = "".join(
+            f"<tr><td style='padding:8px 0;border-bottom:1px solid #374151;color:#9CA3AF;'>{t.get('title','Task')}</td>"
+            f"<td style='padding:8px 0;border-bottom:1px solid #374151;color:{color};font-size:12px;text-align:right;'>{label}</td></tr>"
+            for t in tasks
+        )
+        return f"<tr><td colspan='2' style='padding:12px 0 4px;color:#6B7280;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;'>{label}</td></tr>{rows}"
+
+    html_content = f"""
+    <!DOCTYPE html><html><head><style>
+        body{{font-family:Arial,sans-serif;background:#0B1220;color:#fff;padding:40px;}}
+        .container{{max-width:600px;margin:0 auto;background:#111827;padding:40px;border:1px solid #374151;}}
+        .logo{{font-family:Oswald,sans-serif;font-size:28px;font-weight:700;text-align:center;margin-bottom:30px;}}
+        .logo-accent{{color:#B91C1C;}}
+        h1{{font-family:Oswald,sans-serif;color:#ffffff;}}
+        .btn{{display:inline-block;background:#B91C1C;color:#fff;padding:14px 28px;text-decoration:none;font-weight:600;margin-top:20px;}}
+        .footer{{margin-top:40px;padding-top:20px;border-top:1px solid #374151;text-align:center;font-size:12px;color:#6B7280;}}
+    </style></head><body>
+    <div class="container">
+        <div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+        <h1>Daily Task Summary</h1>
+        <p style="color:#9CA3AF;">Hi {first_name}, here are your tasks for today:</p>
+        <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+            {task_rows(overdue_tasks, "Overdue", "#EF4444")}
+            {task_rows(due_today_tasks, "Due Today", "#C9952A")}
+        </table>
+        <p style="text-align:center;"><a href="https://silenthonor.org/counselor-tasks.html" class="btn">View All Tasks</a></p>
+        <div class="footer"><p>Silent Honor Foundation | Veterans Helping Veterans</p></div>
+    </div></body></html>
+    """
+    text_content = f"Daily task reminder: {len(overdue_tasks)} overdue, {len(due_today_tasks)} due today. Visit https://silenthonor.org/counselor-tasks.html"
+    return await send_email(to, subject, html_content, text_content)
+
+
+async def send_task_reminders(db) -> None:
+    """Query all counselors with overdue/due-today tasks and send reminder emails."""
+    from datetime import datetime, timezone, timedelta
+    from bson import ObjectId
+    from collections import defaultdict
+
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+    tasks = await db.tasks.find({
+        "completed": {"$ne": True},
+        "due_date": {"$lte": today_end}
+    }).to_list(2000)
+
+    counselor_tasks = defaultdict(lambda: {"overdue": [], "due_today": []})
+    for task in tasks:
+        cid = task.get("counselor_id")
+        if not cid:
+            continue
+        due = task.get("due_date")
+        key = str(cid)
+        if due and due < today_start:
+            counselor_tasks[key]["overdue"].append(task)
+        else:
+            counselor_tasks[key]["due_today"].append(task)
+
+    for cid_str, groups in counselor_tasks.items():
+        try:
+            counselor = await db.users.find_one({"_id": ObjectId(cid_str)})
+        except Exception:
+            continue
+        if not counselor or not counselor.get("email"):
+            continue
+        await send_task_reminder_email(
+            counselor["email"],
+            counselor.get("first_name", "Counselor"),
+            groups["overdue"],
+            groups["due_today"]
+        )
+
+
 async def send_staff_invite_email(to: str, first_name: str, role: str, reset_token: str) -> bool:
     """Send portal invitation email to new counselor/staff with password setup link"""
     setup_url = f"https://silenthonor.org/reset-password.html?token={reset_token}"

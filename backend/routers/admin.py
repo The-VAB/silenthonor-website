@@ -121,12 +121,25 @@ async def get_member(request: Request, member_id: str):
 
 @router.get("/dd214/{filename}")
 async def get_dd214_file(request: Request, filename: str):
-    """Get DD-214 file for review - returns file or redirect to signed URL"""
+    """Get DD-214 file for review - decrypts .enc files, or redirects to Supabase signed URL"""
     await get_current_admin(request)
 
     # First try local file
     filepath = f"/app/uploads/dd214/{filename}"
     if os.path.exists(filepath):
+        if filename.endswith(".enc"):
+            from utils.storage import decrypt_dd214
+            from fastapi.responses import Response
+            with open(filepath, "rb") as f:
+                encrypted = f.read()
+            try:
+                decrypted = decrypt_dd214(encrypted)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Decryption failed: {e}")
+            base = filename[:-4]
+            ext = base.rsplit(".", 1)[-1].lower() if "." in base else "pdf"
+            mime = {"pdf": "application/pdf", "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png"}.get(ext, "application/octet-stream")
+            return Response(content=decrypted, media_type=mime, headers={"Content-Disposition": f"inline; filename={base}"})
         return FileResponse(filepath)
 
     # Try to get Supabase signed URL

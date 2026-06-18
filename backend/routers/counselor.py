@@ -9,7 +9,7 @@ from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
 from fastapi import UploadFile, File, Form
 from utils.auth import hash_password
 from utils.validators import CounselorRequest
-from utils.email import send_counselor_assigned_email
+from utils.email import send_counselor_assigned_email, send_dispute_update_email
 from utils.storage import get_dd214_url, upload_document, get_document_url, delete_document
 
 router = APIRouter(prefix="/api", tags=["Counselor"])
@@ -1270,6 +1270,18 @@ async def update_member_dispute(request: Request, dispute_id: str):
         {"_id": dispute["user_id"]},
         {"$set": {"last_activity_date": now}}
     )
+
+    # Email member on significant status transitions
+    if new_status in ("sent", "responded", "resolved", "rejected"):
+        member_doc = await db.users.find_one({"_id": dispute["user_id"]}, {"email": 1, "first_name": 1})
+        if member_doc and member_doc.get("email"):
+            asyncio.create_task(send_dispute_update_email(
+                member_doc["email"],
+                member_doc.get("first_name", "Member"),
+                dispute.get("account_name", "Account"),
+                dispute.get("bureau", "Bureau"),
+                new_status
+            ))
 
     return {"message": "Dispute updated"}
 
