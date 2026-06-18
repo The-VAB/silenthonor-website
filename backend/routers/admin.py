@@ -749,3 +749,68 @@ async def approve_dd214_manual(request: Request, member_id: str):
     return {"message": "DD-214 manually approved, member verified"}
 
 
+@router.patch("/members/{member_id}/archive")
+async def archive_member(request: Request, member_id: str):
+    """Soft-archive a member: marks inactive, blocks login, preserves all data"""
+    admin = await get_current_admin(request)
+    member = await db.users.find_one({"_id": ObjectId(member_id), "role": "member"})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    now = datetime.now(timezone.utc)
+    await db.users.update_one(
+        {"_id": ObjectId(member_id)},
+        {"$set": {
+            "pipeline_stage": "inactive",
+            "is_active": False,
+            "archived_at": now,
+            "archived_by": admin.get("email"),
+            "updated_at": now
+        }}
+    )
+
+    await log_audit_event(
+        action="MEMBER_ARCHIVED",
+        entity_type="user",
+        entity_id=member_id,
+        user_id=admin["_id"],
+        user_email=admin.get("email"),
+        ip_address=request.client.host if request.client else None
+    )
+    return {"message": f"{member.get('first_name', 'Member')} has been archived"}
+
+
+@router.delete("/members/{member_id}")
+async def delete_member(request: Request, member_id: str):
+    """Hard-delete a member and all associated data. Irreversible."""
+    admin = await get_current_admin(request)
+    member = await db.users.find_one({"_id": ObjectId(member_id), "role": "member"})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    oid = ObjectId(member_id)
+
+    # Delete user doc and all related data in parallel collections
+    await db.users.delete_one({"_id": oid})
+    await db.intake_notes.delete_many({"member_id": oid})
+    await db.disputes.delete_many({"user_id": oid})
+    await db.tasks.delete_many({"member_id": oid})
+    await db.credit_accounts.delete_many({"member_id": oid})
+    await db.credit_scores.delete_many({"$or": [{"user_id": oid}, {"member_id": oid}]})
+    await db.program_applications.delete_many({"member_id": oid})
+    await db.documents.delete_many({"member_id": oid})
+    await db.course_progress.delete_many({"user_id": oid})
+    await db.messages.delete_many({"$or": [{"from_user_id": oid}, {"to_user_id": oid}]})
+
+    await log_audit_event(
+        action="MEMBER_DELETED",
+        entity_type="user",
+        entity_id=member_id,
+        user_id=admin["_id"],
+        user_email=admin.get("email"),
+        details={"deleted_email": member.get("email"), "deleted_name": f"{member.get('first_name','')} {member.get('last_name','')}".strip()},
+        ip_address=request.client.host if request.client else None
+    )
+    return {"message": f"Member {member.get('email')} permanently deleted"}
+
+
