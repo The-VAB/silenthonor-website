@@ -7,7 +7,7 @@ from bson import ObjectId
 
 from middleware.auth_middleware import get_current_user, get_current_admin
 from middleware.logging_middleware import log_audit_event, AUDIT_ACTIONS
-from utils.email import send_email, send_counselor_assigned_email
+from utils.email import send_email, send_counselor_assigned_email, send_program_approved_email
 
 router = APIRouter(prefix="/api", tags=["Programs"])
 
@@ -502,13 +502,22 @@ async def approve_application(request: Request, application_id: str):
     member = await db.users.find_one({"_id": member_id})
     counselor = await db.users.find_one({"_id": ObjectId(counselor_id)}) if counselor_id else None
 
-    if member and counselor:
-        counselor_name = f"{counselor.get('first_name', '')} {counselor.get('last_name', '')}".strip()
-        asyncio.create_task(send_counselor_assigned_email(
+    if member:
+        program_label = "Credit Repair" if program_type == "credit_repair" else "Financial Counseling"
+        counselor_name = f"{counselor.get('first_name', '')} {counselor.get('last_name', '')}".strip() if counselor else None
+        asyncio.create_task(send_program_approved_email(
             member.get("email"),
             member.get("first_name", "Member"),
+            program_label,
+            bool(counselor),
             counselor_name
         ))
+        if counselor:
+            asyncio.create_task(send_counselor_assigned_email(
+                member.get("email"),
+                member.get("first_name", "Member"),
+                counselor_name
+            ))
 
     await log_audit_event(
         action="PROGRAM_APPLICATION_APPROVED",

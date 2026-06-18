@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-from datetime import datetime, timezone
+import asyncio
+from datetime import datetime, timezone, timedelta
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -53,6 +54,22 @@ DB_NAME = os.environ.get("DB_NAME", "silenthonor")
 client = None
 db = None
 
+async def daily_task_reminder_loop():
+    """Fire send_task_reminders every day at 8 AM UTC."""
+    from utils.email import send_task_reminders
+    while True:
+        now = datetime.now(timezone.utc)
+        target = now.replace(hour=8, minute=0, second=0, microsecond=0)
+        if now >= target:
+            target += timedelta(days=1)
+        await asyncio.sleep((target - now).total_seconds())
+        try:
+            await send_task_reminders(db)
+            logger.info("Daily task reminders sent")
+        except Exception as e:
+            logger.error(f"Task reminder error: {e}")
+
+
 @app.on_event("startup")
 async def startup_db():
     global client, db
@@ -86,6 +103,9 @@ async def startup_db():
     os.makedirs("/app/uploads/dd214", exist_ok=True)
     os.makedirs("/app/uploads/documents", exist_ok=True)
     os.makedirs("/app/memory", exist_ok=True)
+
+    # Start daily task reminder loop (fires at 8 AM UTC)
+    asyncio.create_task(daily_task_reminder_loop())
 
     logger.info("API startup complete")
 

@@ -68,8 +68,11 @@ async def get_assigned_counselor(request: Request):
 
 @router.get("/courses")
 async def get_courses(request: Request):
-    """Get member's courses with progress"""
+    """Get member's courses with progress — verified members only"""
     user = await get_current_user(request)
+
+    if not user.get("verified"):
+        raise HTTPException(status_code=403, detail="Your account must be verified to access courses.")
 
     progress = await db.course_progress.find(
         {"user_id": ObjectId(user["_id"])},
@@ -104,8 +107,12 @@ async def get_courses(request: Request):
 
 @router.post("/courses/{course_id}/progress")
 async def update_course_progress(request: Request, course_id: str):
-    """Update course progress"""
+    """Update course progress — verified members only"""
     user = await get_current_user(request)
+
+    if not user.get("verified"):
+        raise HTTPException(status_code=403, detail="Your account must be verified to access courses.")
+
     data = await request.json()
 
     await db.course_progress.update_one(

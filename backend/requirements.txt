@@ -27,3 +27,6 @@ supabase==2.3.0
 
 # HTTP Client (version compatible with supabase)
 httpx>=0.24.0,<0.25.0
+
+# File encryption (DD-214 local fallback AES-256)
+cryptography==42.0.5
