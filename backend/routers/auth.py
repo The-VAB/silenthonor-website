@@ -125,6 +125,9 @@ async def login(request: Request, response: Response, data: LoginRequest):
         await record_failed_attempt(identifier)
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
+    if user.get("is_active") is False:
+        raise HTTPException(status_code=403, detail="This account has been deactivated. Please contact Silent Honor Foundation for assistance.")
+
     await clear_failed_attempts(identifier)
 
     user_id = str(user["_id"])
