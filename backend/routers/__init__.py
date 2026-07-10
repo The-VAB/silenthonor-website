@@ -11,6 +11,7 @@ from .staff import router as staff_router, set_db as set_staff_db
 from .reports import router as reports_router, set_db as set_reports_db
 from .content import router as content_router, set_db as set_content_db
 from .programs import router as programs_router, set_db as set_programs_db
+from .financial_counseling import router as fc_router, set_db as set_fc_db
 
 def initialize_routers(database):
     """Initialize all routers with database reference"""
@@ -26,6 +27,7 @@ def initialize_routers(database):
     set_reports_db(database)
     set_content_db(database)
     set_programs_db(database)
+    set_fc_db(database)
 
 all_routers = [
     auth_router,
@@ -39,5 +41,6 @@ all_routers = [
     staff_router,
     reports_router,
     content_router,
-    programs_router
+    programs_router,
+    fc_router
 ]
