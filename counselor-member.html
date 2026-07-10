@@ -151,6 +151,67 @@
         .gp-check-label{font-size:0.85rem;display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer}
         @media(max-width:900px){.credit-scores{grid-template-columns:1fr}.profile-grid{grid-template-columns:1fr 1fr}.gp-edit-grid{grid-template-columns:1fr}}
         @media(max-width:600px){.profile-grid{grid-template-columns:1fr}.doc-row{flex-wrap:wrap}}
+
+        /* ── Financial Counseling Tab ─────────────────────────────── */
+        .fc-subnav{display:flex;gap:0.4rem;flex-wrap:wrap;padding:0.6rem 0 1rem;border-bottom:1px solid var(--border);margin-bottom:1.25rem}
+        .fc-tool-btn{font-family:Oswald,sans-serif;font-size:0.65rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.8rem;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.2s;white-space:nowrap}
+        .fc-tool-btn:hover{color:var(--white);border-color:rgba(201,149,42,0.4)}
+        .fc-tool-btn.active{background:rgba(201,149,42,0.12);border-color:var(--gold);color:var(--gold)}
+        .fc-tool-panel{display:none}
+        .fc-tool-panel.active{display:block}
+        .fc-snapshot{background:rgba(201,149,42,0.08);border:1px solid rgba(201,149,42,0.25);padding:1rem 1.25rem;margin-bottom:1.25rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem}
+        .fc-snap-item{text-align:center}
+        .fc-snap-val{font-family:Oswald,sans-serif;font-size:1.5rem;font-weight:700}
+        .fc-snap-val.pos{color:#10B981}.fc-snap-val.neg{color:#EF4444}.fc-snap-val.gold{color:var(--gold)}
+        .fc-snap-label{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:0.2rem}
+        .fc-table{width:100%;border-collapse:collapse;margin-bottom:0.75rem}
+        .fc-table th{font-family:Oswald,sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:0.6rem 0.75rem;border-bottom:1px solid var(--border);text-align:left;background:rgba(0,0,0,0.15)}
+        .fc-table td{padding:0.6rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.88rem;vertical-align:middle}
+        .fc-table td input,.fc-table td select{background:rgba(11,18,32,0.9);border:1px solid var(--border);color:var(--white);padding:0.3rem 0.5rem;font-size:0.85rem;font-family:Barlow,sans-serif;width:100%;box-sizing:border-box}
+        .fc-table td input:focus,.fc-table td select:focus{outline:none;border-color:var(--gold)}
+        .fc-result-box{background:rgba(0,0,0,0.2);border:1px solid var(--border);padding:1rem 1.25rem;margin-bottom:1rem}
+        .fc-result-row{display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.88rem}
+        .fc-result-row:last-child{border-bottom:none}
+        .fc-result-key{color:var(--muted)}
+        .fc-result-val{font-family:Oswald,sans-serif;font-weight:600}
+        .fc-warning{background:rgba(185,28,28,0.1);border:1px solid rgba(185,28,28,0.3);padding:0.75rem 1rem;font-size:0.85rem;color:var(--red-light);margin-bottom:0.75rem}
+        .fc-tip{background:rgba(201,149,42,0.08);border:1px solid rgba(201,149,42,0.2);padding:0.6rem 1rem;font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem}
+        .fc-goal-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-left:3px solid var(--gold);padding:0.85rem 1rem;margin-bottom:0.5rem}
+        .fc-goal-title{font-family:Oswald,sans-serif;font-size:0.95rem;font-weight:600;margin-bottom:0.2rem}
+        .fc-goal-meta{font-size:0.75rem;color:var(--muted)}
+        .fc-goal-status{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.5rem;border-radius:2px;float:right}
+        .fc-goal-status.active{background:rgba(16,185,129,0.15);color:#10B981}
+        .fc-goal-status.completed{background:rgba(59,130,246,0.15);color:#3B82F6}
+        .fc-goal-status.paused{background:rgba(255,255,255,0.07);color:var(--muted)}
+        .fc-path-section{background:rgba(0,0,0,0.15);border:1px solid var(--border);padding:1rem;margin-bottom:0.75rem}
+        .fc-path-label{font-family:Oswald,sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem}
+        .fc-sn-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-left:3px solid var(--gold);padding:0.85rem 1rem;margin-bottom:0.5rem}
+        .fc-sn-header{display:flex;justify-content:space-between;margin-bottom:0.6rem;align-items:baseline}
+        .fc-sn-date{font-family:Oswald,sans-serif;font-size:0.8rem;font-weight:600}
+        .fc-sn-by{font-size:0.72rem;color:var(--muted)}
+        .fc-sn-track{font-family:Oswald,sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.45rem;background:rgba(201,149,42,0.15);color:var(--gold);border:1px solid rgba(201,149,42,0.3)}
+        .fc-calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+        .fc-ref-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);padding:0.75rem 1rem;margin-bottom:0.4rem;display:flex;align-items:flex-start;gap:0.75rem}
+        .fc-ref-cat{font-family:Oswald,sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.45rem;border-radius:2px;flex-shrink:0;margin-top:2px}
+        .fc-ref-name{font-family:Oswald,sans-serif;font-size:0.88rem;font-weight:600;margin-bottom:0.15rem}
+        .fc-ref-desc{font-size:0.78rem;color:var(--muted)}
+        .fc-flag-row{display:flex;align-items:flex-start;gap:0.75rem;padding:0.85rem;border:1px solid var(--border);background:rgba(0,0,0,0.15);margin-bottom:0.4rem}
+        .fc-flag-row.flagged{border-color:rgba(185,28,28,0.4);background:rgba(185,28,28,0.05)}
+        .fc-flag-num{font-family:Oswald,sans-serif;font-size:1.2rem;font-weight:700;color:var(--muted);flex-shrink:0;width:24px}
+        .fc-flag-text{flex:1;font-size:0.88rem}
+        .fc-flag-title{font-weight:600;margin-bottom:0.2rem}
+        .fc-flag-sub{font-size:0.78rem;color:var(--muted)}
+        .budget-toggle{display:flex;gap:0;margin-bottom:1rem}
+        .budget-mode-btn{font-family:Oswald,sans-serif;font-size:0.68rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:0.45rem 1rem;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.2s}
+        .budget-mode-btn.active{background:rgba(201,149,42,0.15);border-color:var(--gold);color:var(--gold)}
+        .budget-mode-btn:first-child{border-right:none}
+        .budget-bar{height:8px;background:rgba(255,255,255,0.05);margin-bottom:1rem;display:flex;overflow:hidden}
+        .budget-bar-needs{background:#3B82F6;transition:width 0.4s}
+        .budget-bar-wants{background:var(--gold);transition:width 0.4s}
+        .budget-bar-savings{background:#10B981;transition:width 0.4s}
+        .housing-calc{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+        @media(max-width:800px){.fc-calc-grid{grid-template-columns:1fr}.housing-calc{grid-template-columns:1fr}}
+        @media(max-width:600px){.fc-snapshot{grid-template-columns:1fr 1fr}}
     </style>
 </head>
 <body>
@@ -205,6 +266,7 @@
                     <button class="detail-tab" data-tab="game-plan" onclick="switchTab('game-plan')">Game Plan</button>
                     <button class="detail-tab" data-tab="notes" onclick="switchTab('notes')">Notes</button>
                     <button class="detail-tab" data-tab="messages" onclick="switchTab('messages', true)">Messages</button>
+                    <button class="detail-tab" data-tab="fin-counseling" onclick="switchTab('fin-counseling')">Financial Counseling</button>
                 </div>
 
                 <!-- Profile Tab -->
@@ -438,6 +500,616 @@
                     <div class="quick-reply">
                         <input type="text" id="reply-input" placeholder="Type a message..." onkeypress="handleReplyKey(event)">
                         <button class="send-btn" onclick="sendReply()">Send</button>
+                    </div>
+                </div>
+
+                <!-- Financial Counseling Tab -->
+                <div id="tab-fin-counseling" class="tab-panel">
+                    <div class="fc-subnav">
+                        <button class="fc-tool-btn active" onclick="switchFCTool('intake')">1. Client Intake</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('budget')">2. Budgeting</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('debt')">3. Debt Payoff</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('goals')">4. Goals</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('session-notes')">5. Session Notes</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('housing')">6. Housing</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('retirement')">7. Retirement</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('tax')">8. Tax Reference</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('fraud')">9. Fraud Checklist</button>
+                        <button class="fc-tool-btn" onclick="switchFCTool('referrals')">10. Referral Library</button>
+                    </div>
+
+                    <!-- Tool 1: Client Intake -->
+                    <div id="fc-intake" class="fc-tool-panel active">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Client Intake &amp; Profile</div>
+                            <button class="form-submit" onclick="saveFCIntake()">Save Intake</button>
+                        </div>
+                        <div id="intake-snapshot" class="fc-snapshot" style="display:none"></div>
+                        <div class="section-title">Demographics</div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.25rem">
+                            <div><label class="form-label">Date of Birth</label><input type="date" id="intake-dob" class="form-input"></div>
+                            <div><label class="form-label">Marital Status</label>
+                                <select id="intake-marital" class="form-input">
+                                    <option value="">Select...</option>
+                                    <option value="single">Single</option><option value="married">Married</option>
+                                    <option value="divorced">Divorced</option><option value="widowed">Widowed</option><option value="separated">Separated</option>
+                                </select></div>
+                            <div><label class="form-label">Dependents</label><input type="number" id="intake-dependents" class="form-input" min="0" placeholder="0"></div>
+                            <div><label class="form-label">City</label><input type="text" id="intake-city" class="form-input"></div>
+                            <div><label class="form-label">State</label><input type="text" id="intake-state" class="form-input" maxlength="2" placeholder="TX"></div>
+                            <div><label class="form-label">ZIP</label><input type="text" id="intake-zip" class="form-input" maxlength="5"></div>
+                        </div>
+                        <div class="section-title">Employment &amp; Income</div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.25rem">
+                            <div><label class="form-label">Employment Status</label>
+                                <select id="intake-employment" class="form-input">
+                                    <option value="">Select...</option>
+                                    <option value="employed_full">Employed Full-Time</option><option value="employed_part">Employed Part-Time</option>
+                                    <option value="self_employed">Self-Employed</option><option value="unemployed">Unemployed</option>
+                                    <option value="retired">Retired</option><option value="disabled">Disabled / VA Only</option>
+                                </select></div>
+                            <div><label class="form-label">Employer</label><input type="text" id="intake-employer" class="form-input"></div>
+                            <div><label class="form-label">Gross Monthly Income ($)</label><input type="number" id="intake-gross-income" class="form-input" min="0" step="0.01" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">VA Disability / Benefits ($/mo)</label><input type="number" id="intake-va-income" class="form-input" min="0" step="0.01" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Other Income ($/mo)</label><input type="number" id="intake-other-income" class="form-input" min="0" step="0.01" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Other Income Source</label><input type="text" id="intake-other-source" class="form-input" placeholder="e.g. Rental income"></div>
+                        </div>
+                        <div class="section-title">Monthly Expenses</div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.25rem">
+                            <div><label class="form-label">Rent / Mortgage ($)</label><input type="number" id="intake-exp-housing" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Utilities ($)</label><input type="number" id="intake-exp-utilities" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Food / Groceries ($)</label><input type="number" id="intake-exp-food" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Transportation ($)</label><input type="number" id="intake-exp-transport" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Insurance Premiums ($)</label><input type="number" id="intake-exp-insurance" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Phone / Internet ($)</label><input type="number" id="intake-exp-phone" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Child / Pet Care ($)</label><input type="number" id="intake-exp-care" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Entertainment ($)</label><input type="number" id="intake-exp-entertainment" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                            <div><label class="form-label">Other Expenses ($)</label><input type="number" id="intake-exp-other" class="form-input" min="0" oninput="updateIntakeSnapshot()"></div>
+                        </div>
+                        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+                            Existing Debts
+                            <button class="doc-btn" onclick="addIntakeDebtRow()" style="font-size:0.65rem">+ Add Debt</button>
+                        </div>
+                        <table class="fc-table" style="margin-bottom:1.25rem"><thead><tr>
+                            <th>Creditor</th><th>Type</th><th>Balance ($)</th><th>Min Payment ($)</th><th>Rate (%)</th><th></th>
+                        </tr></thead><tbody id="intake-debts-tbody"></tbody></table>
+                        <div class="section-title">Insurance Coverage</div>
+                        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.25rem">
+                            <label class="gp-check-label"><input type="checkbox" id="intake-ins-health"> Health</label>
+                            <label class="gp-check-label"><input type="checkbox" id="intake-ins-life"> Life</label>
+                            <label class="gp-check-label"><input type="checkbox" id="intake-ins-auto"> Auto</label>
+                            <label class="gp-check-label"><input type="checkbox" id="intake-ins-renters"> Renters / Homeowners</label>
+                            <label class="gp-check-label"><input type="checkbox" id="intake-ins-disability"> Disability</label>
+                        </div>
+                        <div class="section-title">Financial Stress Scale</div>
+                        <div style="margin-bottom:1.25rem">
+                            <div style="display:flex;align-items:center;gap:1rem">
+                                <input type="range" id="intake-stress" min="1" max="10" value="5" oninput="document.getElementById('stress-val').textContent=this.value" style="flex:1;accent-color:var(--gold)">
+                                <span id="stress-val" style="font-family:Oswald;font-size:1.5rem;font-weight:700;color:var(--gold);min-width:2rem;text-align:center">5</span>
+                                <span style="font-size:0.8rem;color:var(--muted)">/10</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-top:0.2rem"><span>Minimal</span><span>Overwhelming</span></div>
+                        </div>
+                        <div class="section-title">Consent</div>
+                        <div style="margin-bottom:1.25rem">
+                            <label class="gp-check-label" style="font-size:0.88rem">
+                                <input type="checkbox" id="intake-consent">
+                                Member has provided consent for financial counseling services and information sharing within Silent Honor Foundation
+                            </label>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end">
+                            <button class="form-submit" onclick="saveFCIntake()">Save Intake</button>
+                        </div>
+                    </div>
+
+                    <!-- Tool 2: Budgeting -->
+                    <div id="fc-budget" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Budgeting &amp; Cash Flow</div>
+                            <div style="display:flex;gap:0.5rem;align-items:center">
+                                <div class="budget-toggle">
+                                    <button class="budget-mode-btn active" id="mode-zero" onclick="setBudgetMode('zero_based')">Zero-Based</button>
+                                    <button class="budget-mode-btn" id="mode-503020" onclick="setBudgetMode('50_30_20')">50/30/20</button>
+                                </div>
+                                <button class="form-submit" onclick="saveBudget()">Save Version</button>
+                            </div>
+                        </div>
+                        <div id="budget-503020-guide" style="display:none" class="fc-tip">
+                            <strong style="color:var(--gold)">50/30/20 Rule:</strong> 50% Needs · 30% Wants · 20% Savings &amp; Debt
+                            <div class="budget-bar" style="margin-top:0.5rem">
+                                <div class="budget-bar-needs" id="bar-needs" style="width:0%"></div>
+                                <div class="budget-bar-wants" id="bar-wants" style="width:0%"></div>
+                                <div class="budget-bar-savings" id="bar-savings" style="width:0%"></div>
+                            </div>
+                            <div style="display:flex;gap:1.5rem;font-size:0.75rem;margin-top:0.25rem">
+                                <span style="color:#3B82F6">&#9632; Needs: <span id="bar-needs-pct">0%</span></span>
+                                <span style="color:var(--gold)">&#9632; Wants: <span id="bar-wants-pct">0%</span></span>
+                                <span style="color:#10B981">&#9632; Savings/Debt: <span id="bar-savings-pct">0%</span></span>
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+                            <div>
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+                                    <div class="section-title" style="margin:0">Income</div>
+                                    <button class="doc-btn" onclick="addBudgetRow('income')">+ Add</button>
+                                </div>
+                                <table class="fc-table"><thead><tr><th>Source</th><th>Amount ($)</th><th></th></tr></thead>
+                                <tbody id="budget-income-tbody"></tbody></table>
+                                <div style="padding:0.5rem 0.75rem;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);text-align:right;font-family:Oswald;font-size:0.8rem;color:#10B981">
+                                    Total Income: <strong id="budget-total-income">$0</strong>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+                                    <div class="section-title" style="margin:0">Expenses</div>
+                                    <button class="doc-btn" onclick="addBudgetRow('expense')">+ Add</button>
+                                </div>
+                                <table class="fc-table"><thead><tr><th>Category</th><th>Amount ($)</th><th id="budget-exp-type-th" style="display:none">Type</th><th></th></tr></thead>
+                                <tbody id="budget-expense-tbody"></tbody></table>
+                                <div style="padding:0.5rem 0.75rem;background:rgba(185,28,28,0.08);border:1px solid rgba(185,28,28,0.2);text-align:right;font-family:Oswald;font-size:0.8rem;color:var(--red-light)">
+                                    Total Expenses: <strong id="budget-total-expenses">$0</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="budget-balance-box" class="fc-result-box" style="margin-top:1rem">
+                            <div class="fc-result-row"><span class="fc-result-key">Monthly Surplus / Deficit</span><span class="fc-result-val" id="budget-balance">$0</span></div>
+                            <div class="fc-result-row" id="budget-zero-row" style="display:none"><span class="fc-result-key">Unallocated (should be $0)</span><span class="fc-result-val" id="budget-unallocated">$0</span></div>
+                        </div>
+                        <div style="margin-top:1rem">
+                            <div class="section-title">Saved Versions</div>
+                            <div id="budget-versions-list" style="color:var(--muted);font-size:0.85rem">No saved versions yet.</div>
+                        </div>
+                    </div>
+
+                    <!-- Tool 3: Debt Payoff -->
+                    <div id="fc-debt" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Debt Payoff Planning</div>
+                            <button class="form-submit" onclick="saveFCDebtPlan()">Save Plan</button>
+                        </div>
+                        <div class="fc-tip">Add all debts below, enter your extra monthly payment, then compare Snowball vs Avalanche side-by-side.</div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+                            <div class="section-title" style="margin:0">Debts</div>
+                            <button class="doc-btn" onclick="addDebtRow()">+ Add Debt</button>
+                        </div>
+                        <table class="fc-table" style="margin-bottom:1rem"><thead><tr>
+                            <th>Creditor</th><th>Balance ($)</th><th>Rate (%)</th><th>Min Payment ($)</th><th></th>
+                        </tr></thead><tbody id="debt-payoff-tbody"></tbody></table>
+                        <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;align-items:end;margin-bottom:1rem">
+                            <div>
+                                <label class="form-label">Extra Monthly Payment ($)</label>
+                                <input type="number" id="debt-extra" class="form-input" min="0" value="0" oninput="runDebtCalc()">
+                            </div>
+                            <div id="debt-high-risk-warning" class="fc-warning" style="display:none;margin:0">
+                                &#9888; <strong>High-Interest Debt Detected</strong> — Balance transfer to a 0% promo card may save significant interest. Ensure transfer fee is less than interest savings. Balance transfer does not erase debt.
+                            </div>
+                        </div>
+                        <div class="fc-calc-grid" id="debt-results" style="display:none">
+                            <div class="fc-result-box">
+                                <div style="font-family:Oswald;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#10B981;margin-bottom:0.75rem">&#9656; Snowball Method (smallest balance first)</div>
+                                <div class="fc-result-row"><span class="fc-result-key">Months to Debt-Free</span><span class="fc-result-val" id="snow-months">—</span></div>
+                                <div class="fc-result-row"><span class="fc-result-key">Total Interest Paid</span><span class="fc-result-val" id="snow-interest">—</span></div>
+                                <div class="fc-result-row"><span class="fc-result-key">Payoff Date (est.)</span><span class="fc-result-val" id="snow-date">—</span></div>
+                                <div style="font-size:0.78rem;color:var(--muted);margin-top:0.6rem">Best for: motivation — quick wins by eliminating small debts first.</div>
+                            </div>
+                            <div class="fc-result-box">
+                                <div style="font-family:Oswald;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#3B82F6;margin-bottom:0.75rem">&#9656; Avalanche Method (highest rate first)</div>
+                                <div class="fc-result-row"><span class="fc-result-key">Months to Debt-Free</span><span class="fc-result-val" id="aval-months">—</span></div>
+                                <div class="fc-result-row"><span class="fc-result-key">Total Interest Paid</span><span class="fc-result-val" id="aval-interest">—</span></div>
+                                <div class="fc-result-row"><span class="fc-result-key">Payoff Date (est.)</span><span class="fc-result-val" id="aval-date">—</span></div>
+                                <div style="font-size:0.78rem;color:var(--muted);margin-top:0.6rem">Best for: math — saves the most interest over time.</div>
+                            </div>
+                        </div>
+                        <div id="debt-consolidation-tip" class="fc-tip" style="display:none">
+                            &#128161; <strong>Consolidation Option:</strong> With multiple high-rate debts, a personal consolidation loan (VA IRRRL for mortgage, personal loan for consumer debt) at a lower rate may reduce your total interest paid.
+                        </div>
+                        <div style="margin-bottom:0.75rem">
+                            <label class="form-label">Counselor Notes</label>
+                            <textarea id="debt-notes" class="form-input" rows="3" placeholder="Recommended strategy, considerations, next steps..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Tool 4: Goals -->
+                    <div id="fc-goals" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Goal Setting &amp; Game Plan Builder</div>
+                            <button class="doc-btn" onclick="toggleGoalForm()">+ Add Goal</button>
+                        </div>
+                        <div id="goal-add-form" class="add-note-form" style="display:none;margin-bottom:1.25rem">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+                                <div><label class="form-label">Goal Title <span style="color:var(--red)">*</span></label><input type="text" id="goal-title" class="form-input" placeholder="e.g. Build $1,000 Emergency Fund"></div>
+                                <div><label class="form-label">Category</label>
+                                    <select id="goal-category" class="form-input">
+                                        <option value="emergency_fund">Emergency Fund</option>
+                                        <option value="debt_freedom">Debt Freedom</option>
+                                        <option value="home_purchase">Home Purchase</option>
+                                        <option value="retirement">Retirement Savings</option>
+                                        <option value="education">Education</option>
+                                        <option value="vehicle">Vehicle</option>
+                                        <option value="other">Other</option>
+                                    </select></div>
+                                <div><label class="form-label">Target Amount ($)</label><input type="number" id="goal-amount" class="form-input" min="0" step="0.01"></div>
+                                <div><label class="form-label">Target Date</label><input type="date" id="goal-date" class="form-input"></div>
+                            </div>
+                            <div style="margin-bottom:0.75rem">
+                                <label class="form-label">Why This Goal Matters (Relevant)</label>
+                                <textarea id="goal-why" class="form-input" rows="2" placeholder="Why is this goal important to the member?"></textarea>
+                            </div>
+                            <div style="margin-bottom:0.75rem">
+                                <label class="form-label">Action Steps</label>
+                                <textarea id="goal-steps" class="form-input" rows="3" placeholder="List action steps, one per line..."></textarea>
+                            </div>
+                            <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                                <button class="doc-btn" onclick="toggleGoalForm()">Cancel</button>
+                                <button class="form-submit" onclick="saveGoal()">Add Goal</button>
+                            </div>
+                        </div>
+                        <div id="goals-list"></div>
+                    </div>
+
+                    <!-- Tool 5: Session Notes -->
+                    <div id="fc-session-notes" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Session Notes (P.A.T.H.)</div>
+                            <button class="doc-btn" onclick="toggleSNForm()">+ New Session Note</button>
+                        </div>
+                        <div id="sn-add-form" class="add-note-form" style="display:none;margin-bottom:1.25rem">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+                                <div><label class="form-label">Session Date</label><input type="date" id="sn-date" class="form-input"></div>
+                                <div><label class="form-label">Counseling Track</label>
+                                    <select id="sn-track" class="form-input">
+                                        <option value="general">General Counseling</option>
+                                        <option value="budgeting">Budgeting</option>
+                                        <option value="debt_payoff">Debt Payoff</option>
+                                        <option value="credit_building">Credit Building</option>
+                                        <option value="housing">Housing</option>
+                                        <option value="retirement">Retirement</option>
+                                        <option value="goal_setting">Goal Setting</option>
+                                    </select></div>
+                            </div>
+                            <div class="fc-path-section">
+                                <div class="fc-path-label">P — Plan</div>
+                                <textarea id="sn-plan" class="form-input" rows="2" placeholder="What is the client's current plan or situation?"></textarea>
+                            </div>
+                            <div class="fc-path-section">
+                                <div class="fc-path-label">A — Action</div>
+                                <textarea id="sn-action" class="form-input" rows="2" placeholder="Specific action steps agreed upon this session..."></textarea>
+                            </div>
+                            <div class="fc-path-section">
+                                <div class="fc-path-label">T — Timeline</div>
+                                <textarea id="sn-timeline" class="form-input" rows="2" placeholder="When will action steps be completed?"></textarea>
+                            </div>
+                            <div class="fc-path-section" style="margin-bottom:0.75rem">
+                                <div class="fc-path-label">H — Help Needed</div>
+                                <textarea id="sn-help" class="form-input" rows="2" placeholder="What support does the counselor need to provide?"></textarea>
+                            </div>
+                            <div style="margin-bottom:0.75rem">
+                                <label class="form-label">Session Summary</label>
+                                <textarea id="sn-summary" class="form-input" rows="2" placeholder="Brief overall summary of the session..."></textarea>
+                            </div>
+                            <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                                <button class="doc-btn" onclick="toggleSNForm()">Cancel</button>
+                                <button class="form-submit" onclick="saveSN()">Save Session Note</button>
+                            </div>
+                        </div>
+                        <div id="sn-list"></div>
+                    </div>
+
+                    <!-- Tool 6: Housing -->
+                    <div id="fc-housing" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Housing &amp; Mortgage Workout</div>
+                            <button class="form-submit" onclick="saveFCHousing()">Save</button>
+                        </div>
+                        <div style="margin-bottom:0.75rem">
+                            <label class="form-label">Scenario</label>
+                            <select id="housing-scenario" class="form-input" style="max-width:280px" onchange="updateHousingScenario()">
+                                <option value="renting">Currently Renting</option>
+                                <option value="buying">Planning to Buy</option>
+                                <option value="refinance">Refinancing</option>
+                                <option value="workout">Mortgage Workout / At Risk</option>
+                            </select>
+                        </div>
+                        <div class="housing-calc">
+                            <div>
+                                <div class="section-title">Inputs</div>
+                                <div style="display:flex;flex-direction:column;gap:0.6rem">
+                                    <div id="housing-rent-row"><label class="form-label">Monthly Rent ($)</label><input type="number" id="housing-rent" class="form-input" min="0" oninput="calcHousing()"></div>
+                                    <div id="housing-price-row"><label class="form-label">Home Price ($)</label><input type="number" id="housing-price" class="form-input" min="0" oninput="calcHousing()"></div>
+                                    <div id="housing-down-row"><label class="form-label">Down Payment ($)</label><input type="number" id="housing-down" class="form-input" min="0" oninput="calcHousing()"></div>
+                                    <div><label class="form-label">Interest Rate (%)</label><input type="number" id="housing-rate" class="form-input" min="0" step="0.01" value="6.5" oninput="calcHousing()"></div>
+                                    <div><label class="form-label">Loan Term (years)</label>
+                                        <select id="housing-term" class="form-input" onchange="calcHousing()">
+                                            <option value="30" selected>30 years</option><option value="20">20 years</option><option value="15">15 years</option><option value="10">10 years</option>
+                                        </select></div>
+                                    <div><label class="form-label">Property Tax ($/yr)</label><input type="number" id="housing-tax" class="form-input" min="0" oninput="calcHousing()"></div>
+                                    <div><label class="form-label">Home Insurance ($/yr)</label><input type="number" id="housing-ins" class="form-input" min="0" oninput="calcHousing()"></div>
+                                    <div id="housing-hoa-row"><label class="form-label">HOA ($/mo)</label><input type="number" id="housing-hoa" class="form-input" min="0" oninput="calcHousing()"></div>
+                                    <div><label class="form-label">Gross Monthly Income ($)</label><input type="number" id="housing-income" class="form-input" min="0" oninput="calcHousing()"></div>
+                                    <div><label class="form-label">Other Monthly Debt Payments ($)</label><input type="number" id="housing-other-debt" class="form-input" min="0" oninput="calcHousing()"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="section-title">Results</div>
+                                <div id="housing-results" class="fc-result-box">
+                                    <div class="fc-result-row"><span class="fc-result-key">Monthly P&amp;I</span><span class="fc-result-val" id="h-pi">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Property Tax (mo)</span><span class="fc-result-val" id="h-tax">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Insurance (mo)</span><span class="fc-result-val" id="h-ins">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">PITI Total</span><span class="fc-result-val" id="h-piti">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Front-End DTI (28% limit)</span><span class="fc-result-val" id="h-front-dti">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Back-End DTI (36–43% limit)</span><span class="fc-result-val" id="h-back-dti">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">LTV</span><span class="fc-result-val" id="h-ltv">—</span></div>
+                                    <div class="fc-result-row" id="h-pmi-row"><span class="fc-result-key">PMI Required (&lt;20% down)</span><span class="fc-result-val" id="h-pmi">—</span></div>
+                                </div>
+                                <div id="housing-dti-warning" class="fc-warning" style="display:none">
+                                    &#9888; DTI exceeds recommended thresholds. Lender approval may be difficult. Consider increasing income, reducing other debts, or a lower purchase price.
+                                </div>
+                                <div id="housing-workout-checklist" style="display:none">
+                                    <div class="section-title" style="margin-top:1rem">Mortgage Workout Checklist</div>
+                                    <div style="display:flex;flex-direction:column;gap:0.4rem">
+                                        <label class="gp-check-label"><input type="checkbox" id="hwc-forbearance"> Forbearance requested / active</label>
+                                        <label class="gp-check-label"><input type="checkbox" id="hwc-modification"> Loan modification application submitted</label>
+                                        <label class="gp-check-label"><input type="checkbox" id="hwc-hud"> HUD-approved housing counselor contacted</label>
+                                        <label class="gp-check-label"><input type="checkbox" id="hwc-va-sah"> VA SAH / SHA grant explored</label>
+                                        <label class="gp-check-label"><input type="checkbox" id="hwc-state-aid"> State/local homeowner assistance contacted</label>
+                                        <label class="gp-check-label"><input type="checkbox" id="hwc-short-sale"> Short sale eligibility assessed</label>
+                                        <label class="gp-check-label"><input type="checkbox" id="hwc-deed-lieu"> Deed in lieu discussed</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:1rem">
+                            <label class="form-label">Notes</label>
+                            <textarea id="housing-notes" class="form-input" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Tool 7: Retirement -->
+                    <div id="fc-retirement" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Retirement &amp; Savings</div>
+                            <button class="form-submit" onclick="saveFCRetirement()">Save</button>
+                        </div>
+                        <div class="fc-calc-grid">
+                            <div>
+                                <div class="section-title">Gap Calculator Inputs</div>
+                                <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1rem">
+                                    <div><label class="form-label">Current Age</label><input type="number" id="ret-age" class="form-input" min="18" max="80" oninput="calcRetirement()"></div>
+                                    <div><label class="form-label">Retirement Age</label><input type="number" id="ret-retire-age" class="form-input" min="50" max="85" value="65" oninput="calcRetirement()"></div>
+                                    <div><label class="form-label">Current Savings ($)</label><input type="number" id="ret-savings" class="form-input" min="0" oninput="calcRetirement()"></div>
+                                    <div><label class="form-label">Monthly Contribution ($)</label><input type="number" id="ret-contrib" class="form-input" min="0" oninput="calcRetirement()"></div>
+                                    <div><label class="form-label">Expected Annual Return (%)</label><input type="number" id="ret-return" class="form-input" min="0" max="20" step="0.1" value="6" oninput="calcRetirement()"></div>
+                                    <div><label class="form-label">Expected Monthly SS Benefit ($)</label><input type="number" id="ret-ss" class="form-input" min="0" oninput="calcRetirement()"></div>
+                                    <div><label class="form-label">Desired Monthly Retirement Income ($)</label><input type="number" id="ret-need" class="form-input" min="0" oninput="calcRetirement()"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="section-title">Projection</div>
+                                <div class="fc-result-box" id="ret-results">
+                                    <div class="fc-result-row"><span class="fc-result-key">Years to Retirement</span><span class="fc-result-val" id="ret-years">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Projected Balance at Retirement</span><span class="fc-result-val" id="ret-projected">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Safe Withdrawal (4% rule, /mo)</span><span class="fc-result-val" id="ret-withdrawal">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">SS Benefit / mo</span><span class="fc-result-val" id="ret-ss-display">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Total Monthly Income</span><span class="fc-result-val" id="ret-total-income">—</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Monthly Gap / Surplus</span><span class="fc-result-val" id="ret-gap">—</span></div>
+                                </div>
+                                <div id="ret-warning" class="fc-warning" style="display:none">&#9888; Projected retirement income falls short of desired amount. Consider increasing contributions or adjusting retirement age.</div>
+                                <div class="section-title" style="margin-top:1rem">Account Type Reference</div>
+                                <div style="font-size:0.82rem;color:var(--muted);display:flex;flex-direction:column;gap:0.4rem">
+                                    <div class="fc-result-box" style="padding:0.6rem 0.75rem">
+                                        <div style="font-family:Oswald;font-size:0.75rem;font-weight:600;color:var(--white);margin-bottom:0.25rem">TSP (Thrift Savings Plan)</div>
+                                        <div>For military / federal employees. Traditional &amp; Roth options. 2025 limit: $23,500 (+$7,500 catch-up ≥50).</div>
+                                    </div>
+                                    <div class="fc-result-box" style="padding:0.6rem 0.75rem">
+                                        <div style="font-family:Oswald;font-size:0.75rem;font-weight:600;color:var(--white);margin-bottom:0.25rem">Traditional IRA</div>
+                                        <div>Pre-tax contributions. Tax-deferred growth. RMDs at 73. 2025 limit: $7,000 (+$1,000 ≥50).</div>
+                                    </div>
+                                    <div class="fc-result-box" style="padding:0.6rem 0.75rem">
+                                        <div style="font-family:Oswald;font-size:0.75rem;font-weight:600;color:var(--white);margin-bottom:0.25rem">Roth IRA</div>
+                                        <div>After-tax contributions. Tax-free growth &amp; withdrawals. 2025 income limit: $150k single / $236k married. Same contribution limits as traditional IRA.</div>
+                                    </div>
+                                    <div class="fc-result-box" style="padding:0.6rem 0.75rem">
+                                        <div style="font-family:Oswald;font-size:0.75rem;font-weight:600;color:var(--white);margin-bottom:0.25rem">VA Benefits Note</div>
+                                        <div>VA disability compensation is non-taxable and does not count as earned income for IRA contribution eligibility. FERS / CSRS pension may reduce SS benefits.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:0.75rem">
+                            <label class="form-label">Notes</label>
+                            <textarea id="ret-notes" class="form-input" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Tool 8: Tax Reference -->
+                    <div id="fc-tax" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Tax Guidance Reference</div>
+                            <button class="form-submit" onclick="saveFCTaxRef()">Save</button>
+                        </div>
+                        <div class="fc-tip">For general counseling reference only. Direct members to a qualified tax professional (CPA, EA) or VITA/TCE for tax filing help.</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+                            <div>
+                                <div class="section-title">W-4 Withholding Checklist</div>
+                                <div style="display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem">
+                                    <label class="gp-check-label"><input type="checkbox" id="tax-w4-reviewed"> W-4 reviewed with employer in last 12 months</label>
+                                    <label class="gp-check-label"><input type="checkbox" id="tax-w4-life-event"> Life change event triggered new W-4 (marriage, child, divorce)</label>
+                                    <label class="gp-check-label"><input type="checkbox" id="tax-w4-extra"> Extra withholding elected to avoid underpayment penalty</label>
+                                    <label class="gp-check-label"><input type="checkbox" id="tax-prior-refund"> Prior year refund &gt; $1,000 (possible over-withholding)</label>
+                                    <label class="gp-check-label"><input type="checkbox" id="tax-prior-owe"> Prior year balance due (possible under-withholding)</label>
+                                </div>
+                                <div class="section-title">Filing Status</div>
+                                <select id="tax-filing-status" class="form-input" style="margin-bottom:1rem">
+                                    <option value="">Select...</option>
+                                    <option value="single">Single</option>
+                                    <option value="mfj">Married Filing Jointly</option>
+                                    <option value="mfs">Married Filing Separately</option>
+                                    <option value="hoh">Head of Household</option>
+                                    <option value="qss">Qualifying Surviving Spouse</option>
+                                </select>
+                                <div class="section-title">Standard vs. Itemized (2024)</div>
+                                <div class="fc-result-box">
+                                    <div class="fc-result-row"><span class="fc-result-key">Single</span><span class="fc-result-val">$14,600</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Married Filing Jointly</span><span class="fc-result-val">$29,200</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Head of Household</span><span class="fc-result-val">$21,900</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">≥65 / Blind add-on (Single)</span><span class="fc-result-val">+$1,950</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">≥65 / Blind add-on (MFJ ea.)</span><span class="fc-result-val">+$1,550</span></div>
+                                </div>
+                                <div class="fc-tip" style="margin-top:0.5rem">Itemize only if deductible expenses (mortgage interest, charitable, state/local taxes up to $10k, medical) exceed the standard deduction.</div>
+                            </div>
+                            <div>
+                                <div class="section-title">VITA / TCE Free Filing</div>
+                                <div class="fc-result-box" style="margin-bottom:0.75rem">
+                                    <div class="fc-result-row"><span class="fc-result-key">VITA Income Limit (2024)</span><span class="fc-result-val">≤$67,000</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">TCE (Tax Counseling for Elderly)</span><span class="fc-result-val">Age 60+</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">MilTax (DoD — no income limit)</span><span class="fc-result-val">Active / Veteran</span></div>
+                                </div>
+                                <div class="fc-tip">Find a VITA site: <strong>irs.gov/vita</strong> or call 800-906-9887.<br>MilTax: <strong>militaryonesource.mil/taxes</strong></div>
+                                <div class="section-title" style="margin-top:1rem">Key Veteran Tax Items</div>
+                                <div style="font-size:0.82rem;color:var(--muted);display:flex;flex-direction:column;gap:0.35rem">
+                                    <div class="fc-result-row"><span class="fc-result-key">VA Disability Compensation</span><span class="fc-result-val" style="color:#10B981">Not Taxable</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Military Retirement Pay</span><span class="fc-result-val" style="color:var(--red-light)">Taxable (federal)</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Combat Pay</span><span class="fc-result-val" style="color:#10B981">Not Taxable</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">BAH / BAS</span><span class="fc-result-val" style="color:#10B981">Not Taxable</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">GI Bill Benefits</span><span class="fc-result-val" style="color:#10B981">Not Taxable</span></div>
+                                    <div class="fc-result-row"><span class="fc-result-key">Unemployment Benefits</span><span class="fc-result-val" style="color:var(--red-light)">Taxable</span></div>
+                                </div>
+                                <div class="section-title" style="margin-top:1rem">Counselor Notes</div>
+                                <textarea id="tax-notes" class="form-input" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool 9: Fraud Checklist -->
+                    <div id="fc-fraud" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Investment Fraud Red-Flag Checklist</div>
+                            <button class="form-submit" onclick="saveFCFraud()">Save</button>
+                        </div>
+                        <div class="fc-tip">Check each flag that applies to a product or pitch the member has encountered. 3 or more flags is a strong indicator of fraud.</div>
+                        <div id="fraud-flags-list">
+                            <div class="fc-flag-row" id="fraud-flag-0">
+                                <div class="fc-flag-num">1</div>
+                                <div style="flex:1">
+                                    <label class="gp-check-label" style="align-items:flex-start">
+                                        <input type="checkbox" id="fraud-0" onchange="updateFraudScore()">
+                                        <div><div class="fc-flag-title">Guaranteed Returns / No-Risk Promises</div>
+                                        <div class="fc-flag-sub">All legitimate investments carry risk. "Guaranteed profit" or "risk-free" are hallmarks of fraud.</div></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="fc-flag-row" id="fraud-flag-1">
+                                <div class="fc-flag-num">2</div>
+                                <div style="flex:1">
+                                    <label class="gp-check-label" style="align-items:flex-start">
+                                        <input type="checkbox" id="fraud-1" onchange="updateFraudScore()">
+                                        <div><div class="fc-flag-title">Pressure to Act Immediately / Limited-Time Offer</div>
+                                        <div class="fc-flag-sub">Urgency tactics prevent victims from doing research or seeking advice.</div></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="fc-flag-row" id="fraud-flag-2">
+                                <div class="fc-flag-num">3</div>
+                                <div style="flex:1">
+                                    <label class="gp-check-label" style="align-items:flex-start">
+                                        <input type="checkbox" id="fraud-2" onchange="updateFraudScore()">
+                                        <div><div class="fc-flag-title">Unregistered Investment or Unlicensed Seller</div>
+                                        <div class="fc-flag-sub">Check BrokerCheck (finra.org/brokercheck) and the SEC's investment search before investing.</div></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="fc-flag-row" id="fraud-flag-3">
+                                <div class="fc-flag-num">4</div>
+                                <div style="flex:1">
+                                    <label class="gp-check-label" style="align-items:flex-start">
+                                        <input type="checkbox" id="fraud-3" onchange="updateFraudScore()">
+                                        <div><div class="fc-flag-title">Returns Too Good to Be True (&gt;10–12% "guaranteed")</div>
+                                        <div class="fc-flag-sub">Historical stock market average is ~7–10% annually. Claims far above this are red flags.</div></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="fc-flag-row" id="fraud-flag-4">
+                                <div class="fc-flag-num">5</div>
+                                <div style="flex:1">
+                                    <label class="gp-check-label" style="align-items:flex-start">
+                                        <input type="checkbox" id="fraud-4" onchange="updateFraudScore()">
+                                        <div><div class="fc-flag-title">Offshore Account or Cryptocurrency Required</div>
+                                        <div class="fc-flag-sub">Requests to wire money abroad or to crypto wallets are nearly impossible to reverse or trace.</div></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="fc-flag-row" id="fraud-flag-5">
+                                <div class="fc-flag-num">6</div>
+                                <div style="flex:1">
+                                    <label class="gp-check-label" style="align-items:flex-start">
+                                        <input type="checkbox" id="fraud-5" onchange="updateFraudScore()">
+                                        <div><div class="fc-flag-title">Difficulty Accessing or Withdrawing Your Own Money</div>
+                                        <div class="fc-flag-sub">Legitimate firms allow withdrawal of funds at any time (subject to standard settlement periods).</div></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="fraud-score-display" style="margin:1rem 0;font-family:Oswald;font-size:1rem;color:var(--muted)">Flags checked: <strong id="fraud-score">0</strong> / 6</div>
+                        <div id="fraud-referral-trigger" class="fc-warning" style="display:none">
+                            &#9888; <strong>3+ Red Flags — Likely Fraud.</strong> Advise the member to stop all contact with the seller immediately. Report to:
+                            <ul style="margin:0.5rem 0 0 1rem;font-size:0.85rem">
+                                <li>SEC: <strong>investor.gov/CRS</strong> or call 800-732-2999</li>
+                                <li>FINRA: <strong>finra.org/investors/have-problem</strong></li>
+                                <li>FTC: <strong>reportfraud.ftc.gov</strong></li>
+                                <li>IC3 (Internet fraud): <strong>ic3.gov</strong></li>
+                            </ul>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap">
+                            <label class="gp-check-label"><input type="checkbox" id="fraud-referred"> Referral to SEC / FINRA initiated</label>
+                            <input type="text" id="fraud-referred-agency" class="form-input" style="max-width:240px" placeholder="Agency name / case #">
+                        </div>
+                        <div><label class="form-label">Notes</label><textarea id="fraud-notes" class="form-input" rows="3"></textarea></div>
+                    </div>
+
+                    <!-- Tool 10: Referral Library -->
+                    <div id="fc-referrals" class="fc-tool-panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                            <div class="section-title" style="margin:0">Referral &amp; Resource Library</div>
+                            <div style="display:flex;gap:0.5rem">
+                                <select id="ref-filter" class="note-type-select" onchange="filterReferralLib()">
+                                    <option value="">All Categories</option>
+                                    <option value="va_benefits">VA Benefits</option>
+                                    <option value="housing">Housing</option>
+                                    <option value="legal">Legal Aid</option>
+                                    <option value="mental_health">Mental Health</option>
+                                    <option value="employment">Employment</option>
+                                    <option value="financial_ed">Financial Education</option>
+                                    <option value="food_aid">Food Assistance</option>
+                                    <option value="tax">Tax Help</option>
+                                </select>
+                                <button class="doc-btn" onclick="toggleLogRefForm()">+ Log Referral</button>
+                            </div>
+                        </div>
+                        <div id="log-ref-form" class="add-note-form" style="display:none;margin-bottom:1.25rem">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem">
+                                <div><label class="form-label">Resource / Organization</label><input type="text" id="ref-name" class="form-input" placeholder="e.g. Veterans Crisis Line"></div>
+                                <div><label class="form-label">Category</label>
+                                    <select id="ref-cat" class="form-input">
+                                        <option value="va_benefits">VA Benefits</option>
+                                        <option value="housing">Housing</option>
+                                        <option value="legal">Legal Aid</option>
+                                        <option value="mental_health">Mental Health</option>
+                                        <option value="employment">Employment</option>
+                                        <option value="financial_ed">Financial Education</option>
+                                        <option value="food_aid">Food Assistance</option>
+                                        <option value="tax">Tax Help</option>
+                                    </select></div>
+                            </div>
+                            <div style="margin-bottom:0.75rem"><label class="form-label">Notes / Contact Info</label><textarea id="ref-log-notes" class="form-input" rows="2" placeholder="Phone number, website, what was discussed..."></textarea></div>
+                            <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                                <button class="doc-btn" onclick="toggleLogRefForm()">Cancel</button>
+                                <button class="form-submit" onclick="logReferral()">Log Referral</button>
+                            </div>
+                        </div>
+                        <div class="section-title">Logged Referrals for This Member</div>
+                        <div id="logged-referrals-list" style="margin-bottom:1.5rem;color:var(--muted);font-size:0.85rem">No referrals logged yet.</div>
+                        <div class="section-title">Resource Library</div>
+                        <div id="referral-lib-list"></div>
                     </div>
                 </div>
             </div>
@@ -1182,6 +1854,7 @@
         if (tabName === "credit-scores") loadCreditScores();
         if (tabName === "disputes") loadDisputes();
         if (tabName === "game-plan") loadGamePlan();
+        if (tabName === "fin-counseling") loadFCData();
     }
 
     function showNoteForm() {
@@ -1370,6 +2043,971 @@
         if (bytes < 1048576) return (bytes / 1024).toFixed(0) + " KB";
         return (bytes / 1048576).toFixed(1) + " MB";
     }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // FINANCIAL COUNSELING TAB
+    // ══════════════════════════════════════════════════════════════════════════
+
+    var _fcData = {};
+    var _fcCurrentTool = "intake";
+    var _intakeDebts = [];
+    var _budgetIncome = [];
+    var _budgetExpenses = [];
+    var _budgetMode = "zero_based";
+    var _debtPayoffList = [];
+
+    // ── FC Tab init ───────────────────────────────────────────────────────────
+
+    async function loadFCData() {
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc", {credentials: "include"});
+            if (r.ok) {
+                _fcData = await r.json();
+                populateFCTool(_fcCurrentTool);
+            }
+        } catch(e) {
+            console.error("FC load error:", e);
+        }
+        renderReferralLib();
+        loadLoggedReferrals();
+    }
+
+    function switchFCTool(tool) {
+        _fcCurrentTool = tool;
+        document.querySelectorAll(".fc-tool-btn").forEach(function(b) { b.classList.remove("active"); });
+        document.querySelectorAll(".fc-tool-panel").forEach(function(p) { p.classList.remove("active"); });
+        var toolMap = {
+            "intake":"fc-intake","budget":"fc-budget","debt":"fc-debt","goals":"fc-goals",
+            "session-notes":"fc-session-notes","housing":"fc-housing","retirement":"fc-retirement",
+            "tax":"fc-tax","fraud":"fc-fraud","referrals":"fc-referrals"
+        };
+        var toolIdx = {"intake":0,"budget":1,"debt":2,"goals":3,"session-notes":4,"housing":5,"retirement":6,"tax":7,"fraud":8,"referrals":9};
+        var btns = document.querySelectorAll(".fc-tool-btn");
+        if (btns[toolIdx[tool]]) btns[toolIdx[tool]].classList.add("active");
+        var panel = document.getElementById(toolMap[tool]);
+        if (panel) panel.classList.add("active");
+        populateFCTool(tool);
+    }
+
+    function populateFCTool(tool) {
+        if (tool === "intake") populateIntake();
+        else if (tool === "budget") populateBudget();
+        else if (tool === "debt") populateDebtPlan();
+        else if (tool === "goals") renderGoals();
+        else if (tool === "session-notes") renderSessionNotes();
+        else if (tool === "housing") populateHousing();
+        else if (tool === "retirement") populateRetirement();
+        else if (tool === "tax") populateTaxRef();
+        else if (tool === "fraud") populateFraud();
+        else if (tool === "referrals") { loadLoggedReferrals(); renderReferralLib(); }
+    }
+
+    function $fc(id) { return document.getElementById(id); }
+    function fcVal(id) { var el = $fc(id); return el ? el.value : ""; }
+    function fcNum(id) { return parseFloat(fcVal(id)) || 0; }
+    function fcCheck(id) { var el = $fc(id); return el ? el.checked : false; }
+    function fcSet(id, val) { var el = $fc(id); if (el) { if (el.type === "checkbox") el.checked = !!val; else el.value = val != null ? val : ""; } }
+    function fmtMoney(n) { return "$" + (parseFloat(n)||0).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:0}); }
+    function fmtPct(n) { return (parseFloat(n)||0).toFixed(1) + "%"; }
+
+    // ── Tool 1: Intake ────────────────────────────────────────────────────────
+
+    var _intakeDebtIdCounter = 0;
+
+    function populateIntake() {
+        var d = _fcData.intake || {};
+        fcSet("intake-dob", d.dob || "");
+        fcSet("intake-marital", d.marital || "");
+        fcSet("intake-dependents", d.dependents != null ? d.dependents : "");
+        fcSet("intake-city", d.city || "");
+        fcSet("intake-state", d.state || "");
+        fcSet("intake-zip", d.zip || "");
+        fcSet("intake-employment", d.employment || "");
+        fcSet("intake-employer", d.employer || "");
+        fcSet("intake-gross-income", d.gross_income || "");
+        fcSet("intake-va-income", d.va_income || "");
+        fcSet("intake-other-income", d.other_income || "");
+        fcSet("intake-other-source", d.other_source || "");
+        fcSet("intake-exp-housing", d.exp_housing || "");
+        fcSet("intake-exp-utilities", d.exp_utilities || "");
+        fcSet("intake-exp-food", d.exp_food || "");
+        fcSet("intake-exp-transport", d.exp_transport || "");
+        fcSet("intake-exp-insurance", d.exp_insurance || "");
+        fcSet("intake-exp-phone", d.exp_phone || "");
+        fcSet("intake-exp-care", d.exp_care || "");
+        fcSet("intake-exp-entertainment", d.exp_entertainment || "");
+        fcSet("intake-exp-other", d.exp_other || "");
+        fcSet("intake-ins-health", d.ins_health);
+        fcSet("intake-ins-life", d.ins_life);
+        fcSet("intake-ins-auto", d.ins_auto);
+        fcSet("intake-ins-renters", d.ins_renters);
+        fcSet("intake-ins-disability", d.ins_disability);
+        if (d.stress_scale) { fcSet("intake-stress", d.stress_scale); $fc("stress-val").textContent = d.stress_scale; }
+        fcSet("intake-consent", d.consent);
+        _intakeDebts = (d.debts || []).map(function(x, i) { return Object.assign({_id: ++_intakeDebtIdCounter}, x); });
+        renderIntakeDebts();
+        updateIntakeSnapshot();
+    }
+
+    function renderIntakeDebts() {
+        var tbody = $fc("intake-debts-tbody");
+        if (!tbody) return;
+        tbody.innerHTML = _intakeDebts.map(function(row) {
+            var id = row._id;
+            return "<tr>" +
+                "<td><input type='text' value='" + escHtml(row.creditor||"") + "' onchange='_intakeDebts.find(function(r){return r._id==="+id+"}).creditor=this.value'></td>" +
+                "<td><select onchange='_intakeDebts.find(function(r){return r._id==="+id+"}).type=this.value'>" +
+                    ["credit_card","installment","auto","mortgage","medical","collection","other"].map(function(t){
+                        return "<option value='"+t+"'"+(row.type===t?" selected":"")+">"+t.replace(/_/g," ")+"</option>";
+                    }).join("") +
+                "</select></td>" +
+                "<td><input type='number' value='"+(row.balance||"")+"' min='0' onchange='_intakeDebts.find(function(r){return r._id==="+id+"}).balance=parseFloat(this.value)||0;updateIntakeSnapshot()'></td>" +
+                "<td><input type='number' value='"+(row.min_payment||"")+"' min='0' onchange='_intakeDebts.find(function(r){return r._id==="+id+"}).min_payment=parseFloat(this.value)||0'></td>" +
+                "<td><input type='number' value='"+(row.rate||"")+"' min='0' step='0.01' onchange='_intakeDebts.find(function(r){return r._id==="+id+"}).rate=parseFloat(this.value)||0'></td>" +
+                "<td><button class='doc-btn danger' onclick='removeIntakeDebt("+id+")'>&#10005;</button></td>" +
+            "</tr>";
+        }).join("");
+    }
+
+    function addIntakeDebtRow() {
+        _intakeDebts.push({_id: ++_intakeDebtIdCounter, creditor:"", type:"credit_card", balance:0, min_payment:0, rate:0});
+        renderIntakeDebts();
+    }
+
+    function removeIntakeDebt(id) {
+        _intakeDebts = _intakeDebts.filter(function(r) { return r._id !== id; });
+        renderIntakeDebts();
+        updateIntakeSnapshot();
+    }
+
+    function updateIntakeSnapshot() {
+        var income = fcNum("intake-gross-income") + fcNum("intake-va-income") + fcNum("intake-other-income");
+        var expenses = fcNum("intake-exp-housing") + fcNum("intake-exp-utilities") + fcNum("intake-exp-food") +
+            fcNum("intake-exp-transport") + fcNum("intake-exp-insurance") + fcNum("intake-exp-phone") +
+            fcNum("intake-exp-care") + fcNum("intake-exp-entertainment") + fcNum("intake-exp-other");
+        var totalDebt = _intakeDebts.reduce(function(s, d) { return s + (parseFloat(d.balance)||0); }, 0);
+        var surplus = income - expenses;
+
+        var snap = $fc("intake-snapshot");
+        if (!snap) return;
+        if (income > 0 || expenses > 0) {
+            snap.style.display = "grid";
+            snap.innerHTML =
+                "<div class='fc-snap-item'><div class='fc-snap-val gold'>"+fmtMoney(income)+"</div><div class='fc-snap-label'>Monthly Income</div></div>" +
+                "<div class='fc-snap-item'><div class='fc-snap-val'>"+fmtMoney(expenses)+"</div><div class='fc-snap-label'>Monthly Expenses</div></div>" +
+                "<div class='fc-snap-item'><div class='fc-snap-val "+(surplus>=0?"pos":"neg")+"'>"+fmtMoney(surplus)+"</div><div class='fc-snap-label'>Surplus / Deficit</div></div>" +
+                "<div class='fc-snap-item'><div class='fc-snap-val'>"+fmtMoney(totalDebt)+"</div><div class='fc-snap-label'>Total Debt</div></div>" +
+                "<div class='fc-snap-item'><div class='fc-snap-val gold'>"+(fcVal("stress-val")||fcVal("intake-stress")||"—")+"/10</div><div class='fc-snap-label'>Stress Level</div></div>";
+        } else {
+            snap.style.display = "none";
+        }
+    }
+
+    async function saveFCIntake() {
+        var payload = {
+            dob: fcVal("intake-dob"), marital: fcVal("intake-marital"),
+            dependents: fcNum("intake-dependents"), city: fcVal("intake-city"),
+            state: fcVal("intake-state"), zip: fcVal("intake-zip"),
+            employment: fcVal("intake-employment"), employer: fcVal("intake-employer"),
+            gross_income: fcNum("intake-gross-income"), va_income: fcNum("intake-va-income"),
+            other_income: fcNum("intake-other-income"), other_source: fcVal("intake-other-source"),
+            exp_housing: fcNum("intake-exp-housing"), exp_utilities: fcNum("intake-exp-utilities"),
+            exp_food: fcNum("intake-exp-food"), exp_transport: fcNum("intake-exp-transport"),
+            exp_insurance: fcNum("intake-exp-insurance"), exp_phone: fcNum("intake-exp-phone"),
+            exp_care: fcNum("intake-exp-care"), exp_entertainment: fcNum("intake-exp-entertainment"),
+            exp_other: fcNum("intake-exp-other"),
+            ins_health: fcCheck("intake-ins-health"), ins_life: fcCheck("intake-ins-life"),
+            ins_auto: fcCheck("intake-ins-auto"), ins_renters: fcCheck("intake-ins-renters"),
+            ins_disability: fcCheck("intake-ins-disability"),
+            stress_scale: parseInt(fcVal("intake-stress")||5),
+            consent: fcCheck("intake-consent"),
+            debts: _intakeDebts.map(function(d) {
+                return {creditor:d.creditor, type:d.type, balance:d.balance, min_payment:d.min_payment, rate:d.rate};
+            })
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/intake", {
+                method: "PUT", headers: {"Content-Type":"application/json"},
+                credentials: "include", body: JSON.stringify(payload)
+            });
+            if (r.ok) {
+                _fcData.intake = payload;
+                updateIntakeSnapshot();
+                showToast("Saved", "Client intake saved", "success");
+            } else {
+                var e = await r.json().catch(function(){return{};});
+                showToast("Error", e.detail || "Could not save intake", "error");
+            }
+        } catch(e) { showToast("Error", "Network error", "error"); }
+    }
+
+    // ── Tool 2: Budgeting ─────────────────────────────────────────────────────
+
+    var _budgetIncomeId = 0, _budgetExpenseId = 0;
+
+    function populateBudget() {
+        var d = _fcData;
+        var versions = d.budgets || [];
+        if (versions.length > 0) {
+            var latest = versions[versions.length - 1];
+            _budgetIncome = (latest.income_items || []).map(function(x,i){return Object.assign({_id:++_budgetIncomeId},x);});
+            _budgetExpenses = (latest.expense_items || []).map(function(x,i){return Object.assign({_id:++_budgetExpenseId},x);});
+            _budgetMode = latest.mode || "zero_based";
+        }
+        if (_budgetIncome.length === 0) {
+            _budgetIncome = [{_id:++_budgetIncomeId, source:"Primary Job", amount:0}];
+        }
+        if (_budgetExpenses.length === 0) {
+            ["Housing","Utilities","Food","Transportation","Insurance","Phone","Savings","Other"].forEach(function(cat){
+                _budgetExpenses.push({_id:++_budgetExpenseId, category:cat, amount:0, type:"need"});
+            });
+        }
+        setBudgetMode(_budgetMode);
+        renderBudgetRows();
+        renderBudgetVersions(d.budgets || []);
+    }
+
+    function setBudgetMode(mode) {
+        _budgetMode = mode;
+        $fc("mode-zero").classList.toggle("active", mode==="zero_based");
+        $fc("mode-503020").classList.toggle("active", mode==="50_30_20");
+        var guide = $fc("budget-503020-guide");
+        var typeTh = $fc("budget-exp-type-th");
+        if (guide) guide.style.display = mode==="50_30_20" ? "block" : "none";
+        if (typeTh) typeTh.style.display = mode==="50_30_20" ? "" : "none";
+        var zeroRow = $fc("budget-zero-row");
+        if (zeroRow) zeroRow.style.display = mode==="zero_based" ? "flex" : "none";
+        // show/hide type column in expense rows
+        document.querySelectorAll(".budget-exp-type-cell").forEach(function(el){ el.style.display = mode==="50_30_20"?"":"none"; });
+        calcBudget();
+    }
+
+    function renderBudgetRows() {
+        var incTbody = $fc("budget-income-tbody");
+        var expTbody = $fc("budget-expense-tbody");
+        if (incTbody) incTbody.innerHTML = _budgetIncome.map(function(row) {
+            return "<tr>" +
+                "<td><input type='text' value='"+escHtml(row.source||"")+"' onchange='_budgetIncome.find(function(r){return r._id==="+row._id+"}).source=this.value'></td>" +
+                "<td><input type='number' value='"+(row.amount||0)+"' min='0' oninput='_budgetIncome.find(function(r){return r._id==="+row._id+"}).amount=parseFloat(this.value)||0;calcBudget()'></td>" +
+                "<td><button class='doc-btn danger' style='padding:0.2rem 0.4rem' onclick='removeBudgetRow(\"income\","+row._id+")'>&#10005;</button></td>" +
+            "</tr>";
+        }).join("");
+        if (expTbody) expTbody.innerHTML = _budgetExpenses.map(function(row) {
+            var typeCell = "<td class='budget-exp-type-cell' style='display:"+ (_budgetMode==="50_30_20"?"":"none") +"'><select onchange='_budgetExpenses.find(function(r){return r._id==="+row._id+"}).type=this.value;calcBudget()'>" +
+                "<option value='need'"+(row.type==="need"?" selected":"")+">Need</option>" +
+                "<option value='want'"+(row.type==="want"?" selected":"")+">Want</option>" +
+                "<option value='savings'"+(row.type==="savings"?" selected":"")+">Savings/Debt</option>" +
+                "</select></td>";
+            return "<tr>" +
+                "<td><input type='text' value='"+escHtml(row.category||"")+"' onchange='_budgetExpenses.find(function(r){return r._id==="+row._id+"}).category=this.value'></td>" +
+                "<td><input type='number' value='"+(row.amount||0)+"' min='0' oninput='_budgetExpenses.find(function(r){return r._id==="+row._id+"}).amount=parseFloat(this.value)||0;calcBudget()'></td>" +
+                typeCell +
+                "<td><button class='doc-btn danger' style='padding:0.2rem 0.4rem' onclick='removeBudgetRow(\"expense\","+row._id+")'>&#10005;</button></td>" +
+            "</tr>";
+        }).join("");
+        calcBudget();
+    }
+
+    function addBudgetRow(type) {
+        if (type === "income") _budgetIncome.push({_id:++_budgetIncomeId, source:"", amount:0});
+        else _budgetExpenses.push({_id:++_budgetExpenseId, category:"", amount:0, type:"need"});
+        renderBudgetRows();
+    }
+
+    function removeBudgetRow(type, id) {
+        if (type === "income") _budgetIncome = _budgetIncome.filter(function(r){return r._id!==id;});
+        else _budgetExpenses = _budgetExpenses.filter(function(r){return r._id!==id;});
+        renderBudgetRows();
+    }
+
+    function calcBudget() {
+        var totalIncome = _budgetIncome.reduce(function(s,r){return s+(parseFloat(r.amount)||0);},0);
+        var totalExpenses = _budgetExpenses.reduce(function(s,r){return s+(parseFloat(r.amount)||0);},0);
+        var balance = totalIncome - totalExpenses;
+        var balEl = $fc("budget-balance");
+        var incEl = $fc("budget-total-income");
+        var expEl = $fc("budget-total-expenses");
+        if (incEl) incEl.textContent = fmtMoney(totalIncome);
+        if (expEl) expEl.textContent = fmtMoney(totalExpenses);
+        if (balEl) { balEl.textContent = fmtMoney(balance); balEl.style.color = balance >= 0 ? "#10B981" : "#EF4444"; }
+        var unallocEl = $fc("budget-unallocated");
+        if (unallocEl) { unallocEl.textContent = fmtMoney(balance); unallocEl.style.color = Math.abs(balance) < 1 ? "#10B981" : "#EAB308"; }
+        if (_budgetMode === "50_30_20" && totalIncome > 0) {
+            var needs = _budgetExpenses.filter(function(r){return r.type==="need";}).reduce(function(s,r){return s+(parseFloat(r.amount)||0);},0);
+            var wants = _budgetExpenses.filter(function(r){return r.type==="want";}).reduce(function(s,r){return s+(parseFloat(r.amount)||0);},0);
+            var savings = _budgetExpenses.filter(function(r){return r.type==="savings";}).reduce(function(s,r){return s+(parseFloat(r.amount)||0);},0);
+            var np = Math.round(needs/totalIncome*100); var wp = Math.round(wants/totalIncome*100); var sp = Math.round(savings/totalIncome*100);
+            var bn = $fc("bar-needs"); var bw = $fc("bar-wants"); var bs = $fc("bar-savings");
+            if (bn) { bn.style.width=np+"%"; $fc("bar-needs-pct").textContent=np+"%"; }
+            if (bw) { bw.style.width=wp+"%"; $fc("bar-wants-pct").textContent=wp+"%"; }
+            if (bs) { bs.style.width=sp+"%"; $fc("bar-savings-pct").textContent=sp+"%"; }
+        }
+    }
+
+    function renderBudgetVersions(versions) {
+        var el = $fc("budget-versions-list");
+        if (!el) return;
+        if (!versions || versions.length === 0) { el.innerHTML = "<span style='color:var(--muted);font-size:0.85rem'>No saved versions yet.</span>"; return; }
+        el.innerHTML = versions.slice().reverse().map(function(v) {
+            return "<div style='display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.75rem;background:rgba(0,0,0,0.15);border:1px solid var(--border);margin-bottom:0.3rem'>" +
+                "<span style='font-family:Oswald;font-size:0.85rem'>Version "+v.version + (v.name?" — "+escHtml(v.name):"")+"</span>" +
+                "<span style='font-size:0.75rem;color:var(--muted)'>"+fmtDate(v.created_at)+"</span>" +
+            "</div>";
+        }).join("");
+    }
+
+    async function saveBudget() {
+        var name = prompt("Name this budget version (optional):", "");
+        if (name === null) return;
+        var payload = {
+            mode: _budgetMode, name: name || "",
+            income_items: _budgetIncome.map(function(r){return{source:r.source,amount:r.amount};}),
+            expense_items: _budgetExpenses.map(function(r){return{category:r.category,amount:r.amount,type:r.type};})
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/budgets", {
+                method: "POST", headers: {"Content-Type":"application/json"},
+                credentials: "include", body: JSON.stringify(payload)
+            });
+            if (r.ok) {
+                var res = await r.json();
+                if (!_fcData.budgets) _fcData.budgets = [];
+                _fcData.budgets.push(Object.assign({}, payload, {id:res.id, version:res.version, created_at:new Date().toISOString()}));
+                renderBudgetVersions(_fcData.budgets);
+                showToast("Saved", "Budget version " + res.version + " saved", "success");
+            } else {
+                var e = await r.json().catch(function(){return{};});
+                showToast("Error", e.detail || "Could not save budget", "error");
+            }
+        } catch(e) { showToast("Error", "Network error", "error"); }
+    }
+
+    // ── Tool 3: Debt Payoff ───────────────────────────────────────────────────
+
+    var _debtRowId = 0;
+
+    function populateDebtPlan() {
+        var d = _fcData.debt_plan || {};
+        _debtPayoffList = (d.debts || []).map(function(x){return Object.assign({_id:++_debtRowId},x);});
+        fcSet("debt-extra", d.extra_payment || 0);
+        fcSet("debt-notes", d.notes || "");
+        // Pre-populate from intake if no debts saved
+        if (_debtPayoffList.length === 0 && _fcData.intake && _fcData.intake.debts) {
+            _debtPayoffList = (_fcData.intake.debts || []).map(function(x){return Object.assign({_id:++_debtRowId},x);});
+        }
+        renderDebtRows();
+        runDebtCalc();
+    }
+
+    function renderDebtRows() {
+        var tbody = $fc("debt-payoff-tbody");
+        if (!tbody) return;
+        tbody.innerHTML = _debtPayoffList.map(function(row) {
+            return "<tr>" +
+                "<td><input type='text' value='"+escHtml(row.creditor||row.name||"")+"' onchange='_debtPayoffList.find(function(r){return r._id==="+row._id+"}).name=this.value;runDebtCalc()'></td>" +
+                "<td><input type='number' value='"+(row.balance||0)+"' min='0' oninput='_debtPayoffList.find(function(r){return r._id==="+row._id+"}).balance=parseFloat(this.value)||0;runDebtCalc()'></td>" +
+                "<td><input type='number' value='"+(row.rate||0)+"' min='0' step='0.01' oninput='_debtPayoffList.find(function(r){return r._id==="+row._id+"}).rate=parseFloat(this.value)||0;runDebtCalc()'></td>" +
+                "<td><input type='number' value='"+(row.min_payment||25)+"' min='0' oninput='_debtPayoffList.find(function(r){return r._id==="+row._id+"}).min_payment=parseFloat(this.value)||25;runDebtCalc()'></td>" +
+                "<td><button class='doc-btn danger' style='padding:0.2rem 0.4rem' onclick='removeDebtRow("+row._id+")'>&#10005;</button></td>" +
+            "</tr>";
+        }).join("");
+    }
+
+    function addDebtRow() {
+        _debtPayoffList.push({_id:++_debtRowId, name:"", balance:0, rate:0, min_payment:25});
+        renderDebtRows();
+    }
+
+    function removeDebtRow(id) {
+        _debtPayoffList = _debtPayoffList.filter(function(r){return r._id!==id;});
+        renderDebtRows();
+        runDebtCalc();
+    }
+
+    function calcDebtPayoff(debts, extraMonthly, method) {
+        var ds = debts.map(function(d){
+            return {name:d.name||d.creditor||"", bal:Math.max(0,parseFloat(d.balance)||0), rate:parseFloat(d.rate)||0, min:Math.max(5,parseFloat(d.min_payment)||25)};
+        }).filter(function(d){return d.bal>0;});
+        if (ds.length === 0) return {months:0, totalInterest:0};
+        if (method==="snowball") ds.sort(function(a,b){return a.bal-b.bal;});
+        else ds.sort(function(a,b){return b.rate-a.rate;});
+        var months=0, totalInterest=0, rolledOver=0;
+        while (months<601 && ds.some(function(d){return d.bal>0;})) {
+            months++;
+            var extra = (parseFloat(extraMonthly)||0) + rolledOver;
+            rolledOver = 0;
+            ds.forEach(function(d){
+                if (d.bal>0) { var i=d.bal*d.rate/100/12; d.bal+=i; totalInterest+=i; }
+            });
+            ds.forEach(function(d){
+                if (d.bal>0) { var pay=Math.min(d.bal,d.min); d.bal=Math.max(0,d.bal-pay); if(d.bal===0) rolledOver+=d.min; }
+            });
+            for (var i=0;i<ds.length;i++) {
+                if (ds[i].bal>0) { var apply=Math.min(ds[i].bal,extra); ds[i].bal=Math.max(0,ds[i].bal-apply); if(ds[i].bal===0) rolledOver+=ds[i].min; break; }
+            }
+        }
+        return {months:months>600?999:months, totalInterest:Math.round(totalInterest)};
+    }
+
+    function runDebtCalc() {
+        var extra = fcNum("debt-extra");
+        var activeDebts = _debtPayoffList.filter(function(d){return (parseFloat(d.balance)||0)>0;});
+        if (activeDebts.length === 0) {
+            $fc("debt-results").style.display = "none";
+            $fc("debt-high-risk-warning").style.display = "none";
+            $fc("debt-consolidation-tip").style.display = "none";
+            return;
+        }
+        var snow = calcDebtPayoff(activeDebts, extra, "snowball");
+        var aval = calcDebtPayoff(activeDebts, extra, "avalanche");
+        $fc("debt-results").style.display = "grid";
+        var now = new Date();
+        function payoffDate(months) {
+            if (months >= 999) return "50+ years";
+            var d = new Date(now.getFullYear(), now.getMonth() + months, 1);
+            return d.toLocaleDateString("en-US",{month:"short",year:"numeric"});
+        }
+        $fc("snow-months").textContent = snow.months >= 999 ? "50+ yrs" : snow.months + " mo";
+        $fc("snow-interest").textContent = fmtMoney(snow.totalInterest);
+        $fc("snow-date").textContent = payoffDate(snow.months);
+        $fc("aval-months").textContent = aval.months >= 999 ? "50+ yrs" : aval.months + " mo";
+        $fc("aval-interest").textContent = fmtMoney(aval.totalInterest);
+        $fc("aval-date").textContent = payoffDate(aval.months);
+        var hasHighRate = activeDebts.some(function(d){return (parseFloat(d.rate)||0)>20;});
+        $fc("debt-high-risk-warning").style.display = hasHighRate ? "block" : "none";
+        $fc("debt-consolidation-tip").style.display = activeDebts.length > 1 ? "block" : "none";
+    }
+
+    async function saveFCDebtPlan() {
+        var payload = {
+            debts: _debtPayoffList.map(function(d){return{name:d.name||d.creditor||"",balance:d.balance,rate:d.rate,min_payment:d.min_payment};}),
+            extra_payment: fcNum("debt-extra"),
+            notes: fcVal("debt-notes")
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/debt-plan", {
+                method:"PUT", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify(payload)
+            });
+            if (r.ok) { _fcData.debt_plan=payload; showToast("Saved","Debt plan saved","success"); }
+            else { var e=await r.json().catch(function(){return{};}); showToast("Error",e.detail||"Could not save","error"); }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    // ── Tool 4: Goals ─────────────────────────────────────────────────────────
+
+    var GOAL_CAT_LABELS = {emergency_fund:"Emergency Fund",debt_freedom:"Debt Freedom",home_purchase:"Home Purchase",retirement:"Retirement",education:"Education",vehicle:"Vehicle",other:"Other"};
+    var GOAL_STATUS_LABELS = {active:"Active",completed:"Completed",paused:"Paused"};
+
+    function toggleGoalForm() {
+        var f = $fc("goal-add-form");
+        f.style.display = f.style.display === "none" ? "block" : "none";
+        if (f.style.display === "block") $fc("goal-date").value = "";
+    }
+
+    function renderGoals() {
+        var goals = _fcData.goals || [];
+        var el = $fc("goals-list");
+        if (!el) return;
+        if (goals.length === 0) {
+            el.innerHTML = "<div class='empty-state'><div class='empty-state-icon'>&#127919;</div><p>No goals yet. Use \"+ Add Goal\" above.</p></div>";
+            return;
+        }
+        el.innerHTML = goals.map(function(g) {
+            var catLabel = GOAL_CAT_LABELS[g.category] || (g.category||"Goal");
+            var statusLabel = GOAL_STATUS_LABELS[g.status] || g.status;
+            var steps = (g.steps||"").split("\n").filter(function(s){return s.trim();});
+            return "<div class='fc-goal-card'>" +
+                "<span class='fc-goal-status "+(g.status||"active")+"'>"+statusLabel+"</span>" +
+                "<div class='fc-goal-title'>"+escHtml(g.title)+"</div>" +
+                "<div class='fc-goal-meta'>" + escHtml(catLabel) +
+                    (g.target_amount ? " · Target: "+fmtMoney(g.target_amount) : "") +
+                    (g.target_date ? " · By "+fmtDate(g.target_date) : "") +
+                "</div>" +
+                (g.why ? "<div style='font-size:0.82rem;color:var(--muted);margin-top:0.4rem'>"+escHtml(g.why)+"</div>" : "") +
+                (steps.length ? "<div style='margin-top:0.5rem'>" + steps.map(function(s,i){return "<div style='font-size:0.82rem;color:var(--muted);padding-left:0.5rem;border-left:2px solid rgba(201,149,42,0.3);margin-bottom:0.2rem'>"+(i+1)+". "+escHtml(s)+"</div>";}).join("") + "</div>" : "") +
+                "<div style='display:flex;gap:0.4rem;margin-top:0.6rem'>" +
+                    "<button class='doc-btn' onclick='toggleGoalStatus(\""+g.id+"\",\""+g.status+"\")'>"+(g.status==="completed"?"Reopen":"Mark Complete")+"</button>" +
+                    "<button class='doc-btn danger' onclick='deleteGoal(\""+g.id+"\")'>Delete</button>" +
+                "</div>" +
+            "</div>";
+        }).join("");
+    }
+
+    async function saveGoal() {
+        var title = fcVal("goal-title").trim();
+        if (!title) { showToast("Error","Goal title is required","error"); return; }
+        var payload = {
+            title:title, category:fcVal("goal-category"),
+            target_amount:fcNum("goal-amount")||null,
+            target_date:fcVal("goal-date")||null,
+            why:fcVal("goal-why"), steps:fcVal("goal-steps")
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/goals", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify(payload)
+            });
+            if (r.ok) {
+                var res = await r.json();
+                if (!_fcData.goals) _fcData.goals=[];
+                _fcData.goals.push(Object.assign({},payload,{id:res.id,status:"active",created_at:new Date().toISOString()}));
+                toggleGoalForm();
+                ["goal-title","goal-amount","goal-date","goal-why","goal-steps"].forEach(function(id){fcSet(id,"");});
+                renderGoals();
+                showToast("Added","Goal added","success");
+            } else {
+                var e=await r.json().catch(function(){return{};}); showToast("Error",e.detail||"Could not add goal","error");
+            }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    async function toggleGoalStatus(goalId, currentStatus) {
+        var newStatus = currentStatus === "completed" ? "active" : "completed";
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/goals/" + goalId, {
+                method:"PATCH", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify({status:newStatus})
+            });
+            if (r.ok) {
+                var goal = (_fcData.goals||[]).find(function(g){return g.id===goalId;});
+                if (goal) goal.status = newStatus;
+                renderGoals();
+                showToast("Updated","Goal status updated","success");
+            } else { showToast("Error","Could not update goal","error"); }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    async function deleteGoal(goalId) {
+        if (!confirm("Delete this goal?")) return;
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/goals/" + goalId, {
+                method:"DELETE", credentials:"include"
+            });
+            if (r.ok) {
+                _fcData.goals = (_fcData.goals||[]).filter(function(g){return g.id!==goalId;});
+                renderGoals();
+                showToast("Deleted","Goal removed","success");
+            } else { showToast("Error","Could not delete goal","error"); }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    // ── Tool 5: Session Notes ─────────────────────────────────────────────────
+
+    function toggleSNForm() {
+        var f = $fc("sn-add-form");
+        f.style.display = f.style.display==="none" ? "block" : "none";
+        if (f.style.display==="block") fcSet("sn-date", new Date().toISOString().split("T")[0]);
+    }
+
+    function renderSessionNotes() {
+        var notes = (_fcData.session_notes || []).slice().reverse();
+        var el = $fc("sn-list");
+        if (!el) return;
+        if (notes.length === 0) {
+            el.innerHTML = "<div class='empty-state'><div class='empty-state-icon'>&#128203;</div><p>No session notes yet.</p></div>";
+            return;
+        }
+        el.innerHTML = notes.map(function(n) {
+            var trackLabel = {general:"General",budgeting:"Budgeting",debt_payoff:"Debt Payoff",credit_building:"Credit Building",housing:"Housing",retirement:"Retirement",goal_setting:"Goal Setting"}[n.track]||n.track||"";
+            return "<div class='fc-sn-card'>" +
+                "<div class='fc-sn-header'>" +
+                    "<span class='fc-sn-date'>"+fmtDate(n.session_date||n.created_at)+"</span>" +
+                    "<div style='display:flex;align-items:center;gap:0.5rem'>" +
+                        (trackLabel?"<span class='fc-sn-track'>"+trackLabel+"</span>":"") +
+                        "<span class='fc-sn-by'>"+escHtml(n.created_by||"")+"</span>" +
+                    "</div>" +
+                "</div>" +
+                (n.plan?"<div style='margin-bottom:0.4rem'><span style='font-family:Oswald;font-size:0.65rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold)'>P — Plan:</span> <span style='font-size:0.85rem;color:var(--muted)'>"+escHtml(n.plan)+"</span></div>":"") +
+                (n.action?"<div style='margin-bottom:0.4rem'><span style='font-family:Oswald;font-size:0.65rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold)'>A — Action:</span> <span style='font-size:0.85rem;color:var(--muted)'>"+escHtml(n.action)+"</span></div>":"") +
+                (n.timeline?"<div style='margin-bottom:0.4rem'><span style='font-family:Oswald;font-size:0.65rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold)'>T — Timeline:</span> <span style='font-size:0.85rem;color:var(--muted)'>"+escHtml(n.timeline)+"</span></div>":"") +
+                (n.help?"<div style='margin-bottom:0.4rem'><span style='font-family:Oswald;font-size:0.65rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold)'>H — Help:</span> <span style='font-size:0.85rem;color:var(--muted)'>"+escHtml(n.help)+"</span></div>":"") +
+                (n.summary?"<div style='font-size:0.85rem;color:var(--muted);margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid rgba(255,255,255,0.05)'>"+escHtml(n.summary)+"</div>":"") +
+            "</div>";
+        }).join("");
+    }
+
+    async function saveSN() {
+        var date = fcVal("sn-date");
+        if (!date) { showToast("Error","Session date required","error"); return; }
+        var payload = {
+            session_date: date, track: fcVal("sn-track"),
+            plan: fcVal("sn-plan"), action: fcVal("sn-action"),
+            timeline: fcVal("sn-timeline"), help: fcVal("sn-help"),
+            summary: fcVal("sn-summary")
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/session-notes", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify(payload)
+            });
+            if (r.ok) {
+                var res = await r.json();
+                if (!_fcData.session_notes) _fcData.session_notes=[];
+                _fcData.session_notes.push(Object.assign({},payload,{id:res.id,created_at:new Date().toISOString(),created_by:(currentUser.first_name||"")+" "+(currentUser.last_name||"")}));
+                toggleSNForm();
+                ["sn-plan","sn-action","sn-timeline","sn-help","sn-summary"].forEach(function(id){fcSet(id,"");});
+                renderSessionNotes();
+                showToast("Saved","Session note saved","success");
+            } else {
+                var e=await r.json().catch(function(){return{};}); showToast("Error",e.detail||"Could not save","error");
+            }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    // ── Tool 6: Housing ───────────────────────────────────────────────────────
+
+    function populateHousing() {
+        var d = _fcData.housing || {};
+        fcSet("housing-scenario", d.scenario || "renting");
+        fcSet("housing-rent", d.rent || "");
+        fcSet("housing-price", d.price || "");
+        fcSet("housing-down", d.down || "");
+        fcSet("housing-rate", d.rate || 6.5);
+        fcSet("housing-term", d.term || 30);
+        fcSet("housing-tax", d.tax_annual || "");
+        fcSet("housing-ins", d.ins_annual || "");
+        fcSet("housing-hoa", d.hoa || "");
+        fcSet("housing-income", d.income || "");
+        fcSet("housing-other-debt", d.other_debt || "");
+        fcSet("housing-notes", d.notes || "");
+        ["hwc-forbearance","hwc-modification","hwc-hud","hwc-va-sah","hwc-state-aid","hwc-short-sale","hwc-deed-lieu"].forEach(function(id){
+            fcSet(id, (d.workout_checklist||{})[id.replace("hwc-","")] || false);
+        });
+        updateHousingScenario();
+        calcHousing();
+    }
+
+    function updateHousingScenario() {
+        var s = fcVal("housing-scenario");
+        var isRenting = s==="renting";
+        var isWorkout = s==="workout";
+        var rentRow = $fc("housing-rent-row"); var priceRow = $fc("housing-price-row"); var downRow = $fc("housing-down-row"); var hoaRow = $fc("housing-hoa-row");
+        if (rentRow) rentRow.style.display = isRenting ? "" : "none";
+        if (priceRow) priceRow.style.display = !isRenting ? "" : "none";
+        if (downRow) downRow.style.display = !isRenting ? "" : "none";
+        if (hoaRow) hoaRow.style.display = !isRenting ? "" : "none";
+        var wc = $fc("housing-workout-checklist");
+        if (wc) wc.style.display = isWorkout ? "block" : "none";
+        calcHousing();
+    }
+
+    function calcHousing() {
+        var s = fcVal("housing-scenario");
+        if (s === "renting") {
+            var rent = fcNum("housing-rent");
+            var income = fcNum("housing-income");
+            var otherDebt = fcNum("housing-other-debt");
+            var frontDTI = income > 0 ? (rent/income*100) : 0;
+            var backDTI = income > 0 ? ((rent+otherDebt)/income*100) : 0;
+            fcSet("h-pi", "—"); fcSet("h-tax", "—"); fcSet("h-ins", "—");
+            fcSet("h-piti", fmtMoney(rent) + "/mo");
+            fcSet("h-front-dti", income>0 ? fmtPct(frontDTI) + (frontDTI>28?" ⚠":"") : "—");
+            fcSet("h-back-dti", income>0 ? fmtPct(backDTI) + (backDTI>36?" ⚠":"") : "—");
+            fcSet("h-ltv", "—"); fcSet("h-pmi", "—");
+            $fc("housing-dti-warning").style.display = (income>0 && (frontDTI>28||backDTI>36)) ? "block" : "none";
+            return;
+        }
+        var price = fcNum("housing-price");
+        var down = fcNum("housing-down");
+        var rate = fcNum("housing-rate") / 100 / 12;
+        var term = parseInt(fcVal("housing-term")||30) * 12;
+        var loan = price - down;
+        var pi = loan>0&&rate>0 ? loan*rate*Math.pow(1+rate,term)/(Math.pow(1+rate,term)-1) : 0;
+        var taxMo = fcNum("housing-tax") / 12;
+        var insMo = fcNum("housing-ins") / 12;
+        var hoa = fcNum("housing-hoa");
+        var piti = pi + taxMo + insMo + hoa;
+        var income = fcNum("housing-income");
+        var otherDebt = fcNum("housing-other-debt");
+        var ltv = price > 0 ? (loan/price*100) : 0;
+        var pmiNeeded = ltv > 80;
+        var frontDTI = income > 0 ? (piti/income*100) : 0;
+        var backDTI = income > 0 ? ((piti+otherDebt)/income*100) : 0;
+        fcSet("h-pi", fmtMoney(pi)+"/mo");
+        fcSet("h-tax", fmtMoney(taxMo)+"/mo");
+        fcSet("h-ins", fmtMoney(insMo)+"/mo");
+        fcSet("h-piti", "<strong>"+fmtMoney(piti)+"</strong>/mo");
+        fcSet("h-front-dti", income>0 ? fmtPct(frontDTI)+(frontDTI>28?" ⚠":"") : "—");
+        fcSet("h-back-dti", income>0 ? fmtPct(backDTI)+(backDTI>43?" ⚠":(backDTI>36?" ⚡":"")) : "—");
+        fcSet("h-ltv", price>0 ? fmtPct(ltv) : "—");
+        fcSet("h-pmi", pmiNeeded ? "Yes — est. $"+(Math.round(loan*0.005/12))+"/mo" : "No (≥20% down)");
+        var dtiWarn = income > 0 && (frontDTI > 28 || backDTI > 43);
+        $fc("housing-dti-warning").style.display = dtiWarn ? "block" : "none";
+        // Use innerHTML for h-piti and h-front-dti/back-dti since they contain HTML
+        var pitiEl=$fc("h-piti"); if(pitiEl) pitiEl.innerHTML="<strong>"+fmtMoney(piti)+"</strong>/mo";
+        var frontEl=$fc("h-front-dti"); if(frontEl) { frontEl.textContent=income>0?fmtPct(frontDTI)+(frontDTI>28?" ⚠":""):"—"; frontEl.style.color=frontDTI>28&&income>0?"#EF4444":""; }
+        var backEl=$fc("h-back-dti"); if(backEl) { backEl.textContent=income>0?fmtPct(backDTI)+(backDTI>43?" ⚠":(backDTI>36?" ⚡":"")):"—"; backEl.style.color=backDTI>43&&income>0?"#EF4444":backDTI>36&&income>0?"#EAB308":""; }
+    }
+
+    async function saveFCHousing() {
+        var s = fcVal("housing-scenario");
+        var wc = {};
+        ["forbearance","modification","hud","va-sah","state-aid","short-sale","deed-lieu"].forEach(function(k){
+            wc[k] = fcCheck("hwc-"+k);
+        });
+        var payload = {
+            scenario:s, rent:fcNum("housing-rent"), price:fcNum("housing-price"),
+            down:fcNum("housing-down"), rate:fcNum("housing-rate"),
+            term:parseInt(fcVal("housing-term")||30),
+            tax_annual:fcNum("housing-tax"), ins_annual:fcNum("housing-ins"),
+            hoa:fcNum("housing-hoa"), income:fcNum("housing-income"),
+            other_debt:fcNum("housing-other-debt"), notes:fcVal("housing-notes"),
+            workout_checklist:wc
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/housing", {
+                method:"PUT", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify(payload)
+            });
+            if (r.ok) { _fcData.housing=payload; showToast("Saved","Housing data saved","success"); }
+            else { var e=await r.json().catch(function(){return{};}); showToast("Error",e.detail||"Could not save","error"); }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    // ── Tool 7: Retirement ────────────────────────────────────────────────────
+
+    function populateRetirement() {
+        var d = _fcData.retirement || {};
+        fcSet("ret-age", d.current_age || "");
+        fcSet("ret-retire-age", d.retirement_age || 65);
+        fcSet("ret-savings", d.current_savings || "");
+        fcSet("ret-contrib", d.monthly_contribution || "");
+        fcSet("ret-return", d.annual_return || 6);
+        fcSet("ret-ss", d.ss_benefit || "");
+        fcSet("ret-need", d.desired_income || "");
+        fcSet("ret-notes", d.notes || "");
+        calcRetirement();
+    }
+
+    function calcRetirement() {
+        var age = fcNum("ret-age");
+        var retireAge = fcNum("ret-retire-age") || 65;
+        var years = Math.max(0, retireAge - age);
+        var pv = fcNum("ret-savings");
+        var monthly = fcNum("ret-contrib");
+        var annualRate = fcNum("ret-return") / 100;
+        var monthlyRate = annualRate / 12;
+        var months = years * 12;
+        var fv = monthlyRate > 0
+            ? pv * Math.pow(1+monthlyRate, months) + monthly * (Math.pow(1+monthlyRate,months)-1)/monthlyRate
+            : pv + monthly * months;
+        var withdrawal4pct = fv * 0.04 / 12;
+        var ss = fcNum("ret-ss");
+        var totalIncome = withdrawal4pct + ss;
+        var desired = fcNum("ret-need");
+        var gap = totalIncome - desired;
+        $fc("ret-years").textContent = age>0 ? years+" yrs" : "—";
+        $fc("ret-projected").textContent = age>0 ? fmtMoney(fv) : "—";
+        $fc("ret-withdrawal").textContent = age>0 ? fmtMoney(withdrawal4pct)+"/mo" : "—";
+        $fc("ret-ss-display").textContent = ss>0 ? fmtMoney(ss)+"/mo" : "—";
+        $fc("ret-total-income").textContent = age>0 ? fmtMoney(totalIncome)+"/mo" : "—";
+        var gapEl = $fc("ret-gap");
+        if (gapEl) {
+            gapEl.textContent = (age>0&&desired>0) ? fmtMoney(Math.abs(gap))+"/mo "+(gap>=0?"surplus":"shortfall") : "—";
+            gapEl.style.color = gap>=0?"#10B981":"#EF4444";
+        }
+        $fc("ret-warning").style.display = (age>0&&desired>0&&gap<0) ? "block" : "none";
+    }
+
+    async function saveFCRetirement() {
+        var payload = {
+            current_age:fcNum("ret-age"), retirement_age:fcNum("ret-retire-age"),
+            current_savings:fcNum("ret-savings"), monthly_contribution:fcNum("ret-contrib"),
+            annual_return:fcNum("ret-return"), ss_benefit:fcNum("ret-ss"),
+            desired_income:fcNum("ret-need"), notes:fcVal("ret-notes")
+        };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/retirement", {
+                method:"PUT", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify(payload)
+            });
+            if (r.ok) { _fcData.retirement=payload; showToast("Saved","Retirement data saved","success"); }
+            else { var e=await r.json().catch(function(){return{};}); showToast("Error",e.detail||"Could not save","error"); }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    // ── Tool 8: Tax Reference ─────────────────────────────────────────────────
+
+    function populateTaxRef() {
+        var d = _fcData.tax_ref || {};
+        fcSet("tax-filing-status", d.filing_status || "");
+        fcSet("tax-notes", d.notes || "");
+        var checks = d.withholding_check || {};
+        ["tax-w4-reviewed","tax-w4-life-event","tax-w4-extra","tax-prior-refund","tax-prior-owe"].forEach(function(id){
+            fcSet(id, checks[id] || false);
+        });
+    }
+
+    async function saveFCTaxRef() {
+        var wc = {};
+        ["tax-w4-reviewed","tax-w4-life-event","tax-w4-extra","tax-prior-refund","tax-prior-owe"].forEach(function(id){
+            wc[id] = fcCheck(id);
+        });
+        var payload = { filing_status:fcVal("tax-filing-status"), withholding_check:wc, notes:fcVal("tax-notes") };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/tax-ref", {
+                method:"PUT", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify(payload)
+            });
+            if (r.ok) { _fcData.tax_ref=payload; showToast("Saved","Tax reference saved","success"); }
+            else { var e=await r.json().catch(function(){return{};}); showToast("Error",e.detail||"Could not save","error"); }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    // ── Tool 9: Fraud Checklist ───────────────────────────────────────────────
+
+    function populateFraud() {
+        var d = _fcData.fraud_checklist || {};
+        var flags = d.flags || {};
+        for (var i=0;i<6;i++) { fcSet("fraud-"+i, flags["fraud_"+i] || false); }
+        fcSet("fraud-referred", d.referral_triggered || false);
+        fcSet("fraud-referred-agency", d.referral_agency || "");
+        fcSet("fraud-notes", d.notes || "");
+        updateFraudScore();
+    }
+
+    function updateFraudScore() {
+        var count = 0;
+        for (var i=0;i<6;i++) {
+            var checked = fcCheck("fraud-"+i);
+            var row = $fc("fraud-flag-"+i);
+            if (row) row.classList.toggle("flagged", checked);
+            if (checked) count++;
+        }
+        var scoreEl = $fc("fraud-score");
+        if (scoreEl) scoreEl.textContent = count;
+        var trigger = $fc("fraud-referral-trigger");
+        if (trigger) trigger.style.display = count >= 3 ? "block" : "none";
+        var scoreDisplay = $fc("fraud-score-display");
+        if (scoreDisplay) scoreDisplay.style.color = count >= 3 ? "#EF4444" : "var(--muted)";
+    }
+
+    async function saveFCFraud() {
+        var flags = {};
+        for (var i=0;i<6;i++) flags["fraud_"+i] = fcCheck("fraud-"+i);
+        var count = Object.values(flags).filter(Boolean).length;
+        var payload = { flags:flags, referral_triggered:fcCheck("fraud-referred")||count>=3, referral_agency:fcVal("fraud-referred-agency"), notes:fcVal("fraud-notes") };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/fraud-checklist", {
+                method:"PUT", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify(payload)
+            });
+            if (r.ok) { _fcData.fraud_checklist=payload; showToast("Saved","Fraud checklist saved","success"); }
+            else { var e=await r.json().catch(function(){return{};}); showToast("Error",e.detail||"Could not save","error"); }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    // ── Tool 10: Referral Library ─────────────────────────────────────────────
+
+    var FC_RESOURCES = [
+        {cat:"va_benefits",name:"VA.gov Benefits Portal",desc:"Apply for VA benefits, check claim status, manage health care.",link:"https://www.va.gov/"},
+        {cat:"va_benefits",name:"Veterans Service Organizations (VSOs)",desc:"Free claims assistance — DAV, VFW, American Legion, etc.",link:"https://www.va.gov/decision-reviews/get-help-with-decision-review/"},
+        {cat:"housing",name:"HUD Housing Counselor Locator",desc:"Find a HUD-approved free housing counselor near you.",link:"https://www.hud.gov/counseling"},
+        {cat:"housing",name:"VA Home Loan Program",desc:"VA-backed home loans with no PMI and competitive rates.",link:"https://www.va.gov/housing-assistance/home-loans/"},
+        {cat:"housing",name:"NFCC — Housing Counseling",desc:"National Foundation for Credit Counseling — housing and foreclosure prevention.",link:"https://www.nfcc.org/"},
+        {cat:"legal",name:"State Bar Lawyer Referral Service",desc:"Low-cost or free legal aid through state bar association referrals."},
+        {cat:"legal",name:"Veterans Legal Services Clinic",desc:"Pro-bono legal services for veterans through law school clinics."},
+        {cat:"mental_health",name:"Veterans Crisis Line",desc:"Confidential support 24/7. Call 988 and press 1. Text 838255.",link:"https://www.veteranscrisisline.net/"},
+        {cat:"mental_health",name:"Vet Center Program",desc:"Community-based counseling for combat veterans and their families.",link:"https://www.va.gov/vet-centers/"},
+        {cat:"employment",name:"VA Vocational Rehabilitation (VR&E)",desc:"Education and employment assistance for veterans with service-connected disabilities.",link:"https://www.va.gov/careers-employment/vocational-rehabilitation/"},
+        {cat:"employment",name:"American Job Centers",desc:"Free employment services, job search assistance, and training programs.",link:"https://www.careeronestop.org/LocalHelp/AmericanJobCenters/"},
+        {cat:"financial_ed",name:"CFPB Your Money Your Goals",desc:"Free financial education toolkit designed for social service workers.",link:"https://www.consumerfinance.gov/consumer-tools/your-money-your-goals/"},
+        {cat:"financial_ed",name:"NFCC Member Agencies",desc:"Nonprofit credit counseling — budgeting, debt management plans, credit review.",link:"https://www.nfcc.org/"},
+        {cat:"financial_ed",name:"InCharge Debt Solutions",desc:"Nonprofit financial counseling and debt management programs.",link:"https://www.incharge.org/"},
+        {cat:"food_aid",name:"Feeding America Food Bank Locator",desc:"Find local food banks and pantries.",link:"https://www.feedingamerica.org/find-your-local-foodbank"},
+        {cat:"food_aid",name:"USDA SNAP",desc:"Supplemental Nutrition Assistance Program — eligibility and application.",link:"https://www.fns.usda.gov/snap/"},
+        {cat:"tax",name:"IRS VITA / Tax Aide",desc:"Free tax preparation for income ≤$67,000. Call 800-906-9887 or visit irs.gov/vita.",link:"https://www.irs.gov/individuals/free-tax-return-preparation-for-qualifying-taxpayers"},
+        {cat:"tax",name:"MilTax (DoD)",desc:"Free federal and state tax filing for military members and veterans — no income limit.",link:"https://www.militaryonesource.mil/financial-legal/taxes/miltax-military-tax-services/"}
+    ];
+
+    var FC_CAT_COLORS = {
+        va_benefits:"rgba(59,130,246,.2);color:#3B82F6",housing:"rgba(16,185,129,.2);color:#10B981",
+        legal:"rgba(139,92,246,.2);color:#A78BFA",mental_health:"rgba(239,68,68,.2);color:#EF4444",
+        employment:"rgba(249,115,22,.2);color:#F97316",financial_ed:"rgba(201,149,42,.2);color:var(--gold)",
+        food_aid:"rgba(16,185,129,.2);color:#10B981",tax:"rgba(59,130,246,.2);color:#3B82F6"
+    };
+    var FC_CAT_LABELS = {va_benefits:"VA Benefits",housing:"Housing",legal:"Legal Aid",mental_health:"Mental Health",employment:"Employment",financial_ed:"Financial Ed",food_aid:"Food Aid",tax:"Tax Help"};
+
+    function filterReferralLib() {
+        renderReferralLib();
+    }
+
+    function renderReferralLib() {
+        var filter = fcVal("ref-filter");
+        var list = filter ? FC_RESOURCES.filter(function(r){return r.cat===filter;}) : FC_RESOURCES;
+        var el = $fc("referral-lib-list");
+        if (!el) return;
+        el.innerHTML = list.map(function(res) {
+            var catStyle = FC_CAT_COLORS[res.cat] || "";
+            var catLabel = FC_CAT_LABELS[res.cat] || res.cat;
+            var link = res.link ? "<a href='"+res.link+"' target='_blank' rel='noopener' style='font-size:0.75rem;color:var(--gold);text-decoration:none;margin-left:0.5rem'>&#8599; Visit</a>" : "";
+            return "<div class='fc-ref-card'>" +
+                "<span class='fc-ref-cat' style='background:"+catStyle+";border:1px solid transparent'>"+catLabel+"</span>" +
+                "<div><div class='fc-ref-name'>"+escHtml(res.name)+link+"</div><div class='fc-ref-desc'>"+escHtml(res.desc)+"</div></div>" +
+                "<button class='doc-btn' style='flex-shrink:0;font-size:0.62rem' onclick='quickLogReferral(\""+escHtml(res.name)+"\",\""+res.cat+"\")'>Log</button>" +
+            "</div>";
+        }).join("");
+    }
+
+    function toggleLogRefForm() {
+        var f = $fc("log-ref-form");
+        f.style.display = f.style.display==="none" ? "block" : "none";
+    }
+
+    function quickLogReferral(name, cat) {
+        fcSet("ref-name", name);
+        fcSet("ref-cat", cat);
+        var f = $fc("log-ref-form");
+        if (f) { f.style.display="block"; f.scrollIntoView({behavior:"smooth",block:"nearest"}); }
+    }
+
+    async function loadLoggedReferrals() {
+        var referrals = _fcData.referrals_used || [];
+        var el = $fc("logged-referrals-list");
+        if (!el) return;
+        if (referrals.length === 0) {
+            el.innerHTML = "<span style='color:var(--muted);font-size:0.85rem'>No referrals logged yet.</span>";
+            return;
+        }
+        el.innerHTML = referrals.slice().reverse().map(function(r) {
+            var catStyle = FC_CAT_COLORS[r.category] || "";
+            var catLabel = FC_CAT_LABELS[r.category] || r.category;
+            return "<div style='display:flex;align-items:flex-start;gap:0.75rem;padding:0.6rem 0.85rem;background:rgba(0,0,0,0.15);border:1px solid var(--border);margin-bottom:0.3rem'>" +
+                "<span class='fc-ref-cat' style='background:"+catStyle+";border:1px solid transparent;margin-top:1px'>"+catLabel+"</span>" +
+                "<div style='flex:1'><div style='font-family:Oswald;font-size:0.85rem;font-weight:600'>"+escHtml(r.resource_name||r.name||"")+"</div>" +
+                (r.notes?"<div style='font-size:0.78rem;color:var(--muted)'>"+escHtml(r.notes)+"</div>":"")+
+                "<div style='font-size:0.72rem;color:var(--muted);margin-top:0.15rem'>"+fmtDate(r.logged_at)+" by "+escHtml(r.logged_by||"")+"</div></div>" +
+            "</div>";
+        }).join("");
+    }
+
+    async function logReferral() {
+        var name = fcVal("ref-name").trim();
+        if (!name) { showToast("Error","Resource name required","error"); return; }
+        var payload = { resource_name:name, name:name, category:fcVal("ref-cat"), notes:fcVal("ref-log-notes") };
+        try {
+            var r = await fetch(window.API_BASE + "/api/counselor/members/" + memberId + "/fc/referrals", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                credentials:"include", body:JSON.stringify(payload)
+            });
+            if (r.ok) {
+                var res = await r.json();
+                if (!_fcData.referrals_used) _fcData.referrals_used=[];
+                _fcData.referrals_used.push(Object.assign({},payload,{id:res.id,logged_at:new Date().toISOString(),logged_by:(currentUser.first_name||"")+" "+(currentUser.last_name||"")}));
+                toggleLogRefForm();
+                fcSet("ref-name",""); fcSet("ref-log-notes","");
+                loadLoggedReferrals();
+                showToast("Logged","Referral logged to case file","success");
+            } else {
+                var e=await r.json().catch(function(){return{};}); showToast("Error",e.detail||"Could not log referral","error");
+            }
+        } catch(e){ showToast("Error","Network error","error"); }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // END FINANCIAL COUNSELING TAB
+    // ══════════════════════════════════════════════════════════════════════════
 
     function escHtml(str) {
         if (!str) return "";
