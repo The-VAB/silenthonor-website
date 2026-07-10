@@ -138,10 +138,12 @@
             var r = await fetch(window.API_BASE + "/api/auth/me", {credentials: "include"});
             if (!r.ok) { window.location.href = "login.html"; return; }
             var user = await r.json();
-            if (user.role !== "counselor" && user.role !== "admin") { window.location.href = "dashboard.html"; return; }
+            var _roles = user.roles || [user.role];
+            if (!_roles.some(r => ["counselor","admin"].includes(r))) { window.location.href = "dashboard.html"; return; }
             var initials = ((user.first_name || "").charAt(0) + (user.last_name || "").charAt(0)).toUpperCase() || "??";
             document.getElementById("user-avatar").textContent = initials;
             document.getElementById("user-name").textContent = (user.first_name || "") + " " + (user.last_name || "");
+            if (_roles.includes("admin")) { var vs = document.getElementById("view-switcher"); if(vs) vs.style.display=""; }
         } catch(e) { window.location.href = "login.html"; return; }
 
         await loadTasks();

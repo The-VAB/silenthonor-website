@@ -45,24 +45,29 @@ async def get_current_user(request: Request) -> dict:
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+def _user_has_role(user: dict, *roles: str) -> bool:
+    """Check if user has any of the given roles. Checks roles[] array first, falls back to role string."""
+    user_roles = user.get("roles") or [user.get("role", "")]
+    return any(r in user_roles for r in roles)
+
 async def get_current_admin(request: Request) -> dict:
     """Get current user and verify admin role"""
     user = await get_current_user(request)
-    if user.get("role") != "admin":
+    if not _user_has_role(user, "admin"):
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
 async def get_current_counselor(request: Request) -> dict:
     """Get current user and verify counselor role"""
     user = await get_current_user(request)
-    if user.get("role") not in ["counselor", "admin"]:
+    if not _user_has_role(user, "counselor", "admin"):
         raise HTTPException(status_code=403, detail="Counselor access required")
     return user
 
 async def get_current_staff(request: Request) -> dict:
     """Get current user and verify staff/admin role"""
     user = await get_current_user(request)
-    if user.get("role") not in ["staff", "admin"]:
+    if not _user_has_role(user, "staff", "admin"):
         raise HTTPException(status_code=403, detail="Staff access required")
     return user
 
