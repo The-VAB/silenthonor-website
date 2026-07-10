@@ -147,12 +147,14 @@ async def login(request: Request, response: Response, data: LoginRequest):
         ip_address=client_ip
     )
 
+    _role = user.get("role", "member")
     return {
         "id": user_id,
         "email": user["email"],
         "first_name": user.get("first_name", ""),
         "last_name": user.get("last_name", ""),
-        "role": user.get("role", "member"),
+        "role": _role,
+        "roles": user.get("roles") or [_role],
         "verified": user.get("verified", False),
         "branch": user.get("branch"),
         "service_status": user.get("service_status"),

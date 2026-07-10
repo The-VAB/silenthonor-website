@@ -72,6 +72,7 @@ async def create_staff(request: Request, data: StaffRequest):
         "first_name": data.first_name,
         "last_name": data.last_name,
         "role": data.role,
+        "roles": [data.role],
         "title": data.title or "",
         "bio": data.bio or "",
         "specialties": data.specialties or [],

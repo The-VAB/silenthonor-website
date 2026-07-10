@@ -1088,12 +1088,13 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
     currentUser = await response.json();
 
-    // Role-based redirects
-    if (currentUser.role === "admin" || currentUser.role === "staff") {
+    // Role-based redirects (supports roles[] array and legacy role string)
+    const _roles = currentUser.roles || [currentUser.role];
+    if (_roles.includes("admin") || _roles.includes("staff")) {
       window.location.href = "admin.html";
       return;
     }
-    if (currentUser.role === "counselor") {
+    if (_roles.includes("counselor")) {
       window.location.href = "counselor-portal.html";
       return;
     }

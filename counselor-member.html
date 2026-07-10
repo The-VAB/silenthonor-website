@@ -470,12 +470,12 @@
             var r = await fetch(window.API_BASE + "/api/auth/me", {credentials: "include"});
             if (!r.ok) { window.location.href = "login.html"; return; }
             currentUser = await r.json();
-            if (currentUser.role !== "counselor" && currentUser.role !== "admin") {
-                window.location.href = "dashboard.html"; return;
-            }
+            var _roles = currentUser.roles || [currentUser.role];
+            if (!_roles.some(r => ["counselor","admin"].includes(r))) { window.location.href = "dashboard.html"; return; }
             var initials = ((currentUser.first_name || "").charAt(0) + (currentUser.last_name || "").charAt(0)).toUpperCase() || "??";
             document.getElementById("user-avatar").textContent = initials;
             document.getElementById("user-name").textContent = (currentUser.first_name || "") + " " + (currentUser.last_name || "");
+            if (_roles.includes("admin")) { var vs = document.getElementById("view-switcher"); if(vs) vs.style.display=""; }
         } catch(e) {
             window.location.href = "login.html"; return;
         }

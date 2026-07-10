@@ -67,6 +67,15 @@
                 <a href="messages.html" class="dash-nav-link">Messages</a>
             </div>
             <div class="dash-nav-user">
+                <div id="view-switcher" style="display:none;margin-bottom:10px;">
+                    <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Viewing As</div>
+                    <div style="position:relative;">
+                        <button onclick="document.getElementById('vs-menu').style.display=document.getElementById('vs-menu').style.display==='none'?'block':'none'" style="width:100%;background:rgba(201,149,42,.15);border:1px solid #C9952A;color:#C9952A;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:600;text-align:left;">Counselor ▾</button>
+                        <div id="vs-menu" style="display:none;position:absolute;top:100%;left:0;right:0;background:#0f1a27;border:1px solid rgba(255,255,255,.12);z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.4);">
+                            <a href="admin.html" style="display:block;padding:9px 12px;color:#e2e8f0;text-decoration:none;font-size:13px;">Admin View</a>
+                        </div>
+                    </div>
+                </div>
                 <div class="user-avatar" id="user-avatar">??</div>
                 <span class="user-name" id="user-name">Loading...</span>
                 <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
@@ -142,12 +151,12 @@
             var r = await fetch(window.API_BASE + "/api/auth/me", {credentials: "include"});
             if (!r.ok) { window.location.href = "login.html"; return; }
             var user = await r.json();
-            if (user.role !== "counselor" && user.role !== "admin") {
-                window.location.href = "dashboard.html"; return;
-            }
+            var _roles = user.roles || [user.role];
+            if (!_roles.some(r => ["counselor","admin"].includes(r))) { window.location.href = "dashboard.html"; return; }
             var initials = ((user.first_name || "").charAt(0) + (user.last_name || "").charAt(0)).toUpperCase() || "??";
             document.getElementById("user-avatar").textContent = initials;
             document.getElementById("user-name").textContent = (user.first_name || "") + " " + (user.last_name || "");
+            if (_roles.includes("admin")) { document.getElementById("view-switcher").style.display = ""; }
             loadStats();
         } catch(e) {
             window.location.href = "login.html";

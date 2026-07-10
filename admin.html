@@ -248,9 +248,18 @@ input,select,textarea{font-family:inherit;font-size:14px;}
   </div>
   <div class="sidebar-user">
     <div class="sidebar-avatar" id="sidebar-avatar">A</div>
-    <div>
+    <div style="flex:1;min-width:0;">
       <div class="sidebar-user-name" id="sidebar-name">Admin</div>
       <div class="sidebar-user-role" id="sidebar-role">Administrator</div>
+    </div>
+  </div>
+  <div id="view-switcher" style="display:none;padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.08);">
+    <div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Viewing As</div>
+    <div style="position:relative;">
+      <button onclick="document.getElementById('vs-menu').style.display=document.getElementById('vs-menu').style.display==='none'?'block':'none'" style="width:100%;background:rgba(201,149,42,.15);border:1px solid #C9952A;color:#C9952A;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:600;text-align:left;letter-spacing:.02em;">Admin ▾</button>
+      <div id="vs-menu" style="display:none;position:absolute;top:100%;left:0;right:0;background:#0f1a27;border:1px solid rgba(255,255,255,.12);z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.4);">
+        <a href="counselor-portal.html" style="display:block;padding:9px 12px;color:#e2e8f0;text-decoration:none;font-size:13px;border-bottom:1px solid rgba(255,255,255,.06);">Counselor View</a>
+      </div>
     </div>
   </div>
   <nav class="sidebar-nav">
@@ -849,11 +858,13 @@ async function init() {
     const r = await fetch(`${API}/api/auth/me`, {credentials:'include'});
     if (!r.ok) { window.location.href = 'login.html'; return; }
     currentAdmin = await r.json();
-    if (!['admin','staff'].includes(currentAdmin.role)) { window.location.href = 'login.html'; return; }
+    const _adminRoles = currentAdmin.roles || [currentAdmin.role];
+    if (!_adminRoles.some(r => ['admin','staff'].includes(r))) { window.location.href = 'login.html'; return; }
     const initials = ((currentAdmin.first_name||'A')[0] + (currentAdmin.last_name||'D')[0]).toUpperCase();
     document.getElementById('sidebar-avatar').textContent = initials;
     document.getElementById('sidebar-name').textContent = `${currentAdmin.first_name||''} ${currentAdmin.last_name||''}`.trim();
-    document.getElementById('sidebar-role').textContent = currentAdmin.role;
+    document.getElementById('sidebar-role').textContent = _adminRoles.join(' · ');
+    if (_adminRoles.includes('counselor')) { document.getElementById('view-switcher').style.display = ''; }
     loadOverview();
     loadBadges();
     setInterval(loadBadges, 60000);
