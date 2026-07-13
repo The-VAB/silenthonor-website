@@ -142,8 +142,9 @@ async def get_dd214_file(request: Request, filename: str):
             return Response(content=decrypted, media_type=mime, headers={"Content-Disposition": f"inline; filename={base}"})
         return FileResponse(filepath)
 
-    # Try to get Supabase signed URL
-    signed_url = await get_dd214_url(filename, "supabase")
+    # Not on local disk — fetch a signed URL from the configured object store
+    from utils.storage import S3_ENABLED
+    signed_url = await get_dd214_url(filename, "s3" if S3_ENABLED else "supabase")
     if signed_url:
         from fastapi.responses import RedirectResponse
         return RedirectResponse(url=signed_url)

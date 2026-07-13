@@ -26,10 +26,25 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# CORS Configuration - DO NOT MODIFY THESE SETTINGS
+# CORS Configuration
+# The production origins below are always allowed. Additional origins (e.g. the
+# CloudFront distribution or an api/app custom domain during the AWS migration)
+# can be added via the CORS_ORIGINS env var (comma-separated). Credentials are
+# enabled, so wildcard "*" is intentionally not used.
+_default_origins = [
+    "https://silenthonor.org",
+    "https://www.silenthonor.org",
+    "https://silenthonorfoundation.org",
+    "https://www.silenthonorfoundation.org",
+]
+_extra_origins = [
+    o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()
+]
+_allowed_origins = list(dict.fromkeys(_default_origins + _extra_origins))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://silenthonor.org", "https://www.silenthonor.org"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,8 +63,10 @@ except Exception as e:
     logger.warning(f"Could not mount static files: {e}")
 
 # MongoDB connection
-MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME = os.environ.get("DB_NAME", "silenthonor")
+# Accept either MONGO_URL/DB_NAME or MONGODB_URI/MONGODB_DB (used by docker-compose
+# and Amazon DocumentDB) so the same image runs unchanged across environments.
+MONGO_URL = os.environ.get("MONGO_URL") or os.environ.get("MONGODB_URI", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("DB_NAME") or os.environ.get("MONGODB_DB", "silenthonor")
 
 client = None
 db = None
@@ -306,6 +323,12 @@ async def serve_html_page(page: str):
     if os.path.exists(filepath):
         return FileResponse(filepath, media_type="text/html")
     return FileResponse("/app/404.html", status_code=404, media_type="text/html")
+
+# Lightweight liveness probe (used by the Docker HEALTHCHECK and App Runner).
+# The richer readiness check lives at /api/health.
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 # Clean URL routes
 @app.get("/")

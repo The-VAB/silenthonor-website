@@ -57,3 +57,12 @@ htmlcov/
 # Docker
 *.pid
 docker-compose.override.yml
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log

@@ -1,0 +1,20 @@
+# CodeBuild buildspec: builds the backend Docker image and pushes it to ECR.
+# Runs in AWS (privileged CodeBuild) so no local Docker daemon is required.
+# Expected env vars: AWS_ACCOUNT_ID, AWS_DEFAULT_REGION, ECR_REPO, IMAGE_TAG
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+      - REPO_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO"
+  build:
+    commands:
+      - echo Building backend image...
+      - docker build -t "$REPO_URI:$IMAGE_TAG" -f backend/Dockerfile backend
+  post_build:
+    commands:
+      - echo Pushing image to ECR...
+      - docker push "$REPO_URI:$IMAGE_TAG"
+      - echo "Pushed $REPO_URI:$IMAGE_TAG"

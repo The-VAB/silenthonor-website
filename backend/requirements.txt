@@ -22,8 +22,11 @@ aiofiles==23.2.1
 # Email (Resend)
 resend==0.7.0
 
-# Supabase Storage
+# Supabase Storage (legacy fallback)
 supabase==2.3.0
+
+# AWS SDK (S3 storage + SES email)
+boto3==1.34.69
 
 # HTTP Client (version compatible with supabase)
 httpx>=0.24.0,<0.25.0
