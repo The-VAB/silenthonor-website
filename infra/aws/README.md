@@ -107,6 +107,43 @@ so DNS changes happen wherever the domain is registered:
 
 Apply for [AWS nonprofit credits](https://aws.amazon.com/government-education/nonprofits/) to offset these.
 
+## As-deployed (2026-07) — live environment
+
+The initial live deploy was provisioned via the AWS CLI (the Terraform registry is
+egress-blocked from the build environment). It matches this IaC **except** for the
+network: the account was at its VPC limit (5/5) and over the EIP limit, so instead
+of a fresh VPC the deploy **reused the existing `prod-vpc` private subnets and NAT
+gateway**, with dedicated, isolated `silenthonor-*` security groups (additive only —
+no existing subnet/route/SG was modified). This also saved the ~$33/mo NAT cost.
+
+| Resource            | Value                                                        |
+|---------------------|--------------------------------------------------------------|
+| Region / Account    | us-east-1 / 802104113048                                     |
+| API (App Runner)    | https://akzv4v7mje.us-east-1.awsapprunner.com               |
+| Frontend (CloudFront)| https://d27zjlncmljktr.cloudfront.net                      |
+| Frontend bucket     | silenthonor-frontend-802104113048                           |
+| Uploads bucket      | silenthonor-uploads-802104113048 (SSE-KMS, private, TLS-only)|
+| DocumentDB          | silenthonor-docdb (db.t3.medium, 1 instance, in prod-vpc)   |
+| VPC / subnets       | vpc-08f6c3091778e46b1 (prod-vpc), prod-private-1a/1b/1c      |
+| Secrets             | silenthonor/{mongodb-uri,jwt-secret,resend-api-key,admin-password} |
+| ECR                 | 802104113048.dkr.ecr.us-east-1.amazonaws.com/silenthonor-backend |
+| KMS alias           | alias/silenthonor-uploads                                    |
+
+To reproduce this as a fresh isolated VPC (once a VPC-limit increase is granted),
+apply the Terraform as-is. To reuse an existing VPC instead, replace `network.tf`'s
+VPC/subnet/NAT resources with `data` lookups for the target VPC and its private
+subnets, and keep only the two security groups + the S3 gateway endpoint.
+
+**Post-deploy manual steps still required:**
+1. Put the real Resend API key into `silenthonor/resend-api-key` (currently a
+   `REPLACE_ME` placeholder) — otherwise outbound email is disabled.
+2. Add the SES DKIM CNAMEs + request SES production access if switching email to SES.
+3. DNS: point `silenthonorfoundation.org` → CloudFront and (optionally)
+   `api.silenthonorfoundation.org` → App Runner custom domain, at the registrar.
+4. Migrate existing MongoDB data + DD-214 files (below).
+5. The bootstrap admin password is in Secrets Manager (`silenthonor/admin-password`);
+   log in and change it.
+
 ## Data migration
 
 Move existing MongoDB data into DocumentDB with `mongodump`/`mongorestore`:

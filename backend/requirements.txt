@@ -14,6 +14,7 @@ PyJWT==2.8.0
 
 # Validation & Config
 pydantic==2.5.2
+email-validator==2.1.1  # required by pydantic EmailStr fields in utils/validators.py
 python-dotenv==1.0.0
 
 # File handling
