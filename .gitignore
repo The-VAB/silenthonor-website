@@ -60,3 +60,12 @@ docker-compose.override.yml
 
 # Dev-only admin credentials written at startup (was leaked once — never commit)
 memory/test_credentials.md
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
