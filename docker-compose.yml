@@ -1,8 +1,6 @@
 # Silent Honor Foundation - Docker Compose
 # For local development and testing
 
-version: '3.8'
-
 services:
   # Backend API
   backend:

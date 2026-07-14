@@ -57,3 +57,6 @@ htmlcov/
 # Docker
 *.pid
 docker-compose.override.yml
+
+# Dev-only admin credentials written at startup (was leaked once — never commit)
+memory/test_credentials.md

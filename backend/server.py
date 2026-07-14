@@ -26,10 +26,26 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# CORS Configuration - DO NOT MODIFY THESE SETTINGS
+# CORS Configuration
+# Origins are env-driven (CORS_ORIGINS, comma-separated) so the same binary works
+# across the new domain (silenthonorfoundation.org), the legacy domain
+# (silenthonor.org), and local dev without a code change + redeploy. The default set
+# covers both production domains + www so a credentialed cross-site request from the
+# static frontend to the api.* subdomain is not silently blocked by CORS.
+_DEFAULT_CORS_ORIGINS = [
+    "https://silenthonorfoundation.org",
+    "https://www.silenthonorfoundation.org",
+    "https://silenthonor.org",
+    "https://www.silenthonor.org",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+_env_origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
+ALLOWED_ORIGINS = _env_origins or _DEFAULT_CORS_ORIGINS
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://silenthonor.org", "https://www.silenthonor.org"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,18 +54,45 @@ app.add_middleware(
 # Add request logging middleware
 app.add_middleware(RequestLoggingMiddleware)
 
+# Resolve the directory that holds the frontend (index.html, css/, js/, images/).
+# Emergent/Docker copies everything under /app; on the VPS the FastAPI service runs
+# from backend/ and the frontend lives one level up (the repo root). Resolve it once
+# so static mounts and HTML routes work in every deployment shape instead of assuming
+# a hardcoded /app.
+def _resolve_base_dir() -> str:
+    env_dir = os.environ.get("APP_DIR")
+    if env_dir and os.path.isfile(os.path.join(env_dir, "index.html")):
+        return env_dir
+    if os.path.isfile("/app/index.html"):
+        return "/app"
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+BASE_DIR = _resolve_base_dir()
+# Uploads are kept alongside the running service (matches utils/storage.py, which the
+# live server already uses) rather than the frontend dir.
+UPLOADS_DIR = os.environ.get("UPLOADS_DIR", "/app/uploads")
+
 # Serve static files
+def _mount_static(url: str, directory: str, name: str):
+    if os.path.isdir(directory):
+        app.mount(url, StaticFiles(directory=directory), name=name)
+    else:
+        logger.warning(f"Static dir not found, skipping mount {url} -> {directory}")
+
 try:
-    app.mount("/css", StaticFiles(directory="/app/css"), name="css")
-    app.mount("/js", StaticFiles(directory="/app/js"), name="js")
-    app.mount("/images", StaticFiles(directory="/app/images"), name="images")
-    app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
+    _mount_static("/css", os.path.join(BASE_DIR, "css"), "css")
+    _mount_static("/js", os.path.join(BASE_DIR, "js"), "js")
+    _mount_static("/images", os.path.join(BASE_DIR, "images"), "images")
+    if os.path.isdir(UPLOADS_DIR):
+        app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 except Exception as e:
     logger.warning(f"Could not mount static files: {e}")
 
-# MongoDB connection
-MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME = os.environ.get("DB_NAME", "silenthonor")
+# MongoDB connection — accept both MONGO_URL/DB_NAME (what this service reads) and the
+# MONGODB_URI/MONGODB_DB names used by docker-compose/.env.example, so the compose stack
+# actually reaches Mongo instead of silently falling back to localhost.
+MONGO_URL = os.environ.get("MONGO_URL") or os.environ.get("MONGODB_URI", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("DB_NAME") or os.environ.get("MONGODB_DB", "silenthonor")
 
 client = None
 db = None
@@ -100,9 +143,8 @@ async def startup_db():
     await migrate_legacy_courses()
 
     # Create required directories
-    os.makedirs("/app/uploads/dd214", exist_ok=True)
-    os.makedirs("/app/uploads/documents", exist_ok=True)
-    os.makedirs("/app/memory", exist_ok=True)
+    os.makedirs(os.path.join(UPLOADS_DIR, "dd214"), exist_ok=True)
+    os.makedirs(os.path.join(UPLOADS_DIR, "documents"), exist_ok=True)
 
     # Start daily task reminder loop (fires at 8 AM UTC)
     asyncio.create_task(daily_task_reminder_loop())
@@ -201,10 +243,15 @@ async def seed_admin():
         )
         logger.info(f"Admin password updated: {admin_email}")
 
-    # Write credentials to test file (for development only)
+    # Write credentials to a local test file for DEVELOPMENT ONLY. Never in production —
+    # this file previously leaked a real admin password into the public git repo.
+    if os.environ.get("ENVIRONMENT", "development").lower() == "production":
+        return
     try:
-        with open("/app/memory/test_credentials.md", "w") as f:
-            f.write("# Test Credentials\n\n")
+        memory_dir = os.path.join(BASE_DIR, "memory")
+        os.makedirs(memory_dir, exist_ok=True)
+        with open(os.path.join(memory_dir, "test_credentials.md"), "w") as f:
+            f.write("# Test Credentials (development only — gitignored)\n\n")
             f.write("## Admin Account\n")
             f.write(f"- Email: {admin_email}\n")
             f.write(f"- Password: {admin_password}\n")
@@ -299,63 +346,74 @@ async def migrate_legacy_courses():
     await db.migrations.insert_one({"name": "legacy_courses_v1", "applied_at": datetime.now(timezone.utc)})
     logger.info("Legacy courses migrated into db.courses")
 
-# HTML page serving
+# HTML page serving.
+# In production the static frontend is served by nginx; these routes are a fallback so
+# the API host can also serve pages (Emergent/all-in-one). Resolved against BASE_DIR and
+# guarded so a missing file returns a clean 404 instead of a 500.
+from fastapi.responses import HTMLResponse
+
+def _serve_page(name: str):
+    filepath = os.path.join(BASE_DIR, f"{name}.html")
+    if os.path.isfile(filepath):
+        return FileResponse(filepath, media_type="text/html")
+    fallback = os.path.join(BASE_DIR, "404.html")
+    if os.path.isfile(fallback):
+        return FileResponse(fallback, status_code=404, media_type="text/html")
+    return HTMLResponse("<h1>404 — Page Not Found</h1>", status_code=404)
+
 @app.get("/{page}.html")
 async def serve_html_page(page: str):
-    filepath = f"/app/{page}.html"
-    if os.path.exists(filepath):
-        return FileResponse(filepath, media_type="text/html")
-    return FileResponse("/app/404.html", status_code=404, media_type="text/html")
+    return _serve_page(page)
 
 # Clean URL routes
 @app.get("/")
 async def serve_index():
-    return FileResponse("/app/index.html", media_type="text/html")
+    return _serve_page("index")
 
 @app.get("/login")
 async def serve_login():
-    return FileResponse("/app/login.html", media_type="text/html")
+    return _serve_page("login")
 
 @app.get("/signup")
 async def serve_signup():
-    return FileResponse("/app/signup.html", media_type="text/html")
+    return _serve_page("signup")
 
 @app.get("/dashboard")
 async def serve_dashboard():
-    return FileResponse("/app/dashboard.html", media_type="text/html")
+    return _serve_page("dashboard")
 
 @app.get("/admin")
 async def serve_admin():
-    return FileResponse("/app/admin.html", media_type="text/html")
+    return _serve_page("admin")
 
 @app.get("/contact")
 async def serve_contact():
-    return FileResponse("/app/contact.html", media_type="text/html")
+    return _serve_page("contact")
 
 @app.get("/courses")
 async def serve_courses():
-    return FileResponse("/app/courses.html", media_type="text/html")
+    return _serve_page("courses")
 
 @app.get("/counselor")
 async def serve_counselor():
-    return FileResponse("/app/counselor.html", media_type="text/html")
+    return _serve_page("counselor")
 
 @app.get("/credit-tracker")
 async def serve_credit_tracker():
-    return FileResponse("/app/credit-tracker.html", media_type="text/html")
+    return _serve_page("credit-tracker")
 
 @app.get("/dispute-tracker")
 async def serve_dispute_tracker():
-    return FileResponse("/app/dispute-tracker.html", media_type="text/html")
+    return _serve_page("dispute-tracker")
 
 @app.get("/messages")
 async def serve_messages():
-    return FileResponse("/app/messages.html", media_type="text/html")
+    return _serve_page("messages")
 
 @app.get("/reset-password")
 async def serve_reset_password():
-    return FileResponse("/app/reset-password.html", media_type="text/html")
+    return _serve_page("reset-password")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))
