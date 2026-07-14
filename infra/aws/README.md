@@ -154,6 +154,41 @@ subnets, and keep only the two security groups + the S3 gateway endpoint.
 5. The bootstrap admin password is in Secrets Manager (`silenthonor/admin-password`);
    log in and change it.
 
+## Custom domains (silenthonorfoundation.org + silenthonor.org)
+
+Canonical site = **silenthonorfoundation.org** (apex primary); **silenthonor.org**
+redirects to it. Because GoDaddy DNS can't alias an apex to CloudFront, DNS for
+`silenthonorfoundation.org` is delegated to **Route 53** (zone `Z0665134NU5HGJLGSP1D`).
+
+**What you do at GoDaddy (one time):**
+1. `silenthonorfoundation.org` → set nameservers to:
+   ```
+   ns-1055.awsdns-03.org
+   ns-1925.awsdns-48.co.uk
+   ns-954.awsdns-55.net
+   ns-469.awsdns-58.com
+   ```
+2. `silenthonor.org` → add a **Domain Forwarding** rule (301) to
+   `https://silenthonorfoundation.org` for both the root and `www` (leave its
+   MX/email records alone). No AWS resources needed for the redirect.
+
+Everything else is already staged in Route 53 (ACM + App Runner cert validation,
+`api` → App Runner, SES DKIM). Once the nameservers propagate, ACM and the App
+Runner custom domain validate automatically, then run:
+
+```bash
+CERT_ARN=<acm arn> CF_ID=<dist id> ZONE_ID=Z0665134NU5HGJLGSP1D \
+SVC_ARN=<apprunner arn> FE_BUCKET=silenthonor-frontend-802104113048 \
+CF_DOMAIN=d27zjlncmljktr.cloudfront.net \
+  ./scripts/aws-finalize-domains.sh
+```
+
+It attaches the cert + aliases to CloudFront, points apex/www at CloudFront, and
+(once `api.silenthonorfoundation.org` is active) repoints the frontend at
+`https://api.silenthonorfoundation.org` — which makes auth cookies **first-party**
+(same registrable domain), fixing the Safari third-party-cookie caveat. Re-runnable;
+it no-ops until the cert is issued.
+
 ## Data migration
 
 Move existing MongoDB data into DocumentDB with `mongodump`/`mongorestore`:
