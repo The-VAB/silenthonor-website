@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found — Silent Honor Foundation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --red: #B91C1C; --red-light: #EF4444; --navy: #0B1220;
+      --navy-mid: #111827; --gold: #C9952A; --muted: #6B7A99;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(1200px 600px at 50% -10%, var(--navy-mid), var(--navy));
+      color: #E5E9F0; font-family: "Barlow", system-ui, sans-serif; text-align: center; padding: 2rem;
+    }
+    .wrap { max-width: 560px; }
+    .code { font-family: "Oswald", sans-serif; font-weight: 700; font-size: clamp(5rem, 18vw, 9rem); line-height: 1; color: var(--red-light); letter-spacing: 0.04em; }
+    h1 { font-family: "Oswald", sans-serif; font-weight: 600; font-size: clamp(1.4rem, 4vw, 2rem); margin: 0.5rem 0 1rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    p { font-family: "Lora", serif; color: var(--muted); font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem; }
+    .rule { width: 64px; height: 3px; background: var(--gold); margin: 0 auto 1.5rem; border-radius: 2px; }
+    a.btn {
+      display: inline-block; font-family: "Oswald", sans-serif; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.08em; text-decoration: none; color: #fff; background: var(--red);
+      padding: 0.85rem 2rem; border-radius: 6px; transition: background 0.2s ease;
+    }
+    a.btn:hover { background: var(--red-light); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="code">404</div>
+    <div class="rule"></div>
+    <h1>Page Not Found</h1>
+    <p>The page you're looking for has moved or no longer exists. Let's get you back on mission.</p>
+    <a class="btn" href="/">Return Home</a>
+  </div>
+</body>
+</html>

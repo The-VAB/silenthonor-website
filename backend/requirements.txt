@@ -14,6 +14,9 @@ PyJWT==2.8.0
 
 # Validation & Config
 pydantic==2.5.2
+# Required by pydantic EmailStr fields (auth/contact models). Without it the app
+# crashes on startup — was only working in prod because it happened to be preinstalled.
+email-validator==2.1.1
 python-dotenv==1.0.0
 
 # File handling
