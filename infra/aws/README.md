@@ -156,38 +156,43 @@ subnets, and keep only the two security groups + the S3 gateway endpoint.
 
 ## Custom domains (silenthonorfoundation.org + silenthonor.org)
 
-Canonical site = **silenthonorfoundation.org** (apex primary); **silenthonor.org**
-redirects to it. Because GoDaddy DNS can't alias an apex to CloudFront, DNS for
-`silenthonorfoundation.org` is delegated to **Route 53** (zone `Z0665134NU5HGJLGSP1D`).
+Canonical site = **silenthonorfoundation.org** (apex primary). DNS is hosted at
+**Cloudflare** (the registrar), which supports apex CNAME flattening — so no
+Route 53 / nameserver change is needed; records are added directly in Cloudflare.
+`silenthonor.org` will later be added to Cloudflare and CNAME'd to
+`silenthonorfoundation.org`.
 
-**What you do at GoDaddy (one time):**
-1. `silenthonorfoundation.org` → set nameservers to:
-   ```
-   ns-1055.awsdns-03.org
-   ns-1925.awsdns-48.co.uk
-   ns-954.awsdns-55.net
-   ns-469.awsdns-58.com
-   ```
-2. `silenthonor.org` → add a **Domain Forwarding** rule (301) to
-   `https://silenthonorfoundation.org` for both the root and `www` (leave its
-   MX/email records alone). No AWS resources needed for the redirect.
+**What you add in Cloudflare DNS — all with Proxy status = "DNS only" (grey cloud):**
 
-Everything else is already staged in Route 53 (ACM + App Runner cert validation,
-`api` → App Runner, SES DKIM). Once the nameservers propagate, ACM and the App
-Runner custom domain validate automatically, then run:
+| Type  | Name (host)                              | Value / Target                          |
+|-------|------------------------------------------|-----------------------------------------|
+| CNAME | `@` (apex)                               | `d27zjlncmljktr.cloudfront.net`         |
+| CNAME | `www`                                    | `d27zjlncmljktr.cloudfront.net`         |
+| CNAME | `api`                                    | `tv9nakyd9p.us-east-1.awsapprunner.com` |
+| CNAME | *(ACM validation — apex)*                | *(from `aws acm describe-certificate`)* |
+| CNAME | *(ACM validation — www)*                 | *(same)*                                |
+| CNAME | *(App Runner validation ×2)*             | *(from `aws apprunner describe-custom-domains`)* |
+| CNAME | `<token>._domainkey` ×3 (SES DKIM)       | `<token>.dkim.amazonses.com`            |
+
+The grey-cloud (DNS-only) setting matters: it lets CloudFront/App Runner serve
+their own ACM certs and lets ACM validate. (Proxied/orange works too but needs
+Cloudflare SSL mode = Full and adds a second CDN in front — not recommended here.)
+
+Once ACM + the App Runner custom domain validate (automatic once the records
+resolve), run:
 
 ```bash
-CERT_ARN=<acm arn> CF_ID=<dist id> ZONE_ID=Z0665134NU5HGJLGSP1D \
+CERT_ARN=<acm arn> CF_ID=E1H1ZTFC6CP7BY \
 SVC_ARN=<apprunner arn> FE_BUCKET=silenthonor-frontend-802104113048 \
 CF_DOMAIN=d27zjlncmljktr.cloudfront.net \
   ./scripts/aws-finalize-domains.sh
 ```
 
-It attaches the cert + aliases to CloudFront, points apex/www at CloudFront, and
-(once `api.silenthonorfoundation.org` is active) repoints the frontend at
+It attaches the cert + aliases to CloudFront and (once
+`api.silenthonorfoundation.org` is active) repoints the frontend at
 `https://api.silenthonorfoundation.org` — which makes auth cookies **first-party**
-(same registrable domain), fixing the Safari third-party-cookie caveat. Re-runnable;
-it no-ops until the cert is issued.
+(same registrable domain), removing the cross-site-cookie caveat. Re-runnable;
+it no-ops until the cert is issued. The apex/www/api DNS records live in Cloudflare.
 
 ## Data migration
 

@@ -2,36 +2,35 @@
 # Finalize custom-domain cutover for Silent Honor once the ACM cert is validated.
 # Safe to run repeatedly: it no-ops until the cert is ISSUED, and each step is idempotent.
 #
-# Prereq (done once, manually at GoDaddy): point silenthonorfoundation.org
-# nameservers at the Route 53 delegation set for this zone. That lets ACM +
-# App Runner validate via the records already staged in the zone.
+# DNS for silenthonorfoundation.org is hosted at Cloudflare. Prereq (done once, in
+# Cloudflare, all records "DNS only" / grey cloud): add the ACM + App Runner cert
+# validation CNAMEs and the api CNAME. That lets ACM + App Runner validate.
 #
 # What it does when the cert is ready:
 #   1. Attach the ACM cert + aliases (apex, www) to the CloudFront distribution
-#   2. Add Route 53 alias A/AAAA records apex + www -> CloudFront
-#   3. Once the App Runner custom domain is active, repoint the frontend at
+#   2. Once the App Runner custom domain is active, repoint the frontend at
 #      https://api.silenthonorfoundation.org and redeploy the static site
+# The apex/www -> CloudFront and api -> App Runner DNS records live in Cloudflare
+# (add them there); this script does not touch DNS.
 set -euo pipefail
 export AWS_DEFAULT_REGION=us-east-1
 
 DOM=silenthonorfoundation.org
 CERT_ARN="${CERT_ARN:?set CERT_ARN}"
 CF_ID="${CF_ID:?set CF_ID}"
-ZONE_ID="${ZONE_ID:?set ZONE_ID}"
 SVC_ARN="${SVC_ARN:?set SVC_ARN}"
 FE_BUCKET="${FE_BUCKET:?set FE_BUCKET}"
 CF_DOMAIN="${CF_DOMAIN:?set CF_DOMAIN}"        # e.g. d27zjlncmljktr.cloudfront.net
-CF_ZONE_ID="Z2FDTNDATAQYW2"                     # global CloudFront hosted-zone id (constant)
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 STATUS=$(aws acm describe-certificate --certificate-arn "$CERT_ARN" --query 'Certificate.Status' --output text)
 echo "ACM cert status: $STATUS"
 if [ "$STATUS" != "ISSUED" ]; then
-  echo "Cert not issued yet — did you switch the GoDaddy nameservers to Route 53? Exiting (safe to re-run)."
+  echo "Cert not issued yet — are the ACM validation CNAMEs added in Cloudflare (DNS only)? Exiting (safe to re-run)."
   exit 0
 fi
 
-echo "=== [1/3] CloudFront: attach cert + aliases ==="
+echo "=== [1/2] CloudFront: attach cert + aliases ==="
 python3 - "$CF_ID" "$CERT_ARN" "$DOM" <<'PY'
 import sys, json, subprocess
 cf_id, cert_arn, dom = sys.argv[1:4]
@@ -51,19 +50,9 @@ subprocess.check_call(["aws","cloudfront","update-distribution","--id",cf_id,
 print("CloudFront updated with aliases:", aliases)
 PY
 
-echo "=== [2/3] Route 53: apex + www alias -> CloudFront ==="
-cat > /tmp/site_alias.json <<JSON
-{"Changes":[
- {"Action":"UPSERT","ResourceRecordSet":{"Name":"$DOM.","Type":"A","AliasTarget":{"HostedZoneId":"$CF_ZONE_ID","DNSName":"$CF_DOMAIN","EvaluateTargetHealth":false}}},
- {"Action":"UPSERT","ResourceRecordSet":{"Name":"$DOM.","Type":"AAAA","AliasTarget":{"HostedZoneId":"$CF_ZONE_ID","DNSName":"$CF_DOMAIN","EvaluateTargetHealth":false}}},
- {"Action":"UPSERT","ResourceRecordSet":{"Name":"www.$DOM.","Type":"A","AliasTarget":{"HostedZoneId":"$CF_ZONE_ID","DNSName":"$CF_DOMAIN","EvaluateTargetHealth":false}}},
- {"Action":"UPSERT","ResourceRecordSet":{"Name":"www.$DOM.","Type":"AAAA","AliasTarget":{"HostedZoneId":"$CF_ZONE_ID","DNSName":"$CF_DOMAIN","EvaluateTargetHealth":false}}}
-]}
-JSON
-aws route53 change-resource-record-sets --hosted-zone-id "$ZONE_ID" --change-batch file:///tmp/site_alias.json >/dev/null
-echo "apex + www now resolve to CloudFront"
+echo "NOTE: apex + www -> $CF_DOMAIN must exist in Cloudflare (CNAME, DNS only). This script does not manage DNS."
 
-echo "=== [3/3] Frontend -> api.$DOM (only once App Runner domain is active) ==="
+echo "=== [2/2] Frontend -> api.$DOM (only once App Runner domain is active) ==="
 AR_STATUS=$(aws apprunner describe-custom-domains --service-arn "$SVC_ARN" \
   --query "CustomDomains[?DomainName=='api.$DOM'].Status|[0]" --output text)
 echo "App Runner custom domain status: $AR_STATUS"
