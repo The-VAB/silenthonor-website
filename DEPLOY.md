@@ -15,7 +15,7 @@ The frontend calls the API cross-site via cookies (`window.API_BASE` in `js/comp
 1. **DNS** — `silenthonorfoundation.org` (and `www.`) have no A record, so the frontend is unreachable. *(Registrar/DNS action — see step 1.)*
 2. **CORS** — the live API only allowed `silenthonor.org`, so even once the frontend resolves, every logged-in call from `silenthonorfoundation.org` was blocked. *(Fixed in this PR — env-driven CORS now allows both domains; requires an API redeploy.)*
 3. **No frontend server config** — the repo only shipped an API nginx block; nothing served the static site. *(Fixed — `scripts/silenthonor-frontend.nginx.conf` added.)*
-4. **Leaked admin credential** — `memory/test_credentials.md` (real admin password) was committed to this public repo. *(Untracked + gitignored + startup no longer writes it in production. Password must be rotated — step 4.)*
+4. **Leaked admin credential** — a credentials file was committed to this public repo. *(Untracked + gitignored + startup no longer writes it in production. The affected admin password must be rotated — step 4.)*
 
 ## What this PR fixes (code — deploy to take effect)
 
@@ -54,10 +54,10 @@ The frontend calls the API cross-site via cookies (`window.API_BASE` in `js/comp
    or run `scripts/deploy.sh` from a machine with SSH access.
 
 **4. Rotate the leaked admin credential — required**
-   The password `SilentHonor2024!` for `admin@silenthonor.org` was public. Set a new
+   The seed admin password was exposed in the public repo history. Set a new strong
    `ADMIN_PASSWORD` in `.env` and `systemctl restart silenthonor` (startup resets the
-   admin hash to the env value). Optionally purge it from git history (`git filter-repo`)
-   — a force-push, so coordinate first.
+   admin hash to the env value). Optionally purge the old file from git history
+   (`git filter-repo`) — a force-push, so coordinate first.
 
 ## Verify (after steps 1–4)
 
