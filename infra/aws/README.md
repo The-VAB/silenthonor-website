@@ -112,19 +112,29 @@ Apply for [AWS nonprofit credits](https://aws.amazon.com/government-education/no
 The initial live deploy was provisioned via the AWS CLI (the Terraform registry is
 egress-blocked from the build environment). It matches this IaC **except** for the
 network: the account was at its VPC limit (5/5) and over the EIP limit, so instead
-of a fresh VPC the deploy **reused the existing `prod-vpc` private subnets and NAT
-gateway**, with dedicated, isolated `silenthonor-*` security groups (additive only —
-no existing subnet/route/SG was modified). This also saved the ~$33/mo NAT cost.
+of a fresh VPC the deploy **reused the existing `prod-vpc` and its NAT gateway**,
+with dedicated, isolated `silenthonor-*` security groups (additive only — no
+existing subnet/route/SG was modified). This also saved the ~$33/mo NAT cost.
+
+DocumentDB uses the existing `prod-private-*` subnets. The App Runner VPC connector,
+however, needed **two dedicated new subnets** (`silenthonor-apprunner-a/b`,
+10.1.240.0/24 + 10.1.241.0/24, routed through the same NAT): App Runner's Hyperplane
+ENIs failed to provision in the busy shared `prod-private` subnets (deployment failed
+right after image pull, before "Provisioning instances"). Fresh dedicated subnets in
+App Runner-supported AZs (use1-az1/az2) resolved it. If you rebuild, give App Runner
+its own subnets rather than reusing heavily-used ones.
 
 | Resource            | Value                                                        |
 |---------------------|--------------------------------------------------------------|
 | Region / Account    | us-east-1 / 802104113048                                     |
-| API (App Runner)    | https://akzv4v7mje.us-east-1.awsapprunner.com               |
+| API (App Runner)    | https://tv9nakyd9p.us-east-1.awsapprunner.com               |
 | Frontend (CloudFront)| https://d27zjlncmljktr.cloudfront.net                      |
 | Frontend bucket     | silenthonor-frontend-802104113048                           |
 | Uploads bucket      | silenthonor-uploads-802104113048 (SSE-KMS, private, TLS-only)|
 | DocumentDB          | silenthonor-docdb (db.t3.medium, 1 instance, in prod-vpc)   |
-| VPC / subnets       | vpc-08f6c3091778e46b1 (prod-vpc), prod-private-1a/1b/1c      |
+| VPC                 | vpc-08f6c3091778e46b1 (prod-vpc)                            |
+| DocDB subnets       | prod-private-1a/1b/1c                                        |
+| App Runner subnets  | silenthonor-apprunner-a/b (10.1.240/241.0/24) — dedicated   |
 | Secrets             | silenthonor/{mongodb-uri,jwt-secret,resend-api-key,admin-password} |
 | ECR                 | 802104113048.dkr.ecr.us-east-1.amazonaws.com/silenthonor-backend |
 | KMS alias           | alias/silenthonor-uploads                                    |
