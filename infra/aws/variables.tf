@@ -77,13 +77,13 @@ variable "apprunner_memory" {
 variable "email_provider" {
   description = "resend or ses"
   type        = string
-  default     = "resend"
+  default     = "ses"
 }
 
 variable "from_email" {
   description = "From address for outbound email"
   type        = string
-  default     = "Silent Honor <noreply@silenthonorfoundation.org>"
+  default     = "Silent Honor <no-reply@silenthonorfoundation.org>"
 }
 
 variable "email_domain" {

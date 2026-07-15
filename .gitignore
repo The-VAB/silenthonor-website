@@ -66,3 +66,6 @@ docker-compose.override.yml
 *.tfvars
 !*.tfvars.example
 crash.log
+
+# App-generated admin credentials (never commit)
+memory/test_credentials.md
