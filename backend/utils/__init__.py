@@ -33,6 +33,4 @@ from .storage import (
     upload_dd214,
     delete_dd214,
     get_dd214_url,
-    migrate_to_supabase,
-    check_supabase_connection
 )

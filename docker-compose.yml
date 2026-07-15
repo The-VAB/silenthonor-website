@@ -16,11 +16,11 @@ services:
       - MONGODB_DB=silenthonor
       - JWT_SECRET=${JWT_SECRET:-development-secret-change-in-production}
       - JWT_EXPIRY_HOURS=24
+      - EMAIL_PROVIDER=${EMAIL_PROVIDER:-ses}
+      - FROM_EMAIL=${FROM_EMAIL:-Silent Honor <no-reply@silenthonorfoundation.org>}
       - RESEND_API_KEY=${RESEND_API_KEY}
-      - FROM_EMAIL=${FROM_EMAIL:-noreply@silenthonorfoundation.org}
-      - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_KEY=${SUPABASE_KEY}
-      - SUPABASE_BUCKET=${SUPABASE_BUCKET:-dd214-uploads}
+      - S3_BUCKET=${S3_BUCKET}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
       - ENVIRONMENT=development
       - FRONTEND_URL=http://localhost:3000
     volumes:

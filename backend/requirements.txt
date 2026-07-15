@@ -20,16 +20,13 @@ python-dotenv==1.0.0
 # File handling
 aiofiles==23.2.1
 
-# Email (Resend)
+# Email (Resend — optional fallback; SES is the default provider)
 resend==0.7.0
-
-# Supabase Storage (legacy fallback)
-supabase==2.3.0
 
 # AWS SDK (S3 storage + SES email)
 boto3==1.34.69
 
-# HTTP Client (version compatible with supabase)
+# HTTP Client (used by the Resend email fallback)
 httpx>=0.24.0,<0.25.0
 
 # File encryption (DD-214 local fallback AES-256)

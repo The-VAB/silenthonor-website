@@ -121,7 +121,7 @@ async def get_member(request: Request, member_id: str):
 
 @router.get("/dd214/{filename}")
 async def get_dd214_file(request: Request, filename: str):
-    """Get DD-214 file for review - decrypts .enc files, or redirects to Supabase signed URL"""
+    """Get DD-214 file for review - decrypts .enc files, or redirects to the S3 signed URL"""
     await get_current_admin(request)
 
     # First try local file
@@ -142,9 +142,9 @@ async def get_dd214_file(request: Request, filename: str):
             return Response(content=decrypted, media_type=mime, headers={"Content-Disposition": f"inline; filename={base}"})
         return FileResponse(filepath)
 
-    # Not on local disk — fetch a signed URL from the configured object store
+    # Not on local disk — fetch a signed URL from S3
     from utils.storage import S3_ENABLED
-    signed_url = await get_dd214_url(filename, "s3" if S3_ENABLED else "supabase")
+    signed_url = await get_dd214_url(filename, "s3" if S3_ENABLED else "local")
     if signed_url:
         from fastapi.responses import RedirectResponse
         return RedirectResponse(url=signed_url)

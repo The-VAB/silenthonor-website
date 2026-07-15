@@ -181,7 +181,7 @@ async def get_dashboard_data(request: Request):
 @router.post("/dd214")
 @router.post("/upload/dd214")
 async def upload_dd214(request: Request, file: UploadFile = File(...)):
-    """Upload DD-214 document to Supabase or local storage"""
+    """Upload DD-214 document to S3 (encrypted) or local storage"""
     user = await get_current_user(request)
 
     # Validate file type
@@ -194,7 +194,7 @@ async def upload_dd214(request: Request, file: UploadFile = File(...)):
     if len(contents) > 10 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="File too large. Maximum 10MB.")
 
-    # Upload to storage (Supabase or local fallback)
+    # Upload to storage (S3 or local fallback)
     result = await storage_upload_dd214(contents, file.filename, user["_id"])
 
     if not result["success"]:
