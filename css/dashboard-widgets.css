@@ -1,0 +1,159 @@
+/*
+ * Shared dashboard widget styles - stat tiles, panel hover/glow, chart containers.
+ * Extracted verbatim from dashboard.html (PR #5) so every dashboard-style page
+ * (admin.html, counselor-*.html) reuses the exact same classes instead of each
+ * page reinventing its own version. Uses Silent Honor's existing brand tokens
+ * only (var(--red), var(--red-light), var(--navy), var(--gold), var(--white),
+ * var(--muted), var(--border) from css/global.css) - no new colors, no new fonts.
+ *
+ * Usage: link this file AFTER css/global.css, then use the markup patterns
+ * documented in each class below. See dashboard.html for a live reference
+ * implementation.
+ */
+
+/* ---- Stat tiles (icon + large number + optional trend badge) ---- */
+.stat-card {
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.stat-card:hover {
+  border-color: rgba(201, 149, 42, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px);
+}
+.stat-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(201, 149, 42, 0.12);
+  color: var(--gold);
+}
+.stat-icon svg {
+  width: 22px;
+  height: 22px;
+}
+/* Color variants - add one of these classes to .stat-card alongside the base class */
+.stat-card.stat-red .stat-icon {
+  background: rgba(212, 43, 43, 0.14);
+  color: var(--red-light);
+}
+.stat-card.stat-blue .stat-icon {
+  background: rgba(59, 130, 246, 0.14);
+  color: #3B82F6;
+}
+.stat-card.stat-green .stat-icon {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10B981;
+}
+.stat-body {
+  flex: 1;
+  min-width: 0;
+}
+.stat-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+.stat-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.stat-value {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+.stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+.stat-trend svg { width: 10px; height: 10px; }
+.stat-trend.up { background: rgba(16, 185, 129, 0.15); color: #10B981; }
+.stat-trend.down { background: rgba(239, 68, 68, 0.15); color: #EF4444; }
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .stat-card { text-align: left; }
+}
+
+/* ---- Card / panel hover glow (apply to any existing bordered card/panel) ---- */
+.widget-card-hover {
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.widget-card-hover:hover {
+  border-color: rgba(201, 149, 42, 0.3);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+.widget-card-hover.lift:hover {
+  transform: translateY(-2px);
+}
+
+/* ---- ApexCharts container + legend (used with js/dashboard-widgets.js) ---- */
+.chart-container {
+  min-height: 260px;
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.chart-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---- Honest empty state (use whenever a widget has no real data yet) ---- */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+.empty-state-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.empty-state-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  max-width: 320px;
+  margin: 0 auto;
+}
