@@ -480,31 +480,18 @@ button {
 .footer-partners-logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.9rem;
-}
-
-.va-logo-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
-  color: #fff;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.03em;
-  display: flex;
-  align-items: center;
   justify-content: center;
+  margin-bottom: 0.9rem;
+  transition: transform 0.2s ease;
 }
 
-.va-logo-text {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.85rem;
-  letter-spacing: 0.14em;
-  color: var(--white);
+.footer-partners-logo:hover { transform: translateY(-2px); }
+
+.va-logo-img {
+  height: 66px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
 }
 
 .footer-partners-sub {

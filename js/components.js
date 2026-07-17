@@ -146,10 +146,9 @@ function injectFooter() {
 
       <div class="footer-partners">
         <p class="footer-partners-line">Insurance built, created, and offered through <a href="https://theveteranalliance.com" target="_blank" rel="noopener">The Veteran Alliance</a>.</p>
-        <div class="footer-partners-logo" aria-label="The Veteran Alliance">
-          <span class="va-logo-mark">VA</span>
-          <span class="va-logo-text">THE&nbsp;VETERAN&nbsp;ALLIANCE</span>
-        </div>
+        <a href="https://theveteranalliance.com" target="_blank" rel="noopener" class="footer-partners-logo" aria-label="The Veteran Alliance">
+          <img src="images/veteran-alliance-logo.png" alt="The Veteran Alliance" class="va-logo-img">
+        </a>
         <p class="footer-partners-sub">In direct support and partnership with Corgi.</p>
       </div>
 
