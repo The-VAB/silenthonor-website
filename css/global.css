@@ -28,7 +28,70 @@
   --font-display: 'Oswald', sans-serif;
   --font-body: 'Lora', serif;
   --font-ui: 'Barlow', sans-serif;
+
+  /* Glass */
+  --glass-bg: rgba(17, 24, 39, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  color-scheme: dark;
 }
+
+/* ── LIGHT MODE ──
+   Same semantic variable names, luxe-light values — every component that
+   already reads var(--navy)/var(--white)/etc. re-themes automatically. */
+:root[data-theme="light"] {
+  --navy: #F5F3EC;
+  --navy-mid: #FFFFFF;
+  --navy-light: #ECE8DC;
+  --white: #14171F;
+  --muted: #5B6376;
+  --steel: #E4E0D3;
+  --border: rgba(20, 23, 31, 0.08);
+  --border-red: rgba(185, 28, 28, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(20, 23, 31, 0.08);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --navy: #F5F3EC;
+    --navy-mid: #FFFFFF;
+    --navy-light: #ECE8DC;
+    --white: #14171F;
+    --muted: #5B6376;
+    --steel: #E4E0D3;
+    --border: rgba(20, 23, 31, 0.08);
+    --border-red: rgba(185, 28, 28, 0.2);
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(20, 23, 31, 0.08);
+    color-scheme: light;
+  }
+}
+
+/* Light mode needs the topo/hero glows toned down and shadows added back in,
+   since they were tuned against a dark base. */
+:root[data-theme="light"] .topo-bg { opacity: 0.05; filter: none; }
+:root[data-theme="light"] .nav {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 3px rgba(20,23,31,0.06);
+}
+:root[data-theme="light"] .btn-outline { border-color: rgba(20, 23, 31, 0.25); }
+:root[data-theme="light"] .btn-outline:hover { background: rgba(20, 23, 31, 0.04); border-color: rgba(20, 23, 31, 0.4); }
+:root[data-theme="light"] .theme-toggle { background: rgba(20, 23, 31, 0.04); }
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .topo-bg { opacity: 0.05; filter: none; }
+  :root:not([data-theme="dark"]) .nav {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 1px 3px rgba(20,23,31,0.06);
+  }
+  :root:not([data-theme="dark"]) .btn-outline { border-color: rgba(20, 23, 31, 0.25); }
+  :root:not([data-theme="dark"]) .btn-outline:hover { background: rgba(20, 23, 31, 0.04); border-color: rgba(20, 23, 31, 0.4); }
+  :root:not([data-theme="dark"]) .theme-toggle { background: rgba(20, 23, 31, 0.04); }
+}
+:root[data-theme="light"] .hero-stat-card,
+:root[data-theme="light"] .glass-panel { box-shadow: 0 4px 24px rgba(20,23,31,0.06); }
 
 /* ── RESET & BASE ── */
 *, *::before, *::after {
@@ -213,6 +276,42 @@ button {
   color: var(--gold-light);
 }
 
+/* Theme toggle */
+.theme-toggle {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+}
+
+.theme-toggle:hover {
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.theme-toggle:active { transform: translateY(0) scale(0.94); }
+
+.theme-icon {
+  width: 17px;
+  height: 17px;
+  position: absolute;
+  transition: opacity 0.25s ease, transform 0.35s ease;
+}
+
+.theme-icon-sun { opacity: 1; transform: rotate(0deg) scale(1); }
+.theme-icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+
+:root[data-theme="light"] .theme-icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); }
+:root[data-theme="light"] .theme-icon-moon { opacity: 1; transform: rotate(0deg) scale(1); }
+
 /* Mobile menu toggle */
 .nav-mobile-toggle {
   display: none;
@@ -352,8 +451,73 @@ button {
   color: var(--white);
 }
 
+/* Insurance / Veteran Alliance / Corgi partner credit */
+.footer-partners {
+  max-width: 1300px;
+  margin: 3rem auto 0;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.footer-partners-line {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--muted);
+  margin-bottom: 1.1rem;
+}
+
+.footer-partners-line a {
+  color: var(--gold-light);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+
+.footer-partners-line a:hover { color: var(--gold); }
+
+.footer-partners-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.va-logo-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.va-logo-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  color: var(--white);
+}
+
+.footer-partners-sub {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #3D4F6B;
+}
+
 .footer-bottom {
-  margin-top: 3rem;
+  margin-top: 2.5rem;
   padding-top: 2rem;
   border-top: 1px solid var(--border);
   display: flex;
@@ -1000,12 +1164,15 @@ a:focus-visible {
   color: var(--red);
 }
 
-.nav-links {
+/* Scoped to .site-header — an unscoped .nav-links rule here overrides the
+   public nav's mobile display:none media query (source order beats media
+   queries) and leaves the mobile menu stuck open. */
+.site-header .nav-links {
   display: flex;
   gap: 0.5rem;
 }
 
-.nav-links a {
+.site-header .nav-links a {
   font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 500;
@@ -1018,13 +1185,13 @@ a:focus-visible {
   transition: all 0.2s;
 }
 
-.nav-links a:hover,
-.nav-links a.active {
+.site-header .nav-links a:hover,
+.site-header .nav-links a.active {
   color: var(--white);
   background: rgba(255, 255, 255, 0.05);
 }
 
-.nav-links a.active {
+.site-header .nav-links a.active {
   color: var(--red-light);
 }
 
@@ -1252,4 +1419,96 @@ a:focus-visible {
 .btn-danger:hover {
   background: rgba(239, 68, 68, 0.2);
   border-color: #EF4444;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLASS / BENTO / JOURNEY SELECTOR — shared utilities for modern layouts
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.1rem;
+}
+
+.bento-grid > * { grid-column: span 2; }
+.bento-span-3 { grid-column: span 3 !important; }
+.bento-span-4 { grid-column: span 4 !important; }
+.bento-span-6 { grid-column: span 6 !important; }
+
+@media (max-width: 1024px) {
+  .bento-grid { grid-template-columns: repeat(2, 1fr); }
+  .bento-grid > * { grid-column: span 2 !important; }
+}
+
+/* Journey self-select — the zero-party signal from the Personalization
+   Standard: one optional tap, framed as control the visitor has, never a
+   gate. Selecting one sets [data-journey] on <body>; content tagged with
+   data-applies-to / data-suppress-for reacts via journey.js. */
+.journey-select {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.journey-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.journey-pill:hover {
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.journey-pill.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+/* Content eligibility — hidden entirely (not just dimmed) when it doesn't
+   apply to the selected journey; this is the "suppress, don't downrank"
+   rule from the Personalization Standard. Toggled by journey.js. */
+.journey-hidden { display: none !important; }
+
+/* Emphasis — the matching card/section for the active journey gets top
+   billing and a quiet highlight, set by journey.js. */
+.journey-emphasis {
+  order: -1;
+  border-color: var(--border-red) !important;
+}
+
+.journey-emphasis::before {
+  content: 'Recommended for you';
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red-light);
+  margin-bottom: 0.8rem;
 }
