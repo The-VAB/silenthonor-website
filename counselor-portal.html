@@ -192,23 +192,42 @@
     }
 
     function renderStats(s) {
-        var slots = s.open_slots != null ? s.open_slots : "—";
+        var slots = s.open_slots;
         var slotEl = document.getElementById("stat-slots");
-        slotEl.textContent = slots;
-        if (typeof slots === "number" && slots === 0) slotEl.className = "stat-value highlight-red";
+        if (typeof slots === "number") {
+            if (typeof animateCountUp === "function") animateCountUp("stat-slots", slots);
+            else slotEl.textContent = slots;
+            if (slots === 0) slotEl.className = "stat-value highlight-red";
+        } else {
+            slotEl.textContent = "—";
+        }
 
         document.getElementById("stat-slots-sub").textContent =
             s.assigned_members != null ? s.assigned_members + " / " + s.max_caseload + " used" : "";
 
-        document.getElementById("stat-waitlist").textContent = s.waitlist_count != null ? s.waitlist_count : "—";
+        if (typeof s.waitlist_count === "number" && typeof animateCountUp === "function") {
+            animateCountUp("stat-waitlist", s.waitlist_count);
+        } else {
+            document.getElementById("stat-waitlist").textContent = s.waitlist_count != null ? s.waitlist_count : "—";
+        }
 
         var taskEl = document.getElementById("stat-tasks");
-        taskEl.textContent = s.tasks_due != null ? s.tasks_due : "—";
-        if (s.tasks_due > 0) taskEl.className = "stat-value highlight-red";
+        if (typeof s.tasks_due === "number") {
+            if (typeof animateCountUp === "function") animateCountUp("stat-tasks", s.tasks_due);
+            else taskEl.textContent = s.tasks_due;
+            if (s.tasks_due > 0) taskEl.className = "stat-value highlight-red";
+        } else {
+            taskEl.textContent = "—";
+        }
 
         var msgEl = document.getElementById("stat-messages");
-        msgEl.textContent = s.unread_messages != null ? s.unread_messages : "—";
-        if (s.unread_messages > 0) msgEl.className = "stat-value highlight-gold";
+        if (typeof s.unread_messages === "number") {
+            if (typeof animateCountUp === "function") animateCountUp("stat-messages", s.unread_messages);
+            else msgEl.textContent = s.unread_messages;
+            if (s.unread_messages > 0) msgEl.className = "stat-value highlight-gold";
+        } else {
+            msgEl.textContent = "—";
+        }
     }
 
     function renderActivity(items) {
