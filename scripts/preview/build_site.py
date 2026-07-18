@@ -93,10 +93,10 @@ ZEFFY="https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb3072
 
 # ---- pages
 PAGES=[("home","index-staging.html","Home"),
-       ("about","about.html","About"),
+       ("about","about-staging.html","About"),
        ("services","services-staging.html","Services"),
-       ("courses","courses.html","Courses"),
-       ("contact","contact.html","Contact")]
+       ("courses","courses-staging.html","Courses"),
+       ("contact","contact-staging.html","Contact")]
 
 # inline any local images referenced in page content
 LOCAL_IMG={}

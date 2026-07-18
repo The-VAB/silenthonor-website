@@ -2280,6 +2280,17 @@ body{padding-top:0;}
   #v-about .board-grid { grid-template-columns: 1fr; }
   #v-about .staff-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== staging polish: glass cards, hover lift, rounded ===== */
+#v-about .value-card, #v-about .board-card, #v-about .staff-card { border-radius:14px; background:var(--glass-bg) !important; backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); border:1px solid var(--glass-border); box-shadow:0 4px 24px rgba(0,0,0,0.10); transition:transform .28s ease, border-color .28s ease, box-shadow .28s ease; }
+#v-about .value-card:hover, #v-about .staff-card:hover { transform:translateY(-4px); border-color:var(--border-red); box-shadow:0 16px 44px rgba(0,0,0,0.24); }
+#v-about .board-card:hover { border-color:var(--border-red); box-shadow:0 16px 44px rgba(0,0,0,0.24); }
+#v-about .story-img-frame { border-radius:14px; overflow:hidden; }
+#v-about .cred-item { border-radius:10px; transition:transform .2s ease; }
+#v-about .cred-item:hover { transform:translateX(3px); }
+#v-about .position-row { border-radius:10px; transition:transform .2s ease, border-color .2s ease; }
+#v-about .position-row:hover { transform:translateY(-2px); border-color:var(--border-red); }
+
 /* ===== services ===== */
 
 #v-services .staging-flag {
@@ -2585,6 +2596,15 @@ body{padding-top:0;}
   #v-courses .module-list { grid-template-columns: 1fr; }
   #v-courses .course-body { padding: 2rem 1.5rem; }
 }
+
+/* ===== staging polish: glass cards, hover lift, rounded ===== */
+#v-courses .course-full-card { border-radius:14px; background:var(--glass-bg); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); box-shadow:0 4px 24px rgba(0,0,0,0.12); transition:transform .28s ease, border-color .28s ease, box-shadow .28s ease; }
+#v-courses .course-full-card:hover { transform:translateY(-4px); box-shadow:0 16px 44px rgba(0,0,0,0.28); }
+#v-courses .course-sidebar { background:transparent; }
+#v-courses .module-list { background:transparent; gap:1.1rem; }
+#v-courses .module-card { border:1px solid var(--glass-border); border-radius:12px; background:var(--glass-bg); backdrop-filter:blur(12px) saturate(140%); -webkit-backdrop-filter:blur(12px) saturate(140%); transition:transform .28s ease, border-color .28s ease, box-shadow .28s ease; }
+#v-courses .module-card:hover { transform:translateY(-4px); border-color:var(--border-red); box-shadow:0 14px 40px rgba(0,0,0,0.24); }
+
 /* ===== contact ===== */
 
 #v-contact .contact-main {
@@ -2795,6 +2815,14 @@ body{padding-top:0;}
 @media (max-width: 640px) {
   #v-contact .contact-main { padding: 3.5rem 1.5rem; }
 }
+
+/* ===== staging polish: glass cards, hover lift, rounded ===== */
+#v-contact .info-block { border-radius:12px; background:var(--glass-bg); backdrop-filter:blur(12px) saturate(140%); -webkit-backdrop-filter:blur(12px) saturate(140%); box-shadow:0 4px 20px rgba(0,0,0,0.10); transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease; }
+#v-contact .info-block:hover { transform:translateY(-3px); border-color:var(--border-red); box-shadow:0 14px 36px rgba(0,0,0,0.22); }
+#v-contact .contact-form { border-radius:14px; }
+#v-contact .faq-item { border-radius:10px; overflow:hidden; transition:background .2s ease; }
+#v-contact .faq-item:hover { background:var(--glass-bg); }
+
 
 </style>
 
