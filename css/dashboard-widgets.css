@@ -13,31 +13,68 @@
 
 /* ---- Stat tiles (icon + large number + optional trend badge) ---- */
 .stat-card {
-  background: rgba(17, 24, 39, 0.6);
+  position: relative;
+  background: linear-gradient(160deg, rgba(26, 37, 64, 0.7), rgba(15, 21, 36, 0.75));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 1.25rem;
   text-align: left;
   display: flex;
   align-items: flex-start;
   gap: 0.9rem;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+  animation: widgetRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
+/* Staggered entrance - first 6 siblings in a stats row fade/rise in sequence
+   instead of popping in simultaneously (flat dashboards do the latter). */
+.stats-row .stat-card:nth-child(1), .counselor-stats .stat-card:nth-child(1) { animation-delay: 0.02s; }
+.stats-row .stat-card:nth-child(2), .counselor-stats .stat-card:nth-child(2) { animation-delay: 0.08s; }
+.stats-row .stat-card:nth-child(3), .counselor-stats .stat-card:nth-child(3) { animation-delay: 0.14s; }
+.stats-row .stat-card:nth-child(4), .counselor-stats .stat-card:nth-child(4) { animation-delay: 0.2s; }
+.stats-row .stat-card:nth-child(5), .counselor-stats .stat-card:nth-child(5) { animation-delay: 0.26s; }
+.stats-row .stat-card:nth-child(6), .counselor-stats .stat-card:nth-child(6) { animation-delay: 0.32s; }
+@keyframes widgetRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Faint corner glow for depth - a flat card has none of this */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -30%;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(201, 149, 42, 0.14), transparent 70%);
+  pointer-events: none;
+}
+.stat-card.stat-red::before { background: radial-gradient(circle, rgba(212, 43, 43, 0.16), transparent 70%); }
+.stat-card.stat-blue::before { background: radial-gradient(circle, rgba(59, 130, 246, 0.16), transparent 70%); }
+.stat-card.stat-green::before { background: radial-gradient(circle, rgba(16, 185, 129, 0.16), transparent 70%); }
 .stat-card:hover {
-  border-color: rgba(201, 149, 42, 0.4);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  transform: translateY(-2px);
+  border-color: rgba(201, 149, 42, 0.45);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(201, 149, 42, 0.08) inset;
+  transform: translateY(-3px);
 }
 .stat-icon {
+  position: relative;
   flex-shrink: 0;
   width: 42px;
   height: 42px;
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(201, 149, 42, 0.12);
+  background: linear-gradient(150deg, rgba(201, 149, 42, 0.28), rgba(201, 149, 42, 0.08));
+  box-shadow: 0 0 0 1px rgba(201, 149, 42, 0.18) inset;
   color: var(--gold);
+  transition: transform 0.25s;
+}
+.stat-card:hover .stat-icon {
+  transform: scale(1.08) rotate(-3deg);
 }
 .stat-icon svg {
   width: 22px;
@@ -45,16 +82,39 @@
 }
 /* Color variants - add one of these classes to .stat-card alongside the base class */
 .stat-card.stat-red .stat-icon {
-  background: rgba(212, 43, 43, 0.14);
+  background: linear-gradient(150deg, rgba(212, 43, 43, 0.32), rgba(212, 43, 43, 0.08));
+  box-shadow: 0 0 0 1px rgba(212, 43, 43, 0.2) inset;
   color: var(--red-light);
 }
 .stat-card.stat-blue .stat-icon {
-  background: rgba(59, 130, 246, 0.14);
+  background: linear-gradient(150deg, rgba(59, 130, 246, 0.32), rgba(59, 130, 246, 0.08));
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2) inset;
   color: #3B82F6;
 }
 .stat-card.stat-green .stat-icon {
-  background: rgba(16, 185, 129, 0.14);
+  background: linear-gradient(150deg, rgba(16, 185, 129, 0.32), rgba(16, 185, 129, 0.08));
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2) inset;
   color: #10B981;
+}
+/* Small pulsing dot - opt-in via <span class="stat-live-dot"></span>, use only
+   next to numbers that are genuinely live/real-time, never decoratively. */
+.stat-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  animation: liveDotPulse 2s ease-out infinite;
+}
+@keyframes liveDotPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stat-card, .stat-live-dot { animation: none; }
+  .stat-card:hover .stat-icon { transform: none; }
 }
 .stat-body {
   flex: 1;
@@ -103,12 +163,12 @@
 
 /* ---- Card / panel hover glow (apply to any existing bordered card/panel) ---- */
 .widget-card-hover {
-  border-radius: 6px;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  border-radius: 8px;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
 }
 .widget-card-hover:hover {
   border-color: rgba(201, 149, 42, 0.3);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(201, 149, 42, 0.06) inset;
 }
 .widget-card-hover.lift:hover {
   transform: translateY(-2px);
