@@ -8,6 +8,40 @@
  */
 
 /**
+ * Animates a stat-value element from 0 (or its current text) up to a real
+ * target number instead of just dropping the number in flat/instantly - a
+ * standard "ultramodern dashboard" cue. Respects prefers-reduced-motion.
+ * Only ever animates TO a real value you already fetched - never guesses
+ * or interpolates fake intermediate data.
+ * @param {string} elId - id of the .stat-value element
+ * @param {number} target - the real final value (integer)
+ * @param {{duration?: number, prefix?: string, suffix?: string}} [opts]
+ */
+function animateCountUp(elId, target, opts) {
+  var el = document.getElementById(elId);
+  if (!el || typeof target !== "number" || isNaN(target)) return;
+  opts = opts || {};
+  var prefix = opts.prefix || "";
+  var suffix = opts.suffix || "";
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    el.textContent = prefix + target + suffix;
+    return;
+  }
+  var duration = opts.duration || 900;
+  var start = null;
+  function ease(t) { return 1 - Math.pow(1 - t, 3); } // cubic ease-out
+  function step(ts) {
+    if (start === null) start = ts;
+    var progress = Math.min((ts - start) / duration, 1);
+    var current = Math.round(target * ease(progress));
+    el.textContent = prefix + current + suffix;
+    if (progress < 1) window.requestAnimationFrame(step);
+  }
+  window.requestAnimationFrame(step);
+}
+
+/**
  * Sets a stat-trend badge (arrow + magnitude) on an element produced by the
  * .stat-trend markup pattern. Never invents a value - pass a real number
  * (or null/undefined to leave the badge hidden) sourced from the backend.
