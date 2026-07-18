@@ -186,12 +186,17 @@ function toggleTheme(){var r=document.documentElement;var n=r.getAttribute('data
 // toast
 function toast(msg){var t=document.createElement('div');t.className='sh-toast';t.textContent=msg;document.body.appendChild(t);requestAnimationFrame(function(){t.classList.add('show');});setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove();},350);},2600);}
 
+var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var SCROLL = RM ? 'auto' : 'smooth';
+
 // reveal + counters within a view
 function activateView(v){
   v.querySelectorAll('.reveal').forEach(function(el){el.classList.add('visible');});
   v.querySelectorAll('[data-count]').forEach(function(el){
     if(el.dataset.done)return;el.dataset.done='1';
-    var target=parseInt(el.dataset.count),start=null;
+    var target=parseInt(el.dataset.count);
+    if(RM){el.textContent=target.toLocaleString();return;}
+    var start=null;
     function step(ts){if(!start)start=ts;var p=Math.min((ts-start)/1600,1);var e=1-Math.pow(1-p,3);el.textContent=Math.floor(target*e).toLocaleString();if(p<1)requestAnimationFrame(step);}
     requestAnimationFrame(step);
   });
@@ -205,7 +210,7 @@ function route(key,hash){
   var v=document.getElementById('v-'+key);
   activateView(v);
   document.getElementById('nav-links').classList.remove('open');
-  if(hash){var t=v.querySelector(hash);if(t){t.scrollIntoView({behavior:'smooth'});return;}}
+  if(hash){var t=v.querySelector(hash);if(t){t.scrollIntoView({behavior:SCROLL});return;}}
   window.scrollTo({top:0,behavior:'auto'});
 }
 
@@ -221,7 +226,7 @@ document.addEventListener('click',function(e){
   var m=href.match(/^(index|about|services|courses|contact)\.html(?:#(.+))?$/);
   if(m){e.preventDefault();var key=m[1]==='index'?'home':m[1];location.hash=key;route(key,m[2]?('#'+m[2]):null);return;}
   if(/^(signup|login|dashboard|donate)\.html/.test(href)){e.preventDefault();toast('Staging preview — member sign-up, login, and donation flows go live on the deployed site.');return;}
-  if(href.charAt(0)==='#'&&href.length>1){var cur=document.querySelector('.view.active');var t=cur&&cur.querySelector(href);if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}return;}
+  if(href.charAt(0)==='#'&&href.length>1){var cur=document.querySelector('.view.active');var t=cur&&cur.querySelector(href);if(t){e.preventDefault();t.scrollIntoView({behavior:SCROLL});}return;}
   // external http(s) links: let them open normally
 });
 
