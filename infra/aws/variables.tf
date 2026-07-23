@@ -100,16 +100,19 @@ variable "resend_api_key" {
 }
 
 # ── Frontend ──────────────────────────────────────────────────────────────────
+# Defaults match the live DNS cutover done via scripts/aws-finalize-domains.sh
+# (see infra/aws/README.md) -- empty aliases would detach the real custom
+# domains from the live CloudFront distribution.
 variable "frontend_aliases" {
   description = "Custom domain aliases for the CloudFront frontend. Empty = use the default *.cloudfront.net domain (no ACM cert needed)."
   type        = list(string)
-  default     = []
+  default     = ["silenthonorfoundation.org", "www.silenthonorfoundation.org"]
 }
 
 variable "acm_certificate_arn" {
   description = "ACM cert ARN (us-east-1) for frontend_aliases. Required only if aliases are set."
   type        = string
-  default     = ""
+  default     = "arn:aws:acm:us-east-1:802104113048:certificate/a10f91e0-fa27-4b5b-b284-07a7e8ec0351"
 }
 
 # ── App secrets (seeded into Secrets Manager) ─────────────────────────────────

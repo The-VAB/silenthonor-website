@@ -1,5 +1,6 @@
 resource "aws_cloudfront_origin_access_control" "frontend" {
   name                              = "${var.project}-frontend-oac"
+  description                       = "SH frontend"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
@@ -7,6 +8,7 @@ resource "aws_cloudfront_origin_access_control" "frontend" {
 
 resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
+  is_ipv6_enabled     = true
   default_root_object = "index.html"
   comment             = "Silent Honor frontend"
   aliases             = var.frontend_aliases
@@ -35,11 +37,19 @@ resource "aws_cloudfront_distribution" "frontend" {
     max_ttl     = 86400
   }
 
-  # Static HTML site: send SPA-style 403/404 to index so clean URLs resolve.
+  # Static HTML site: send SPA-style 403/404 to the branded 404 page.
   custom_error_response {
-    error_code         = 403
-    response_code      = 404
-    response_page_path = "/404.html"
+    error_code            = 403
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 10
+  }
+
+  custom_error_response {
+    error_code            = 404
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 10
   }
 
   restrictions {
