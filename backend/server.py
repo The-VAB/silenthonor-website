@@ -27,25 +27,28 @@ app = FastAPI(
 )
 
 # CORS Configuration
-# Origins are env-driven (CORS_ORIGINS, comma-separated) so the same binary works
-# across the new domain (silenthonorfoundation.org), the legacy domain
-# (silenthonor.org), and local dev without a code change + redeploy. The default set
-# covers both production domains + www so a credentialed cross-site request from the
-# static frontend to the api.* subdomain is not silently blocked by CORS.
-_DEFAULT_CORS_ORIGINS = [
-    "https://silenthonorfoundation.org",
-    "https://www.silenthonorfoundation.org",
+# The production origins below are ALWAYS allowed, so a deploy can never lock the live
+# frontend out of the API by misconfiguring an env var. Additional origins (the
+# CloudFront distribution domain, a custom api/app domain, a preview URL) are ADDED via
+# the CORS_ORIGINS env var (comma-separated). Credentials are enabled, so the wildcard
+# "*" is intentionally never used.
+_default_origins = [
     "https://silenthonor.org",
     "https://www.silenthonor.org",
+    "https://silenthonorfoundation.org",
+    "https://www.silenthonorfoundation.org",
+    # Local development (docker-compose serves the frontend on :3000)
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-_env_origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
-ALLOWED_ORIGINS = _env_origins or _DEFAULT_CORS_ORIGINS
+_extra_origins = [
+    o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()
+]
+_allowed_origins = list(dict.fromkeys(_default_origins + _extra_origins))
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -88,9 +91,9 @@ try:
 except Exception as e:
     logger.warning(f"Could not mount static files: {e}")
 
-# MongoDB connection — accept both MONGO_URL/DB_NAME (what this service reads) and the
-# MONGODB_URI/MONGODB_DB names used by docker-compose/.env.example, so the compose stack
-# actually reaches Mongo instead of silently falling back to localhost.
+# MongoDB connection
+# Accept either MONGO_URL/DB_NAME or MONGODB_URI/MONGODB_DB (used by docker-compose
+# and Amazon DocumentDB) so the same image runs unchanged across environments.
 MONGO_URL = os.environ.get("MONGO_URL") or os.environ.get("MONGODB_URI", "mongodb://localhost:27017")
 DB_NAME = os.environ.get("DB_NAME") or os.environ.get("MONGODB_DB", "silenthonor")
 
@@ -364,6 +367,12 @@ def _serve_page(name: str):
 @app.get("/{page}.html")
 async def serve_html_page(page: str):
     return _serve_page(page)
+
+# Lightweight liveness probe (used by the Docker HEALTHCHECK and App Runner).
+# The richer readiness check lives at /api/health.
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 # Clean URL routes
 @app.get("/")
