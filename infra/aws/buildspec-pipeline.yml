@@ -18,7 +18,7 @@ phases:
       - docker build -t "$REPO_URI:$IMAGE_TAG" -f backend/Dockerfile backend
       - echo Pushing image to ECR...
       - docker push "$REPO_URI:$IMAGE_TAG"
-      - echo Syncing static assets to S3 (long cache)...
+      - echo "Syncing static assets to S3 (long cache)..."
       - >
         aws s3 sync . "s3://$FRONTEND_BUCKET"
         --exclude ".git/*" --exclude "backend/*" --exclude "infra/*"
@@ -26,7 +26,7 @@ phases:
         --exclude "*.py" --exclude "*.md" --exclude "docker-compose.yml"
         --exclude "*.html"
         --cache-control "public,max-age=604800,immutable" --delete
-      - echo Syncing HTML to S3 (no cache)...
+      - echo "Syncing HTML to S3 (no cache)..."
       - >
         aws s3 sync . "s3://$FRONTEND_BUCKET" --exclude "*" --include "*.html"
         --cache-control "no-cache,no-store,must-revalidate"
