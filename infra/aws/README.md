@@ -208,14 +208,41 @@ GitHub connection through the API — go to
 **AWS Console → Developer Tools → Settings → Connections**, find
 `silenthonor-github` (status "Pending"), click **Update pending connection**,
 and complete the GitHub App install/authorization for
-`The-VAB/silenthonor-website`. The pipeline's Source stage fails until this is
-done; once authorized it starts working on the next push (no re-apply needed).
+`The-VAB/silenthonor-website`.
 
 `terraform output codestar_connection_arn` / `terraform output deploy_pipeline_name`
 locate the connection and the pipeline in the console.
 
 The old manual scripts still work standalone if you ever need an out-of-band
 deploy (e.g. re-running just the frontend sync).
+
+### Trigger: webhook.tf (the org can't install the AWS Connector for GitHub)
+
+Authorizing the connection above only lets the pipeline *read* the repo — it
+does not, by itself, make GitHub notify AWS on every push. That normally
+happens via the AWS-managed "AWS Connector for GitHub" App, which this org's
+policy doesn't allow installing. `webhook.tf` supplies the missing trigger
+without it: a plain GitHub repo webhook (no App, no org approval — just repo
+admin access) posts to a Lambda Function URL, which verifies the
+`X-Hub-Signature-256` HMAC against a secret in Secrets Manager and calls
+`codepipeline:StartPipelineExecution` on a valid push to `main`.
+
+**One-time GitHub-side setup after `terraform apply`:**
+```bash
+terraform output webhook_url
+aws secretsmanager get-secret-value \
+  --secret-id "$(terraform output -raw webhook_secret_arn)" \
+  --query SecretString --output text
+```
+Then on GitHub: repo → **Settings → Webhooks → Add webhook**
+- Payload URL: the `webhook_url` output above
+- Content type: `application/json`
+- Secret: the value from the `secretsmanager get-secret-value` command
+- Events: just the **push** event
+
+Without this webhook configured, deploys don't happen automatically — use
+`aws codepipeline start-pipeline-execution --name silenthonor-deploy` to
+trigger one manually in the meantime.
 
 ## Data migration
 
