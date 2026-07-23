@@ -1,7 +1,10 @@
 # Silent Honor Foundation Backend
 # Production Dockerfile
 
-FROM python:3.11-slim
+# Pulled from the ECR Public Gallery mirror, not Docker Hub directly: CodeBuild
+# containers share egress IPs across many AWS customers, which routinely trips
+# Docker Hub's anonymous-pull rate limit (429) and fails otherwise-good builds.
+FROM public.ecr.aws/docker/library/python:3.11-slim
 
 # Set working directory
 WORKDIR /app
