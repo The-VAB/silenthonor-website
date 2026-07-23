@@ -5,8 +5,8 @@
 // Zeffy donation link
 const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7c08-420b-91d8-2bb30723e3b1';
 
-// Logo URL
-const LOGO_URL = 'https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/ejw735ko_a597f541-5826-493e-8e3d-af5702609fa5.tmp';
+// Logo URL — served locally so the site has no external asset dependency
+const LOGO_URL = 'images/silent-honor-logo.png';
 
 // API Base URL
 window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";
@@ -31,21 +31,17 @@ async function checkAuth() {
   }
 }
 
-// Inject Navigation
-async function injectNav() {
+// Inject Navigation — renders immediately with the logged-out default, then
+// patches the member link once the auth check resolves, so the header never
+// waits on an API round-trip.
+function injectNav() {
   const placeholder = document.getElementById('nav-placeholder');
   if (!placeholder) return;
 
   const currentPage = getCurrentPage();
 
-  // Determine member link based on auth state
-  const user = await checkAuth();
-  let memberLinkHref = 'login.html';
-  let memberLinkText = 'Member Login';
-  if (user) {
-    memberLinkHref = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
-    memberLinkText = user.role === 'admin' ? 'Admin' : 'Dashboard';
-  }
+  const memberLinkHref = 'login.html';
+  const memberLinkText = 'Member Login';
 
   const navHTML = `
     <nav class="nav">
@@ -62,6 +58,10 @@ async function injectNav() {
       </div>
 
       <div class="nav-actions">
+        <button class="theme-toggle" onclick="toggleTheme()" data-testid="nav-theme-toggle" aria-label="Toggle light/dark mode">
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
         <a href="${ZEFFY_DONATION_URL}" target="_blank" class="nav-donate" data-testid="nav-donate-btn">Donate</a>
         <a href="${memberLinkHref}" class="btn-outline" style="padding: 10px 20px; font-size: 0.68rem;" data-testid="nav-member-btn">${memberLinkText}</a>
         <button class="nav-mobile-toggle" onclick="toggleMobileNav()" data-testid="nav-mobile-toggle">☰</button>
@@ -70,6 +70,24 @@ async function injectNav() {
   `;
 
   placeholder.innerHTML = navHTML;
+
+  // Upgrade the member link in place once auth state is known.
+  checkAuth().then(user => {
+    if (!user) return;
+    const btn = placeholder.querySelector('[data-testid="nav-member-btn"]');
+    if (!btn) return;
+    btn.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+    btn.textContent = user.role === 'admin' ? 'Admin' : 'Dashboard';
+  });
+}
+
+// Theme toggle (light/dark) — persisted, applied before paint on future loads via inline head script
+function toggleTheme() {
+  const root = document.documentElement;
+  const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  const next = current === 'light' ? 'dark' : 'light';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('sh-theme', next); } catch (e) {}
 }
 
 // Toggle mobile nav
@@ -126,6 +144,14 @@ function injectFooter() {
         </div>
       </div>
 
+      <div class="footer-partners">
+        <p class="footer-partners-line">Insurance built, created, and offered through <a href="https://theveteranalliance.com" target="_blank" rel="noopener">The Veteran Alliance</a>.</p>
+        <a href="https://theveteranalliance.com" target="_blank" rel="noopener" class="footer-partners-logo" aria-label="The Veteran Alliance">
+          <img src="images/veteran-alliance-logo.png" alt="The Veteran Alliance" class="va-logo-img">
+        </a>
+        <p class="footer-partners-sub">In direct support and partnership with Corgi.</p>
+      </div>
+
       <div class="footer-bottom">
         <span class="footer-copy">© ${new Date().getFullYear()} Silent Honor Foundation Inc. All rights reserved.</span>
         <div class="footer-legal">
@@ -138,6 +164,17 @@ function injectFooter() {
 
   placeholder.innerHTML = footerHTML;
 }
+
+// Apply saved theme immediately (best-effort; pages that want zero-flash
+// should inline this same read in <head> before global.css loads)
+(function initTheme() {
+  try {
+    const saved = localStorage.getItem('sh-theme');
+    if (saved === 'light' || saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  } catch (e) {}
+})();
 
 // Initialize components
 document.addEventListener('DOMContentLoaded', () => {

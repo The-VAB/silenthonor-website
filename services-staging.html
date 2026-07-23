@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services &amp; the Veteran Network — Silent Honor Foundation</title>
+<meta name="description" content="Free financial services for veterans, plus a national veteran-owned business network and member protection built with The Veteran Alliance.">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('sh-theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="css/global.css">
+<style>
+.staging-flag {
+  position: fixed; top: 76px; left: 0; right: 0; z-index: 99;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold));
+  color: #0B1220; font-family: var(--font-display); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase; text-align: center; padding: 6px;
+}
+
+.page-hero { padding-top: 10rem; }
+.page-hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+
+/* Journey pills row under hero */
+.svc-journey { margin-top: 2rem; }
+.svc-journey-label { font-family: var(--font-display); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.8rem; }
+
+/* Section shell */
+.sh-section { padding: 6rem 3.5rem; position: relative; z-index: 1; }
+.sh-section.alt { background: var(--navy-mid); }
+.sh-wrap { max-width: 1300px; margin: 0 auto; }
+.sh-head { max-width: 640px; margin-bottom: 3rem; }
+.sh-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+
+/* Service detail cards */
+.svc-full-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.svc-full-card {
+  padding: 2.6rem 2.4rem; position: relative; overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.svc-full-card:hover { transform: translateY(-4px); border-color: rgba(185,28,28,0.3); }
+.svc-full-num { font-family: var(--font-display); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.2rem; }
+.svc-full-icon { font-size: 2rem; margin-bottom: 1rem; }
+.svc-status { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-size: 0.58rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.2rem; padding: 4px 10px; border-radius: 999px; }
+.svc-status.live { background: rgba(185,28,28,0.12); border: 1px solid rgba(185,28,28,0.25); color: #FCA5A5; }
+.svc-status.live::before { content: '●'; font-size: 6px; color: var(--red-light); }
+.svc-status.soon { background: rgba(201,149,42,0.1); border: 1px solid rgba(201,149,42,0.22); color: var(--gold-light); }
+.svc-status.soon::before { content: '◐'; font-size: 8px; }
+.svc-full-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--white); margin-bottom: 1rem; line-height: 1.2; }
+.svc-full-desc { font-family: var(--font-body); font-size: 0.95rem; color: var(--muted); line-height: 1.8; margin-bottom: 1.4rem; }
+.svc-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.8rem; }
+.svc-bullets li { display: flex; align-items: flex-start; gap: 0.8rem; font-size: 0.85rem; color: var(--muted); }
+.svc-bullets li::before { content: '→'; color: var(--red-light); flex-shrink: 0; font-family: var(--font-display); font-size: 0.8rem; margin-top: 1px; }
+
+/* Process steps */
+.process-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 1rem; }
+.process-step { padding: 2.4rem 2rem; text-align: center; }
+.step-num { width: 54px; height: 54px; border-radius: 50%; background: rgba(185,28,28,0.15); border: 2px solid rgba(185,28,28,0.3); color: var(--red-light); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin: 0 auto 1.4rem; }
+.step-title { font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white); margin-bottom: 0.7rem; }
+.step-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+/* Jodi's List network */
+.jl-panel { padding: 3.2rem; position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(201,149,42,0.06), rgba(185,28,28,0.05)); }
+.jl-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,149,42,0.12); border: 1px solid rgba(201,149,42,0.3); color: var(--gold-light); font-family: var(--font-display); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; padding: 5px 14px; border-radius: 999px; margin-bottom: 1rem; }
+.jl-top { display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: center; margin-bottom: 2.6rem; }
+.jl-stat-num { font-family: var(--font-display); font-size: clamp(2.6rem, 5vw, 4rem); font-weight: 700; color: var(--white); line-height: 1; }
+.jl-stat-label { font-size: 0.9rem; color: var(--muted); margin-top: 0.6rem; max-width: 380px; line-height: 1.6; }
+.jl-cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; }
+.jl-cta-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease; text-decoration: none; display: block; }
+.jl-cta-card:hover { transform: translateY(-4px); border-color: rgba(201,149,42,0.4); background: rgba(255,255,255,0.05); }
+.jl-cta-icon { font-size: 1.6rem; margin-bottom: 0.9rem; }
+.jl-cta-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; text-transform: uppercase; color: var(--white); margin-bottom: 0.6rem; }
+.jl-cta-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.2rem; }
+.jl-cta-arrow { font-family: var(--font-display); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-light); display: inline-flex; align-items: center; gap: 6px; transition: gap 0.2s; }
+.jl-cta-card:hover .jl-cta-arrow { gap: 12px; }
+
+/* Vertical directory grid */
+.vert-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 2.2rem; }
+.vert-cell { background: var(--navy-mid); padding: 1.6rem 1.4rem; transition: background 0.2s; }
+.vert-cell:hover { background: var(--navy-light); }
+.vert-icon { font-size: 1.3rem; margin-bottom: 0.6rem; }
+.vert-count { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; color: var(--gold-light); line-height: 1; margin-bottom: 0.3rem; }
+.vert-name { font-family: var(--font-display); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--white); line-height: 1.3; }
+
+/* Protection section */
+.protect-lead { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; margin-bottom: 2.4rem; }
+.protect-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; margin-bottom: 2.2rem; }
+.protect-card { padding: 1.8rem 1.5rem; transition: transform 0.25s ease, border-color 0.25s ease; }
+.protect-card:hover { transform: translateY(-3px); border-color: rgba(185,28,28,0.3); }
+.protect-icon { font-size: 1.4rem; margin-bottom: 0.9rem; }
+.protect-count { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gold-light); line-height: 1; margin-bottom: 0.4rem; }
+.protect-title { font-family: var(--font-display); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.5rem; }
+.protect-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+.protect-cta-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.2rem; padding-top: 1.6rem; border-top: 1px solid var(--border); }
+.protect-cta-text { font-family: var(--font-body); font-size: 0.88rem; font-style: italic; color: var(--muted); max-width: 560px; }
+.protect-disclaimer { font-size: 0.72rem; color: var(--muted); opacity: 0.7; margin-top: 1.4rem; line-height: 1.6; }
+
+/* Eligibility */
+.elig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+.elig-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+.elig-item { background: var(--navy-mid); padding: 1.3rem 1.6rem; display: flex; align-items: center; gap: 1rem; font-size: 0.88rem; color: var(--muted); border-left: 3px solid var(--red); transition: background 0.2s, color 0.2s; }
+.elig-item:hover { background: var(--navy-light); color: var(--white); }
+.elig-check { color: var(--red-light); font-size: 1rem; flex-shrink: 0; }
+
+@media (max-width: 1024px) {
+  .sh-section { padding: 4rem 2rem; }
+  .svc-full-grid { grid-template-columns: 1fr; }
+  .process-steps { grid-template-columns: 1fr; }
+  .jl-top, .protect-lead, .elig-grid { grid-template-columns: 1fr; gap: 1.6rem; }
+  .jl-cta-grid { grid-template-columns: 1fr; }
+  .vert-grid { grid-template-columns: repeat(2, 1fr); }
+  .protect-grid { grid-template-columns: repeat(2, 1fr); }
+  .jl-panel { padding: 2rem 1.5rem; }
+}
+@media (max-width: 640px) {
+  .sh-section { padding: 3.5rem 1.5rem; }
+  .vert-grid, .protect-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+<div id="nav-placeholder"></div>
+<div class="staging-flag">Staging Preview — Not Live · For Internal Review Only</div>
+
+<div class="page-content">
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="page-hero-tag">What We Offer</div>
+    <h1 class="page-hero-title">Services &amp; the<br><em>Veteran Network</em></h1>
+    <p class="page-hero-sub">Every service Silent Honor provides is free to eligible veterans and military families — plus access to a national network of veteran-owned businesses and member-only protection built for the industries veterans run.</p>
+    <div class="svc-journey">
+      <div class="svc-journey-label">Tell us where you're at — we'll lead with what matters most</div>
+      <div class="journey-select">
+        <button class="journey-pill" data-journey="veteran">I'm a Veteran</button>
+        <button class="journey-pill" data-journey="business">I Own a Business</button>
+        <button class="journey-pill" data-journey="supporter">I Want to Support</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORE SERVICES -->
+  <section class="sh-section" data-applies-to="veteran all">
+    <div class="sh-wrap">
+      <div class="sh-head">
+        <div class="section-tag reveal">Free for All Veterans</div>
+        <h2 class="section-title reveal" data-delay="100">Financial Services</h2>
+        <p class="section-body reveal" data-delay="150" style="margin-top: 1rem;">No hidden fees, no upsells, no strings attached. Every service below is 100% free to eligible veterans.</p>
+      </div>
+      <div class="svc-full-grid" data-emphasize-for="veteran">
+
+        <div class="glass-panel svc-full-card reveal" data-delay="0">
+          <div class="svc-full-num">Service 01</div>
+          <div class="svc-full-icon">💳</div>
+          <div class="svc-status live">Available Now</div>
+          <h3 class="svc-full-title">Credit Review &amp; Education</h3>
+          <p class="svc-full-desc">Your credit report is often the biggest obstacle between where you are and where you're trying to go. We pull it apart, explain what's there, and give you an actionable plan.</p>
+          <ul class="svc-bullets">
+            <li>Full tri-bureau credit report review</li>
+            <li>Score factor analysis — what's hurting you and by how much</li>
+            <li>Dispute identification and guidance</li>
+            <li>Custom credit improvement roadmap</li>
+            <li>Military-specific credit protections (SCRA, MLA) explained</li>
+          </ul>
+          <a href="contact.html" class="btn-primary">Get Started →</a>
+        </div>
+
+        <div class="glass-panel svc-full-card reveal" data-delay="100">
+          <div class="svc-full-num">Service 02</div>
+          <div class="svc-full-icon">📚</div>
+          <div class="svc-status live">Available Now</div>
+          <h3 class="svc-full-title">Financial Literacy Training</h3>
+          <p class="svc-full-desc">Self-paced courses built specifically for veterans — not generic financial advice recycled from civilian playbooks. Real content for real situations veterans face.</p>
+          <ul class="svc-bullets">
+            <li>Credit education course (7 lessons, fully live)</li>
+            <li>Financial literacy foundations course</li>
+            <li>Money Mission comprehensive course (in development)</li>
+            <li>All courses 100% free, self-paced, no registration required</li>
+            <li>Content designed by a CFEI with veteran-specific framing</li>
+          </ul>
+          <a href="courses.html" class="btn-primary">View Courses →</a>
+        </div>
+
+        <div class="glass-panel svc-full-card reveal" data-delay="0">
+          <div class="svc-full-num">Service 03</div>
+          <div class="svc-full-icon">🎯</div>
+          <div class="svc-status live">Available Now</div>
+          <h3 class="svc-full-title">One-on-One Financial Coaching</h3>
+          <p class="svc-full-desc">Personalized coaching sessions with a Certified Financial Education Instructor and Certified Credit Counselor. No judgment. No scripts. Just real, actionable guidance for your situation.</p>
+          <ul class="svc-bullets">
+            <li>Budget creation and debt review</li>
+            <li>Debt payoff strategy (snowball, avalanche, hybrid)</li>
+            <li>Credit rebuilding plan with milestone tracking</li>
+            <li>Financial goal setting and 90-day action planning</li>
+            <li>Ongoing accountability check-ins</li>
+          </ul>
+          <a href="contact.html" class="btn-primary">Get Matched →</a>
+        </div>
+
+        <div class="glass-panel svc-full-card reveal" data-delay="100">
+          <div class="svc-full-num">Service 04</div>
+          <div class="svc-full-icon">🏠</div>
+          <div class="svc-status soon">Coming Soon</div>
+          <h3 class="svc-full-title">VA Loan Closing Cost Assistance</h3>
+          <p class="svc-full-desc">A VA loan eliminates the down payment — but closing costs can still run $5,000–$15,000+. We're building a program to provide direct assistance to veterans who qualify, bridging that final gap to homeownership.</p>
+          <ul class="svc-bullets">
+            <li>Direct closing cost assistance for qualifying veterans</li>
+            <li>VA loan eligibility review</li>
+            <li>Homeownership readiness assessment</li>
+            <li>Lender referrals with veteran-friendly track records</li>
+            <li>Pre-purchase financial coaching</li>
+          </ul>
+          <a href="contact.html" class="btn-outline">Get Notified →</a>
+        </div>
+
+        <div class="glass-panel svc-full-card reveal" data-delay="0">
+          <div class="svc-full-num">Service 05</div>
+          <div class="svc-full-icon">📊</div>
+          <div class="svc-status live">Available Now</div>
+          <h3 class="svc-full-title">Debt Management Planning</h3>
+          <p class="svc-full-desc">We help you build a realistic, strategic debt payoff plan based on your actual numbers — not a one-size-fits-all template.</p>
+          <ul class="svc-bullets">
+            <li>Full debt inventory review</li>
+            <li>Debt-to-income ratio analysis</li>
+            <li>Snowball vs. avalanche comparison for your specific debts</li>
+            <li>Consolidation and refinance evaluation</li>
+            <li>Creditor hardship program identification</li>
+          </ul>
+          <a href="contact.html" class="btn-primary">Get Started →</a>
+        </div>
+
+        <div class="glass-panel svc-full-card reveal" data-delay="100">
+          <div class="svc-full-num">Service 06</div>
+          <div class="svc-full-icon">🛡️</div>
+          <div class="svc-status soon">Coming Soon</div>
+          <h3 class="svc-full-title">VA Disability Support</h3>
+          <p class="svc-full-desc">Getting the VA disability rating you've earned is a fight — and most veterans don't know their full options. We're building a dedicated support service to help with documentation, appeals, and benefits maximization — no claim sharks taking a cut of your back pay.</p>
+          <ul class="svc-bullets">
+            <li>Disability claim documentation guidance</li>
+            <li>Appeal support and strategy</li>
+            <li>Benefits maximization review</li>
+            <li>Referrals to accredited VA claims agents</li>
+          </ul>
+          <a href="contact.html" class="btn-outline">Get Notified →</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- VETERAN BUSINESS NETWORK — JODI'S LIST -->
+  <section class="sh-section alt" id="network" data-applies-to="business all">
+    <div class="sh-wrap">
+      <div class="glass-panel jl-panel reveal" data-emphasize-for="business">
+        <div class="jl-top">
+          <div>
+            <div class="jl-badge">Powered by Jodi's List</div>
+            <div class="jl-stat-num"><span data-count="2500000">0</span>+</div>
+            <div class="jl-stat-label">Veteran-owned businesses discovered nationwide — the largest veteran business directory in the country, free to find and free to list.</div>
+          </div>
+          <div>
+            <p class="section-body" style="max-width: 460px;">Jodi's List is the free national directory built exclusively for veteran-owned businesses. Silent Honor members get first access — find a veteran to hire, or make sure your own business gets found and supported by the community.</p>
+          </div>
+        </div>
+        <div class="jl-cta-grid">
+          <a href="https://jodislist.com/?ref=silenthonor&utm_source=silenthonor&utm_medium=website&utm_campaign=find" target="_blank" rel="noopener" class="jl-cta-card">
+            <div class="jl-cta-icon">🔎</div>
+            <h3 class="jl-cta-title">Find a Veteran-Owned Business</h3>
+            <p class="jl-cta-desc">Hiring a contractor, choosing a restaurant, picking an agent? Search thousands of verified veteran-owned businesses near you first.</p>
+            <span class="jl-cta-arrow">Search Jodi's List →</span>
+          </a>
+          <a href="https://jodislist.com/?ref=silenthonor&utm_source=silenthonor&utm_medium=website&utm_campaign=list" target="_blank" rel="noopener" class="jl-cta-card">
+            <div class="jl-cta-icon">🚩</div>
+            <h3 class="jl-cta-title">List Your Business — Free</h3>
+            <p class="jl-cta-desc">Own a veteran-owned business? Claim your free listing so other veterans — and the community — can find and support you. No fee, ever.</p>
+            <span class="jl-cta-arrow">Claim Your Listing →</span>
+          </a>
+        </div>
+
+        <div class="vert-grid">
+          <div class="vert-cell"><div class="vert-icon">🍽️</div><div class="vert-count">3,500+</div><div class="vert-name">Restaurants &amp; Caterers</div></div>
+          <div class="vert-cell"><div class="vert-icon">🔧</div><div class="vert-count">2,300+</div><div class="vert-name">Automotive Shops</div></div>
+          <div class="vert-cell"><div class="vert-icon">💼</div><div class="vert-count">3,600+</div><div class="vert-name">Professionals</div></div>
+          <div class="vert-cell"><div class="vert-icon">⚖️</div><div class="vert-count">680+</div><div class="vert-name">Attorneys</div></div>
+          <div class="vert-cell"><div class="vert-icon">🏗️</div><div class="vert-count">800+</div><div class="vert-name">Home Builders</div></div>
+          <div class="vert-cell"><div class="vert-icon">✈️</div><div class="vert-count">540+</div><div class="vert-name">Aviation</div></div>
+          <div class="vert-cell"><div class="vert-icon">🎯</div><div class="vert-count">500+</div><div class="vert-name">Firearms &amp; FFL</div></div>
+          <div class="vert-cell"><div class="vert-icon">🚚</div><div class="vert-count">490+</div><div class="vert-name">Trucking &amp; Driving</div></div>
+          <div class="vert-cell"><div class="vert-icon">🎣</div><div class="vert-count">520+</div><div class="vert-name">Charters</div></div>
+          <div class="vert-cell"><div class="vert-icon">🍴</div><div class="vert-count">260+</div><div class="vert-name">Food Trucks</div></div>
+          <div class="vert-cell"><div class="vert-icon">🏘️</div><div class="vert-count">Growing</div><div class="vert-name">Property Managers</div></div>
+          <div class="vert-cell"><div class="vert-icon">➕</div><div class="vert-count">Every</div><div class="vert-name">Veteran-Owned Industry</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROTECTION PARTNER -->
+  <section class="sh-section" data-applies-to="business">
+    <div class="sh-wrap">
+      <div class="protect-lead" data-emphasize-for="business">
+        <div class="reveal">
+          <div class="section-tag">Member Benefit</div>
+          <h2 class="section-title">A Protection Partner.<br>Not Just a <em>Policy</em>.</h2>
+        </div>
+        <p class="section-body reveal" data-delay="120">Veteran-owned businesses that join the Alliance get access to significantly better insurance rates — built for the industries veterans actually run, and quoted by fellow veterans. Not a call center. A protection partner.</p>
+      </div>
+
+      <div class="protect-grid">
+        <div class="glass-panel protect-card reveal" data-delay="0">
+          <div class="protect-icon">🍽️</div>
+          <div class="protect-count">3,500+</div>
+          <div class="protect-title">Restaurants, Bars &amp; Caterers</div>
+          <div class="protect-desc">Liquor liability, general liability &amp; product coverage — the hardest lines to place, done right.</div>
+        </div>
+        <div class="glass-panel protect-card reveal" data-delay="60">
+          <div class="protect-icon">🔧</div>
+          <div class="protect-count">2,300+</div>
+          <div class="protect-title">Auto &amp; Garage Shops</div>
+          <div class="protect-desc">Garage liability, garagekeepers &amp; commercial auto.</div>
+        </div>
+        <div class="glass-panel protect-card reveal" data-delay="120">
+          <div class="protect-icon">🏗️</div>
+          <div class="protect-count">800+</div>
+          <div class="protect-title">Builders &amp; Contractors</div>
+          <div class="protect-desc">Builder's risk, CGL &amp; workers' comp.</div>
+        </div>
+        <div class="glass-panel protect-card reveal" data-delay="180">
+          <div class="protect-icon">🏘️</div>
+          <div class="protect-count">Growing</div>
+          <div class="protect-title">Property &amp; More</div>
+          <div class="protect-desc">Habitational, E&amp;O, and coverage across every veteran-owned industry.</div>
+        </div>
+      </div>
+
+      <div class="protect-cta-row reveal">
+        <p class="protect-cta-text">Every veteran-owned business in the Alliance gets rate protection — typically well below market. See what your business qualifies for.</p>
+        <a href="https://theveteranalliance.com" target="_blank" rel="noopener" class="btn-gold">See If You Qualify →</a>
+      </div>
+      <p class="protect-disclaimer">Insurance products are built, created, and offered through The Veteran Alliance, in direct support and partnership with Corgi. Silent Honor Foundation is a 501(c)(3) nonprofit and does not sell insurance; membership benefits are provided through our partners.</p>
+    </div>
+  </section>
+
+  <!-- HOW MEMBERSHIP WORKS -->
+  <section class="sh-section alt" data-applies-to="all">
+    <div class="sh-wrap">
+      <div class="sh-head center">
+        <div class="section-tag reveal">How It Works</div>
+        <h2 class="section-title reveal" data-delay="100">Getting Started</h2>
+        <p class="section-body reveal" data-delay="150" style="margin: 1rem auto 0;">Three steps to unlock every service, the veteran business network, and member protection.</p>
+      </div>
+      <div class="process-steps">
+        <div class="glass-panel process-step reveal" data-delay="0">
+          <div class="step-num">1</div>
+          <div class="step-title">Join as a Member</div>
+          <p class="step-desc">Fill out the free membership application. Takes about 5 minutes. We'll review and get back to you.</p>
+        </div>
+        <div class="glass-panel process-step reveal" data-delay="100">
+          <div class="step-num">2</div>
+          <div class="step-title">Apply for What You Need</div>
+          <p class="step-desc">Once approved, access coaching, courses, the business network, and protection through your member dashboard.</p>
+        </div>
+        <div class="glass-panel process-step reveal" data-delay="200">
+          <div class="step-num">3</div>
+          <div class="step-title">Complete Intake</div>
+          <p class="step-desc">We'll schedule an intake call to understand your situation and match you with the right resources.</p>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 2.5rem;" class="reveal" data-delay="250">
+        <a href="signup.html" class="btn-primary">Become a Member — It's Free →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ELIGIBILITY -->
+  <section class="sh-section" data-applies-to="all">
+    <div class="sh-wrap">
+      <div class="elig-grid">
+        <div class="reveal">
+          <div class="section-tag">Who Qualifies</div>
+          <h2 class="section-title">Who We Serve</h2>
+          <p class="section-body" style="margin-top: 1rem;">If you served in the U.S. military, you qualify. Silent Honor is exclusively for veterans — all branches, all eras.</p>
+          <div style="margin-top: 2rem;">
+            <a href="signup.html" class="btn-primary">Join Free →</a>
+          </div>
+        </div>
+        <div class="reveal" data-delay="150">
+          <div class="elig-list">
+            <div class="elig-item"><span class="elig-check">✓</span> Veterans of all branches — Army, Navy, Air Force, Marines, Coast Guard, Space Force</div>
+            <div class="elig-item"><span class="elig-check">✓</span> Active duty service members</div>
+            <div class="elig-item"><span class="elig-check">✓</span> National Guard and Reserve members</div>
+            <div class="elig-item"><span class="elig-check">✓</span> Retired military of any era</div>
+            <div class="elig-item"><span class="elig-check">✓</span> Any credit score, any starting point — judgment-free</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="js/components.js"></script>
+<script src="js/main.js"></script>
+<script src="js/journey.js"></script>
+</body>
+</html>
