@@ -52,3 +52,13 @@ output "deploy_pipeline_name" {
   description = "CodePipeline that builds + deploys on every push to github_branch"
   value       = aws_codepipeline.deploy.name
 }
+
+output "webhook_url" {
+  description = "Configure as the Payload URL of a GitHub repo webhook (Settings -> Webhooks -> Add webhook), push events only"
+  value       = aws_lambda_function_url.webhook_trigger.function_url
+}
+
+output "webhook_secret_arn" {
+  description = "Fetch with: aws secretsmanager get-secret-value --secret-id <this> --query SecretString --output text -- use that value as the webhook's Secret"
+  value       = aws_secretsmanager_secret.github_webhook.arn
+}

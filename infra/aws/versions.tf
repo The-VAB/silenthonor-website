@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.6"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
   }
 
   # Remote state lives in a dedicated, namespaced S3 bucket (created out-of-band,

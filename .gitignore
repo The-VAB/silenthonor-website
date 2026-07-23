@@ -67,5 +67,6 @@ memory/test_credentials.md
 *.tfstate
 *.tfstate.*
 *.tfvars
+infra/aws/lambda/*.zip
 !*.tfvars.example
 crash.log
