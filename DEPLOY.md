@@ -1,74 +1,83 @@
-# Silent Honor Foundation — Deployment & Restore Runbook
+# Silent Honor Foundation — Deployment
 
-## Infrastructure (as-is)
+> **The live system runs on AWS** (account `802104113048`, `us-east-1`).
+> The old Hostinger VPS (`srv1077820.hstgr.cloud`) is **RETIRED** — do not deploy to it.
+> Its deploy scripts were removed in this commit precisely so nobody ships there by mistake.
 
-| Piece | Where | Status (2026-07-13) |
+## Live architecture (verified 2026-07-14)
+
+| Piece | Resource | URL / ID |
 |---|---|---|
-| Backend API | Hostinger VPS `72.60.175.115` → `https://api.srv1077820.hstgr.cloud` — systemd `silenthonor`, uvicorn :8000, nginx reverse proxy, MongoDB | ✅ **UP** (`/api/health` → 200, v2.0.0) |
-| Static frontend | intended `https://silenthonorfoundation.org` | ❌ **DOWN** — domain does not resolve (no DNS record) |
-| Legacy site | `https://silenthonor.org` (WordPress, AWS `76.223.67.189`) | ✅ up (separate host) |
+| Site (public) | CloudFront + S3 | **https://silenthonorfoundation.org** (+ `www`) |
+| CloudFront distro | `E1H1ZTFC6CP7BY` | `d27zjlncmljktr.cloudfront.net` |
+| Frontend bucket | S3 | `silenthonor-frontend-802104113048` |
+| API | App Runner `silenthonor-backend` | `https://tv9nakyd9p.us-east-1.awsapprunner.com` |
+| Database | DocumentDB | `silenthonor-docdb` (in `prod-vpc`) |
+| Uploads (DD-214) | S3, SSE-KMS, private, TLS-only | `silenthonor-uploads-802104113048` |
+| Email | Resend (or SES) | `noreply@silenthonorfoundation.org` |
+| Secrets | Secrets Manager | `silenthonor/jwt-secret`, `/admin-password`, `/mongodb-uri`, `/resend-api-key` |
+| DNS | Cloudflare | zone `silenthonorfoundation.org` (NS: `owen`/`sue.ns.cloudflare.com`) |
+| TLS | ACM (us-east-1) | covers apex + `www` |
 
-The frontend calls the API cross-site via cookies (`window.API_BASE` in `js/components.js`).
+Infrastructure as code lives in [`infra/aws/`](infra/aws/) (Terraform). See its README for
+the full resource map and cost notes.
 
-## Why the site was down (root causes)
+## Deploy the frontend (static site)
 
-1. **DNS** — `silenthonorfoundation.org` (and `www.`) have no A record, so the frontend is unreachable. *(Registrar/DNS action — see step 1.)*
-2. **CORS** — the live API only allowed `silenthonor.org`, so even once the frontend resolves, every logged-in call from `silenthonorfoundation.org` was blocked. *(Fixed in this PR — env-driven CORS now allows both domains; requires an API redeploy.)*
-3. **No frontend server config** — the repo only shipped an API nginx block; nothing served the static site. *(Fixed — `scripts/silenthonor-frontend.nginx.conf` added.)*
-4. **Leaked admin credential** — a credentials file was committed to this public repo. *(Untracked + gitignored + startup no longer writes it in production. The affected admin password must be rotated — step 4.)*
-
-## What this PR fixes (code — deploy to take effect)
-
-- Env-driven CORS (`CORS_ORIGINS`) defaulting to both prod domains + www + localhost.
-- `server.py` no longer hardcodes `/app`; frontend dir auto-detected → clean-URL routes work on the VPS.
-- Missing-page returns a branded `404.html` (added) instead of a 500.
-- Startup skips writing `test_credentials.md` when `ENVIRONMENT=production`.
-- `docker-compose` local stack works (backend now reads `MONGODB_URI`/`MONGODB_DB`).
-- `.env.example` documents every variable the code actually reads.
-
-## Restore procedure
-
-**1. DNS (registrar / Cloudflare) — required, only the owner can do this**
-   - Decide the canonical domain: **`silenthonorfoundation.org`** (new) or reuse **`silenthonor.org`** (replaces WordPress).
-   - Point it at the VPS: `A silenthonorfoundation.org → 72.60.175.115` and `A www → 72.60.175.115` (proxy off / DNS-only for cert issuance).
-
-**2. Frontend hosting on the VPS**
-   ```bash
-   ssh root@72.60.175.115
-   cd /var/www/silenthonor && git pull origin main
-   cp scripts/silenthonor-frontend.nginx.conf /etc/nginx/sites-available/silenthonor-frontend
-   ln -sf /etc/nginx/sites-available/silenthonor-frontend /etc/nginx/sites-enabled/
-   nginx -t && systemctl reload nginx
-   certbot --nginx -d silenthonorfoundation.org -d www.silenthonorfoundation.org
-   ```
-   *(If `silenthonor.org` is the chosen domain, set that in the `server_name` and certbot instead, and update `CORS_ORIGINS`.)*
-
-**3. Redeploy the API (picks up the CORS fix)**
-   ```bash
-   cd /var/www/silenthonor/backend && git pull origin main
-   # ensure /var/www/silenthonor/backend/.env has ENVIRONMENT=production and, if desired,
-   # CORS_ORIGINS=https://silenthonorfoundation.org,https://www.silenthonorfoundation.org
-   pip install -r requirements.txt
-   systemctl restart silenthonor
-   ```
-   or run `scripts/deploy.sh` from a machine with SSH access.
-
-**4. Rotate the leaked admin credential — required**
-   The seed admin password was exposed in the public repo history. Set a new strong
-   `ADMIN_PASSWORD` in `.env` and `systemctl restart silenthonor` (startup resets the
-   admin hash to the env value). Optionally purge the old file from git history
-   (`git filter-repo`) — a force-push, so coordinate first.
-
-## Verify (after steps 1–4)
+The site is plain HTML/CSS/JS — no build step. Sync to S3 and invalidate CloudFront:
 
 ```bash
-curl -s https://api.srv1077820.hstgr.cloud/api/health           # {"status":"healthy",...}
-curl -s -D- -o /dev/null -H "Origin: https://silenthonorfoundation.org" \
-     https://api.srv1077820.hstgr.cloud/api/health | grep -i access-control-allow-origin
-curl -s -o /dev/null -w "%{http_code}\n" https://silenthonorfoundation.org   # 200
+scripts/aws-deploy-frontend.sh
+# or manually:
+aws s3 sync . s3://silenthonor-frontend-802104113048 \
+  --exclude ".git/*" --exclude "backend/*" --exclude "infra/*" --exclude "memory/*" \
+  --exclude "scripts/*" --exclude "test_reports/*" --delete
+aws cloudfront create-invalidation --distribution-id E1H1ZTFC6CP7BY --paths "/*"
 ```
-Then in a browser: load the site, sign up / log in, confirm the dashboard loads and the
-auth cookie is set (DevTools → Application → Cookies).
+
+`index.html` and other HTML must not be long-cached — CloudFront is configured to
+revalidate HTML so deploys are visible immediately.
+
+## Deploy the backend (API)
+
+Build the image, push to ECR, and App Runner rolls it out:
+
+```bash
+scripts/aws-build-image.sh          # builds + pushes to ECR via CodeBuild
+```
+
+App Runner auto-deploys the new image tag. Watch it:
+
+```bash
+aws apprunner list-operations --region us-east-1 \
+  --service-arn "$(aws apprunner list-services --region us-east-1 \
+    --query "ServiceSummaryList[?ServiceName=='silenthonor-backend'].ServiceArn" --output text)"
+```
+
+## Configuration
+
+Backend config is injected by App Runner — plain values as env vars, secrets from
+Secrets Manager. See [`backend/.env.example`](backend/.env.example) for every variable
+the code reads. Two that matter and are easy to get wrong:
+
+- **`FRONTEND_URL`** — used to build links in outbound email (password reset). Must be
+  the public site URL (`https://silenthonorfoundation.org`), *not* the CloudFront domain.
+- **`CORS_ORIGINS`** — only *adds* origins. The production domains and localhost are
+  always allowed in code, so a bad env value can't lock the live site out of the API.
+
+## Verify a deploy
+
+```bash
+curl -s https://silenthonorfoundation.org -o /dev/null -w "site %{http_code}\n"
+curl -s https://tv9nakyd9p.us-east-1.awsapprunner.com/api/health
+# CORS must echo the site origin back:
+curl -s -D- -o /dev/null -H "Origin: https://silenthonorfoundation.org" \
+  https://tv9nakyd9p.us-east-1.awsapprunner.com/api/health | grep -i access-control-allow-origin
+```
+
+Then in a browser: load the site, sign up, log in, confirm the dashboard renders and the
+auth cookie is set (DevTools → Application → Cookies). Auth cookies are
+`HttpOnly; Secure; SameSite=None` because the site and API are on different origins.
 
 ## Local development
 
@@ -76,3 +85,13 @@ auth cookie is set (DevTools → Application → Cookies).
 cp backend/.env.example backend/.env   # fill values
 docker compose up --build              # frontend :3000, backend :8000, mongo :27017
 ```
+
+## Security notes
+
+- DD-214s are federal records: they go to the private, KMS-encrypted S3 bucket. Never
+  expose that bucket publicly and never commit uploads.
+- `ENVIRONMENT=production` suppresses writing the dev `memory/test_credentials.md` file.
+  That file previously leaked an admin password into this public repo — it is now
+  untracked and gitignored. Do not re-add it.
+- Rotate `silenthonor/admin-password` in Secrets Manager rather than hardcoding an admin
+  password anywhere.

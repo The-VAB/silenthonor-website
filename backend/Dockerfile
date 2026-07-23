@@ -17,6 +17,11 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Amazon DocumentDB TLS: bundle the RDS global CA so the app can connect over TLS.
+# Referenced from the Mongo connection string via tlsCAFile=/app/rds-global-bundle.pem
+ADD https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem /app/rds-global-bundle.pem
+RUN chmod 644 /app/rds-global-bundle.pem
+
 # Copy application code
 COPY . .
 

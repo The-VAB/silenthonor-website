@@ -1,6 +1,11 @@
-# Supabase Storage utilities for Silent Honor Foundation
+# File storage utilities for Silent Honor Foundation
+#
+# Backend priority: Amazon S3 (preferred on AWS) → Supabase Storage → local disk.
+# All public functions keep the same signatures/return shapes so routers are unchanged.
+# The stored ``storage_type`` ("s3" | "supabase" | "local") is what selects the read/delete path later.
 import os
 import uuid
+import asyncio
 import httpx
 from datetime import datetime, timezone
 from middleware.logging_middleware import logger
@@ -9,6 +14,49 @@ from middleware.logging_middleware import logger
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "dd214")
+
+# ── Amazon S3 configuration ─────────────────────────────────────────────────
+# When S3_BUCKET is set the app stores DD-214 files and member documents in a
+# single private bucket, under the "dd214/" and "documents/" prefixes.
+# Server-side encryption is enforced by the bucket policy; if S3_KMS_KEY_ID is
+# provided we request SSE-KMS explicitly, otherwise the bucket default applies.
+S3_BUCKET = os.environ.get("S3_BUCKET", "")
+S3_KMS_KEY_ID = os.environ.get("S3_KMS_KEY_ID", "")
+S3_REGION = os.environ.get("AWS_REGION", os.environ.get("AWS_DEFAULT_REGION", "us-east-1"))
+S3_ENABLED = bool(S3_BUCKET)
+S3_DD214_PREFIX = "dd214/"
+S3_DOCS_PREFIX = "documents/"
+
+_s3_client = None
+
+def _get_s3():
+    """Lazily build a boto3 S3 client. Credentials come from the App Runner
+    instance role (or standard AWS env/credential chain)."""
+    global _s3_client
+    if _s3_client is None:
+        import boto3
+        _s3_client = boto3.client("s3", region_name=S3_REGION)
+    return _s3_client
+
+def _s3_put(key: str, content: bytes) -> None:
+    """Synchronous S3 put with server-side encryption. Runs in a worker thread."""
+    extra = {}
+    if S3_KMS_KEY_ID:
+        extra["ServerSideEncryption"] = "aws:kms"
+        extra["SSEKMSKeyId"] = S3_KMS_KEY_ID
+    else:
+        extra["ServerSideEncryption"] = "AES256"
+    _get_s3().put_object(Bucket=S3_BUCKET, Key=key, Body=content, **extra)
+
+def _s3_presign(key: str, expires_in: int = 3600) -> str:
+    return _get_s3().generate_presigned_url(
+        "get_object",
+        Params={"Bucket": S3_BUCKET, "Key": key},
+        ExpiresIn=expires_in,
+    )
+
+def _s3_delete(key: str) -> None:
+    _get_s3().delete_object(Bucket=S3_BUCKET, Key=key)
 
 # Local fallback directories
 LOCAL_STORAGE_PATH = "/app/uploads/dd214"
@@ -60,7 +108,21 @@ async def upload_dd214(file_content: bytes, original_filename: str, user_id: str
     ext = original_filename.split(".")[-1] if "." in original_filename else "pdf"
     filename = f"{user_id}_{uuid.uuid4()}.{ext}"
 
-    # Try Supabase first if configured
+    # Prefer S3 when configured (encrypted at rest via SSE-KMS/SSE-S3)
+    if S3_ENABLED:
+        try:
+            await asyncio.to_thread(_s3_put, S3_DD214_PREFIX + filename, file_content)
+            logger.info(f"DD-214 uploaded to S3: {S3_DD214_PREFIX}{filename}")
+            return {
+                "success": True,
+                "filename": filename,
+                "storage_type": "s3",
+                "url": await asyncio.to_thread(_s3_presign, S3_DD214_PREFIX + filename),
+            }
+        except Exception as e:
+            logger.error(f"S3 DD-214 upload error: {e}, falling back")
+
+    # Try Supabase next if configured
     if SUPABASE_URL and SUPABASE_KEY:
         try:
             result = await upload_to_supabase(file_content, filename)
@@ -157,7 +219,14 @@ async def get_signed_url(filename: str, expires_in: int = 3600) -> str:
 
 async def delete_dd214(filename: str, storage_type: str = "local") -> bool:
     """Delete DD-214 file from storage"""
-    if storage_type == "supabase":
+    if storage_type == "s3":
+        try:
+            await asyncio.to_thread(_s3_delete, S3_DD214_PREFIX + filename)
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting DD-214 from S3: {e}")
+            return False
+    elif storage_type == "supabase":
         return await delete_from_supabase(filename)
     else:
         return await delete_from_local(filename)
@@ -192,7 +261,13 @@ async def delete_from_local(filename: str) -> bool:
 
 async def get_dd214_url(filename: str, storage_type: str = "local") -> str:
     """Get URL for accessing DD-214 file"""
-    if storage_type == "supabase":
+    if storage_type == "s3":
+        try:
+            return await asyncio.to_thread(_s3_presign, S3_DD214_PREFIX + filename)
+        except Exception as e:
+            logger.error(f"Error presigning DD-214 S3 URL: {e}")
+            return ""
+    elif storage_type == "supabase":
         return await get_signed_url(filename)
     else:
         return f"/uploads/dd214/{filename}"
@@ -207,6 +282,15 @@ async def upload_document(file_content: bytes, original_filename: str, member_id
     """
     ext = original_filename.rsplit(".", 1)[-1].lower() if "." in original_filename else "pdf"
     storage_key = f"documents/{member_id}_{uuid.uuid4()}.{ext}"
+
+    # Prefer S3 when configured
+    if S3_ENABLED:
+        try:
+            await asyncio.to_thread(_s3_put, storage_key, file_content)
+            logger.info(f"Document uploaded to S3: {storage_key}")
+            return {"success": True, "storage_key": storage_key, "storage_type": "s3"}
+        except Exception as e:
+            logger.error(f"S3 document upload error: {e}, falling back")
 
     if SUPABASE_URL and SUPABASE_KEY:
         try:
@@ -231,7 +315,13 @@ async def upload_document(file_content: bytes, original_filename: str, member_id
 
 async def get_document_url(storage_key: str, storage_type: str) -> str:
     """Get a download URL for a counselor-uploaded document."""
-    if storage_type == "supabase":
+    if storage_type == "s3":
+        try:
+            return await asyncio.to_thread(_s3_presign, storage_key)
+        except Exception as e:
+            logger.error(f"Error presigning document S3 URL: {e}")
+            return ""
+    elif storage_type == "supabase":
         return await get_signed_url(storage_key)
     else:
         # storage_key is "documents/filename.ext", local path strips the prefix
@@ -240,7 +330,14 @@ async def get_document_url(storage_key: str, storage_type: str) -> str:
 
 async def delete_document(storage_key: str, storage_type: str) -> bool:
     """Delete a counselor-uploaded document from storage."""
-    if storage_type == "supabase":
+    if storage_type == "s3":
+        try:
+            await asyncio.to_thread(_s3_delete, storage_key)
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting document from S3: {e}")
+            return False
+    elif storage_type == "supabase":
         return await delete_from_supabase(storage_key)
     else:
         local_filename = storage_key.replace("documents/", "")

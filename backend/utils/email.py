@@ -1,15 +1,61 @@
-# Email utilities using Resend API for Silent Honor Foundation
+# Email utilities for Silent Honor Foundation
+#
+# Two providers are supported, selected by EMAIL_PROVIDER:
+#   "resend" (default) — Resend HTTP API, preserves existing behavior
+#   "ses"              — Amazon SES v2 via boto3 (uses the App Runner instance role)
 import os
+import asyncio
 import httpx
 from middleware.logging_middleware import logger
+
+# Provider selection
+EMAIL_PROVIDER = os.environ.get("EMAIL_PROVIDER", "resend").lower()
 
 # Resend API configuration
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "Silent Honor <noreply@silenthonor.org>")
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@silenthonor.org")
 
+# SES configuration
+SES_REGION = os.environ.get("AWS_REGION", os.environ.get("AWS_DEFAULT_REGION", "us-east-1"))
+_ses_client = None
+
+def _get_ses():
+    global _ses_client
+    if _ses_client is None:
+        import boto3
+        _ses_client = boto3.client("sesv2", region_name=SES_REGION)
+    return _ses_client
+
+def _ses_send(to: str, subject: str, html_content: str, text_content: str) -> bool:
+    """Synchronous SES v2 send. Runs in a worker thread."""
+    _get_ses().send_email(
+        FromEmailAddress=FROM_EMAIL,
+        Destination={"ToAddresses": [to]},
+        Content={
+            "Simple": {
+                "Subject": {"Data": subject, "Charset": "UTF-8"},
+                "Body": {
+                    "Html": {"Data": html_content, "Charset": "UTF-8"},
+                    "Text": {"Data": text_content or "", "Charset": "UTF-8"},
+                },
+            }
+        },
+    )
+    return True
+
 async def send_email(to: str, subject: str, html_content: str, text_content: str = None) -> bool:
-    """Send email using Resend API"""
+    """Send email using the configured provider (Amazon SES or Resend)."""
+    if EMAIL_PROVIDER == "ses":
+        try:
+            await asyncio.to_thread(_ses_send, to, subject, html_content, text_content)
+            logger.info(f"Email sent via SES to {to}: {subject}")
+            return True
+        except Exception as e:
+            logger.error(f"SES email error: {e}")
+            return False
+
+    # Default: Resend
     if not RESEND_API_KEY:
         logger.warning("RESEND_API_KEY not set - email not sent")
         return False
