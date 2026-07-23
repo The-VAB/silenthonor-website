@@ -125,3 +125,16 @@ variable "admin_password" {
   default     = ""
   sensitive   = true
 }
+
+# ── CI/CD ─────────────────────────────────────────────────────────────────────
+variable "github_repo" {
+  description = "GitHub repo the deploy pipeline watches, as owner/repo"
+  type        = string
+  default     = "The-VAB/silenthonor-website"
+}
+
+variable "github_branch" {
+  description = "Branch that triggers a deploy on push"
+  type        = string
+  default     = "main"
+}

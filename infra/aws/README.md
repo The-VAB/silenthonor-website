@@ -189,6 +189,34 @@ It attaches the cert + aliases to CloudFront, points apex/www at CloudFront, and
 (same registrable domain), fixing the Safari third-party-cookie caveat. Re-runnable;
 it no-ops until the cert is issued.
 
+## Continuous deployment (CodePipeline)
+
+`cicd.tf` adds a pipeline so pushes to `main` deploy automatically instead of
+running `scripts/aws-build-image.sh` / `scripts/aws-deploy-frontend.sh` by hand:
+
+```
+GitHub (push to main) ──▶ CodePipeline Source (CodeStar Connection)
+                              └─▶ CodeBuild "silenthonor-deploy"
+                                    1. docker build + push backend image → ECR
+                                       (App Runner auto-deploys it: auto_deployments_enabled = true)
+                                    2. aws s3 sync → frontend bucket
+                                    3. CloudFront invalidation
+```
+
+**One manual step required after `terraform apply`:** AWS can't authorize a
+GitHub connection through the API — go to
+**AWS Console → Developer Tools → Settings → Connections**, find
+`silenthonor-github` (status "Pending"), click **Update pending connection**,
+and complete the GitHub App install/authorization for
+`The-VAB/silenthonor-website`. The pipeline's Source stage fails until this is
+done; once authorized it starts working on the next push (no re-apply needed).
+
+`terraform output codestar_connection_arn` / `terraform output deploy_pipeline_name`
+locate the connection and the pipeline in the console.
+
+The old manual scripts still work standalone if you ever need an out-of-band
+deploy (e.g. re-running just the frontend sync).
+
 ## Data migration
 
 Move existing MongoDB data into DocumentDB with `mongodump`/`mongorestore`:

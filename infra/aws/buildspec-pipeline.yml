@@ -1,0 +1,37 @@
+# CodeBuild buildspec for the CodePipeline "Deploy" stage: builds and pushes the
+# backend Docker image to ECR (App Runner auto-deploys the new image since
+# auto_deployments_enabled = true), then syncs the static frontend to S3 and
+# invalidates CloudFront. Runs on every push to main via the pipeline in cicd.tf.
+# Expected env vars (set by aws_codebuild_project.deploy): AWS_ACCOUNT_ID,
+# AWS_DEFAULT_REGION, ECR_REPO, IMAGE_TAG, FRONTEND_BUCKET, CLOUDFRONT_DIST_ID
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+      - REPO_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO"
+  build:
+    commands:
+      - echo Building backend image...
+      - docker build -t "$REPO_URI:$IMAGE_TAG" -f backend/Dockerfile backend
+      - echo Pushing image to ECR...
+      - docker push "$REPO_URI:$IMAGE_TAG"
+      - echo Syncing static assets to S3 (long cache)...
+      - >
+        aws s3 sync . "s3://$FRONTEND_BUCKET"
+        --exclude ".git/*" --exclude "backend/*" --exclude "infra/*"
+        --exclude "scripts/*" --exclude "test_reports/*" --exclude "memory/*"
+        --exclude "*.py" --exclude "*.md" --exclude "docker-compose.yml"
+        --exclude "*.html"
+        --cache-control "public,max-age=604800,immutable" --delete
+      - echo Syncing HTML to S3 (no cache)...
+      - >
+        aws s3 sync . "s3://$FRONTEND_BUCKET" --exclude "*" --include "*.html"
+        --cache-control "no-cache,no-store,must-revalidate"
+      - echo Invalidating CloudFront...
+      - aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_DIST_ID" --paths "/*"
+  post_build:
+    commands:
+      - echo "Deployed $REPO_URI:$IMAGE_TAG; frontend synced to $FRONTEND_BUCKET; CloudFront invalidated."

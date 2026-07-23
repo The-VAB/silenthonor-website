@@ -42,3 +42,13 @@ output "generated_admin_password_secret" {
   description = "Secrets Manager entry holding the bootstrap admin password"
   value       = aws_secretsmanager_secret.admin_password.name
 }
+
+output "codestar_connection_arn" {
+  description = "Authorize this at AWS Console -> Developer Tools -> Settings -> Connections (one-time, required before the pipeline can pull from GitHub)"
+  value       = aws_codestarconnections_connection.github.arn
+}
+
+output "deploy_pipeline_name" {
+  description = "CodePipeline that builds + deploys on every push to github_branch"
+  value       = aws_codepipeline.deploy.name
+}
