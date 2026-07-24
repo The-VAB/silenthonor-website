@@ -314,6 +314,10 @@ input,select,textarea{font-family:inherit;font-size:14px;}
         <span class="sidebar-item-icon">&#128226;</span>
         <span class="sidebar-item-label">Announcements</span>
       </div>
+      <div class="sidebar-item" onclick="showView('knowledge')" data-view="knowledge">
+        <span class="sidebar-item-icon">&#129504;</span>
+        <span class="sidebar-item-label">Knowledge Base</span>
+      </div>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-section-label">Operations</div>
@@ -484,6 +488,40 @@ input,select,textarea{font-family:inherit;font-size:14px;}
     <table class="data-table">
       <thead><tr><th>Title</th><th>Type</th><th>Created</th><th>Expires</th><th>Active</th><th>Actions</th></tr></thead>
       <tbody id="announcements-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== KNOWLEDGE BASE ===== -->
+<div id="view-knowledge" class="view">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Knowledge Base</div>
+      <div class="page-subtitle">Grounds both AI assistants. Member-visible entries are the only ones Major Finance (the member-facing assistant) can ever read.</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline btn-sm" onclick="loadKnowledge()">&#8635; Refresh</button>
+      <button class="btn btn-primary" onclick="openKnowledgeModal()">+ New Entry</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+    <input type="text" id="kb-search" class="form-input" style="max-width:260px;" placeholder="Search title or body..." oninput="renderKnowledge()">
+    <select id="kb-filter-visibility" class="form-select" style="max-width:180px;" onchange="renderKnowledge()">
+      <option value="">All visibility</option>
+      <option value="member_visible">Member-visible</option>
+      <option value="staff_only">Staff-only</option>
+    </select>
+    <select id="kb-filter-status" class="form-select" style="max-width:160px;" onchange="renderKnowledge()">
+      <option value="">All statuses</option>
+      <option value="draft">Draft</option>
+      <option value="published">Published</option>
+      <option value="retired">Retired</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Title</th><th>Category</th><th>Visibility</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
+      <tbody id="knowledge-tbody"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -733,6 +771,50 @@ input,select,textarea{font-family:inherit;font-size:14px;}
   </div>
 </div>
 
+<!-- Knowledge Base Modal -->
+<div id="knowledge-modal" class="modal-backdrop">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="kb-modal-title">New Knowledge Entry</span>
+      <button class="modal-close" onclick="closeModal('knowledge-modal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="form-group"><label class="form-label">Title *</label><input type="text" id="kb-title" class="form-input" placeholder="e.g. How credit utilization affects your score"></div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Category</label><input type="text" id="kb-category" class="form-input" placeholder="e.g. Credit, Budgeting, Veteran Benefits"></div>
+          <div class="form-group"><label class="form-label">Tags (comma-separated)</label><input type="text" id="kb-tags" class="form-input" placeholder="scra, garnishment"></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Visibility *</label>
+            <select id="kb-visibility" class="form-select" onchange="onKbVisibilityStatusChange()">
+              <option value="staff_only">Staff-only (internal)</option>
+              <option value="member_visible">Member-visible (Major Finance can read)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status *</label>
+            <select id="kb-status" class="form-select" onchange="onKbVisibilityStatusChange()">
+              <option value="draft">Draft (not live)</option>
+              <option value="published">Published (live)</option>
+              <option value="retired">Retired</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Body *</label><textarea id="kb-body" class="form-textarea" rows="10" placeholder="The answer/article content. Plain text or markdown."></textarea></div>
+        <div id="kb-member-warning" style="display:none;background:rgba(201,149,42,0.1);border:1px solid rgba(201,149,42,0.35);color:var(--gold);padding:8px 12px;font-size:0.8rem;border-radius:4px;">
+          Member-visible + published means this becomes readable by members through the Major Finance assistant. Keep it educational, accurate, and free of guarantees or individualized advice.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('knowledge-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveKnowledge()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
 <!-- Lesson Modal -->
 <div id="lesson-modal" class="modal-backdrop">
   <div class="modal modal-lg">
@@ -858,6 +940,8 @@ let lessonEditContext = null;
 let manualApproveTarget = null;
 let staffEditId = null;
 let announcementEditId = null;
+let knowledgeEditId = null;
+let knowledgeEntries = [];
 let messagesPollInterval = null;
 let activeConvoId = null;
 let charts = {};
@@ -913,6 +997,7 @@ function showView(name) {
   else if (name === 'dd214') loadDd214();
   else if (name === 'courses') loadCourseList();
   else if (name === 'announcements') loadAnnouncements();
+  else if (name === 'knowledge') loadKnowledge();
   else if (name === 'messages') { loadMessages(); messagesPollInterval = setInterval(loadMessages, 30000); }
   else if (name === 'contacts') loadContacts();
   else if (name === 'staff') loadStaff();
@@ -2448,6 +2533,124 @@ async function deleteAnnouncement(id) {
     await fetch(`${API}/api/admin/announcements/${id}`, {method:'DELETE',credentials:'include'});
     loadAnnouncements();
   } catch(e) {}
+}
+
+// ===== KNOWLEDGE BASE =====
+function kbEsc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function loadKnowledge() {
+  const tbody = document.getElementById('knowledge-tbody');
+  try {
+    const r = await fetch(`${API}/api/admin/knowledge`, {credentials:'include'});
+    if (!r.ok) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--red);">Could not load knowledge base</td></tr>'; return; }
+    knowledgeEntries = await r.json();
+    renderKnowledge();
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--red);">Network error</td></tr>'; }
+}
+
+function renderKnowledge() {
+  const tbody = document.getElementById('knowledge-tbody');
+  const q = (document.getElementById('kb-search').value || '').toLowerCase();
+  const fv = document.getElementById('kb-filter-visibility').value;
+  const fs = document.getElementById('kb-filter-status').value;
+  let rows = knowledgeEntries.filter(e => {
+    if (fv && e.visibility !== fv) return false;
+    if (fs && e.status !== fs) return false;
+    if (q && !((e.title||'').toLowerCase().includes(q) || (e.body||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">No entries. Click "New Entry" to add the first one.</td></tr>'; return; }
+  const visBadge = v => v === 'member_visible' ? '<span class="badge badge-green">Member-visible</span>' : '<span class="badge badge-gray">Staff-only</span>';
+  const statBadge = s => ({published:'badge-green',draft:'badge-gold',retired:'badge-gray'}[s]||'badge-gray');
+  tbody.innerHTML = rows.map(e => `
+    <tr>
+      <td><strong>${kbEsc(e.title)}</strong></td>
+      <td>${kbEsc(e.category)||'—'}</td>
+      <td>${visBadge(e.visibility)}</td>
+      <td><span class="badge ${statBadge(e.status)}">${kbEsc(e.status)}</span></td>
+      <td>${fmtDate(e.updated_at)}</td>
+      <td onclick="event.stopPropagation()" style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-outline btn-xs" onclick="editKnowledge('${e.id}')">Edit</button>
+        ${e.status !== 'published' ? `<button class="btn btn-outline btn-xs" onclick="setKnowledgeStatus('${e.id}','publish')">Publish</button>` : ''}
+        ${e.status !== 'retired' ? `<button class="btn btn-outline btn-xs" onclick="setKnowledgeStatus('${e.id}','retire')">Retire</button>` : ''}
+        <button class="btn btn-red btn-xs" onclick="deleteKnowledge('${e.id}')">Delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+function onKbVisibilityStatusChange() {
+  const vis = document.getElementById('kb-visibility').value;
+  const status = document.getElementById('kb-status').value;
+  document.getElementById('kb-member-warning').style.display =
+    (vis === 'member_visible' && status === 'published') ? 'block' : 'none';
+}
+
+function openKnowledgeModal() {
+  knowledgeEditId = null;
+  document.getElementById('kb-modal-title').textContent = 'New Knowledge Entry';
+  document.getElementById('kb-title').value = '';
+  document.getElementById('kb-category').value = '';
+  document.getElementById('kb-tags').value = '';
+  document.getElementById('kb-visibility').value = 'staff_only';
+  document.getElementById('kb-status').value = 'draft';
+  document.getElementById('kb-body').value = '';
+  onKbVisibilityStatusChange();
+  document.getElementById('knowledge-modal').classList.add('open');
+}
+
+function editKnowledge(id) {
+  const e = knowledgeEntries.find(x => x.id === id);
+  if (!e) return;
+  knowledgeEditId = id;
+  document.getElementById('kb-modal-title').textContent = 'Edit Knowledge Entry';
+  document.getElementById('kb-title').value = e.title || '';
+  document.getElementById('kb-category').value = e.category || '';
+  document.getElementById('kb-tags').value = (e.tags || []).join(', ');
+  document.getElementById('kb-visibility').value = e.visibility || 'staff_only';
+  document.getElementById('kb-status').value = e.status || 'draft';
+  document.getElementById('kb-body').value = e.body || '';
+  onKbVisibilityStatusChange();
+  document.getElementById('knowledge-modal').classList.add('open');
+}
+
+async function saveKnowledge() {
+  const title = document.getElementById('kb-title').value.trim();
+  const body = document.getElementById('kb-body').value.trim();
+  if (!title || !body) { toast('Title and body are required', 'error'); return; }
+  const tags = document.getElementById('kb-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+  const data = {
+    title, body,
+    category: document.getElementById('kb-category').value.trim() || null,
+    tags,
+    visibility: document.getElementById('kb-visibility').value,
+    status: document.getElementById('kb-status').value,
+  };
+  try {
+    let r;
+    if (knowledgeEditId) r = await fetch(`${API}/api/admin/knowledge/${knowledgeEditId}`, {method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    else r = await fetch(`${API}/api/admin/knowledge`, {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if (r.ok) { toast('Knowledge entry saved', 'success'); closeModal('knowledge-modal'); loadKnowledge(); }
+    else { const err = await r.json().catch(()=>({})); toast(err.detail || 'Error saving entry', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function setKnowledgeStatus(id, action) {
+  try {
+    const r = await fetch(`${API}/api/admin/knowledge/${id}/${action}`, {method:'POST',credentials:'include'});
+    if (r.ok) { toast(action === 'publish' ? 'Entry published' : 'Entry retired', 'success'); loadKnowledge(); }
+    else { const err = await r.json().catch(()=>({})); toast(err.detail || 'Error', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
+}
+
+async function deleteKnowledge(id) {
+  if (!confirm('Delete this knowledge entry permanently? Consider Retire instead if it was ever published.')) return;
+  try {
+    const r = await fetch(`${API}/api/admin/knowledge/${id}`, {method:'DELETE',credentials:'include'});
+    if (r.ok) { toast('Entry deleted', 'success'); loadKnowledge(); }
+    else { const err = await r.json().catch(()=>({})); toast(err.detail || 'Delete failed (admin only)', 'error'); }
+  } catch(e) { toast('Network error', 'error'); }
 }
 
 // ===== REPORTS =====

@@ -216,6 +216,11 @@ async def create_indexes():
         await db.audit_log.create_index("timestamp")
         await db.audit_log.create_index("action")
 
+        # Knowledge base (grounds both AI assistants; the member-facing read filters on
+        # status + visibility, so index them together)
+        await db.knowledge_base.create_index([("status", 1), ("visibility", 1)])
+        await db.knowledge_base.create_index("category")
+
         logger.info("Database indexes created")
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")
