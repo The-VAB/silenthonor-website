@@ -23,6 +23,9 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+class GoogleLoginRequest(BaseModel):
+    credential: str
+
 class ContactRequest(BaseModel):
     first_name: str
     last_name: str

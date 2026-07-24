@@ -9,7 +9,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/global.css">
 <script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
+.google-signin-btn {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+  color: var(--muted);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
 .login-wrapper {
   min-height: 100vh;
   display: flex;
@@ -195,6 +221,9 @@
 
     <div class="error-msg" id="error-msg"></div>
 
+    <div class="google-signin-btn" id="google-signin-btn" style="display:none;"></div>
+    <div class="login-divider" id="login-divider" style="display:none;">or sign in with email</div>
+
     <div class="form-group">
       <label class="form-label">Email Address</label>
       <input type="email" id="login-email" class="form-input" placeholder="you@email.com" data-testid="login-email">
@@ -224,6 +253,19 @@
 <script src="js/components.js"></script>
 <script src="js/main.js"></script>
 <script>
+function redirectByRole(user) {
+  const _userRoles = user.roles || [user.role];
+  if (_userRoles.some(r => ['admin', 'staff'].includes(r))) {
+    window.location.href = 'admin.html';
+  } else if (_userRoles.includes('counselor')) {
+    window.location.href = 'counselor-portal.html';
+  } else if (!user.verified) {
+    window.location.href = 'pending.html';
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+}
+
 function togglePassword() {
   const input = document.getElementById('login-password');
   const btn = document.querySelector('.password-toggle');
@@ -263,17 +305,7 @@ async function handleLogin() {
 
     if (response.ok) {
       localStorage.setItem('sh_user', JSON.stringify(data));
-
-      const _userRoles = data.roles || [data.role];
-      if (_userRoles.some(r => ['admin', 'staff'].includes(r))) {
-        window.location.href = 'admin.html';
-      } else if (_userRoles.includes('counselor')) {
-        window.location.href = 'counselor-portal.html';
-      } else if (!data.verified) {
-        window.location.href = 'pending.html';
-      } else {
-        window.location.href = 'dashboard.html';
-      }
+      redirectByRole(data);
     } else {
       errorEl.textContent = data.detail || 'Invalid email or password.';
       errorEl.classList.add('show');
@@ -288,6 +320,30 @@ async function handleLogin() {
   }
 }
 
+async function handleGoogleCredential(response) {
+  const errorEl = document.getElementById('error-msg');
+  errorEl.classList.remove('show');
+  try {
+    const res = await fetch(`${window.API_BASE}/api/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ credential: response.credential })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('sh_user', JSON.stringify(data));
+      redirectByRole(data);
+    } else {
+      errorEl.textContent = data.detail || 'Google sign-in failed. Please try again.';
+      errorEl.classList.add('show');
+    }
+  } catch (err) {
+    errorEl.textContent = 'Connection error. Please try again.';
+    errorEl.classList.add('show');
+  }
+}
+
 // Check if already logged in
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -296,16 +352,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     if (response.ok) {
       const user = await response.json();
-      const _userRoles = user.roles || [user.role];
-      if (_userRoles.some(r => ['admin', 'staff'].includes(r))) {
-        window.location.href = 'admin.html';
-      } else if (_userRoles.includes('counselor')) {
-        window.location.href = 'counselor-portal.html';
-      } else if (!user.verified) {
-        window.location.href = 'pending.html';
-      } else {
-        window.location.href = 'dashboard.html';
-      }
+      redirectByRole(user);
+    }
+  } catch (e) {}
+
+  // Google Sign-In: only rendered if the backend has GOOGLE_CLIENT_ID configured.
+  try {
+    const cfgRes = await fetch(`${window.API_BASE}/api/auth/google/config`);
+    const cfg = await cfgRes.json();
+    if (cfg.client_id && window.google && window.google.accounts) {
+      window.google.accounts.id.initialize({
+        client_id: cfg.client_id,
+        callback: handleGoogleCredential
+      });
+      document.getElementById('google-signin-btn').style.display = '';
+      document.getElementById('login-divider').style.display = '';
+      window.google.accounts.id.renderButton(
+        document.getElementById('google-signin-btn'),
+        { theme: 'outline', size: 'large', width: 360 }
+      );
     }
   } catch (e) {}
 });
