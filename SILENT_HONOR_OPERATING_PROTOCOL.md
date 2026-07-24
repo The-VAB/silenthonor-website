@@ -169,7 +169,9 @@ should get answers scoped to what's relevant and permitted for their role, not i
 output. The four role profiles below (researched against real nonprofit-sector practice,
 not guessed) are the starting set -- as new roles or workflows get added, Battle Buddy's
 behavior for that role is something to define explicitly, not something it should
-improvise.
+improvise. One exception to "each role gets its own scoped slice": the Executive Director
+gets the full union of all four roles' capabilities, not just the ED-specific list --
+see 7.1.
 
 **The one rule that cuts across every role below: Battle Buddy drafts, humans decide and
 send.** Board reports, funder communications, dispute letters, donor asks, compliance
@@ -186,6 +188,19 @@ the full grant compliance lifecycle (proposal -- award -- reporting -- closeout)
 legal/compliance calendar (Form 990, state charitable-solicitation renewal, budget
 approval, audit acceptance), staff oversight, and strategic plan progress -- on top of
 being the fallback for whatever else a small nonprofit needs done.
+
+**Full-capability access.** The ED is the one role with org-wide accountability, so unlike
+the other three roles, ED access to Battle Buddy is not limited to the list below --
+it's the ED-specific list *plus every capability in 7.2, 7.3, and 7.4*. The ED should be
+able to ask Battle Buddy to draft an FCRA dispute letter, check a grant deadline, pull a
+pipeline bottleneck report, or draft a donor appeal, same as the role that normally owns
+that task. This is a broader grant of *capability*, not an exemption from the guardrails
+attached to each capability -- a dispute letter the ED asks for still needs written client
+authorization and still never guarantees results; a gift acknowledgment the ED drafts
+still needs the correct IRS substantiation language; DD-214 document *contents* are still
+governed by the Privacy Act regardless of who's asking (see the guardrail below). "Can do
+everything" means everything the org's other three roles can do, not an override of the
+legal constraints that apply to what's being done.
 
 Battle Buddy for this role should:
 - Auto-draft board packets from real program/financial data: exec summary, status by
