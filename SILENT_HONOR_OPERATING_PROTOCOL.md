@@ -169,9 +169,10 @@ should get answers scoped to what's relevant and permitted for their role, not i
 output. The four role profiles below (researched against real nonprofit-sector practice,
 not guessed) are the starting set -- as new roles or workflows get added, Battle Buddy's
 behavior for that role is something to define explicitly, not something it should
-improvise. One exception to "each role gets its own scoped slice": the Executive Director
-gets the full union of all four roles' capabilities, not just the ED-specific list --
-see 7.1.
+improvise. Two exceptions to "each role gets its own scoped slice," reflecting how
+Silent Honor's org chart actually works: the Executive Director gets the full union of
+all four roles' capabilities (see 7.1), and the Operations Manager gets 7.2 plus 7.3 and
+7.4 -- everything except the ED-specific list (see 7.2).
 
 **The one rule that cuts across every role below: Battle Buddy drafts, humans decide and
 send.** Board reports, funder communications, dispute letters, donor asks, compliance
@@ -239,6 +240,15 @@ enrollment -- counselor assignment), staff scheduling and task follow-through,
 vendor/contract management, compliance record-keeping, internal reporting, and de facto
 ownership of whatever system (the member portal, DD-214 workflow, course gating) the org
 runs on.
+
+**Capability access.** Second exception to "each role gets its own scoped slice" (the
+first is the ED, 7.1): the Operations Manager also gets everything in 7.3 (Financial
+Counselor) and 7.4 (Fundraiser/Development Manager), since Ops is expected to help cover
+both areas -- but not 7.1's ED-specific capabilities (board packets, governance-level
+compliance calendar, org-wide strategic reporting). Same rule as the ED's grant: this
+is broader *capability*, not an exemption from the guardrails tied to each capability --
+an Ops-Manager-requested dispute letter still needs client authorization, a gift
+acknowledgment still needs correct IRS substantiation, etc.
 
 Battle Buddy for this role should:
 - Continuously scan the member pipeline and flag where people are stalling (e.g. "14
