@@ -46,6 +46,27 @@ def set_db(database):
 @router.post("/register")
 async def register(request: Request, response: Response, data: RegisterRequest):
     email = data.email.lower()
+    password_hash = None
+
+    if data.google_credential:
+        client_id = os.environ.get("GOOGLE_CLIENT_ID")
+        if not client_id:
+            raise HTTPException(status_code=503, detail="Google sign-in is not configured")
+        try:
+            idinfo = google_id_token.verify_oauth2_token(
+                data.google_credential, google_requests.Request(), client_id
+            )
+        except ValueError:
+            raise HTTPException(status_code=401, detail="Invalid Google credential")
+        if not idinfo.get("email_verified"):
+            raise HTTPException(status_code=401, detail="Google account email is not verified")
+        # The token is the source of truth for identity -- never trust a
+        # client-posted email over it.
+        email = idinfo["email"].lower()
+    else:
+        if not data.password:
+            raise HTTPException(status_code=400, detail="Password is required")
+        password_hash = hash_password(data.password)
 
     # Check if email exists
     existing = await db.users.find_one({"email": email})
@@ -55,7 +76,8 @@ async def register(request: Request, response: Response, data: RegisterRequest):
     # Create user
     user_doc = {
         "email": email,
-        "password_hash": hash_password(data.password),
+        "password_hash": password_hash,
+        "auth_provider": "google" if data.google_credential else "password",
         "first_name": data.first_name,
         "last_name": data.last_name,
         "dob": data.dob,
@@ -125,6 +147,9 @@ async def login(request: Request, response: Response, data: LoginRequest):
         await record_failed_attempt(identifier)
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
+    if not user.get("password_hash"):
+        raise HTTPException(status_code=400, detail="This account signs in with Google. Please use the \"Sign in with Google\" button instead.")
+
     if not verify_password(data.password, user["password_hash"]):
         await record_failed_attempt(identifier)
         raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -174,10 +199,11 @@ async def google_config():
 
 @router.post("/google")
 async def google_login(request: Request, response: Response, data: GoogleLoginRequest):
-    """Login (not signup) via Google. Only works for an email that already has a
-    Silent Honor account -- Google is an additional way to authenticate an
-    existing member/counselor/staff/admin, never a way to self-provision one
-    (membership still requires the normal application + DD-214 verification)."""
+    """Verifies a Google credential and either logs the user in (an account
+    with this email already exists) or hands back the verified identity so the
+    frontend can carry it into the signup flow -- signup still requires the
+    normal application + DD-214 verification; this endpoint never creates an
+    account by itself."""
     client_id = os.environ.get("GOOGLE_CLIENT_ID")
     if not client_id:
         raise HTTPException(status_code=503, detail="Google sign-in is not configured")
@@ -195,10 +221,12 @@ async def google_login(request: Request, response: Response, data: GoogleLoginRe
 
     user = await db.users.find_one({"email": email})
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="No Silent Honor account found for this Google email. Please sign up first."
-        )
+        return {
+            "exists": False,
+            "email": email,
+            "first_name": idinfo.get("given_name", ""),
+            "last_name": idinfo.get("family_name", "")
+        }
 
     if user.get("is_active") is False:
         raise HTTPException(status_code=403, detail="This account has been deactivated. Please contact Silent Honor Foundation for assistance.")
@@ -221,6 +249,7 @@ async def google_login(request: Request, response: Response, data: GoogleLoginRe
 
     _role = user.get("role", "member")
     return {
+        "exists": True,
         "id": user_id,
         "email": user["email"],
         "first_name": user.get("first_name", ""),

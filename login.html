@@ -331,7 +331,18 @@ async function handleGoogleCredential(response) {
       body: JSON.stringify({ credential: response.credential })
     });
     const data = await res.json();
-    if (res.ok) {
+    if (res.ok && data.exists === false) {
+      // No account yet -- carry the verified Google identity into signup so
+      // they finish the real application (DD-214, etc.) instead of hitting a
+      // dead end here.
+      sessionStorage.setItem('sh_google_pending', JSON.stringify({
+        credential: response.credential,
+        email: data.email,
+        first_name: data.first_name,
+        last_name: data.last_name
+      }));
+      window.location.href = 'signup.html';
+    } else if (res.ok) {
       localStorage.setItem('sh_user', JSON.stringify(data));
       redirectByRole(data);
     } else {
