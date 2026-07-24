@@ -1,8 +1,12 @@
 # Silent Honor Foundation Backend Dependencies
 # FastAPI & ASGI
-fastapi==0.104.1
+# fastapi>=0.115 pulls in starlette>=0.40, fixing CVE-2024-47874 (unbounded
+# multipart form-field buffering / DoS) -- relevant since this app accepts
+# member signup + DD-214 uploads as multipart forms.
+fastapi==0.115.3
 uvicorn==0.24.0
-python-multipart==0.0.6
+# 0.0.7+ fixes CVE-2024-24762 (ReDoS via a crafted Content-Type header).
+python-multipart==0.0.20
 
 # MongoDB
 motor==3.3.2
@@ -35,4 +39,5 @@ boto3==1.34.69
 httpx>=0.24.0,<0.25.0
 
 # File encryption (DD-214 local fallback AES-256)
-cryptography==42.0.5
+# 42.0.5 is ~2 years stale; bumped for the accumulated OpenSSL/CVE fixes since.
+cryptography==44.0.2
