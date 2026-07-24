@@ -42,7 +42,7 @@ merge conflicts across concurrent sessions.
   operating protocol itself (PR #10). Decision as of 2026-07-25: keep merging PRs to
   `main` and batch the actual deploy for later rather than chasing AWS access per PR.
 
-## Battle Buddy (AI assistant — ED, Ops Manager, Financial/Credit Counselor, Development)
+## Battle Buddy (staff/leadership AI copilot — ED, Ops, Financial Counselor, Development)
 
 - **Phase:** in Design
 - **Last sync date:** 2026-07-25
@@ -50,9 +50,40 @@ merge conflicts across concurrent sessions.
 - **Notes:** Cold start per Section 4 is done — role-by-role research complete for
   four roles (Executive Director, Operations Manager, Financial/Credit Counselor,
   Fundraiser/Development Manager), written into `SILENT_HONOR_OPERATING_PROTOCOL.md`
-  Section 7. Compliance/PII review is required before anything here ships, given it
-  touches member financial data and DD-214-adjacent information. Next step: a
-  first-pass Design artifact per role for the Director to iterate on — not yet built.
+  Sections 7.1–7.4. ED gets all four roles' capabilities; Ops gets its own + Counselor
+  + Fundraiser (not ED-specific). Compliance/PII review required before anything ships.
+  Next step: a first-pass Design artifact per role for the Director to iterate on —
+  not yet built.
+
+## Major Finance (member-facing financial assistant)
+
+- **Phase:** in Design
+- **Last sync date:** 2026-07-25
+- **Owner of open questions:** Director
+- **Notes:** New member-facing chatbot (spec in `SILENT_HONOR_OPERATING_PROTOCOL.md`
+  Section 7.5), decided 2026-07-25: one assistant covering both credit and personal
+  finance (not two). Lets logged-in members ask financial questions and get
+  educational answers from the shared knowledge base, tailored to their pipeline
+  stage. Name "Major Finance" is a placeholder, easily renamed. Highest-scrutiny
+  surface in the whole system — it's the only assistant that talks to clients with no
+  staff member in the loop, so the bright line (educational only, no personalized
+  advice, no CROA-prohibited result guarantees, no product steering, always a one-tap
+  route to a human counselor) is non-negotiable and needs legal/compliance sign-off
+  before it goes anywhere near production. Not built.
+
+## Knowledge Base (shared grounding + admin management surface)
+
+- **Phase:** in Design
+- **Last sync date:** 2026-07-25
+- **Owner of open questions:** Director
+- **Notes:** Shared source both assistants draw from (spec in Section 7.6). The piece
+  the Director specifically asked for: an admin-dashboard area to add/edit/publish
+  knowledge articles/FAQs/resources without a developer. Every entry carries a
+  member-visible vs. staff-only visibility flag enforced server-side — this is the wall
+  that keeps Major Finance out of internal SOPs. Entries versioned/attributable, ideally
+  review-before-publish for member-facing content. Battle Buddy and Major Finance both
+  depend on this; realistically it's the first of the three AI modules to build, since
+  the other two are only as good as what's in here. Not built.
 
 ---
 

@@ -158,9 +158,30 @@ different names. Standing requirement, not a one-time cleanup.
 
 ## 7. The Battle Buddy Standard -- the experience bar every module is held to
 
-Silent Honor's one AI teammate is **Battle Buddy**. There is no second persona (no
-"Sgt. Savings" or equivalent) -- one assistant, consistently named and consistently
-present, that adapts to who's using it rather than being multiple separate bots.
+Silent Honor runs **two** AI assistants, deliberately separate because they serve two
+completely different audiences with two completely different sets of rules:
+
+- **Battle Buddy** -- the internal, staff/leadership-facing copilot (Sections 7.1-7.4).
+  It helps the people who *run* the org do their jobs: casework, reporting, grants,
+  fundraising. It reaches real member records, scoped by role.
+- **Major Finance** -- the member-facing financial assistant (Section 7.5). It answers
+  *members'* own financial questions -- credit, budgeting, debt, saving -- educationally,
+  and hands anything case-specific to a human counselor. It never touches another
+  member's data and never files or promises anything.
+
+These two are the whole roster -- not "one bot per feature." The old rule was "no second
+persona," written when the only candidate was a bolted-on VAB mascot ("Sgt. Savings")
+that didn't fit Silent Honor. Major Finance is different: it's a purpose-built,
+member-facing educational assistant for *this* org's clients, not a second staff bot.
+Both draw from one shared knowledge base (Section 7.6). Adding a *third* assistant, or a
+second bot for either audience, is the thing to resist -- that's the sprawl the "no
+second persona" rule was really guarding against.
+
+Everything in the rest of Section 7 -- the drafts-not-decisions rule, the compliance/PII
+discipline, the presentation bar -- applies to both assistants unless a subsection says
+otherwise.
+
+### Battle Buddy (staff/leadership-facing) -- Sections 7.1-7.4
 
 **Customizable by design.** Battle Buddy's behavior, tone, and available actions key off
 the same `roles[]` the platform already uses for auth (`admin`, `staff`, `counselor`,
@@ -374,24 +395,126 @@ screening and prospect-research data is sensitive and must never appear in donor
 drafts. Follow the AFP Donor Bill of Rights in anything Battle Buddy drafts: no misleading
 impact claims, no implying data will be shared/sold, honesty about who's soliciting.
 
-**Knowledge repo.** All four roles above depend on Battle Buddy being grounded in Silent
-Honor's own material -- course content, financial-counseling tools, program policy,
-member-facing FAQs, the org's actual grant/donor history -- so it answers from what's
-actually true about this org, not generic filler. Building and maintaining that knowledge
-base is part of what "Battle Buddy works" means, not a separate project.
+### 7.5 Major Finance (member-facing financial assistant)
 
-**Compliance/PII, non-negotiable.** Battle Buddy will touch member financial data and
-DD-214-adjacent information (DD-214s are federal records, access restricted under the
-Privacy Act of 1974) across every role above. Every Battle Buddy feature goes through the
-Definition of Done's compliance/PII check (Section 9) -- no exceptions, no "we'll flag it
-later." Scope what Battle Buddy can see and do per role deliberately, the same way the
-codebase already scopes admin endpoints by role. Before any of this ships broadly, Silent
-Honor should have a short internal AI-use policy (who approves new AI features, how donor
-and client data may/may not be used, how errors get caught) -- most nonprofits using AI
-today don't have one, and that's the actual risk, not the AI itself.
+Everything in 7.1-7.4 is staff-facing. **Major Finance is the opposite: it talks directly
+to members** -- the veterans themselves -- inside the member dashboard. Its job is to let a
+member ask a financial question in plain English, any time, and get a clear, trustworthy,
+educational answer drawn from Silent Honor's own material, without waiting for a counselor
+appointment. It's one assistant covering the whole money picture -- credit *and* personal
+finance -- because a member usually doesn't know or care which bucket their question falls
+in ("this collection is killing my score and I can't make rent" is both at once).
+
+(Name is a placeholder -- "Major Finance" is easy to rename in one pass. It covers credit
+too, which is why the broader name fits better than "Captain Credit.")
+
+**Who it's for and what it knows:** logged-in members (role `member`). Because it knows who
+it's talking to, it can gently tailor *which educational content* it surfaces to their
+pipeline stage -- someone in `credit_repair` gets credit-focused explainers first, someone
+in `financial_counseling` gets budgeting/debt content first -- without ever reading out
+sensitive computed details or pretending to give individualized advice (see the bright
+line below). It never sees or references any other member's data.
+
+**What Major Finance should do:**
+- Answer credit-education questions from Silent Honor's own curriculum: how credit scores
+  are built, what's on a credit report, what a dispute is and how the process works, how
+  utilization/payment history/age affect a score, what a collection or charge-off means.
+- Answer personal-finance-education questions: building a budget, emergency funds, debt
+  payoff approaches (snowball vs. avalanche), saving goals, understanding interest, reading
+  a pay stub or a bill.
+- Cover veteran-specific financial literacy: how VA disability compensation is generally
+  protected from garnishment, what SCRA is and who it protects, spotting predatory lending
+  around military transition, military-to-civilian budgeting shifts.
+- Point members to the right Silent Honor course, module, or resource for a topic ("we
+  cover this in the Credit Foundations course -- want the link?") so it reinforces the
+  curriculum instead of replacing it.
+- Recognize when a question is really "please look at *my* situation" and offer to connect
+  them to a human counselor -- book a session, send a message -- rather than trying to be
+  the counselor.
+- Recognize financial-distress or crisis language (eviction, garnishment, "I can't feed my
+  family") and route warmly and immediately to a human, plus surface crisis resources --
+  never attempt to handle a crisis conversationally itself.
+- Stay in scope: if asked something outside financial education (legal representation,
+  medical, mental health, VA claims adjudication), say so plainly and point to the right
+  kind of help.
+
+**The bright line -- educational answers, never personalized advice, filing, or promises.**
+This is the whole game for a member-facing money bot, and it is non-negotiable:
+- Major Finance explains how things work *in general*. It does not tell a specific member
+  what *they* should do with *their* debt, *their* dispute, or *their* money -- that's the
+  counselor's job, and crossing that line risks unauthorized practice and blows past the
+  educational safe harbor.
+- It never files or drafts a dispute for a member, and never promises or predicts an
+  outcome ("this will come off," "your score will go up 40 points"). Result guarantees are
+  exactly what the Credit Repair Organizations Act prohibits, and a member-facing bot
+  saying it is far more dangerous than a counselor-supervised draft.
+- It never recommends a specific financial product, lender, or paid service (steering --
+  both a conflict-of-interest problem and a risk to Silent Honor's nonprofit CROA/501(q)
+  posture).
+- Every session makes clear, in plain language, that Major Finance is an educational tool,
+  not financial or legal advice, and not a substitute for a session with a real counselor.
+- When in doubt between "answer it" and "hand to a human," it hands to a human.
+
+**Guardrails specific to Major Finance, non-negotiable:**
+- **Member-facing means highest scrutiny.** This is the only assistant that talks to
+  clients with no staff member in the loop, so it gets the strictest review. Every change
+  to it goes through the Definition of Done compliance/PII check (Section 9), same as
+  anything touching sensitive data.
+- **No cross-member data, ever.** It answers from the shared knowledge base and the current
+  member's own stage -- never another member's records, never aggregate data that could
+  identify anyone.
+- **CROA / no guarantees / no steering**, per the bright line above.
+- **Escalation path is mandatory, not optional.** There must always be a one-tap "talk to a
+  real person" route; the bot is an on-ramp to the counselors, not a wall in front of them.
+- **Log for safety and improvement, respect privacy.** Member conversations should be
+  retained per the org's data-retention/AI-use policy so staff can catch a bad answer and
+  improve the knowledge base -- but treated as the sensitive financial data they are.
+
+### 7.6 The shared knowledge base (and where you actually manage it)
+
+Both assistants are only as good as what they're grounded in. **One shared knowledge base
+feeds both Battle Buddy and Major Finance** -- Silent Honor's own course content,
+financial-counseling material, program policy, member FAQs, veteran-specific financial
+guidance, and (for staff only) internal SOPs. Grounding both in the same curated source is
+what makes them answer from what's actually true about *this* org instead of generic
+internet filler, and keeps a member's chatbot answer consistent with what the courses and
+counselors teach.
+
+**This is the "area where you put the knowledge base" -- it needs a real admin surface, and
+that's a module to build, not just a concept.** Concretely:
+- A **Knowledge Base management area in the admin dashboard** where authorized staff (per
+  role -- ED, Ops, and counselors for their domain) can add, edit, publish, and retire
+  knowledge articles/FAQs/resources, without needing a developer.
+- Every entry carries a **visibility flag: member-visible vs. staff-only.** Major Finance
+  may only ever draw from member-visible entries; internal SOPs and staff-only guidance are
+  never reachable by the member-facing bot. This flag is the wall between the two
+  assistants' knowledge, and it's enforced server-side, not just hidden in the UI.
+- Entries are **versioned and attributable** (who changed what, when) so a wrong or
+  outdated answer can be traced to its source and fixed at the source -- which is how you
+  actually improve either assistant over time.
+- Ideally, entries can be **reviewed/approved before going live**, especially anything
+  member-facing, given the compliance stakes on the member side.
+
+Building and maintaining this knowledge base -- and its management surface -- is part of what
+"the assistants work" means, not a separate afterthought project. In the state tracker it's
+its own module (Knowledge Base), and both assistants depend on it.
+
+**Compliance/PII, non-negotiable (both assistants).** Both Battle Buddy and Major Finance
+operate around member financial data and DD-214-adjacent information (DD-214s are federal
+records, access restricted under the Privacy Act of 1974). Every feature of either one goes
+through the Definition of Done's compliance/PII check (Section 9) -- no exceptions, no
+"we'll flag it later." Scope what each assistant can see and do deliberately, the same way
+the codebase already scopes endpoints by role -- and remember the member-facing side (7.5)
+gets the strictest review because no staff member sits between it and the client. Before
+either ships broadly, Silent Honor should have a short internal AI-use policy (who approves
+new AI features, how client/donor data may/may not be used, how bad answers get caught) --
+most nonprofits using AI today don't have one, and that's the actual risk, not the AI
+itself.
 
 **Explicitly out of scope for Silent Honor:**
-- No second AI persona alongside Battle Buddy.
+- No *third* assistant, and no second bot for either audience. The roster is exactly two:
+  Battle Buddy (staff) and Major Finance (members). New needs get added as capabilities or
+  knowledge, not as new personas.
 - No banking/lending product surface (loans, mortgages, account origination, etc.) --
   that's VAB's platform, not this one. Silent Honor's mission is financial coaching,
   credit repair, and veteran services, not banking products.
@@ -399,7 +522,9 @@ today don't have one, and that's the actual risk, not the AI itself.
 **Presentation.** Modern, trustworthy, easy to use, fully responsive (desktop, tablet,
 mobile) -- a platform veterans and the staff serving them can rely on. This isn't a
 "cutting-edge fintech" bar to hit for its own sake; it's a "this is clearly a serious,
-well-built tool" bar, and Battle Buddy should read as genuinely useful, not decorative.
+well-built tool" bar. Battle Buddy should read as a genuinely useful copilot; Major Finance
+should read as a patient, plain-spoken, trustworthy guide a veteran feels safe asking a
+"dumb money question" at 11pm.
 
 ## 8. Closing the loop: after deploy, sync back to Design
 
@@ -440,7 +565,10 @@ just describing the cycle.
 - [ ] Checked against the full audit scope (Section 5) and state tracker for duplicates.
 - [ ] Backend-to-Frontend Parity confirmed (Section 6).
 - [ ] Meets the Battle Buddy Standard (Section 7) where applicable -- role-aware behavior,
-      knowledge grounded in real Silent Honor content, no second AI persona.
+      knowledge grounded in the shared knowledge base (7.6), roster stays at exactly the
+      two assistants (Battle Buddy + Major Finance), and anything member-facing respects
+      the Major Finance bright line (7.5): educational only, no personalized advice, no
+      result guarantees, always a route to a human counselor.
 - [ ] Matches the shared design-token library (Section 12) -- same components, spacing,
       type scale as everything else.
 - [ ] Has basic test coverage for new/changed logic and passes existing tests.
