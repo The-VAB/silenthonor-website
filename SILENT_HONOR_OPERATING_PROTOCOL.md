@@ -499,6 +499,64 @@ Building and maintaining this knowledge base -- and its management surface -- is
 "the assistants work" means, not a separate afterthought project. In the state tracker it's
 its own module (Knowledge Base), and both assistants depend on it.
 
+### 7.7 Meeting & session notes -- Battle Buddy's queryable memory
+
+Distinct from the knowledge base (7.6, which is curated, org-wide, relatively static
+reference content), this is **operational memory**: the record of specific interactions
+with specific people, captured as they happen and queryable later. Two driving use cases,
+both real:
+- A **counselor** logs what happened in a member's session ("reviewed their auto loan,
+  they're disputing two collections, next step is the budget worksheet"). Weeks later they
+  ask Battle Buddy "what did we land on for this member's collections?" and get an answer
+  grounded in their own past notes instead of re-reading everything.
+- The **ED or a fundraiser** captures notes from a donor/prospect meeting ("wants to fund
+  veteran housing specifically, gives at year-end, mentioned a matching opportunity"). Next
+  time, they ask "what did this donor care about?" and get it back instantly instead of
+  hunting through their memory or a spreadsheet.
+
+That "capture it, then ask questions against it" loop is a retrieval-augmented (RAG) memory:
+notes are stored, indexed for meaning (not just keyword), and when someone asks, Battle
+Buddy pulls the relevant passages and answers from them -- citing which session/meeting and
+date each answer came from, so it's traceable and never just made up.
+
+**What exists today (partial):** the platform already stores member *intake notes*
+(`intake_notes`) and financial-counseling *session notes* (`session_notes`, append-only).
+What's missing and is what this module adds: the queryable retrieval/RAG layer over those
+notes, a **donor/prospect** entity to attach meeting notes to at all (fundraising has no
+notes home today), and more than one way to get notes in.
+
+**Intake methods -- more than one, by design:**
+- **Text** -- type or paste notes directly (works now for member notes; extend to
+  donor/prospect and into the retrieval layer).
+- **Document upload** -- drop in a doc (meeting summary, agenda, a PDF of handwritten
+  notes) and have it parsed into the memory.
+- **Later phase (explicitly deferred):** joining/recording meetings directly from the
+  dashboard and auto-transcribing them. The Director flagged this as "may wait" -- it's a
+  real want, but it's a bigger build (calendar/meeting integration, audio capture,
+  transcription, consent handling) and shouldn't block the text + document version that
+  delivers most of the value now.
+
+**Guardrails specific to this memory, non-negotiable:**
+- **Strict role/entity scoping.** A counselor's queries reach only their assigned members'
+  notes; donor/prospect notes are reachable only by fundraising/leadership roles. This is
+  the same access wall the rest of the system uses -- Battle Buddy's memory must never let
+  one person's query surface notes they aren't entitled to.
+- **Answers cite their source.** Every answer names the session/meeting and date it drew
+  from; the assistant summarizes what's in the notes, it doesn't invent beyond them.
+- **This is among the most sensitive data in the org** -- raw session content about a
+  veteran's finances, or a donor's private conversation. It rides the same
+  retention/AI-use policy as everything else in Section 7, and recording/transcription (the
+  deferred phase) additionally needs a consent story before it's built.
+- **Capture, not autonomous action.** The memory answers questions and surfaces past
+  context; it doesn't take actions (send a message, move a pipeline stage) off the back of
+  a note on its own -- that stays with the human, same as the rest of Battle Buddy.
+
+An architecture note for whoever builds it: the RAG layer needs somewhere to store and
+semantically search embeddings. The live stack is Amazon DocumentDB, which has vector
+search, so that's the natural first place to look before adding a separate vector store --
+but that's an implementation decision to make deliberately at build time, not a settled
+part of this spec.
+
 **Compliance/PII, non-negotiable (both assistants).** Both Battle Buddy and Major Finance
 operate around member financial data and DD-214-adjacent information (DD-214s are federal
 records, access restricted under the Privacy Act of 1974). Every feature of either one goes

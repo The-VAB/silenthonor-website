@@ -73,17 +73,33 @@ merge conflicts across concurrent sessions.
 
 ## Knowledge Base (shared grounding + admin management surface)
 
+- **Phase:** mid-PR
+- **Last sync date:** 2026-07-25
+- **Owner of open questions:** Director
+- **Notes:** Spec in Section 7.6. **Built and open as PR #15** (`feature/knowledge-base`):
+  backend router with a server-enforced member-visible/staff-only wall, admin CRUD
+  gated to admin/staff/counselor, plus a "Knowledge Base" management area in the admin
+  dashboard (table + filters + create/edit modal). The piece the Director specifically
+  asked for ("an area where I can put the knowledge base"). Both assistants will draw
+  from this; it's the first of the AI modules built since the others are only as good as
+  what's in here. Not deployed (same batch-deploy hold as everything else on main).
+  Future refinements noted in the PR: full revision history, formal review-before-publish.
+
+## Meeting & Session Notes (Battle Buddy queryable memory / RAG)
+
 - **Phase:** in Design
 - **Last sync date:** 2026-07-25
 - **Owner of open questions:** Director
-- **Notes:** Shared source both assistants draw from (spec in Section 7.6). The piece
-  the Director specifically asked for: an admin-dashboard area to add/edit/publish
-  knowledge articles/FAQs/resources without a developer. Every entry carries a
-  member-visible vs. staff-only visibility flag enforced server-side — this is the wall
-  that keeps Major Finance out of internal SOPs. Entries versioned/attributable, ideally
-  review-before-publish for member-facing content. Battle Buddy and Major Finance both
-  depend on this; realistically it's the first of the three AI modules to build, since
-  the other two are only as good as what's in here. Not built.
+- **Notes:** New capability the Director asked for (spec in Section 7.7). Capture meeting
+  and session notes, then ask questions against them later — counselors query a member's
+  past sessions, ED/fundraisers query a donor/prospect's past meetings. Partial today:
+  member `intake_notes` and FC `session_notes` are stored, but there's no retrieval/RAG
+  layer, no donor/prospect entity to attach fundraising notes to, and no document intake.
+  Intake methods: text + document upload first; joining/recording meetings from the
+  dashboard + transcription explicitly deferred (bigger build, needs consent handling).
+  Architecture open question: embeddings/vector storage — DocumentDB vector search is the
+  natural first look given the live stack, decide at build time. Highest-sensitivity data;
+  strict role/entity scoping and source-citing answers are non-negotiable. Not built.
 
 ---
 
