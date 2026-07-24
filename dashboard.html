@@ -985,8 +985,27 @@
   .stat-card {
     text-align: left;
   }
+  /* Hiding just .user-name wasn't enough - the "SILENT HONOR" wordmark still
+     overlapped the avatar/Sign Out button at 375px (confirmed via screenshot,
+     same underlying bug as the shared css/dashboard.css nav on counselor
+     pages). Hide the redundant text wordmark too (logo image remains) and
+     tighten the Sign Out button so it fits on one line. */
+  .dash-nav {
+    padding: 0 0.75rem;
+  }
+  .dash-nav-logo span {
+    display: none;
+  }
+  .dash-nav-user {
+    gap: 0.4rem;
+  }
   .dash-nav-user .user-name {
     display: none;
+  }
+  .sign-out-btn {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
   }
 }
 </style>
