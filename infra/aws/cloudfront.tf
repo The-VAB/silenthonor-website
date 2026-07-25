@@ -6,6 +6,62 @@ resource "aws_cloudfront_origin_access_control" "frontend" {
   signing_protocol                  = "sigv4"
 }
 
+# ── Security response headers ──────────────────────────────────────────────
+# Roundtable Verdict 1 (ROUNDTABLE_LOG.md, 2026-07-25): production was serving
+# with zero security headers. CSP allows 'unsafe-inline' for script/style
+# because the site is 35 hand-authored static pages with inline <script>/
+# <style> blocks and no build step to inject nonces -- a strict CSP would
+# break the site outright. Tightening that (nonces, or externalizing inline
+# script/style) is a separate, larger follow-up, not bundled into this fix.
+resource "aws_cloudfront_response_headers_policy" "security_headers" {
+  name = "${var.project}-security-headers"
+
+  security_headers_config {
+    content_security_policy {
+      override = true
+      content_security_policy = join("; ", [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: https://customer-assets.emergentagent.com",
+        "connect-src 'self' https://tv9nakyd9p.us-east-1.awsapprunner.com",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'self'",
+      ])
+    }
+
+    content_type_options {
+      override = true
+    }
+
+    frame_options {
+      override     = true
+      frame_option = "SAMEORIGIN"
+    }
+
+    referrer_policy {
+      override        = true
+      referrer_policy = "strict-origin-when-cross-origin"
+    }
+
+    strict_transport_security {
+      override                   = true
+      access_control_max_age_sec = 63072000
+      include_subdomains         = true
+      preload                    = true
+    }
+
+    xss_protection {
+      override   = true
+      protection = true
+      mode_block = true
+    }
+  }
+}
+
 resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   is_ipv6_enabled     = true
@@ -21,11 +77,12 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   default_cache_behavior {
-    target_origin_id       = "frontend-s3"
-    viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD"]
-    compress               = true
+    target_origin_id           = "frontend-s3"
+    viewer_protocol_policy     = "redirect-to-https"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers.id
 
     forwarded_values {
       query_string = false
