@@ -260,3 +260,74 @@ delivering the service, **[benef]** = high value, **[later]** = nice-to-have. Bu
 360 overview). The rest are specced here and get built in priority order — intake/assessment,
 credit report analyzer, financial action plan, and the veteran-benefit checker are the next
 `[must]` tools to add.
+
+---
+
+## 8. Executive Director + Board President toolkit
+
+The Director holds a dual role — **Executive Director (management) and Board President
+(governance)** — so this portal needs both toolsets. Researched against BoardSource, the
+National Council of Nonprofits, and nonprofit board-management platforms (Boardable, OnBoard,
+BoardPro, BoardEffect). Same marking: **[must]** / **[benef]** / **[later]**, status
+`built`/`spec`.
+
+### A governance note worth stating plainly
+Standard nonprofit governance (BoardSource) has the **board chair supervise and evaluate the
+ED, including compensation**, and lead conflict-of-interest handling. When one person is
+*both* ED and Board President, that oversight loop points at itself. This isn't a blocker,
+but the portal should support good practice rather than paper over it: any function that
+evaluates the ED, sets ED compensation, or handles a conflict involving the ED should route
+to an **independent board member or governance committee**, and the tool should make that
+routing explicit. Flagging it here so it's a deliberate design choice, not an accident.
+
+### A. Management (Executive Director) — from Section 4.1 / protocol 7.1
+- **[must] Org health dashboard** (`built` — overview): members served vs. capacity, reserve
+  coverage, revenue diversification, grant pipeline, program outcomes.
+- **[must] Program outcomes / funder reporting** (`spec`): outcome language, not activity counts.
+- **[must] Grant compliance calendar** (`spec`): report/closeout deadlines with proactive flags.
+- **[must] Financial position** (`spec`): budget vs. actual, reserve trend, cash position.
+- **[benef] Org-wide risk flags** (`built` — overview banner).
+- **[must] Access to every Ops / Counselor / Development tool** (the ED sees everything).
+
+### B. Board meetings & decisions
+- **[must] Board packet builder** (`built`): assemble the board book from live data
+  (exec summary, status by priority, outcomes, financials, risks, decisions-needed).
+- **[must] Agenda builder** (`spec`): build/share the meeting agenda (chair sets it with the ED).
+- **[must] Minutes** (`spec`): capture notes -> decisions -> action items, auto-formatted;
+  minutes must record conflict-of-interest disclosures and abstentions.
+- **[must] Voting & resolutions tracker** (`spec`): record motions, votes, who abstained,
+  and the resolution text — the decision audit trail funders and auditors expect.
+- **[benef] Action-item tracker** (`spec`): follow-ups with owners/dates, carried into the
+  next packet as "follow-up from last meeting."
+- **[benef] Meeting calendar / scheduler** (`spec`).
+
+### C. Governance & fiduciary
+- **[must] Board roster & terms** (`spec`): members, officer roles, term start/end,
+  attendance.
+- **[benef] Board recruitment matrix** (`spec`): skills/represented-communities vs. gaps, to
+  target the next recruit.
+- **[must] Committee management** (`spec`): committees (Finance, Governance, etc.), chairs,
+  charges, membership.
+- **[must] Conflict-of-interest register** (`spec`): annual disclosure questionnaires, active
+  conflicts, and the abstention log tied to specific votes — plus the ED-dual-role routing above.
+- **[must] Policy library** (`spec`): conflict-of-interest, whistleblower, document
+  retention/destruction, gift acceptance — the written policies a board must maintain
+  (pairs with the Knowledge Base module).
+- **[must] Fiduciary / compliance calendar** (`spec`): Form 990 filing, audit acceptance,
+  annual budget approval, bylaws review, state charitable-registration renewal, insurance —
+  the board-level compliance clock (distinct from the grant calendar in section A).
+
+### D. Oversight & strategy
+- **[must] Financial oversight** (`spec`): budget vs. actual and audited-financials
+  acceptance, shared with the Treasurer / Finance Committee.
+- **[benef] Strategic plan tracker** (`spec`): multi-year plan milestones vs. actuals.
+- **[must, dual-role sensitive] ED evaluation & compensation** (`spec`): the annual review
+  workflow — explicitly routed to an independent director / governance committee per the
+  note above, never self-administered.
+- **[benef] Document repository** (`spec`): bylaws, past minutes, board-book archive,
+  version-controlled and permissioned (board-only vs. officer-only).
+
+**Build note:** the board toolset is the ED portal's net-new bulk and overlaps the Knowledge
+Base (policy library) and the Meeting-Notes module (minutes/action items). Sequence it after
+the backend role-access model. In the prototype, the Board Packet Builder is the one board
+tool built so far; the rest are specced here for the ED portal build.
