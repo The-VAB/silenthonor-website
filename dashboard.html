@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="css/global.css">
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script src="js/components.js"></script>
 <style>
 /* Dashboard Layout */
 .dash-wrapper {
@@ -998,26 +999,7 @@
 <body>
 <div class="dash-wrapper">
 
-<nav class="dash-nav">
-  <div class="dash-nav-logo">
-    <img src="images/silent-honor-logo.png" alt="Silent Honor">
-    <span>SILENT</span><span>HONOR</span>
-  </div>
-  <div class="dash-nav-links">
-    <a href="dashboard.html" class="dash-nav-link active">Dashboard</a>
-    <a href="member-courses.html" class="dash-nav-link">Courses</a>
-    <a href="counselor.html" class="dash-nav-link">Counselor</a>
-    <a href="messages.html" class="dash-nav-link">Messages</a>
-    <a href="dispute-tracker.html" class="dash-nav-link">Disputes</a>
-    <a href="credit-tracker.html" class="dash-nav-link">Credit</a>
-  </div>
-  <div class="dash-nav-user">
-    <div class="user-avatar" id="user-avatar">--</div>
-    <span class="user-name" id="user-name">Loading...</span>
-    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-  </div>
-</nav>
-
+<div id="dash-nav-placeholder"></div>
 <div class="dash-content">
 
   <!-- Loading State -->

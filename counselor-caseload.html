@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script src="js/components.js"></script>
     <script src="js/toast.js"></script>
     <style>
         .filter-bar{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
@@ -49,25 +50,7 @@
 </head>
 <body>
     <div class="dash-wrapper">
-        <nav class="dash-nav">
-            <div class="dash-nav-logo">
-                <img src="images/silent-honor-logo.png" alt="Silent Honor">
-                <span>SILENT<span style="color:var(--red)">HONOR</span></span>
-            </div>
-            <div class="dash-nav-links">
-                <a href="counselor-portal.html" class="dash-nav-link">Dashboard</a>
-                <a href="counselor-caseload.html" class="dash-nav-link active">My Caseload</a>
-                <a href="counselor-tasks.html" class="dash-nav-link">Tasks</a>
-                <a href="counselor-waitlist.html" class="dash-nav-link">Waitlist</a>
-                <a href="messages.html" class="dash-nav-link">Messages</a>
-            </div>
-            <div class="dash-nav-user">
-                <div class="user-avatar" id="user-avatar">??</div>
-                <span class="user-name" id="user-name">Loading...</span>
-                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-            </div>
-        </nav>
-
+        <div id="counselor-nav-placeholder"></div>
         <div class="dash-content">
             <div class="dash-header">
                 <h1 class="dash-welcome">My <em>Caseload</em></h1>

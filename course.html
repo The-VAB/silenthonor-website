@@ -15,23 +15,12 @@
 <link rel="stylesheet" href="css/dashboard.css">
 <link rel="stylesheet" href="css/course.css">
 <script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script src="js/components.js"></script>
 </head>
 <body>
 <div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
 <div class="dash-wrapper">
-<nav class="dash-nav">
-<div class="dash-nav-logo"><img src="images/silent-honor-logo.png" alt="Silent Honor"><span>SILENT<span style="color:var(--red)">HONOR</span></span></div>
-<div class="dash-nav-links">
-<a href="dashboard.html" class="dash-nav-link">Dashboard</a>
-<a href="messages.html" class="dash-nav-link">Messages</a>
-<a href="counselor.html" class="dash-nav-link">Counselor</a>
-</div>
-<div class="dash-nav-user">
-<div class="user-avatar" id="user-avatar">--</div>
-<span class="user-name" id="user-name">Loading...</span>
-<button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-</div>
-</nav>
+<div id="dash-nav-placeholder"></div>
 <div class="dash-content">
 <div class="loading-state" id="loading-state"><div class="loading-spinner"></div><p style="color:var(--muted);">Loading course...</p></div>
 <div id="course-content" style="display:none;">
