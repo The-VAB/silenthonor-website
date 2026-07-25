@@ -36,9 +36,9 @@ resource "aws_iam_role_policy" "apprunner_instance" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "UploadsBucket"
-        Effect = "Allow"
-        Action = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
+        Sid      = "UploadsBucket"
+        Effect   = "Allow"
+        Action   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
         Resource = ["${aws_s3_bucket.uploads.arn}/*"]
       },
       {
@@ -72,4 +72,58 @@ resource "aws_iam_role_policy" "apprunner_instance" {
       }
     ]
   })
+}
+
+# ── Human access: let MLugenbell trigger + monitor this pipeline only ─────────
+# Scoped to exactly this pipeline/build project, matching the account's
+# existing per-project deploy-policy convention (staging-consumer-deploy,
+# sandbox-deploy, CI_ONLY). No S3/CloudFront/ECR/App Runner access granted --
+# the pipeline's own service roles already handle every downstream step, so a
+# human triggering it only ever needs to start it and read its status/logs.
+data "aws_iam_user" "mlugenbell" {
+  user_name = "MLugenbell"
+}
+
+resource "aws_iam_policy" "silenthonor_deploy" {
+  name        = "silenthonor-deploy"
+  description = "Trigger and monitor the Silent Honor deploy pipeline only"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "TriggerAndRetryPipeline"
+        Effect   = "Allow"
+        Action   = ["codepipeline:StartPipelineExecution", "codepipeline:RetryStageExecution"]
+        Resource = [aws_codepipeline.deploy.arn]
+      },
+      {
+        Sid    = "ReadPipelineStatus"
+        Effect = "Allow"
+        Action = [
+          "codepipeline:GetPipeline",
+          "codepipeline:GetPipelineState",
+          "codepipeline:GetPipelineExecution",
+          "codepipeline:ListPipelineExecutions",
+        ]
+        Resource = [aws_codepipeline.deploy.arn]
+      },
+      {
+        Sid      = "ReadBuildStatus"
+        Effect   = "Allow"
+        Action   = ["codebuild:BatchGetBuilds", "codebuild:BatchGetProjects", "codebuild:ListBuildsForProject"]
+        Resource = [aws_codebuild_project.deploy.arn]
+      },
+      {
+        Sid      = "ReadBuildLogs"
+        Effect   = "Allow"
+        Action   = ["logs:GetLogEvents", "logs:FilterLogEvents", "logs:DescribeLogStreams"]
+        Resource = ["arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/codebuild/${aws_codebuild_project.deploy.name}:*"]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "mlugenbell_silenthonor_deploy" {
+  user       = data.aws_iam_user.mlugenbell.user_name
+  policy_arn = aws_iam_policy.silenthonor_deploy.arn
 }
