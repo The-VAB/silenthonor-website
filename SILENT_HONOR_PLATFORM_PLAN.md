@@ -178,3 +178,33 @@ Buddy drafts acknowledgments, LOIs, appeal copy.
    conflicts.
 
 Nothing is a one-session job; this plan is the map the build follows.
+
+---
+
+## 8. Tech stack & security (non-negotiable, from Director 2026-07-25)
+
+**Stack for the real build: Rust on AWS Lambda.** The production portals + backend are built
+in **Rust as Lambda functions** (aligns with the VAB platform's Rust backend and the AWS-native
+deployment), not by extending the interim Python/FastAPI service. The Python backend and the
+Knowledge Base module built so far are interim/prototype -- the real build targets Rust/Lambda.
+
+**Secrets NEVER live in code -- this is the hard rule.** No API keys, payment-processor
+credentials (Zeffy, Stripe), DisputeFox keys, QuickBooks tokens, JWT secrets, DB credentials,
+or any other secret/variable is committed to the repo or hardcoded -- ever, in any language,
+prototype or production. All of it is injected at runtime from **AWS Secrets Manager** via
+**IAM roles**. Tyler is setting up the AWS backend for this (Secrets Manager, EC2, IAM roles,
+etc.); the application code reads secrets from that layer, it never contains them.
+
+Concrete rules for every build task:
+- Read secrets from the environment / Secrets Manager at runtime; reference them by name, never
+  by value. `.env` files with real values are gitignored and never committed (only
+  `.env.example` with placeholder names).
+- No secret in a commit, a config file, a client-side bundle, or a log line. If a task seems to
+  need a secret in code, that is a stop-and-flag moment, not a workaround.
+- The frontend never holds a secret. Anything that touches a payment/API key happens
+  server-side (Lambda), behind the IAM-role/Secrets-Manager boundary.
+- Integrations (DisputeFox, Zeffy, QuickBooks, DocuSign, bureau pull) authenticate through
+  secrets pulled from Secrets Manager on the Lambda side -- the portals call our own backend,
+  which holds the credential briefly at runtime and never exposes it.
+
+This rule governs the whole platform. It is not negotiable and not deferrable.
