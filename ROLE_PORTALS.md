@@ -185,3 +185,78 @@ blocked. Making the hierarchy in Section 1 real requires a deliberate pass over 
 
 Each of these is its own module in the state tracker and its own PR (or set of PRs). None is
 a one-session job; the ED redesign and the Development backend especially are substantial.
+
+---
+
+## 7. Counselor toolkit — the complete tool inventory
+
+The Financial Counselor is Silent Honor's core service role, so its portal gets the deepest
+toolset. This is the full inventory, researched against AFCPE's AFC core competencies (the
+counseling arc: gather situation -> action plan -> spending plan -> manage credit & debt ->
+major acquisitions -> risk), NFCC counseling practice, the FCRA/FDCPA dispute workflow, and
+nonprofit credit-counseling software (CaseWorthy, Affina, CFS). Marked: **[must]** = core to
+delivering the service, **[benef]** = high value, **[later]** = nice-to-have. Build status:
+`built` = live in the interactive prototype, `spec` = designed here, not built.
+
+### A. Intake & assessment
+- **[must] Financial intake / health assessment** (`spec`) — gather the member's full
+  situation, resources, and gaps; produce a starting financial-health score. AFC "setting
+  the stage."
+- **[must] Member 360 record** (`built` — overview) — one screen: credit trend, disputes,
+  debt, stage, tasks, notes.
+
+### B. Credit repair
+- **[must] Credit Game Plan** (`built`) — account-by-account strategy with a planned action
+  (Dispute / Pay Down / Settle / Keep) and a live projected-lift summary.
+- **[must] Credit report analyzer** (`spec`) — parse a tri-bureau report, flag negatives,
+  and diff two pulls over time (what changed since last session).
+- **[must] Dispute manager** (`built`) — track disputes, rounds, bureaus, and the FCRA
+  30/45-day clocks.
+- **[must] Dispute letter generator** (`built`) — templated FCRA §611 (reinvestigation),
+  §609 (disclosure), §623 (furnisher validation), and goodwill letters, filled from the
+  member + item, counselor-reviewed before sending, never guaranteeing a result.
+- **[benef] Credit score simulator** (`built`) — utilization slider + what-if toggles
+  (remove collections, cure a late, add a tradeline) -> projected score. Coaching only,
+  never shown to a member as a promise.
+- **[benef] Utilization optimizer** (`spec`) — per-card utilization with target-under-30%/10%
+  recommendations.
+
+### C. Budgeting & debt
+- **[must] Budget builder** (`built`) — income vs. essential/other expenses -> disposable.
+- **[must] DMP feasibility** (`built`) — proposed debt-management payment, payoff timeline,
+  and a sustainability gauge from the budget.
+- **[benef] Debt payoff planner** (`spec`) — snowball vs. avalanche ordering, timeline, and
+  interest saved vs. minimums.
+- **[benef] Cash-flow / spending analyzer** (`spec`) — where the money actually goes.
+- **[benef] Emergency-fund & savings-goal tracker** (`spec`).
+
+### D. Planning & action (the AFC deliverable)
+- **[must] Financial action plan** (`spec`) — the written, prioritized next-steps deliverable
+  the member takes home (AFC core competency); categorized, trackable.
+- **[benef] Goal tracker / milestones** (`spec`).
+- **[benef] Major-acquisition / VA home-loan readiness** (`spec`) — credit + DTI thresholds
+  toward a specific goal.
+
+### E. Veteran-specific
+- **[must] Veteran benefit & protection checker** (`spec`) — SCRA interest-cap eligibility
+  (still-serving Guard/Reserve), VA-compensation garnishment exemptions, and predatory-loan
+  pattern flags, surfaced from the member's profile.
+- **[benef] Resource / referral matcher** (`spec`) — VSO, legal aid, 211, and the right
+  Silent Honor course/module for the situation.
+
+### F. Casework & process
+- **[must] Session notes -> queryable memory** (`built`) — logged notes that feed Battle
+  Buddy's RAG memory (protocol 7.7).
+- **[must] Caseload dashboard** (`built`) + **waitlist claim** (exists in codebase).
+- **[must] Task & follow-up manager** (`spec`) — per-member tasks with SLA/overdue flags.
+- **[must] Compliance pre-flight** (`spec`) — checks written authorization on file, blocks
+  result-guarantee language, CROA/§501(q) safety before anything client-facing goes out.
+- **[benef] Document vault** (`spec`) — DD-214, statements, letters, per member, access-scoped.
+- **[benef] Secure member messaging** (exists — `messages.html`).
+- **[benef] Session scheduler** (`spec`) and **course/curriculum assignment** (`spec`).
+
+**Prototype status:** 7 of these are live and interactive in the command-center prototype
+(Game Plan, Score Simulator, Disputes, Dispute Letters, Budget/DMP, Session Notes, plus the
+360 overview). The rest are specced here and get built in priority order — intake/assessment,
+credit report analyzer, financial action plan, and the veteran-benefit checker are the next
+`[must]` tools to add.
