@@ -18,8 +18,10 @@ This is the change list the next build follows. Marks: **KEEP** / **CHANGE** / *
 2. **Cross-system push -- actions must propagate (this is the point of one system):**
    - **Roster:** adding a board member pushes to the PUBLIC site's board section
      (`about.html`) with their bio + photo.
-   - **Staff:** adding a staff member sends a welcome email + their login credentials and
-     provisions their account/role in the system.
+   - **Staff:** adding a staff member (a) sends a welcome email + their login credentials,
+     (b) provisions their account/role in the system, AND (c) pushes them to the PUBLIC
+     site's staff section (`about.html` "Staff & Coaches") with their bio + photo -- same
+     pattern as the board roster push.
    - **Counselor:** anything a counselor does links through to that member's own portal
      view -- except sensitive/internal items that shouldn't be member-visible.
    - **Compliance:** uploading a document to the S3 bucket auto-populates the fiduciary
@@ -68,8 +70,9 @@ This is the change list the next build follows. Marks: **KEEP** / **CHANGE** / *
 - **Dashboard** -- KEEP. Really liked ("I'll be in operations more than ED").
 - **Pipeline** -- KEEP.
 - **Staffing** -- KEEP + ADD an **Add Staff** button. On add: send a welcome letter + their
-  logins, and provision them into the system (role/account). ADD: click a staff member /
-  counselor to view their activity and workload.
+  logins, provision them into the system (role/account), AND push them to the public site's
+  staff section (`about.html` "Staff & Coaches") with bio + photo. ADD: click a staff member
+  / counselor to view their activity and workload.
 - **Task Board** -- KEEP (liked To Do / In Progress / Done).
 - **SOP Library** -- KEEP.
 - **Vendors** -- MOVE to ED (see ED). Clarify: it's for tracking services the org pays for /
