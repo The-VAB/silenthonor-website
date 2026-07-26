@@ -261,16 +261,22 @@ first proof of the Rust/Lambda + Secrets Manager pattern.
 
 ---
 
-## 12. Open items to confirm before/at kickoff
+## 12. Decisions + open items
 
-1. **ProAble = the VAB Design Directive + shared-theme?** No literal "ProAble" exists in either
-   repo; the authoritative VAB UI is `VAB_DESIGN_DIRECTIVE.md` + `packages/shared-theme`. Confirm
-   that's the intended look, and whether to **reuse the VAB SolidJS components** (`page-blocks`,
-   `battle-buddy`, `financial-charts`, etc. -- which would mean SolidJS, conflicting with the
-   vanilla verdict) or **port the look to vanilla** (recommended, matches the verdict).
-2. **Brand:** Silent Honor keeps its own red/navy/gold + logo (recommended -- it is a separate
-   501(c)(3)), adopting only the directive's structure/patterns? Or match VAB's exact palette?
-3. **Data store** on AWS (DocumentDB vs DynamoDB) -- Tyler.
-4. **Migration path** (Section 11) -- Tyler.
-5. **Sgt. Savings vs Major Finance** -- confirmed Major Finance for SH members; note the VAB
-   directive assumes Sgt. Savings for external audiences, so this is an intentional SH divergence.
+**Decided (Director, 2026-07-26):**
+- **ProAble = the VAB Design Directive + shared-theme.** Confirmed as the UI standard.
+- **Frontend = port the ProAble look to VANILLA HTML/CSS/JS.** Do NOT adopt the VAB SolidJS
+  components; rebuild the three-zone shell, right drawer, tokens, Inter, motion, and AI orb in
+  vanilla, reusing this repo's existing shared component system. Matches Roundtable Verdict 1
+  (no framework, no build step).
+- **Brand = Silent Honor keeps its own identity.** Use the directive's structure/patterns/motion,
+  but Silent Honor's own red/navy/gold tokens (`css/global.css`) + its logo. It is a separate
+  501(c)(3), not the bank. (VAB hexes stay reference-only.)
+- **AI: Major Finance for SH members** (not Sgt. Savings) -- an intentional divergence from the
+  VAB directive's external persona. Battle Buddy stays for staff.
+
+**Still open (for Tyler / AWS):**
+1. **Data store** on AWS (DocumentDB vs DynamoDB).
+2. **FastAPI -> Rust migration path** (Section 11 -- incremental recommended).
+3. **Secrets Manager entries + IAM roles** provisioned for each integration before that
+   integration's PR lands.
