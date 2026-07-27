@@ -13,7 +13,47 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/global.css">
 <script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
+.google-signin-btn {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+.signup-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.signup-divider::before,
+.signup-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.google-linked-note {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10B981;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+.google-linked-note a {
+  color: var(--gold);
+  text-decoration: none;
+  margin-left: 0.5rem;
+}
+.google-linked-note a:hover {
+  text-decoration: underline;
+}
 .signup-wrapper {
   min-height: 100vh;
   padding: 120px 2rem 4rem;
@@ -429,6 +469,13 @@
           <div class="step-title">Personal Information</div>
           <div class="step-subtitle">Tell us about yourself so we can create your account.</div>
 
+          <div class="google-signin-btn" id="google-signin-btn" style="display:none;"></div>
+          <div class="signup-divider" id="signup-divider" style="display:none;">or fill out the form</div>
+          <div class="google-linked-note" id="google-linked-note" style="display:none;">
+            Signing up with your Google account <span id="google-linked-email"></span>.
+            <a href="#" id="google-linked-clear">Not you? Use a different email</a>
+          </div>
+
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">First Name <span class="required">*</span></label>
@@ -451,7 +498,7 @@
             <div class="field-error" id="email-error"></div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id="password-group">
             <label class="form-label">Password <span class="required">*</span></label>
             <div class="password-wrapper">
               <input type="password" id="password" class="form-input" placeholder="Create a secure password" required minlength="8">
@@ -461,7 +508,7 @@
             <div class="field-error" id="password-error"></div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id="confirm_password-group">
             <label class="form-label">Confirm Password <span class="required">*</span></label>
             <div class="password-wrapper">
               <input type="password" id="confirm_password" class="form-input" placeholder="Re-enter your password" required>
@@ -622,6 +669,7 @@
 (function() {
   var currentStep = 1;
   var dd214File = null;
+  var googleCredential = null;
 
   // Elements
   var step1 = document.getElementById("step1");
@@ -638,6 +686,73 @@
   var fileUploadArea = document.getElementById("file-upload-area");
   var fileInput = document.getElementById("dd214_file");
   var fileName = document.getElementById("file-name");
+
+  function applyGoogleIdentity(info) {
+    googleCredential = info.credential;
+    document.getElementById("first_name").value = info.first_name || "";
+    document.getElementById("last_name").value = info.last_name || "";
+    document.getElementById("email").value = info.email || "";
+    document.getElementById("email").readOnly = true;
+    document.getElementById("password-group").style.display = "none";
+    document.getElementById("confirm_password-group").style.display = "none";
+    document.getElementById("password").required = false;
+    document.getElementById("confirm_password").required = false;
+    document.getElementById("google-linked-email").textContent = info.email || "";
+    document.getElementById("google-linked-note").style.display = "";
+  }
+
+  function clearGoogleIdentity() {
+    googleCredential = null;
+    document.getElementById("email").readOnly = false;
+    document.getElementById("password-group").style.display = "";
+    document.getElementById("confirm_password-group").style.display = "";
+    document.getElementById("password").required = true;
+    document.getElementById("confirm_password").required = true;
+    document.getElementById("google-linked-note").style.display = "none";
+  }
+
+  document.getElementById("google-linked-clear").addEventListener("click", function(e) {
+    e.preventDefault();
+    clearGoogleIdentity();
+  });
+
+  async function handleGoogleCredential(response) {
+    hideError();
+    try {
+      var res = await fetch(window.API_BASE + "/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ credential: response.credential })
+      });
+      var data = await res.json();
+      if (res.ok && data.exists === false) {
+        applyGoogleIdentity({
+          credential: response.credential,
+          email: data.email,
+          first_name: data.first_name,
+          last_name: data.last_name
+        });
+      } else if (res.ok) {
+        // Already a Silent Honor account -- this call already logged them in.
+        localStorage.setItem("sh_user", JSON.stringify(data));
+        var _userRoles = data.roles || [data.role];
+        if (_userRoles.some(function(r) { return r === "admin" || r === "staff"; })) {
+          window.location.href = "admin.html";
+        } else if (_userRoles.indexOf("counselor") !== -1) {
+          window.location.href = "counselor-portal.html";
+        } else if (data.verified) {
+          window.location.href = "dashboard.html";
+        } else {
+          window.location.href = "pending.html";
+        }
+      } else {
+        showError(data.detail || "Google sign-in failed. Please try again.");
+      }
+    } catch (err) {
+      showError("Connection error. Please try again.");
+    }
+  }
 
   // Password toggle
   document.getElementById("toggle-password").addEventListener("click", function() {
@@ -779,19 +894,21 @@
       showFieldError("email", "Please enter a valid email address.");
       valid = false;
     }
-    if (!password) {
-      showFieldError("password", "Password is required.");
-      valid = false;
-    } else if (password.length < 8) {
-      showFieldError("password", "Password must be at least 8 characters.");
-      valid = false;
-    }
-    if (!confirmPassword) {
-      showFieldError("confirm_password", "Please confirm your password.");
-      valid = false;
-    } else if (password !== confirmPassword) {
-      showFieldError("confirm_password", "Passwords do not match.");
-      valid = false;
+    if (!googleCredential) {
+      if (!password) {
+        showFieldError("password", "Password is required.");
+        valid = false;
+      } else if (password.length < 8) {
+        showFieldError("password", "Password must be at least 8 characters.");
+        valid = false;
+      }
+      if (!confirmPassword) {
+        showFieldError("confirm_password", "Please confirm your password.");
+        valid = false;
+      } else if (password !== confirmPassword) {
+        showFieldError("confirm_password", "Passwords do not match.");
+        valid = false;
+      }
     }
     if (!state) {
       showError("State is required.");
@@ -903,7 +1020,8 @@
         last_name: document.getElementById("last_name").value.trim(),
         dob: document.getElementById("dob").value,
         email: document.getElementById("email").value.trim(),
-        password: document.getElementById("password").value,
+        password: googleCredential ? null : document.getElementById("password").value,
+        google_credential: googleCredential,
         phone: document.getElementById("phone").value.trim() || null,
         state: document.getElementById("state").value,
         branch: document.getElementById("branch").value,
@@ -975,15 +1093,45 @@
       });
       if (response.ok) {
         var user = await response.json();
-        if (user.role === "admin" || user.role === "staff") {
+        var _userRoles = user.roles || [user.role];
+        if (_userRoles.some(function(r) { return r === "admin" || r === "staff"; })) {
           window.location.href = "admin.html";
-        } else if (user.role === "counselor") {
+        } else if (_userRoles.indexOf("counselor") !== -1) {
           window.location.href = "counselor-portal.html";
         } else if (user.verified) {
           window.location.href = "dashboard.html";
         } else {
           window.location.href = "pending.html";
         }
+      }
+    } catch (e) {}
+
+    // Picked up from login.html when a Google sign-in didn't match an
+    // existing account -- carry the verified identity into this form.
+    var pending = sessionStorage.getItem("sh_google_pending");
+    if (pending) {
+      sessionStorage.removeItem("sh_google_pending");
+      try {
+        applyGoogleIdentity(JSON.parse(pending));
+      } catch (e) {}
+    }
+
+    // Google Sign-In button: only shown if the backend has GOOGLE_CLIENT_ID
+    // configured, and only if the form isn't already Google-linked above.
+    try {
+      var cfgRes = await fetch(window.API_BASE + "/api/auth/google/config");
+      var cfg = await cfgRes.json();
+      if (cfg.client_id && window.google && window.google.accounts && !googleCredential) {
+        window.google.accounts.id.initialize({
+          client_id: cfg.client_id,
+          callback: handleGoogleCredential
+        });
+        document.getElementById("google-signin-btn").style.display = "";
+        document.getElementById("signup-divider").style.display = "";
+        window.google.accounts.id.renderButton(
+          document.getElementById("google-signin-btn"),
+          { theme: "outline", size: "large", width: 360 }
+        );
       }
     } catch (e) {}
   });
