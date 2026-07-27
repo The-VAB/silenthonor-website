@@ -75,7 +75,10 @@ impl User {
             "dd214_file": self.dd214_file,
             "branch": self.branch,
             "service_status": self.service_status,
-            "created_at": self.created_at.and_then(|d| d.try_to_rfc3339_string().ok()),
+            // Epoch milliseconds -- `new Date(ms)` on the frontend handles this
+            // exactly like the previous ISO string, and timestamp_millis() is a
+            // core bson::DateTime method (no version risk).
+            "created_at": self.created_at.map(|d| d.timestamp_millis()),
         })
     }
 }
