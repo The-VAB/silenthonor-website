@@ -1,0 +1,27 @@
+[package]
+name = "api"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish = false
+
+# AWS Lambda custom runtime (provided.al2023) expects the executable to be named
+# `bootstrap`. cargo-lambda produces this automatically; naming the bin here keeps
+# manual/CodeBuild zip packaging correct too.
+[[bin]]
+name = "bootstrap"
+path = "src/main.rs"
+
+[dependencies]
+sh-core = { path = "../sh-core" }
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+axum.workspace = true
+http.workspace = true
+tower.workspace = true
+lambda_http.workspace = true
+mongodb.workspace = true
+bson.workspace = true

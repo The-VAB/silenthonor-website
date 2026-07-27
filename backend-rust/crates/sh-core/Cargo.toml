@@ -1,0 +1,23 @@
+[package]
+name = "sh-core"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+mongodb.workspace = true
+bson.workspace = true
+jsonwebtoken.workspace = true
+bcrypt.workspace = true
+aws-config.workspace = true
+aws-sdk-secretsmanager.workspace = true
+time.workspace = true
+once_cell.workspace = true
+axum.workspace = true
+http.workspace = true

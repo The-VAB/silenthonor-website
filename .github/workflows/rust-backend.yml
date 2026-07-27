@@ -1,0 +1,46 @@
+name: rust-backend
+
+# Compile/lint gate for the Rust/Lambda backend. This is authoritative: the code
+# is authored without a local Rust toolchain, so a green build here is what proves
+# it compiles. `fmt` and `clippy` are advisory on the first pass (continue-on-error)
+# so the build result is the clear signal; tighten them once the workspace is clean.
+
+on:
+  pull_request:
+    paths:
+      - "backend-rust/**"
+      - ".github/workflows/rust-backend.yml"
+  push:
+    branches: [main]
+    paths:
+      - "backend-rust/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend-rust
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain (from rust-toolchain.toml)
+        run: rustup show
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend-rust
+
+      - name: Format check
+        continue-on-error: true
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        continue-on-error: true
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Build (release)
+        run: cargo build --release
+
+      - name: Test
+        run: cargo test

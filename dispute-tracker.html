@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dispute Tracker - Silent Honor Foundation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,6 +14,7 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dispute-tracker.css">
     <script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script src="js/components.js"></script>
 <style>
 .dash-nav{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(11,18,32,0.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;z-index:100;}
 .dash-nav-logo{display:flex;align-items:center;gap:0.5rem;font-family:'Oswald',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);text-decoration:none;}
@@ -28,24 +33,8 @@
 </head>
 <body>
 <div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
-<nav class="dash-nav">
-  <a href="dashboard.html" class="dash-nav-logo"><img src="images/silent-honor-logo.png" alt="Silent Honor"><span>SILENT<span style="color:var(--red)">HONOR</span></span></a>
-  <div class="dash-nav-links">
-    <a href="dashboard.html" class="dash-nav-link">Dashboard</a>
-    <a href="member-courses.html" class="dash-nav-link">Courses</a>
-    <a href="messages.html" class="dash-nav-link">Messages</a>
-    <a href="counselor.html" class="dash-nav-link">Counselor</a>
-    <a href="dispute-tracker.html" class="dash-nav-link active">Disputes</a>
-    <a href="credit-tracker.html" class="dash-nav-link">Credit</a>
-  </div>
-  <div class="dash-nav-user">
-    <div class="user-avatar" id="user-avatar">??</div>
-    <span class="user-name" id="user-name">Loading...</span>
-    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-  </div>
-</nav>
-
-    <main class="main-content">
+<div id="dash-nav-placeholder"></div>
+<main class="main-content">
         <div class="page-header">
             <div class="page-header-content">
                 <h1 class="page-title">Dispute Tracker</h1>

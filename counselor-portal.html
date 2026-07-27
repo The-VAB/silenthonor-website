@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Counselor Dashboard - Silent Honor Foundation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +15,7 @@
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/dashboard-widgets.css">
     <script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script src="js/components.js"></script>
     <script src="js/toast.js"></script>
     <script src="js/dashboard-widgets.js"></script>
     <style>
@@ -55,34 +60,7 @@
 </head>
 <body>
     <div class="dash-wrapper">
-        <nav class="dash-nav">
-            <div class="dash-nav-logo">
-                <img src="images/silent-honor-logo.png" alt="Silent Honor">
-                <span>SILENT<span style="color:var(--red)">HONOR</span></span>
-            </div>
-            <div class="dash-nav-links">
-                <a href="counselor-portal.html" class="dash-nav-link active">Dashboard</a>
-                <a href="counselor-caseload.html" class="dash-nav-link">My Caseload</a>
-                <a href="counselor-tasks.html" class="dash-nav-link">Tasks</a>
-                <a href="counselor-waitlist.html" class="dash-nav-link">Waitlist</a>
-                <a href="messages.html" class="dash-nav-link">Messages</a>
-            </div>
-            <div class="dash-nav-user">
-                <div id="view-switcher" style="display:none;margin-bottom:10px;">
-                    <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Viewing As</div>
-                    <div style="position:relative;">
-                        <button onclick="document.getElementById('vs-menu').style.display=document.getElementById('vs-menu').style.display==='none'?'block':'none'" style="width:100%;background:rgba(201,149,42,.15);border:1px solid #C9952A;color:#C9952A;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:600;text-align:left;">Counselor ▾</button>
-                        <div id="vs-menu" style="display:none;position:absolute;top:100%;left:0;right:0;background:#0f1a27;border:1px solid rgba(255,255,255,.12);z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.4);">
-                            <a href="admin.html" style="display:block;padding:9px 12px;color:#e2e8f0;text-decoration:none;font-size:13px;">Admin View</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="user-avatar" id="user-avatar">??</div>
-                <span class="user-name" id="user-name">Loading...</span>
-                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-            </div>
-        </nav>
-
+        <div id="counselor-nav-placeholder"></div>
         <div class="dash-content">
             <div class="dash-header">
                 <h1 class="dash-welcome">Counselor <em>Dashboard</em></h1>

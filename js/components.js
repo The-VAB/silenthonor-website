@@ -98,6 +98,89 @@ function toggleMobileNav() {
   }
 }
 
+// Inject the member-portal nav (dashboard.html, counselor.html, course.html,
+// credit-tracker.html, dispute-tracker.html, messages.html) — these had each
+// hand-rolled their own copy, which had already drifted: course.html and
+// messages.html were missing the Courses/Disputes/Credit links entirely.
+function injectMemberNav() {
+  const placeholder = document.getElementById('dash-nav-placeholder');
+  if (!placeholder) return;
+
+  const currentPage = getCurrentPage();
+  const links = [
+    { href: 'dashboard.html', label: 'Dashboard' },
+    { href: 'member-courses.html', label: 'Courses' },
+    { href: 'counselor.html', label: 'Counselor' },
+    { href: 'messages.html', label: 'Messages' },
+    { href: 'dispute-tracker.html', label: 'Disputes' },
+    { href: 'credit-tracker.html', label: 'Credit' },
+  ];
+
+  placeholder.innerHTML = `
+    <nav class="dash-nav">
+      <a href="dashboard.html" class="dash-nav-logo">
+        <img src="${LOGO_URL}" alt="Silent Honor">
+        <span>SILENT<span style="color:var(--red)">HONOR</span></span>
+      </a>
+      <div class="dash-nav-links">
+        ${links.map(l => `<a href="${l.href}" class="dash-nav-link${currentPage === l.href.replace('.html', '') ? ' active' : ''}">${l.label}</a>`).join('\n        ')}
+      </div>
+      <div class="dash-nav-user">
+        <div class="user-avatar" id="user-avatar">??</div>
+        <span class="user-name" id="user-name">Loading...</span>
+        <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+      </div>
+    </nav>
+  `;
+}
+
+// Inject the counselor-portal nav (counselor-portal.html, counselor-caseload.html,
+// counselor-tasks.html, counselor-waitlist.html, counselor-member.html) — these
+// were byte-identical already except which link is active, plus counselor-portal.html
+// alone has the admin "Viewing As" switcher; preserved exactly as before (not
+// added to the other 4, since it's unclear whether that was intentional scoping).
+function injectCounselorNav() {
+  const placeholder = document.getElementById('counselor-nav-placeholder');
+  if (!placeholder) return;
+
+  const currentPage = getCurrentPage();
+  const links = [
+    { href: 'counselor-portal.html', label: 'Dashboard' },
+    { href: 'counselor-caseload.html', label: 'My Caseload' },
+    { href: 'counselor-tasks.html', label: 'Tasks' },
+    { href: 'counselor-waitlist.html', label: 'Waitlist' },
+    { href: 'messages.html', label: 'Messages' },
+  ];
+
+  const viewSwitcherHTML = currentPage === 'counselor-portal' ? `
+        <div id="view-switcher" style="display:none;margin-bottom:10px;">
+            <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Viewing As</div>
+            <div style="position:relative;">
+                <button onclick="document.getElementById('vs-menu').style.display=document.getElementById('vs-menu').style.display==='none'?'block':'none'" style="width:100%;background:rgba(201,149,42,.15);border:1px solid #C9952A;color:#C9952A;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:600;text-align:left;">Counselor ▾</button>
+                <div id="vs-menu" style="display:none;position:absolute;top:100%;left:0;right:0;background:#0f1a27;border:1px solid rgba(255,255,255,.12);z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.4);">
+                    <a href="admin.html" style="display:block;padding:9px 12px;color:#e2e8f0;text-decoration:none;font-size:13px;">Admin View</a>
+                </div>
+            </div>
+        </div>` : '';
+
+  placeholder.innerHTML = `
+    <nav class="dash-nav">
+        <div class="dash-nav-logo">
+            <img src="${LOGO_URL}" alt="Silent Honor">
+            <span>SILENT<span style="color:var(--red)">HONOR</span></span>
+        </div>
+        <div class="dash-nav-links">
+            ${links.map(l => `<a href="${l.href}" class="dash-nav-link${currentPage === l.href.replace('.html', '') ? ' active' : ''}">${l.label}</a>`).join('\n            ')}
+        </div>
+        <div class="dash-nav-user">${viewSwitcherHTML}
+            <div class="user-avatar" id="user-avatar">??</div>
+            <span class="user-name" id="user-name">Loading...</span>
+            <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+        </div>
+    </nav>
+  `;
+}
+
 // Inject Footer
 function injectFooter() {
   const placeholder = document.getElementById('footer-placeholder');
@@ -180,6 +263,8 @@ function injectFooter() {
 document.addEventListener('DOMContentLoaded', () => {
   injectNav();
   injectFooter();
+  injectMemberNav();
+  injectCounselorNav();
 });
 
 // Export for use in other scripts

@@ -1,44 +1,41 @@
 # Silent Honor Foundation Backend Dependencies
+#
+# All versions below bumped to current stable (checked against live PyPI) to
+# close out the Dependabot alerts on this manifest. `supabase` and `resend`
+# were removed entirely -- storage.py's Supabase fallback and email.py's
+# Resend integration both talk to their REST APIs directly over httpx and
+# never import either SDK, so both packages (and Supabase's large transitive
+# tree: postgrest/gotrue/storage3/realtime) were dead weight.
+#
 # FastAPI & ASGI
-# fastapi>=0.115 pulls in starlette>=0.40, fixing CVE-2024-47874 (unbounded
-# multipart form-field buffering / DoS) -- relevant since this app accepts
-# member signup + DD-214 uploads as multipart forms.
-fastapi==0.115.3
-uvicorn==0.24.0
-# 0.0.7+ fixes CVE-2024-24762 (ReDoS via a crafted Content-Type header).
-python-multipart==0.0.20
+fastapi==0.140.0
+uvicorn==0.51.0
+python-multipart==0.0.32
 
 # MongoDB
-motor==3.3.2
-pymongo==4.6.1
+motor==3.7.1
+pymongo==4.17.0
 
 # Auth & Security
-bcrypt==4.1.2
-PyJWT==2.8.0
+bcrypt==5.0.0
+PyJWT==2.13.0
 google-auth==2.36.0
 
 # Validation & Config
-pydantic==2.5.2
+pydantic==2.13.4
 # Required by pydantic EmailStr fields (utils/validators.py, auth/contact models).
 # Without it the app crashes on startup.
-email-validator==2.1.1
-python-dotenv==1.0.0
+email-validator==2.3.0
+python-dotenv==1.2.2
 
 # File handling
-aiofiles==23.2.1
-
-# Email (Resend)
-resend==0.7.0
-
-# Supabase Storage (legacy fallback)
-supabase==2.3.0
+aiofiles==25.1.0
 
 # AWS SDK (S3 storage + SES email)
-boto3==1.34.69
+boto3==1.43.56
 
-# HTTP Client (version compatible with supabase)
-httpx>=0.24.0,<0.25.0
+# HTTP Client
+httpx==0.28.1
 
 # File encryption (DD-214 local fallback AES-256)
-# 42.0.5 is ~2 years stale; bumped for the accumulated OpenSSL/CVE fixes since.
-cryptography==44.0.2
+cryptography==49.0.0
