@@ -1,0 +1,46 @@
+# CodeBuild: compile, test, and package the Rust/Lambda API.
+#
+# Runs on an ARM CodeBuild container so the arm64 Lambda binary is built
+# natively (no cross-compile, no zig). If any step in the build phase fails,
+# the CodeBuild run fails and the compiler errors show up in the build logs.
+# On success it uploads api.zip (the `bootstrap` binary + the DocumentDB CA
+# bundle) to s3://$ARTIFACT_BUCKET/rust/api.zip for the Lambda to deploy from.
+#
+# Trigger:  aws codebuild start-build --project-name silenthonor-rust-build
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing Rust toolchain and cargo-lambda..."
+      - curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain 1.82.0
+      - . "$HOME/.cargo/env"
+      - pip3 install cargo-lambda
+      - rustc --version
+      - cargo lambda --version
+  build:
+    commands:
+      - . "$HOME/.cargo/env"
+      - cd backend-rust
+      - echo "Format + lint (advisory, does not fail the build)..."
+      - cargo fmt --all --check || true
+      - cargo clippy --all-targets -- -D warnings || true
+      - echo "Compiling arm64 Lambda (this is the real gate)..."
+      - cargo lambda build --release --arm64
+      - echo "Running tests..."
+      - cargo test --workspace
+  post_build:
+    commands:
+      - . "$HOME/.cargo/env"
+      - cd backend-rust
+      - echo "Fetching DocumentDB / RDS global CA bundle..."
+      - curl -sSL -o global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+      - cp target/lambda/bootstrap/bootstrap ./bootstrap
+      - zip -j api.zip bootstrap global-bundle.pem
+      - |
+        if [ -n "$ARTIFACT_BUCKET" ]; then
+          aws s3 cp api.zip "s3://$ARTIFACT_BUCKET/rust/api.zip"
+          echo "Uploaded s3://$ARTIFACT_BUCKET/rust/api.zip"
+        else
+          echo "ARTIFACT_BUCKET not set; skipping upload (compile/test still validated)."
+        fi
