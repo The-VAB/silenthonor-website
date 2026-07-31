@@ -291,3 +291,56 @@ pub async fn update_progress(
 
     Ok(Json(json!({ "message": "Progress updated" })))
 }
+
+// GET /api/member/financial-intake
+// Returns the member's saved financial profile (income/expenses/debts/savings/
+// goals), or an empty object if they have not filled it in yet.
+pub async fn get_financial_intake(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> AppResult<Json<Value>> {
+    let (uid, _user) = authenticate(&state, &headers).await?;
+    let oid = ObjectId::parse_str(&uid).map_err(|_| AppError::Unauthorized)?;
+
+    let found = state
+        .db
+        .collection::<Document>("financial_intake")
+        .find_one(doc! { "member_id": oid })
+        .await?;
+
+    match found {
+        Some(mut d) => {
+            d.remove("_id");
+            d.remove("member_id");
+            d.remove("updated_at");
+            Ok(Json(serde_json::to_value(&d).unwrap_or_else(|_| json!({}))))
+        }
+        None => Ok(Json(json!({}))),
+    }
+}
+
+// POST /api/member/financial-intake
+// The member submits their own financial profile (from the My Plan intake).
+// Stored per member and available to their assigned counselor.
+pub async fn save_financial_intake(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(body): Json<Value>,
+) -> AppResult<Json<Value>> {
+    let (uid, _user) = authenticate(&state, &headers).await?;
+    let oid = ObjectId::parse_str(&uid).map_err(|_| AppError::Unauthorized)?;
+
+    let mut fields = bson::to_document(&body)
+        .map_err(|_| AppError::BadRequest("Invalid financial profile".to_string()))?;
+    fields.insert("member_id", oid);
+    fields.insert("updated_at", bson::DateTime::now());
+
+    state
+        .db
+        .collection::<Document>("financial_intake")
+        .update_one(doc! { "member_id": oid }, doc! { "$set": fields })
+        .upsert(true)
+        .await?;
+
+    Ok(Json(json!({ "message": "Financial profile saved" })))
+}

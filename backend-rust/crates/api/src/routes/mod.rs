@@ -36,6 +36,10 @@ pub fn router(state: AppState) -> Router {
             "/api/member/courses/:course_id/progress",
             post(members::update_progress),
         )
+        .route(
+            "/api/member/financial-intake",
+            get(members::get_financial_intake).post(members::save_financial_intake),
+        )
         .with_state(state)
 }
 
