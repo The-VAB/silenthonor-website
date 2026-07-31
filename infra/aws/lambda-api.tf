@@ -140,6 +140,12 @@ resource "aws_lambda_function" "api" {
       # CA bundle path inside the Lambda package (see cutover step 1).
       DOCDB_CA_PATH = "/var/task/global-bundle.pem"
       RUST_LOG      = "info"
+
+      # Major Finance (member AI) -- dormant until enable_major_finance = true.
+      # See major-finance.tf and docs/MAJOR_FINANCE.md.
+      MAJOR_FINANCE_ENABLED         = tostring(var.enable_major_finance)
+      MAJOR_FINANCE_MODEL           = var.major_finance_model
+      ANTHROPIC_API_KEY_SECRET_NAME = join("", aws_secretsmanager_secret.anthropic[*].name)
     }
   }
 
