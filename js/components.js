@@ -111,9 +111,12 @@ function injectMemberNav() {
   // no program needed). Counselor, Messages, Disputes, and Credit are program
   // tools: they stay hidden until the member is approved into a program, then
   // revealMemberTools() reveals them. This matches the member portal design.
+  // Major Finance is a feature-flagged tool: available to every verified member,
+  // but hidden until the backend reports it enabled (checkMajorFinance below).
   const links = [
     { href: 'dashboard.html', label: 'Dashboard' },
     { href: 'member-courses.html', label: 'Courses' },
+    { href: 'major-finance.html', label: 'Major Finance', feature: 'major-finance' },
     { href: 'counselor.html', label: 'Counselor', gated: true },
     { href: 'financial-plan.html', label: 'My Plan', gated: true },
     { href: 'messages.html', label: 'Messages', gated: true },
@@ -130,8 +133,10 @@ function injectMemberNav() {
       <div class="dash-nav-links">
         ${links.map(l => {
           const active = currentPage === l.href.replace('.html', '') ? ' active' : '';
-          const hidden = l.gated ? ' data-gated="1" style="display:none"' : '';
-          return `<a href="${l.href}" class="dash-nav-link${active}"${hidden}>${l.label}</a>`;
+          let attrs = '';
+          if (l.gated) attrs = ' data-gated="1" style="display:none"';
+          else if (l.feature) attrs = ` data-feature="${l.feature}" style="display:none"`;
+          return `<a href="${l.href}" class="dash-nav-link${active}"${attrs}>${l.label}</a>`;
         }).join('\n        ')}
       </div>
       <div class="dash-nav-user">
@@ -143,6 +148,24 @@ function injectMemberNav() {
   `;
 
   revealMemberTools(placeholder);
+  checkMajorFinance(placeholder);
+}
+
+// Reveal the Major Finance tab only when the backend reports the feature is
+// enabled. Dormant by default, so members never see a dead AI tab.
+async function checkMajorFinance(placeholder) {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/member/major-finance/status`, { credentials: 'include' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.enabled) {
+      placeholder.querySelectorAll('.dash-nav-link[data-feature="major-finance"]').forEach(el => {
+        el.style.display = '';
+      });
+    }
+  } catch (e) {
+    // On any error, stay hidden (fail closed).
+  }
 }
 
 // Reveal the gated program tools (Counselor/Messages/Disputes/Credit) once we
