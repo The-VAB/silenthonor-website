@@ -34,6 +34,9 @@ pub struct User {
     pub dd214_status: Option<String>,
     #[serde(default)]
     pub dd214_file: Option<String>,
+    /// Hex ObjectId string of the member's assigned counselor (set by staff).
+    #[serde(default)]
+    pub assigned_counselor_id: Option<String>,
     #[serde(default)]
     pub branch: Option<String>,
     #[serde(default)]
