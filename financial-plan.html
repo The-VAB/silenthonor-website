@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Plan - Silent Honor Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script src="js/components.js"></script>
+<style>
+.dash-wrapper { min-height:100vh; background:var(--navy-dark); }
+.dash-nav {
+  position:fixed; top:0; left:0; right:0; height:60px;
+  background:rgba(11,18,32,.98); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; padding:0 1.5rem; z-index:100;
+}
+.dash-nav-logo { display:flex; align-items:center; gap:.5rem; font-family:'Oswald',sans-serif; font-size:1.1rem; font-weight:700; color:var(--white); }
+.dash-nav-logo img { height:32px; width:auto; }
+.dash-nav-links { display:flex; gap:.25rem; }
+.dash-nav-link { font-family:'Barlow',sans-serif; font-size:.85rem; color:var(--muted); text-decoration:none; padding:.5rem 1rem; border-radius:4px; transition:all .2s; }
+.dash-nav-link:hover { color:var(--white); background:rgba(255,255,255,.05); }
+.dash-nav-link.active { color:var(--gold); background:rgba(201,149,42,.1); }
+.dash-nav-user { display:flex; align-items:center; gap:.75rem; }
+.user-avatar { width:36px; height:36px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-family:'Oswald',sans-serif; font-size:.8rem; font-weight:600; color:var(--white); }
+.user-name { font-family:'Barlow',sans-serif; font-size:.9rem; color:var(--white); }
+.sign-out-btn { background:transparent; border:1px solid var(--border); color:var(--muted); font-family:'Barlow',sans-serif; font-size:.8rem; padding:.4rem .75rem; cursor:pointer; }
+.sign-out-btn:hover { border-color:var(--red); color:var(--red-light); }
+
+.page-content { padding:80px 2rem 3rem; max-width:1000px; margin:0 auto; }
+.page-header { margin-bottom:1.75rem; }
+.page-title { font-family:'Oswald',sans-serif; font-size:clamp(1.5rem,3vw,2rem); font-weight:700; color:var(--white); text-transform:uppercase; letter-spacing:.05em; }
+.page-subtitle { font-family:'Lora',serif; font-style:italic; color:var(--muted); font-size:.95rem; }
+
+.loading-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:50vh; gap:1rem; }
+.spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.panel { background:rgba(17,24,39,.8); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin-bottom:1.25rem; }
+.panel.accent { border-color:rgba(201,149,42,.35); background:rgba(201,149,42,.06); }
+.panel-title { font-family:'Oswald',sans-serif; font-size:.85rem; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:var(--white); margin-bottom:.35rem; }
+.muted { font-family:'Barlow',sans-serif; font-size:.85rem; color:var(--muted); line-height:1.6; }
+
+.btn { font-family:'Oswald',sans-serif; font-size:.78rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; padding:.7rem 1.4rem; border:1px solid var(--border); background:transparent; color:var(--white); cursor:pointer; border-radius:4px; transition:all .2s; }
+.btn:hover { border-color:var(--gold); }
+.btn.primary { background:var(--red); border-color:var(--red); color:#fff; }
+.btn.primary:hover { background:var(--red-light); border-color:var(--red-light); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+
+/* Wizard */
+.steps { display:flex; margin:0 0 1.5rem; }
+.step { flex:1; text-align:center; position:relative; font-family:'Barlow',sans-serif; font-size:.72rem; color:var(--muted); }
+.step::before { content:''; position:absolute; top:13px; left:-50%; width:100%; height:2px; background:var(--border); }
+.step:first-child::before { display:none; }
+.step-dot { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; margin:0 auto .4rem; background:var(--navy-mid); border:2px solid var(--border); font-size:.75rem; font-weight:700; color:var(--muted); position:relative; z-index:1; }
+.step.done .step-dot { background:#10B981; border-color:#10B981; color:#04140a; }
+.step.now .step-dot { background:var(--gold); border-color:var(--gold); color:var(--navy-dark); }
+.step.done::before, .step.now::before { background:#10B981; }
+.step.done .step-l, .step.now .step-l { color:var(--white); }
+
+.field { display:flex; flex-direction:column; gap:.35rem; margin-bottom:.9rem; }
+.field label { font-family:'Oswald',sans-serif; font-size:.62rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
+.field input, .field select { background:var(--navy); border:1px solid var(--border); color:var(--white); padding:.7rem .8rem; font-size:.9rem; font-family:'Barlow',sans-serif; border-radius:4px; }
+.field input:focus, .field select:focus { outline:none; border-color:var(--gold); }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.9rem; }
+.debt-row { border:1px solid var(--border); border-radius:6px; padding:1rem; margin-bottom:.8rem; }
+.wizard-nav { display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; border-top:1px solid var(--border); padding-top:1.25rem; }
+.step-heading { font-family:'Oswald',sans-serif; font-size:1rem; color:var(--white); margin-bottom:.2rem; }
+
+/* Plan */
+.tiles { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.25rem; }
+.tile { background:rgba(17,24,39,.8); border:1px solid var(--border); border-radius:8px; padding:1.1rem; }
+.tile-lab { font-family:'Oswald',sans-serif; font-size:.6rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-bottom:.4rem; }
+.tile-val { font-family:'Oswald',sans-serif; font-size:1.5rem; font-weight:700; color:var(--white); }
+.tile-foot { font-family:'Barlow',sans-serif; font-size:.72rem; color:var(--muted); margin-top:.3rem; }
+.bar-row { display:flex; align-items:center; gap:.9rem; padding:.6rem 0; border-bottom:1px solid var(--border); }
+.bar-row:last-child { border-bottom:none; }
+.bar-main { flex:1; min-width:0; }
+.bar-name { font-family:'Barlow',sans-serif; font-size:.85rem; color:var(--white); font-weight:600; }
+.bar-track { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-top:.4rem; }
+.bar-fill { height:100%; background:#3B82F6; border-radius:3px; }
+.bar-val { font-family:'Oswald',sans-serif; font-weight:700; color:var(--white); min-width:80px; text-align:right; }
+.dt { width:100%; border-collapse:collapse; }
+.dt th { font-family:'Oswald',sans-serif; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); text-align:left; padding:.5rem .6rem; border-bottom:1px solid var(--border); }
+.dt td { font-family:'Barlow',sans-serif; font-size:.85rem; color:var(--white); padding:.6rem .6rem; border-bottom:1px solid var(--border); }
+.dt td.r, .dt th.r { text-align:right; }
+.note { display:flex; gap:.6rem; align-items:flex-start; background:rgba(11,18,32,.5); border:1px solid var(--border); border-radius:6px; padding:.8rem 1rem; font-family:'Barlow',sans-serif; font-size:.8rem; color:var(--muted); line-height:1.5; margin-top:1rem; }
+
+@media (max-width:768px) {
+  .dash-nav-links { display:none; }
+  .page-content { padding:70px 1rem 2rem; }
+  .tiles { grid-template-columns:1fr 1fr; }
+  .grid3 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="dash-wrapper">
+<div id="dash-nav-placeholder"></div>
+<div class="page-content">
+
+  <div class="loading-state" id="loading-state">
+    <div class="spinner"></div>
+    <p style="color:var(--muted);">Loading your plan...</p>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="page-header">
+      <h1 class="page-title">My Plan</h1>
+      <p class="page-subtitle">Your budget, debts, and goals, in one place.</p>
+    </div>
+
+    <!-- Intake prompt (before starting) -->
+    <div id="gate" style="display:none;">
+      <div class="panel accent">
+        <div class="panel-title">Let us build your plan</div>
+        <p class="muted" style="margin:.5rem 0 1rem;">You are in a program, nice work. To build your budget, debt payoff, and savings plan, we need a quick picture of your money. About 3 minutes, and it is private and encrypted. It goes straight to your counselor.</p>
+        <button class="btn primary" onclick="startIntake()">Start Financial Profile</button>
+      </div>
+    </div>
+
+    <!-- Wizard -->
+    <div id="wizard" class="panel" style="display:none;">
+      <div class="steps" id="steps">
+        <div class="step now"><div class="step-dot">1</div><div class="step-l">Income</div></div>
+        <div class="step"><div class="step-dot">2</div><div class="step-l">Expenses</div></div>
+        <div class="step"><div class="step-dot">3</div><div class="step-l">Debts</div></div>
+        <div class="step"><div class="step-dot">4</div><div class="step-l">Goals</div></div>
+      </div>
+      <div id="wizard-body"></div>
+      <div class="wizard-nav">
+        <button class="btn" id="backBtn" onclick="wizNav(-1)" style="visibility:hidden;">Back</button>
+        <div style="display:flex; gap:.5rem;">
+          <button class="btn" onclick="cancelIntake()">Cancel</button>
+          <button class="btn primary" id="nextBtn" onclick="wizNav(1)">Next</button>
+        </div>
+      </div>
+      <div class="note"><span>Private and encrypted. Only you and your counselor can see this.</span></div>
+    </div>
+
+    <!-- Plan -->
+    <div id="plan" style="display:none;"></div>
+  </div>
+</div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+var fin = null, step = 1, debtN = 0;
+
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    var res = await fetch(window.API_BASE + "/api/auth/me", { credentials: "include" });
+    if (!res.ok) { window.location.href = "login.html"; return; }
+    var user = await res.json();
+    var roles = user.roles || [user.role];
+    if (roles.indexOf("admin") > -1 || roles.indexOf("staff") > -1) { window.location.href = "admin.html"; return; }
+    if (roles.indexOf("counselor") > -1) { window.location.href = "counselor-portal.html"; return; }
+    if (!user.verified) { window.location.href = "pending.html"; return; }
+
+    var initials = ((user.first_name || "").charAt(0) + (user.last_name || "").charAt(0)).toUpperCase() || "??";
+    var av = document.getElementById("user-avatar"); if (av) av.textContent = initials;
+    var nm = document.getElementById("user-name"); if (nm) nm.textContent = ((user.first_name || "") + " " + (user.last_name || "")).trim();
+
+    await loadProfile();
+  } catch (e) {
+    window.location.href = "login.html";
+  } finally {
+    document.getElementById("loading-state").style.display = "none";
+    document.getElementById("content").style.display = "block";
+  }
+});
+
+async function loadProfile() {
+  // Try the backend first; fall back to a locally saved draft.
+  try {
+    var res = await fetch(window.API_BASE + "/api/member/financial-intake", { credentials: "include" });
+    if (res.ok) {
+      var data = await res.json();
+      if (data && data.income) { fin = data; renderState(); return; }
+    }
+  } catch (e) { /* ignore */ }
+  try {
+    var local = localStorage.getItem("sh_financial_profile");
+    if (local) { fin = JSON.parse(local); }
+  } catch (e) { /* ignore */ }
+  renderState();
+}
+
+function renderState() {
+  document.getElementById("gate").style.display = fin ? "none" : "block";
+  document.getElementById("wizard").style.display = "none";
+  document.getElementById("plan").style.display = fin ? "block" : "none";
+  if (fin) renderPlan();
+}
+
+// ---- wizard ----
+function fF(label, id, val, type, ph) {
+  var v = (val !== undefined && val !== null && val !== "") ? ' value="' + val + '"' : '';
+  return '<div class="field"><label>' + label + '</label><input id="' + id + '" type="' + (type || "number") + '"' + (ph ? ' placeholder="' + ph + '"' : '') + v + '></div>';
+}
+function fS(label, id, opts, cur) {
+  return '<div class="field"><label>' + label + '</label><select id="' + id + '">' +
+    opts.map(function (o) { return '<option' + (o === cur ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></div>';
+}
+
+function startIntake() { buildWizard(); document.getElementById("gate").style.display = "none"; document.getElementById("plan").style.display = "none"; document.getElementById("wizard").style.display = "block"; }
+function cancelIntake() { document.getElementById("wizard").style.display = "none"; renderState(); }
+
+function buildWizard() {
+  var f = fin || {}, inc = f.income || {}, ex = f.expenses || {}, sv = f.savings || {};
+  document.getElementById("wizard-body").innerHTML =
+    '<div class="wstep" data-step="1">' +
+      '<div class="step-heading">Your monthly income</div><p class="muted" style="margin-bottom:1rem;">Take-home, after taxes. Leave blank what does not apply.</p>' +
+      fS("Employment status", "emp", ["Employed full-time", "Employed part-time", "Self-employed", "Retired / VA pension", "Not currently working"], f.emp) +
+      '<div class="grid2">' + fF("Employment / wages", "inc_wage", inc.wage, "number", "0") + fF("VA disability comp", "inc_va", inc.va, "number", "0") + '</div>' +
+      '<div class="grid2">' + fF("VA / military pension", "inc_pen", inc.pen, "number", "0") + fF("Self-employment / gig", "inc_self", inc.self, "number", "0") + '</div>' +
+      fF("Other (SSDI, spouse, support)", "inc_other", inc.other, "number", "0") +
+    '</div>' +
+    '<div class="wstep" data-step="2" style="display:none;">' +
+      '<div class="step-heading">Monthly expenses</div><p class="muted" style="margin-bottom:1rem;">Everything except debt payments, those come next.</p>' +
+      '<div class="grid2">' + fF("Housing (rent / mortgage)", "ex_house", ex.house) + fF("Utilities", "ex_util", ex.util) + '</div>' +
+      '<div class="grid2">' + fF("Phone & internet", "ex_phone", ex.phone) + fF("Groceries & food", "ex_food", ex.food) + '</div>' +
+      '<div class="grid2">' + fF("Transportation", "ex_trans", ex.trans) + fF("Insurance", "ex_ins", ex.ins) + '</div>' +
+      '<div class="grid2">' + fF("Healthcare / medical", "ex_health", ex.health) + fF("Childcare / dependents", "ex_child", ex.child) + '</div>' +
+      '<div class="grid2">' + fF("Subscriptions", "ex_subs", ex.subs) + fF("Other / misc", "ex_misc", ex.misc) + '</div>' +
+    '</div>' +
+    '<div class="wstep" data-step="3" style="display:none;">' +
+      '<div class="step-heading">Your debts</div><p class="muted" style="margin-bottom:1rem;">Add each account. The APR helps your counselor plan the smartest payoff order with you.</p>' +
+      '<div id="debts"></div>' +
+      '<button class="btn" onclick="addDebt()">+ Add a debt</button>' +
+    '</div>' +
+    '<div class="wstep" data-step="4" style="display:none;">' +
+      '<div class="step-heading">Savings & goals</div><p class="muted" style="margin-bottom:1rem;">Where you are now, and where you want to go.</p>' +
+      '<div class="grid2">' + fF("Current savings", "sv_now", sv.now) + fF("Emergency-fund goal", "sv_goal", sv.goal != null ? sv.goal : 1000) + '</div>' +
+      fF("Retirement savings (optional)", "sv_ret", sv.ret) +
+      fS("Biggest goal right now", "goal", ["Pay off debt", "Build an emergency fund", "Stop living paycheck to paycheck", "Buy a home (VA loan)", "Improve my credit", "Start investing"], f.goal) +
+      fS("Target timeline", "timeline", ["3 months", "6 months", "1 year", "2+ years"], f.timeline) +
+    '</div>';
+  debtN = 0;
+  document.getElementById("debts").innerHTML = "";
+  if (f.debts && f.debts.length) { f.debts.forEach(function (d) { addDebt(d); }); } else { addDebt(); addDebt(); }
+  step = 1; showStep();
+}
+
+function addDebt(d) {
+  d = (d && typeof d === "object" && d.creditor !== undefined) ? d : {};
+  var n = ++debtN;
+  var row = document.createElement("div");
+  row.className = "debt-row";
+  row.innerHTML =
+    '<div class="grid2">' + fF("Creditor", "d_cred_" + n, d.creditor, "text", "e.g. Capital One") +
+      fS("Type", "d_type_" + n, ["Credit card", "Auto loan", "Student loan", "Medical", "Personal loan", "Collection", "Other"], d.type) + '</div>' +
+    '<div class="grid3">' + fF("Balance", "d_bal_" + n, d.bal) + fF("APR %", "d_apr_" + n, d.apr, "number", "0") + fF("Min payment", "d_min_" + n, d.min) + '</div>' +
+    '<button class="btn" style="padding:.4rem .9rem;" onclick="this.closest(\'.debt-row\').remove()">Remove</button>';
+  document.getElementById("debts").appendChild(row);
+}
+
+function showStep() {
+  document.querySelectorAll("#wizard-body .wstep").forEach(function (s) { s.style.display = (+s.getAttribute("data-step") === step) ? "block" : "none"; });
+  document.querySelectorAll("#steps .step").forEach(function (d, i) { d.className = "step " + (i + 1 < step ? "done" : (i + 1 === step ? "now" : "")); });
+  document.getElementById("backBtn").style.visibility = step === 1 ? "hidden" : "visible";
+  document.getElementById("nextBtn").textContent = step === 4 ? "Build My Plan" : "Next";
+}
+
+function wizNav(dir) {
+  if (dir > 0 && step === 4) { buildPlan(); return; }
+  step = Math.min(4, Math.max(1, step + dir));
+  showStep();
+  window.scrollTo(0, 0);
+}
+
+function nz(id) { var e = document.getElementById(id); return e ? (parseFloat(e.value) || 0) : 0; }
+function tx(id) { var e = document.getElementById(id); return e ? (e.value || "").trim() : ""; }
+
+async function buildPlan() {
+  var debts = [];
+  document.querySelectorAll("#debts .debt-row").forEach(function (row, i) {
+    var n = i + 1;
+    var bal = nz("d_bal_" + n), cred = tx("d_cred_" + n);
+    if (cred || bal) debts.push({ creditor: cred || "Unnamed debt", type: tx("d_type_" + n), bal: bal, apr: nz("d_apr_" + n), min: nz("d_min_" + n) });
+  });
+  fin = {
+    emp: tx("emp"),
+    income: { wage: nz("inc_wage"), va: nz("inc_va"), pen: nz("inc_pen"), self: nz("inc_self"), other: nz("inc_other") },
+    expenses: { house: nz("ex_house"), util: nz("ex_util"), phone: nz("ex_phone"), food: nz("ex_food"), trans: nz("ex_trans"), ins: nz("ex_ins"), health: nz("ex_health"), child: nz("ex_child"), subs: nz("ex_subs"), misc: nz("ex_misc") },
+    debts: debts,
+    savings: { now: nz("sv_now"), goal: nz("sv_goal") || 1000, ret: nz("sv_ret") },
+    goal: tx("goal"),
+    timeline: tx("timeline")
+  };
+  try { localStorage.setItem("sh_financial_profile", JSON.stringify(fin)); } catch (e) { /* ignore */ }
+  saveToBackend(fin);
+  document.getElementById("wizard").style.display = "none";
+  renderState();
+  window.scrollTo(0, 0);
+}
+
+async function saveToBackend(profile) {
+  // Best effort: works once the backend endpoint exists. The plan is already
+  // computed and shown client-side regardless.
+  try {
+    await fetch(window.API_BASE + "/api/member/financial-intake", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(profile)
+    });
+  } catch (e) { /* ignore */ }
+}
+
+function money(n) { return "$" + Math.round(n || 0).toLocaleString(); }
+function sum(o) { var t = 0; for (var k in o) { t += o[k] || 0; } return t; }
+
+var EXP_LABELS = { house: "Housing", util: "Utilities", phone: "Phone & internet", food: "Groceries & food", trans: "Transportation", ins: "Insurance", health: "Healthcare", child: "Childcare", subs: "Subscriptions", misc: "Other" };
+
+function renderPlan() {
+  var totalInc = sum(fin.income), totalExp = sum(fin.expenses);
+  var debts = fin.debts || [];
+  var totalMin = debts.reduce(function (s, d) { return s + (d.min || 0); }, 0);
+  var totalDebt = debts.reduce(function (s, d) { return s + (d.bal || 0); }, 0);
+  var left = totalInc - totalExp - totalMin;
+  var extra = Math.max(0, left);
+  var sv = fin.savings || { now: 0, goal: 1000 };
+  var epct = sv.goal > 0 ? Math.min(100, Math.round((sv.now / sv.goal) * 100)) : 0;
+
+  var exKeys = Object.keys(fin.expenses).filter(function (k) { return fin.expenses[k] > 0; }).sort(function (a, b) { return fin.expenses[b] - fin.expenses[a]; });
+  var budget = exKeys.length ? exKeys.map(function (k) {
+    var val = fin.expenses[k], pct = totalInc > 0 ? Math.round(val / totalInc * 100) : 0;
+    return '<div class="bar-row"><div class="bar-main"><div class="bar-name">' + EXP_LABELS[k] + '</div><div class="bar-track"><div class="bar-fill" style="width:' + Math.min(100, pct) + '%"></div></div></div><div class="bar-val">' + money(val) + '</div></div>';
+  }).join("") : '<p class="muted">No expenses entered.</p>';
+
+  var rows = debts.length ? debts.map(function (d) {
+    return '<tr><td><b>' + esc(d.creditor) + '</b></td><td>' + esc(d.type || "--") + '</td><td class="r">' + money(d.bal) + '</td><td class="r">' + (d.apr || 0) + '%</td><td class="r">' + money(d.min) + '</td></tr>';
+  }).join("") : '<tr><td colspan="5" style="text-align:center; color:var(--muted); padding:1rem;">No debts entered.</td></tr>';
+
+  document.getElementById("plan").innerHTML =
+    '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1rem;">' +
+      '<p class="page-subtitle" style="margin:0;">Built from your profile. Goal: ' + esc(fin.goal || "--") + (fin.timeline ? ' &middot; ' + esc(fin.timeline) : '') + '</p>' +
+      '<button class="btn" onclick="startIntake()">Update Profile</button>' +
+    '</div>' +
+    '<div class="tiles">' +
+      tile("Monthly Income", money(totalInc), "take-home") +
+      tile("Expenses + Min Debt", money(totalExp + totalMin), money(totalExp) + " + " + money(totalMin) + " debt") +
+      tile("Left Over", money(left), left >= 0 ? "to attack debt / save" : "over budget, counselor will help", left >= 0 ? "#10B981" : "var(--red-light)") +
+      tile("Total Debt", money(totalDebt), debts.length + " account" + (debts.length === 1 ? "" : "s")) +
+    '</div>' +
+    '<div class="panel"><div class="panel-title">Where your money goes</div>' + budget + '</div>' +
+    '<div class="panel"><div class="panel-title">Your debts</div>' +
+      '<div style="overflow-x:auto;"><table class="dt"><thead><tr><th>Creditor</th><th>Type</th><th class="r">Balance</th><th class="r">APR</th><th class="r">Min</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      (debts.length ? '<div class="note"><span>Beyond the minimums you have about <b>' + money(extra) + '/mo</b> to put toward debt. There are a few solid ways to pay it down, and the right one depends on your situation and what keeps you motivated. Your counselor will build the payoff plan with you at your next session.</span></div>' : '') +
+    '</div>' +
+    '<div class="panel"><div class="panel-title">Emergency fund</div>' +
+      '<div class="bar-track" style="height:10px; margin:.5rem 0;"><div class="bar-fill" style="width:' + epct + '%; background:var(--gold);"></div></div>' +
+      '<p class="muted">' + money(sv.now) + ' of ' + money(sv.goal) + ' goal' + (sv.ret > 0 ? '. Retirement savings: ' + money(sv.ret) : '') + '</p>' +
+    '</div>';
+}
+
+function tile(lab, val, foot, color) {
+  return '<div class="tile"><div class="tile-lab">' + lab + '</div><div class="tile-val"' + (color ? ' style="color:' + color + '"' : '') + '>' + val + '</div><div class="tile-foot">' + foot + '</div></div>';
+}
+
+function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+async function signOut() {
+  try { await fetch(window.API_BASE + "/api/auth/logout", { method: "POST", credentials: "include" }); } catch (e) { }
+  localStorage.removeItem("sh_user");
+  window.location.href = "login.html";
+}
+</script>
+</body>
+</html>

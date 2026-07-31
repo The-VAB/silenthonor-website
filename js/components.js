@@ -115,6 +115,7 @@ function injectMemberNav() {
     { href: 'dashboard.html', label: 'Dashboard' },
     { href: 'member-courses.html', label: 'Courses' },
     { href: 'counselor.html', label: 'Counselor', gated: true },
+    { href: 'financial-plan.html', label: 'My Plan', gated: true },
     { href: 'messages.html', label: 'Messages', gated: true },
     { href: 'dispute-tracker.html', label: 'Disputes', gated: true },
     { href: 'credit-tracker.html', label: 'Credit', gated: true },
