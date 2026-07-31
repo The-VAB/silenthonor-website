@@ -2,6 +2,7 @@
 
 pub mod auth;
 pub mod health;
+pub mod major_finance;
 pub mod members;
 
 use axum::http::HeaderMap;
@@ -40,6 +41,11 @@ pub fn router(state: AppState) -> Router {
             "/api/member/financial-intake",
             get(members::get_financial_intake).post(members::save_financial_intake),
         )
+        .route(
+            "/api/member/major-finance/status",
+            get(major_finance::status),
+        )
+        .route("/api/member/major-finance", post(major_finance::chat))
         .with_state(state)
 }
 

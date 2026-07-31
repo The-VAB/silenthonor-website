@@ -37,6 +37,9 @@ jsonwebtoken = "9"
 bcrypt = "0.15"
 aws-config = { version = "1", features = ["behavior-version-latest"] }
 aws-sdk-secretsmanager = "1"
+# HTTP client for the Anthropic Messages API (Rust has no official SDK).
+# rustls-tls keeps the TLS stack consistent with the mongodb driver.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 time = { version = "0.3", features = ["serde"] }
 once_cell = "1"
 

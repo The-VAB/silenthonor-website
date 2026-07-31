@@ -25,3 +25,5 @@ tower.workspace = true
 lambda_http.workspace = true
 mongodb.workspace = true
 bson.workspace = true
+reqwest.workspace = true
+anyhow.workspace = true
