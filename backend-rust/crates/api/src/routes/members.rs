@@ -45,7 +45,13 @@ pub async fn update_profile(
 ) -> AppResult<Json<Value>> {
     let (uid, _user) = authenticate(&state, &headers).await?;
 
-    let allowed = ["first_name", "last_name", "phone", "state", "email_preferences"];
+    let allowed = [
+        "first_name",
+        "last_name",
+        "phone",
+        "state",
+        "email_preferences",
+    ];
     let mut set = Document::new();
     if let Some(obj) = body.as_object() {
         for key in allowed {
@@ -69,7 +75,10 @@ pub async fn update_profile(
 }
 
 // GET /api/member/counselor
-pub async fn counselor(State(state): State<AppState>, headers: HeaderMap) -> AppResult<Json<Value>> {
+pub async fn counselor(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> AppResult<Json<Value>> {
     let (_uid, user) = authenticate(&state, &headers).await?;
 
     let counselor_id = match user.assigned_counselor_id.as_deref() {
@@ -124,7 +133,10 @@ pub async fn counselor(State(state): State<AppState>, headers: HeaderMap) -> App
 }
 
 // GET /api/member/dashboard
-pub async fn dashboard(State(state): State<AppState>, headers: HeaderMap) -> AppResult<Json<Value>> {
+pub async fn dashboard(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> AppResult<Json<Value>> {
     let (uid, user) = authenticate(&state, &headers).await?;
     let oid = ObjectId::parse_str(&uid).map_err(|_| AppError::Unauthorized)?;
 

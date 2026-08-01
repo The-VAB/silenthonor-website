@@ -40,7 +40,9 @@ fn enabled() -> bool {
 // The frontend calls this to decide whether to show the Major Finance tab.
 pub async fn status(State(state): State<AppState>, headers: HeaderMap) -> AppResult<Json<Value>> {
     authenticate(&state, &headers).await?;
-    Ok(Json(json!({ "assistant": "Major Finance", "enabled": enabled() })))
+    Ok(Json(
+        json!({ "assistant": "Major Finance", "enabled": enabled() }),
+    ))
 }
 
 #[derive(Debug, Deserialize)]

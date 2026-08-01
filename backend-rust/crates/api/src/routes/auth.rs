@@ -75,7 +75,8 @@ pub async fn login(
 
 pub async fn me(State(state): State<AppState>, headers: HeaderMap) -> AppResult<Json<Value>> {
     let token = cookie_value(&headers, "access_token").ok_or(AppError::Unauthorized)?;
-    let claims = verify_token(&state.config.jwt_secret, &token).map_err(|_| AppError::Unauthorized)?;
+    let claims =
+        verify_token(&state.config.jwt_secret, &token).map_err(|_| AppError::Unauthorized)?;
 
     // Reject blacklisted (logged-out) tokens.
     let blacklisted = state
@@ -123,7 +124,10 @@ pub async fn logout(State(state): State<AppState>, headers: HeaderMap) -> AppRes
 }
 
 fn with_auth_cookies(mut resp: Response, access: &str, refresh: &str, secure: bool) -> Response {
-    append_cookie(&mut resp, &set_cookie("access_token", access, ACCESS_MAX_AGE, secure));
+    append_cookie(
+        &mut resp,
+        &set_cookie("access_token", access, ACCESS_MAX_AGE, secure),
+    );
     append_cookie(
         &mut resp,
         &set_cookie("refresh_token", refresh, REFRESH_MAX_AGE, secure),

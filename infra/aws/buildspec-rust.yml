@@ -13,7 +13,10 @@ phases:
   install:
     commands:
       - echo "Installing Rust toolchain and cargo-lambda..."
-      - curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain 1.82.0
+      # `stable` (>= 1.85) is required: some transitive deps ship edition2024
+      # manifests that older Cargo cannot parse. Dep versions are pinned by the
+      # committed Cargo.lock (builds below pass --locked), so this stays reproducible.
+      - curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain stable
       - . "$HOME/.cargo/env"
       - pip3 install cargo-lambda
       - rustc --version
@@ -26,9 +29,9 @@ phases:
       - cargo fmt --all --check || true
       - cargo clippy --all-targets -- -D warnings || true
       - echo "Compiling arm64 Lambda (this is the real gate)..."
-      - cargo lambda build --release --arm64
+      - cargo lambda build --release --arm64 --locked
       - echo "Running tests..."
-      - cargo test --workspace
+      - cargo test --workspace --locked
   post_build:
     commands:
       - . "$HOME/.cargo/env"
