@@ -41,7 +41,7 @@ variable "rust_api_s3_key" {
 variable "rust_api_source_hash" {
   description = "base64-encoded sha256 of the Lambda zip; bump to trigger a redeploy."
   type        = string
-  default     = "nmaOWWmU5pKc8xWkCDrQNWePxIHlByuhiUlmxIIPxZs=" # includes /api/auth/register
+  default     = "fahYipkK3N4esxu02pVDPnuPpV+S73/gguvwvSRVETg=" # register + signup emails (SES)
 }
 
 variable "rust_api_memory_mb" {
@@ -121,6 +121,13 @@ data "aws_iam_policy_document" "lambda_secrets" {
       aws_secretsmanager_secret.mongodb_uri.arn,
     ]
   }
+  # Transactional email (welcome + admin notification on signup), same as the
+  # App Runner backend. SES resource-level scoping isn't practical for SendEmail.
+  statement {
+    sid       = "SendEmail"
+    actions   = ["ses:SendEmail", "ses:SendRawEmail"]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role_policy" "lambda_secrets" {
@@ -160,6 +167,11 @@ resource "aws_lambda_function" "api" {
       # CA bundle path inside the Lambda package (see cutover step 1).
       DOCDB_CA_PATH = "/var/task/global-bundle.pem"
       RUST_LOG      = "info"
+
+      # Transactional email (SES) -- same From as the App Runner backend.
+      EMAIL_PROVIDER = "ses"
+      FROM_EMAIL     = var.from_email
+      ADMIN_EMAIL    = var.admin_email
 
       # Major Finance (member AI) -- dormant until enable_major_finance = true.
       # See major-finance.tf and docs/MAJOR_FINANCE.md.

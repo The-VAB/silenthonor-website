@@ -99,9 +99,15 @@ pub struct RegisterRequest {
     #[serde(default)]
     pub separation_year: Option<String>,
     #[serde(default)]
+    pub dob: Option<String>,
+    #[serde(default)]
+    pub how_heard: Option<String>,
+    #[serde(default)]
     pub challenges: Option<Vec<String>>,
     #[serde(default)]
     pub notes: Option<String>,
+    #[serde(default)]
+    pub consent_contact: Option<bool>,
 }
 
 /// `POST /api/auth/register` -- port of backend/server.py `register`.
@@ -149,20 +155,25 @@ pub async fn register(
     let user_doc = doc! {
         "email": email.as_str(),
         "password_hash": password_hash.as_str(),
+        "auth_provider": "password",
         "first_name": first_name.as_str(),
         "last_name": last_name.as_str(),
+        "dob": opt_str(&body.dob),
         "phone": opt_str(&body.phone),
         "state": opt_str(&body.state),
         "branch": opt_str(&body.branch),
         "service_status": opt_str(&body.service_status),
         "years_of_service": opt_str(&body.years_of_service),
         "separation_year": opt_str(&body.separation_year),
+        "how_heard": opt_str(&body.how_heard),
         "challenges": challenges,
         "notes": opt_str(&body.notes),
+        "consent_contact": body.consent_contact.unwrap_or(false),
         "role": "member",
         "verified": false,
         "dd214_file": bson::Bson::Null,
         "dd214_status": "pending",
+        "pipeline_stage": "applied",
         "created_at": now,
     };
 
@@ -175,6 +186,30 @@ pub async fn register(
 
     let access = create_access_token(&state.config.jwt_secret, &id, &email)?;
     let refresh = create_refresh_token(&state.config.jwt_secret, &id)?;
+
+    // Fire the same two signup emails the Python backend sends, non-blocking
+    // (mirrors asyncio.create_task): welcome to the member + admin notification.
+    let na = |o: &Option<String>| {
+        o.clone()
+            .filter(|s| !s.is_empty())
+            .unwrap_or_else(|| "N/A".to_string())
+    };
+    let challenges_display = match &body.challenges {
+        Some(v) if !v.is_empty() => v.join(", "),
+        _ => "Not specified".to_string(),
+    };
+    // AWAIT the sends: a Lambda freezes its execution environment the moment the
+    // handler returns, so fire-and-forget (which the always-warm App Runner
+    // backend uses) would leave the mail unsent. send_* swallow their own errors,
+    // so a mail failure never fails signup. Both sends run concurrently.
+    let (phone, branch) = (na(&body.phone), na(&body.branch));
+    let (svc, st) = (na(&body.service_status), na(&body.state));
+    tokio::join!(
+        sh_core::email::send_welcome_email(&email, &first_name),
+        sh_core::email::send_new_membership_notification(
+            &first_name, &last_name, &email, &phone, &branch, &svc, &st, &challenges_display,
+        ),
+    );
 
     let profile = json!({
         "id": id,
