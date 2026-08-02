@@ -34,8 +34,14 @@ variable "docdb_subnet_ids" {
   ]
 }
 
+# Ownership decision (final): these two dedicated silenthonor-apprunner subnets
+# live inside the shared prod-vpc and are REFERENCED here, not managed by this
+# state. Keeping silenthonor's blast radius to its own compute/data/secrets is
+# the reason; the subnets (and their route-table associations to the shared NAT)
+# stay with whoever owns the shared VPC. To adopt them later, import
+# aws_subnet.apprunner[*] — but that is intentionally not done here.
 variable "apprunner_subnet_ids" {
-  description = "Dedicated silenthonor-apprunner subnets for App Runner + Rust Lambda ENIs"
+  description = "Dedicated silenthonor-apprunner subnets for App Runner + Rust Lambda ENIs (referenced, not owned)"
   type        = list(string)
   default = [
     "subnet-06e8bddabd7060b7f",

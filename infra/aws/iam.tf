@@ -32,11 +32,11 @@ resource "aws_iam_role" "apprunner_instance" {
 resource "aws_iam_role_policy" "apprunner_instance" {
   name = "${var.project}-apprunner-instance-policy"
   role = aws_iam_role.apprunner_instance.id
-  # This MIRRORS the live-deployed role verbatim so adopting it is a 0-diff no-op.
-  # The SecretsKmsDecrypt statement is redundant for the current AWS-managed-key
-  # secrets (they carry no CMK); tightening the policy (dropping it, using exact
-  # secret ARNs, unifying Sids) is a separate, reviewed change deliberately NOT
-  # bundled into the state-reconciliation apply. See STATE_RECONCILIATION.md.
+  # Tightened form (follow-up to the initial reconcile). Drops the redundant
+  # SecretsKmsDecrypt statement — the four app secrets use the AWS-managed
+  # `aws/secretsmanager` key (no CMK), so GetSecretValue alone suffices to
+  # decrypt; scopes the secret reads to exact ARNs. Verified: KmsKeyId=None on
+  # all four secrets. See STATE_RECONCILIATION.md.
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -59,31 +59,20 @@ resource "aws_iam_role_policy" "apprunner_instance" {
         Resource = aws_kms_key.uploads.arn
       },
       {
-        Sid      = "SecretsKmsDecrypt"
-        Effect   = "Allow"
-        Action   = ["kms:Decrypt"]
-        Resource = "*"
-        Condition = {
-          StringEquals = {
-            "kms:ViaService" = "secretsmanager.${var.region}.amazonaws.com"
-          }
-        }
-      },
-      {
         Sid      = "Ses"
         Effect   = "Allow"
         Action   = ["ses:SendEmail", "ses:SendRawEmail"]
         Resource = "*"
       },
       {
-        Sid      = "Secrets"
+        Sid      = "ReadSecrets"
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue"]
         Resource = [
+          aws_secretsmanager_secret.mongodb_uri.arn,
           aws_secretsmanager_secret.jwt.arn,
-          aws_secretsmanager_secret.admin_password.arn,
           aws_secretsmanager_secret.resend.arn,
-          "arn:aws:secretsmanager:${var.region}:${var.account_id}:secret:${var.project}/mongodb-uri-*",
+          aws_secretsmanager_secret.admin_password.arn,
         ]
       }
     ]

@@ -2,6 +2,6 @@
 .terraform/
 *.tfstate
 *.tfstate.*
-tfplan
+tfplan*
 crash.log
 lambda/*.zip

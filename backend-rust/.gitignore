@@ -2,3 +2,7 @@
 **/*.rs.bk
 Cargo.lock.orig
 .env
+# Lambda build artifacts (produced by cargo lambda build + packaging)
+/api.zip
+/bootstrap
+/global-bundle.pem

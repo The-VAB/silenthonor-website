@@ -204,3 +204,18 @@ Audited absent from the diff: `master_password`, `secret_string`, secret values,
 - **Push / PR** — committed on branch `claude/nice-cori-a2f359` (commit `3cbb5a7` + this doc-update follow-up). Not yet pushed. The natural PR base is `feat/rust-lambda-backend` (which owns `infra/aws`) — that diff shows only the reconciliation changes.
 - **Rust API adoption** (§7) — deferred. Would import the 3 scaffold resources under `-var enable_rust_api=true`, then apply to create the Lambda + HTTP API (needs the built zip).
 - **Follow-ups:** tighten the App Runner instance IAM policy (drop redundant `SecretsKmsDecrypt`, use exact secret ARNs); confirm ownership intent for the two `silenthonor-apprunner-*` subnets (currently referenced, not owned); out-of-config extras left alone (`silenthonor-build` bucket, `silenthonor-codebuild` role).
+
+---
+
+## Follow-up updates (2026-08-02, post-reconcile)
+
+- **#2 IAM tighten — DONE & APPLIED.** App Runner instance policy dropped the redundant `SecretsKmsDecrypt` (secrets use the AWS-managed key; `KmsKeyId=None` on all four) and scoped `ReadSecrets` to exact ARNs. `Apply complete! 0 added, 1 changed, 0 destroyed`; App Runner still `RUNNING`; live policy Sids now `UploadsObjects/UploadsList/UploadsKms/Ses/ReadSecrets`.
+- **#3 apprunner subnets — DECIDED: reference-only (final).** The two `silenthonor-apprunner-*` subnets stay referenced (via `var.apprunner_subnet_ids`), not owned — silenthonor's state does not manage networking inside the shared prod-vpc. Documented in `variables.tf`.
+- **#1 Rust API — DONE, ADOPTED, FIXED & HEALTHY.** The Rust API is now terraform-managed and working (`GET .../health → {"status":"ok","db":"up"}`, HTTP 200). Story:
+  - A concurrent CLI deploy (via `deploy-rust-api-cli.sh`, run from Git Bash ~14:32 UTC) had created Lambda `silenthonor-api` + HTTP API `e1tyj5meuc`, but it returned **HTTP 500**.
+  - **Root cause:** the CLI (Git Bash on Windows) mangled `DOCDB_CA_PATH=/var/task/global-bundle.pem` into `C:/Program Files/Git/var/task/global-bundle.pem`, so the Rust code pointed DocumentDB's TLS CA at a nonexistent path → `db connect failed`. Terraform sets that env var via the API (no shell mangling), so **adoption fixed it**.
+  - Built the arm64 `bootstrap` in a `cargo-lambda` container, packaged `api.zip` (bootstrap 0755 + `global-bundle.pem`), uploaded to `s3://silenthonor-pipeline-artifacts-802104113048/rust/api.zip`.
+  - Imported the full stack (5 scaffold + Lambda + API + integration + 2 routes + stage + permission) and applied the fix: `0 added, 4 changed, 0 destroyed`.
+  - Cleaned up an accidental **duplicate** HTTP API (`zu33514kz3`) that a first apply created before hitting a 409 on the pre-existing Lambda.
+  - **Durability:** `enable_rust_api` default flipped to `true` and the Lambda now deploys from **S3** (`rust_api_s3_bucket/key` + `rust_api_source_hash`) — a plain `terraform plan` no longer needs a local zip, and no longer wants to destroy the stack. Fixed a CORS bug (`silenthonor.org` → the real `cors_origins`). Final default-vars plan = **No changes**.
+  - Redeploy new Rust code: rebuild `api.zip` → `aws s3 cp` to the bucket/key → `-var rust_api_source_hash=<new base64 sha256>` → apply.

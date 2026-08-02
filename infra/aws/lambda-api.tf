@@ -1,31 +1,47 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Rust / Lambda API (the real backend build).
 #
-# This stands up the Rust API on Lambda behind API Gateway (HTTP API), IN THE SAME
-# VPC as DocumentDB, reusing the existing secrets. It is INERT by default
-# (enable_rust_api = false) so it never disturbs the current App Runner deploy.
+# This runs the Rust API on Lambda behind API Gateway (HTTP API), IN THE SAME VPC
+# as DocumentDB, reusing the existing secrets. It is now DEPLOYED (enable_rust_api
+# defaults to true) and healthy: GET <invoke_url>/health -> {"db":"up"}. It runs
+# ALONGSIDE the App Runner backend and does not disturb it — no production frontend
+# points at it yet (staging cutover per docs/RUST_BACKEND.md when ready).
 #
-# Tyler's cutover steps (see docs/RUST_BACKEND.md):
-#   1. Build the arm64 artifact:  cd backend-rust && cargo lambda build --release --arm64
-#      then zip target/lambda/bootstrap/bootstrap  ->  set rust_api_zip_path.
-#      (Bundle the DocumentDB CA `global-bundle.pem` into the zip root too.)
-#   2. terraform apply -var enable_rust_api=true -var rust_api_zip_path=...
-#   3. Point a staging frontend's window.API_BASE at the api_gateway output, verify,
-#      then flip production.
+# The Lambda code ships from S3 (rust_api_s3_bucket/key); redeploy new code by
+# rebuilding api.zip, uploading it, and bumping -var rust_api_source_hash. See the
+# variable block below and infra/aws/buildspec-rust.yml.
 #
 # No secret VALUES appear here — only references to secrets that already exist.
 # ─────────────────────────────────────────────────────────────────────────────
 
 variable "enable_rust_api" {
-  description = "Create the Rust/Lambda API stack. Off until the build artifact exists."
+  description = "Create/manage the Rust/Lambda API stack. TRUE now that it is deployed — leaving it false would make a default apply DESTROY the live Lambda + HTTP API."
   type        = bool
-  default     = false
+  default     = true
 }
 
-variable "rust_api_zip_path" {
-  description = "Path to the packaged Lambda zip (bootstrap + CA bundle)."
+# The Lambda code is deployed from S3 (durable), not a local zip, so `terraform
+# plan` never needs a build artifact on disk. Rebuild + redeploy new code by:
+#   1. cargo lambda build --release --arm64  (see infra/aws/buildspec-rust.yml)
+#   2. zip bootstrap + global-bundle.pem -> api.zip
+#   3. aws s3 cp api.zip s3://<rust_api_s3_bucket>/<rust_api_s3_key>
+#   4. set -var rust_api_source_hash=<new base64 sha256> and apply
+variable "rust_api_s3_bucket" {
+  description = "S3 bucket holding the packaged Lambda zip (bootstrap + CA bundle)."
   type        = string
-  default     = ""
+  default     = "silenthonor-pipeline-artifacts-802104113048"
+}
+
+variable "rust_api_s3_key" {
+  description = "S3 key of the packaged Lambda zip."
+  type        = string
+  default     = "rust/api.zip"
+}
+
+variable "rust_api_source_hash" {
+  description = "base64-encoded sha256 of the Lambda zip; bump to trigger a redeploy."
+  type        = string
+  default     = "j9DJ/sLyVwf10pPX+27uqKaQb94cLF+5jReU6KryFDA="
 }
 
 variable "rust_api_memory_mb" {
@@ -84,6 +100,7 @@ data "aws_iam_policy_document" "lambda_assume" {
 resource "aws_iam_role" "lambda_api" {
   count              = local.rust_api_count
   name               = "${var.project}-lambda-api-role"
+  description        = "Execution role for the Silent Honor Rust/Lambda API" # matches live
   assume_role_policy = data.aws_iam_policy_document.lambda_assume[0].json
 }
 
@@ -121,13 +138,16 @@ resource "aws_lambda_function" "api" {
   runtime          = "provided.al2023"
   handler          = "bootstrap"
   architectures    = ["arm64"]
-  filename         = var.rust_api_zip_path
-  source_code_hash = filebase64sha256(var.rust_api_zip_path)
+  s3_bucket        = var.rust_api_s3_bucket
+  s3_key           = var.rust_api_s3_key
+  source_code_hash = var.rust_api_source_hash
   memory_size      = var.rust_api_memory_mb
   timeout          = var.rust_api_timeout_s
 
+  # Same private subnets as DocumentDB (they carry NAT egress for Secrets Manager).
+  # Matches the live-deployed Lambda so adoption doesn't churn its ENIs.
   vpc_config {
-    subnet_ids         = var.apprunner_subnet_ids
+    subnet_ids         = var.docdb_subnet_ids
     security_group_ids = [aws_security_group.lambda_api[0].id]
   }
 
@@ -158,8 +178,11 @@ resource "aws_apigatewayv2_api" "http" {
   name          = "${var.project}-http-api"
   protocol_type = "HTTP"
 
+  # Same origins the live App Runner backend allows (silenthonorfoundation.org +
+  # www + the CloudFront domain). The old value pointed at silenthonor.org, which
+  # is not this project's domain.
   cors_configuration {
-    allow_origins     = ["https://silenthonor.org", "https://www.silenthonor.org"]
+    allow_origins     = var.cors_origins
     allow_methods     = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     allow_headers     = ["content-type", "authorization"]
     allow_credentials = true
@@ -199,7 +222,7 @@ resource "aws_apigatewayv2_stage" "default" {
 
 resource "aws_lambda_permission" "apigw" {
   count         = local.rust_api_count
-  statement_id  = "AllowAPIGatewayInvoke"
+  statement_id  = "apigw-invoke" # matches the live permission (statement_id is ForceNew)
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.api[0].function_name
   principal     = "apigateway.amazonaws.com"
