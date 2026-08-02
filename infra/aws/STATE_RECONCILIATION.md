@@ -219,3 +219,40 @@ Audited absent from the diff: `master_password`, `secret_string`, secret values,
   - Cleaned up an accidental **duplicate** HTTP API (`zu33514kz3`) that a first apply created before hitting a 409 on the pre-existing Lambda.
   - **Durability:** `enable_rust_api` default flipped to `true` and the Lambda now deploys from **S3** (`rust_api_s3_bucket/key` + `rust_api_source_hash`) — a plain `terraform plan` no longer needs a local zip, and no longer wants to destroy the stack. Fixed a CORS bug (`silenthonor.org` → the real `cors_origins`). Final default-vars plan = **No changes**.
   - Redeploy new Rust code: rebuild `api.zip` → `aws s3 cp` to the bucket/key → `-var rust_api_source_hash=<new base64 sha256>` → apply.
+
+---
+
+## Rust backend — frontend-scoped parity (2026-08-02)
+
+The Rust/Lambda API now implements **every endpoint the live static site calls**,
+ported faithfully from the *deployed* FastAPI image (extracted from ECR; the repo
+`backend/` copy was stale). All verified against the live Rust API `e1tyj5meuc`:
+
+- **Auth:** register (+ welcome & admin-notify emails via SES), login, me, logout,
+  refresh, forgot-password (+ reset email), reset-password, change-password.
+- **Member:** dashboard, courses, profile, counselor, financial-intake, major-finance.
+- **Public:** POST /api/contact.
+- **DD-214:** multipart upload -> S3 (SSE-KMS) at /api/member/upload/dd214 (+ aliases);
+  admin GET /api/admin/dd214/{file} -> presigned redirect.
+- **Admin (role-gated):** stats, members, members/{id}/verify (+ approved email),
+  courses CRUD, contacts CRUD.
+
+Emails are AWAITED (Lambda freezes on return). Lambda role gained ses:SendEmail +
+s3:PutObject/GetObject + kms on the uploads key; env: EMAIL_PROVIDER/FROM_EMAIL/
+ADMIN_EMAIL/S3_BUCKET/S3_KMS_KEY_ID. All in PR #21.
+
+**Not yet done / cutover prerequisites:**
+- **CORS preflight:** cross-origin OPTIONS returns 405 (the APIGW `ANY` route
+  forwards OPTIONS to the Lambda). A same-origin cutover (CloudFront `/api/*` ->
+  Rust) avoids it; a cross-origin cutover (point API_BASE at the Rust API URL)
+  needs an OPTIONS handler first.
+- **~185 console endpoints** (counselor, financial-counseling, disputes, messaging,
+  reports, knowledge, programs, staff) have no static-site caller — future work.
+- **Cutover itself:** flip `window.API_BASE` (js/components.js) to the Rust API and
+  redeploy the frontend. Deferred until everything is validated end-to-end.
+- **Google signup** (google_credential path) not ported (frontend hides the button
+  when unconfigured).
+
+Test artifacts to clean up: pending test members (`rust-signup-test-*`,
+`rust-email-test-*`, `rust-mail-check@example.com`, `contact-test@example.com`) and
+one test S3 object under `dd214/` — all clearly test data.

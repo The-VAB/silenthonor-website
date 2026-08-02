@@ -7,7 +7,10 @@ pub mod health;
 pub mod major_finance;
 pub mod members;
 
-use axum::http::HeaderMap;
+use axum::extract::Request;
+use axum::http::{HeaderMap, Method, StatusCode};
+use axum::middleware::{self, Next};
+use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post, put};
 use axum::Router;
 use serde_json::Value;
@@ -76,7 +79,19 @@ pub fn router(state: AppState) -> Router {
             get(major_finance::status),
         )
         .route("/api/member/major-finance", post(major_finance::chat))
+        .layer(middleware::from_fn(preflight_ok))
         .with_state(state)
+}
+
+/// CORS preflight handler. The API Gateway `ANY /{proxy+}` route forwards OPTIONS
+/// to the Lambda, so axum would 405 it (handlers declare no OPTIONS) and a browser
+/// preflight would fail. Short-circuit every OPTIONS with 204; API Gateway's
+/// cors_configuration attaches the Access-Control-* headers to the response.
+async fn preflight_ok(req: Request, next: Next) -> Response {
+    if req.method() == Method::OPTIONS {
+        return StatusCode::NO_CONTENT.into_response();
+    }
+    next.run(req).await
 }
 
 /// Read a single cookie value out of the request `Cookie` header.
