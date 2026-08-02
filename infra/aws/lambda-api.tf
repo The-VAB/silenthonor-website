@@ -41,7 +41,7 @@ variable "rust_api_s3_key" {
 variable "rust_api_source_hash" {
   description = "base64-encoded sha256 of the Lambda zip; bump to trigger a redeploy."
   type        = string
-  default     = "j9DJ/sLyVwf10pPX+27uqKaQb94cLF+5jReU6KryFDA="
+  default     = "nmaOWWmU5pKc8xWkCDrQNWePxIHlByuhiUlmxIIPxZs=" # includes /api/auth/register
 }
 
 variable "rust_api_memory_mb" {

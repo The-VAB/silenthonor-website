@@ -15,7 +15,9 @@ use bson::{doc, Document};
 use serde::Deserialize;
 use serde_json::{json, Value};
 
-use sh_core::auth::{create_access_token, create_refresh_token, verify_password, verify_token};
+use sh_core::auth::{
+    create_access_token, create_refresh_token, hash_password, verify_password, verify_token,
+};
 use sh_core::models::User;
 use sh_core::{AppError, AppResult};
 
@@ -71,6 +73,140 @@ pub async fn login(
         &refresh,
         state.config.cookie_secure,
     ))
+}
+
+/// Signup payload. Mirrors backend/server.py `RegisterRequest`; every field past
+/// the four required ones is optional (the signup form only sends a subset).
+#[derive(Debug, Deserialize)]
+pub struct RegisterRequest {
+    pub email: String,
+    #[serde(default)]
+    pub password: String,
+    #[serde(default)]
+    pub first_name: String,
+    #[serde(default)]
+    pub last_name: String,
+    #[serde(default)]
+    pub phone: Option<String>,
+    #[serde(default)]
+    pub state: Option<String>,
+    #[serde(default)]
+    pub branch: Option<String>,
+    #[serde(default)]
+    pub service_status: Option<String>,
+    #[serde(default)]
+    pub years_of_service: Option<String>,
+    #[serde(default)]
+    pub separation_year: Option<String>,
+    #[serde(default)]
+    pub challenges: Option<Vec<String>>,
+    #[serde(default)]
+    pub notes: Option<String>,
+}
+
+/// `POST /api/auth/register` -- port of backend/server.py `register`.
+///
+/// Creates a LIVE member account (so signup immediately reaches the dashboard),
+/// marked `verified=false` / `dd214_status="pending"` -- i.e. awaiting admin
+/// provisioning. (Phase 2: auto-provision via DD-214 OCR.) Sets the same auth
+/// cookies as login and returns the user profile.
+pub async fn register(
+    State(state): State<AppState>,
+    Json(body): Json<RegisterRequest>,
+) -> AppResult<Response> {
+    let email = body.email.trim().to_lowercase();
+    let first_name = body.first_name.trim().to_string();
+    let last_name = body.last_name.trim().to_string();
+
+    if email.is_empty() || body.password.is_empty() || first_name.is_empty() || last_name.is_empty()
+    {
+        return Err(AppError::BadRequest(
+            "Email, password, first name and last name are required".to_string(),
+        ));
+    }
+    if body.password.len() < 8 {
+        return Err(AppError::BadRequest(
+            "Password must be at least 8 characters".to_string(),
+        ));
+    }
+
+    let users = state.db.collection::<Document>("users");
+    if users
+        .find_one(doc! { "email": email.as_str() })
+        .await?
+        .is_some()
+    {
+        return Err(AppError::BadRequest("Email already registered".to_string()));
+    }
+
+    let password_hash = hash_password(&body.password)?;
+    let now = bson::DateTime::now();
+    let challenges =
+        bson::to_bson(&body.challenges.clone().unwrap_or_default()).unwrap_or(bson::Bson::Array(vec![]));
+
+    // Insert as a raw document so every field the Python backend stores (phone,
+    // state, notes, ...) is preserved even though the typed `User` reads a subset.
+    let user_doc = doc! {
+        "email": email.as_str(),
+        "password_hash": password_hash.as_str(),
+        "first_name": first_name.as_str(),
+        "last_name": last_name.as_str(),
+        "phone": opt_str(&body.phone),
+        "state": opt_str(&body.state),
+        "branch": opt_str(&body.branch),
+        "service_status": opt_str(&body.service_status),
+        "years_of_service": opt_str(&body.years_of_service),
+        "separation_year": opt_str(&body.separation_year),
+        "challenges": challenges,
+        "notes": opt_str(&body.notes),
+        "role": "member",
+        "verified": false,
+        "dd214_file": bson::Bson::Null,
+        "dd214_status": "pending",
+        "created_at": now,
+    };
+
+    let inserted = users.insert_one(user_doc).await?;
+    let id = inserted
+        .inserted_id
+        .as_object_id()
+        .map(|o| o.to_hex())
+        .unwrap_or_default();
+
+    let access = create_access_token(&state.config.jwt_secret, &id, &email)?;
+    let refresh = create_refresh_token(&state.config.jwt_secret, &id)?;
+
+    let profile = json!({
+        "id": id,
+        "_id": id,
+        "email": email,
+        "first_name": first_name,
+        "last_name": last_name,
+        "role": "member",
+        "roles": ["member"],
+        "verified": false,
+        "pipeline_stage": "applied",
+        "dd214_status": "pending",
+        "dd214_file": Value::Null,
+        "branch": body.branch,
+        "service_status": body.service_status,
+        "created_at": now.timestamp_millis(),
+    });
+
+    let resp = Json(profile).into_response();
+    Ok(with_auth_cookies(
+        resp,
+        &access,
+        &refresh,
+        state.config.cookie_secure,
+    ))
+}
+
+fn opt_str(v: &Option<String>) -> bson::Bson {
+    match v {
+        Some(s) if !s.is_empty() => bson::Bson::String(s.clone()),
+        _ => bson::Bson::Null,
+    }
 }
 
 pub async fn me(State(state): State<AppState>, headers: HeaderMap) -> AppResult<Json<Value>> {
