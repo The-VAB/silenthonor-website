@@ -27,3 +27,4 @@ mongodb.workspace = true
 bson.workspace = true
 reqwest.workspace = true
 anyhow.workspace = true
+getrandom.workspace = true

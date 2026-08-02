@@ -1,13 +1,16 @@
 //! HTTP routing + small cookie helpers shared by handlers.
 
+pub mod admin;
 pub mod auth;
+pub mod content;
 pub mod health;
 pub mod major_finance;
 pub mod members;
 
 use axum::http::HeaderMap;
-use axum::routing::{get, post};
+use axum::routing::{get, post, put};
 use axum::Router;
+use serde_json::Value;
 
 use bson::oid::ObjectId;
 use bson::{doc, Document};
@@ -27,6 +30,32 @@ pub fn router(state: AppState) -> Router {
         .route("/api/auth/login", post(auth::login))
         .route("/api/auth/me", get(auth::me))
         .route("/api/auth/logout", post(auth::logout))
+        .route("/api/auth/refresh", post(auth::refresh))
+        .route("/api/auth/forgot-password", post(auth::forgot_password))
+        .route("/api/auth/reset-password", post(auth::reset_password))
+        .route("/api/auth/change-password", post(auth::change_password))
+        .route("/api/contact", post(content::contact))
+        .route("/api/admin/stats", get(admin::stats))
+        .route("/api/admin/members", get(admin::members))
+        .route("/api/admin/members/:member_id/verify", post(admin::verify_member))
+        .route(
+            "/api/admin/courses",
+            get(admin::list_courses).post(admin::create_course),
+        )
+        .route(
+            "/api/admin/courses/:course_id",
+            put(admin::update_course).delete(admin::delete_course),
+        )
+        .route("/api/admin/contacts", get(admin::list_contacts))
+        .route(
+            "/api/admin/contacts/:contact_id",
+            put(admin::update_contact).delete(admin::delete_contact),
+        )
+        .route("/api/admin/dd214/:filename", get(admin::download_dd214))
+        // DD-214 upload -- registered under every path the frontend/backend use.
+        .route("/api/upload/dd214", post(members::upload_dd214))
+        .route("/api/member/upload/dd214", post(members::upload_dd214))
+        .route("/api/member/dd214", post(members::upload_dd214))
         .route(
             "/api/member/profile",
             get(members::get_profile).put(members::update_profile),
@@ -98,4 +127,46 @@ pub async fn authenticate(state: &AppState, headers: &HeaderMap) -> AppResult<(S
         .await?
         .ok_or(AppError::Unauthorized)?;
     Ok((claims.sub, user))
+}
+
+/// Authenticate + require the `admin` role (matches get_current_admin). Roles are
+/// read from the `roles` array if present, else the single `role` field.
+pub async fn authenticate_admin(state: &AppState, headers: &HeaderMap) -> AppResult<(String, User)> {
+    let (id, user) = authenticate(state, headers).await?;
+    if !user.effective_roles().iter().any(|r| r == "admin") {
+        return Err(AppError::Forbidden("Admin access required".to_string()));
+    }
+    Ok((id, user))
+}
+
+/// Best-effort audit-log write (mirrors log_audit_event -> db.audit_log). Never
+/// fails the request.
+pub async fn log_audit(
+    state: &AppState,
+    action: &str,
+    entity_type: &str,
+    entity_id: Option<&str>,
+    user_email: Option<&str>,
+) {
+    let _ = state
+        .db
+        .collection::<Document>("audit_log")
+        .insert_one(doc! {
+            "action": action,
+            "entity_type": entity_type,
+            "entity_id": entity_id,
+            "user_email": user_email,
+            "details": {},
+            "timestamp": bson::DateTime::now(),
+        })
+        .await;
+}
+
+/// Serialize a BSON datetime as an ISO-8601 string (or JSON null), matching the
+/// Python backend's `.isoformat()`.
+pub fn iso(dt: Option<bson::DateTime>) -> Value {
+    match dt.and_then(|d| d.try_to_rfc3339_string().ok()) {
+        Some(s) => Value::String(s),
+        None => Value::Null,
+    }
 }

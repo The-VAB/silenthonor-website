@@ -294,6 +294,160 @@ pub async fn logout(State(state): State<AppState>, headers: HeaderMap) -> AppRes
     Ok(resp)
 }
 
+// ── POST /api/auth/refresh -- mint a new access token from the refresh cookie ──
+pub async fn refresh(State(state): State<AppState>, headers: HeaderMap) -> AppResult<Response> {
+    let token = cookie_value(&headers, "refresh_token").ok_or(AppError::Unauthorized)?;
+    let claims =
+        verify_token(&state.config.jwt_secret, &token).map_err(|_| AppError::Unauthorized)?;
+    if claims.token_type != "refresh" {
+        return Err(AppError::Unauthorized);
+    }
+    let oid = ObjectId::parse_str(&claims.sub).map_err(|_| AppError::Unauthorized)?;
+    let user = state
+        .db
+        .collection::<User>("users")
+        .find_one(doc! { "_id": oid })
+        .await?
+        .ok_or(AppError::Unauthorized)?;
+    let id = user.id.map(|o| o.to_hex()).unwrap_or(claims.sub);
+    let access = create_access_token(&state.config.jwt_secret, &id, &user.email)?;
+
+    let mut resp = Json(json!({ "message": "Token refreshed" })).into_response();
+    append_cookie(
+        &mut resp,
+        &set_cookie("access_token", &access, ACCESS_MAX_AGE, state.config.cookie_secure),
+    );
+    Ok(resp)
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ForgotPasswordRequest {
+    pub email: String,
+}
+
+// ── POST /api/auth/forgot-password -- always 200 (no email enumeration) ───────
+pub async fn forgot_password(
+    State(state): State<AppState>,
+    Json(body): Json<ForgotPasswordRequest>,
+) -> AppResult<Json<Value>> {
+    let email = body.email.trim().to_lowercase();
+    if let Some(user) = state
+        .db
+        .collection::<User>("users")
+        .find_one(doc! { "email": email.as_str() })
+        .await?
+    {
+        let token = gen_reset_token();
+        let expires = bson::DateTime::from_millis(bson::DateTime::now().timestamp_millis() + 3_600_000);
+        let _ = state
+            .db
+            .collection::<Document>("password_reset_tokens")
+            .insert_one(doc! {
+                "token": token.as_str(),
+                "user_id": user.id,
+                "email": email.as_str(),
+                "expires_at": expires,
+                "used": false,
+            })
+            .await;
+        let first_name = user.first_name.clone().unwrap_or_else(|| "Member".to_string());
+        // Awaited (Lambda freezes on return); send_* swallow their own errors.
+        sh_core::email::send_password_reset_email(&email, &first_name, &token).await;
+    }
+    Ok(Json(json!({
+        "message": "If an account exists with this email, a reset link has been sent."
+    })))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ResetPasswordRequest {
+    pub token: String,
+    #[serde(default)]
+    pub new_password: String,
+}
+
+// ── POST /api/auth/reset-password -- consume a one-time token, set new password ─
+pub async fn reset_password(
+    State(state): State<AppState>,
+    Json(body): Json<ResetPasswordRequest>,
+) -> AppResult<Json<Value>> {
+    if body.new_password.len() < 8 {
+        return Err(AppError::BadRequest(
+            "Password must be at least 8 characters".to_string(),
+        ));
+    }
+    let tokens = state.db.collection::<Document>("password_reset_tokens");
+    let reset_doc = tokens
+        .find_one(doc! {
+            "token": body.token.as_str(),
+            "used": false,
+            "expires_at": { "$gt": bson::DateTime::now() },
+        })
+        .await?
+        .ok_or_else(|| AppError::BadRequest("Invalid or expired reset token".to_string()))?;
+
+    let new_hash = hash_password(&body.new_password)?;
+    if let Ok(uid) = reset_doc.get_object_id("user_id") {
+        state
+            .db
+            .collection::<Document>("users")
+            .update_one(
+                doc! { "_id": uid },
+                doc! { "$set": { "password_hash": new_hash.as_str() } },
+            )
+            .await?;
+    }
+    if let Ok(tid) = reset_doc.get_object_id("_id") {
+        tokens
+            .update_one(doc! { "_id": tid }, doc! { "$set": { "used": true } })
+            .await?;
+    }
+    Ok(Json(json!({ "message": "Password reset successfully" })))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ChangePasswordRequest {
+    #[serde(default)]
+    pub current_password: String,
+    #[serde(default)]
+    pub new_password: String,
+}
+
+// ── POST /api/auth/change-password -- authenticated password change ───────────
+pub async fn change_password(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(body): Json<ChangePasswordRequest>,
+) -> AppResult<Json<Value>> {
+    let (id, user) = super::authenticate(&state, &headers).await?;
+    if !verify_password(&body.current_password, &user.password_hash) {
+        return Err(AppError::BadRequest("Current password is incorrect".to_string()));
+    }
+    if body.new_password.len() < 8 {
+        return Err(AppError::BadRequest(
+            "Password must be at least 8 characters".to_string(),
+        ));
+    }
+    let oid = ObjectId::parse_str(&id).map_err(|_| AppError::Unauthorized)?;
+    let new_hash = hash_password(&body.new_password)?;
+    state
+        .db
+        .collection::<Document>("users")
+        .update_one(
+            doc! { "_id": oid },
+            doc! { "$set": { "password_hash": new_hash.as_str() } },
+        )
+        .await?;
+    Ok(Json(json!({ "message": "Password changed successfully" })))
+}
+
+/// URL-safe one-time reset token (hex of 32 random bytes; Python used token_urlsafe(32)).
+fn gen_reset_token() -> String {
+    let mut buf = [0u8; 32];
+    getrandom::getrandom(&mut buf).expect("system RNG");
+    buf.iter().map(|b| format!("{b:02x}")).collect()
+}
+
 fn with_auth_cookies(mut resp: Response, access: &str, refresh: &str, secure: bool) -> Response {
     append_cookie(
         &mut resp,

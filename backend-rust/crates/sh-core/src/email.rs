@@ -107,6 +107,103 @@ p {{ color: #9CA3AF; line-height: 1.8; }}
     send_email(to, subject, &html, &text).await;
 }
 
+/// Password-reset email (port of send_password_reset_email).
+pub async fn send_password_reset_email(to: &str, first_name: &str, reset_token: &str) {
+    let reset_url = format!("https://silenthonor.org/reset-password.html?token={reset_token}");
+    let subject = "Reset Your Password - Silent Honor Foundation";
+    let html = format!(
+        r#"<!DOCTYPE html>
+<html><head><style>
+body {{ font-family: Arial, sans-serif; background: #0B1220; color: #ffffff; padding: 40px; }}
+.container {{ max-width: 600px; margin: 0 auto; background: #111827; padding: 40px; border: 1px solid #374151; }}
+.header {{ text-align: center; margin-bottom: 30px; }}
+.logo {{ font-family: Oswald, sans-serif; font-size: 28px; font-weight: 700; }}
+.logo-accent {{ color: #B91C1C; }}
+h1 {{ font-family: Oswald, sans-serif; color: #ffffff; margin-bottom: 20px; }}
+p {{ color: #9CA3AF; line-height: 1.8; }}
+.btn {{ display: inline-block; background: #B91C1C; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+.footer {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #374151; text-align: center; font-size: 12px; color: #6B7280; }}
+.warning {{ color: #F97316; font-size: 13px; margin-top: 20px; }}
+</style></head><body>
+<div class="container">
+<div class="header"><div class="logo">SILENT<span class="logo-accent">HONOR</span></div></div>
+<h1>Password Reset Request</h1>
+<p>Hi {first_name},</p>
+<p>We received a request to reset your password. Click the button below to create a new password:</p>
+<p style="text-align: center;"><a href="{reset_url}" class="btn">Reset Password</a></p>
+<p class="warning">This link will expire in 1 hour. If you didn't request this reset, please ignore this email.</p>
+<div class="footer"><p>Silent Honor Foundation | Veterans Helping Veterans</p></div>
+</div></body></html>"#
+    );
+    let text = format!(
+        "Password Reset Request\n\nHi {first_name},\n\nWe received a request to reset your password. Visit the link below to create a new password:\n\n{reset_url}\n\nThis link will expire in 1 hour. If you didn't request this reset, please ignore this email.\n\nSilent Honor Foundation | Veterans Helping Veterans"
+    );
+    send_email(to, subject, &html, &text).await;
+}
+
+/// DD-214 approval notification (port of send_dd214_approved_email).
+pub async fn send_dd214_approved_email(to: &str, first_name: &str) {
+    let subject = "Your Veteran Status Has Been Verified - Silent Honor Foundation";
+    let html = format!(
+        r#"<!DOCTYPE html>
+<html><head><style>
+body {{ font-family: Arial, sans-serif; background: #0B1220; color: #ffffff; padding: 40px; }}
+.container {{ max-width: 600px; margin: 0 auto; background: #111827; padding: 40px; border: 1px solid #374151; }}
+.header {{ text-align: center; margin-bottom: 30px; }}
+.logo {{ font-family: Oswald, sans-serif; font-size: 28px; font-weight: 700; }}
+.logo-accent {{ color: #B91C1C; }}
+h1 {{ font-family: Oswald, sans-serif; color: #22C55E; margin-bottom: 20px; }}
+p {{ color: #9CA3AF; line-height: 1.8; }}
+.btn {{ display: inline-block; background: #B91C1C; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+.footer {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #374151; text-align: center; font-size: 12px; color: #6B7280; }}
+.checkmark {{ font-size: 48px; text-align: center; margin-bottom: 20px; }}
+</style></head><body>
+<div class="container">
+<div class="header"><div class="logo">SILENT<span class="logo-accent">HONOR</span></div></div>
+<div class="checkmark">&#10004;</div>
+<h1 style="text-align: center;">Verified!</h1>
+<p>Great news, {first_name}! Your DD-214 has been reviewed and your veteran status has been verified.</p>
+<p>You now have full access to all Silent Honor Foundation services:</p>
+<ul style="color: #9CA3AF; line-height: 2;">
+<li>All financial education courses</li>
+<li>One-on-one financial counseling</li>
+<li>Credit repair guidance</li>
+<li>Dispute tracking tools</li>
+</ul>
+<p style="text-align: center;"><a href="https://silenthonor.org/dashboard.html" class="btn">Go to Dashboard</a></p>
+<div class="footer"><p>Silent Honor Foundation | Veterans Helping Veterans</p></div>
+</div></body></html>"#
+    );
+    let text = format!(
+        "Your Veteran Status Has Been Verified!\n\nGreat news, {first_name}! Your DD-214 has been reviewed and your veteran status has been verified.\n\nYou now have full access to all Silent Honor Foundation services:\n- All financial education courses\n- One-on-one financial counseling\n- Credit repair guidance\n- Dispute tracking tools\n\nVisit your dashboard: https://silenthonor.org/dashboard.html\n\nSilent Honor Foundation | Veterans Helping Veterans"
+    );
+    send_email(to, subject, &html, &text).await;
+}
+
+/// Generic admin notification (port of send_admin_notification). Sends to ADMIN_EMAIL.
+pub async fn send_admin_notification(subject: &str, message: &str) {
+    let admin = std::env::var("ADMIN_EMAIL").unwrap_or_else(|_| "admin@silenthonorfoundation.org".to_string());
+    let html = format!(
+        r#"<!DOCTYPE html>
+<html><head><style>
+body {{ font-family: Arial, sans-serif; background: #0B1220; color: #ffffff; padding: 40px; }}
+.container {{ max-width: 600px; margin: 0 auto; background: #111827; padding: 40px; border: 1px solid #374151; }}
+.logo {{ font-family: Oswald, sans-serif; font-size: 28px; font-weight: 700; text-align:center; margin-bottom:30px; }}
+.logo-accent {{ color: #B91C1C; }}
+h1 {{ font-family: Oswald, sans-serif; color: #ffffff; margin-bottom: 20px; }}
+p {{ color: #9CA3AF; line-height: 1.8; }}
+.btn {{ display: inline-block; background: #B91C1C; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+</style></head><body>
+<div class="container">
+<div class="logo">SILENT<span class="logo-accent">HONOR</span> Admin</div>
+<h1>{subject}</h1>
+<p>{message}</p>
+<p style="text-align: center;"><a href="https://silenthonor.org/admin.html" class="btn">Go to Admin Panel</a></p>
+</div></body></html>"#
+    );
+    send_email(&admin, &format!("[Admin] {subject}"), &html, message).await;
+}
+
 /// New-membership notification to the admin (port of send_new_membership_notification).
 #[allow(clippy::too_many_arguments)]
 pub async fn send_new_membership_notification(

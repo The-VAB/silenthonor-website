@@ -41,7 +41,7 @@ variable "rust_api_s3_key" {
 variable "rust_api_source_hash" {
   description = "base64-encoded sha256 of the Lambda zip; bump to trigger a redeploy."
   type        = string
-  default     = "fahYipkK3N4esxu02pVDPnuPpV+S73/gguvwvSRVETg=" # register + signup emails (SES)
+  default     = "/Urq8uWCSKBexRvx95YZR4R11A5/v5/8qggEWuZxa4I=" # register + emails + auth/contact/admin + dd214
 }
 
 variable "rust_api_memory_mb" {
@@ -128,6 +128,18 @@ data "aws_iam_policy_document" "lambda_secrets" {
     actions   = ["ses:SendEmail", "ses:SendRawEmail"]
     resources = ["*"]
   }
+  # DD-214 upload/download: read+write the private uploads bucket under dd214/.
+  statement {
+    sid       = "UploadsBucket"
+    actions   = ["s3:PutObject", "s3:GetObject"]
+    resources = ["${aws_s3_bucket.uploads.arn}/*"]
+  }
+  # SSE-KMS encrypt (put) + decrypt (presigned get) with the uploads key.
+  statement {
+    sid       = "UploadsKms"
+    actions   = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
+    resources = [aws_kms_key.uploads.arn]
+  }
 }
 
 resource "aws_iam_role_policy" "lambda_secrets" {
@@ -172,6 +184,10 @@ resource "aws_lambda_function" "api" {
       EMAIL_PROVIDER = "ses"
       FROM_EMAIL     = var.from_email
       ADMIN_EMAIL    = var.admin_email
+
+      # DD-214 uploads -> private S3 bucket, SSE-KMS with the uploads key.
+      S3_BUCKET     = aws_s3_bucket.uploads.id
+      S3_KMS_KEY_ID = aws_kms_key.uploads.arn
 
       # Major Finance (member AI) -- dormant until enable_major_finance = true.
       # See major-finance.tf and docs/MAJOR_FINANCE.md.
