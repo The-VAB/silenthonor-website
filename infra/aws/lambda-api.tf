@@ -47,7 +47,7 @@ resource "aws_security_group" "lambda_api" {
   count       = local.rust_api_count
   name        = "${var.project}-lambda-api-sg"
   description = "Rust API Lambda ENIs"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.shared.id
 
   egress {
     from_port   = 0
@@ -127,7 +127,7 @@ resource "aws_lambda_function" "api" {
   timeout          = var.rust_api_timeout_s
 
   vpc_config {
-    subnet_ids         = aws_subnet.private[*].id
+    subnet_ids         = var.apprunner_subnet_ids
     security_group_ids = [aws_security_group.lambda_api[0].id]
   }
 

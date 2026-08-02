@@ -16,17 +16,31 @@ variable "account_id" {
   default     = "802104113048"
 }
 
-# ── Networking ────────────────────────────────────────────────────────────────
-variable "vpc_cidr" {
-  description = "CIDR for the Silent Honor VPC (kept clear of existing 10.0/10.1 VPCs)"
+# ── Networking (reference-only; see network.tf + STATE_RECONCILIATION.md) ──────
+# Silent Honor lives inside the shared prod-vpc; it does not create networking.
+variable "shared_vpc_id" {
+  description = "ID of the shared prod-vpc hosting Silent Honor's DocumentDB + App Runner ENIs"
   type        = string
-  default     = "10.20.0.0/16"
+  default     = "vpc-08f6c3091778e46b1"
 }
 
-variable "az_count" {
-  description = "Number of AZs (DocumentDB subnet group needs >= 2)"
-  type        = number
-  default     = 2
+variable "docdb_subnet_ids" {
+  description = "Shared prod-private subnets backing the DocumentDB subnet group"
+  type        = list(string)
+  default = [
+    "subnet-060bcae134dabaccf",
+    "subnet-0fb8e82e523f72559",
+    "subnet-02ccdbaa719f0c9f4",
+  ]
+}
+
+variable "apprunner_subnet_ids" {
+  description = "Dedicated silenthonor-apprunner subnets for App Runner + Rust Lambda ENIs"
+  type        = list(string)
+  default = [
+    "subnet-06e8bddabd7060b7f",
+    "subnet-09bce5130d93f55fc",
+  ]
 }
 
 # ── DocumentDB ────────────────────────────────────────────────────────────────
@@ -77,13 +91,27 @@ variable "apprunner_memory" {
 variable "email_provider" {
   description = "resend or ses"
   type        = string
-  default     = "resend"
+  default     = "ses" # production was cut over to SES (verified + DKIM SUCCESS); matches live App Runner env
 }
 
 variable "from_email" {
   description = "From address for outbound email"
   type        = string
-  default     = "Silent Honor <noreply@silenthonorfoundation.org>"
+  default     = "Silent Honor <no-reply@silenthonorfoundation.org>" # matches live (note the hyphen in no-reply)
+}
+
+# Allowed CORS origins for the backend API — full scheme+host, as the live App
+# Runner service is configured. NOTE: this differs from frontend_aliases (bare
+# hosts) on purpose; browser Origin headers include the scheme, and the live set
+# also allows the CloudFront default domain.
+variable "cors_origins" {
+  description = "CORS allow-list for the backend API (matches live App Runner CORS_ORIGINS)"
+  type        = list(string)
+  default = [
+    "https://silenthonorfoundation.org",
+    "https://www.silenthonorfoundation.org",
+    "https://d27zjlncmljktr.cloudfront.net",
+  ]
 }
 
 variable "email_domain" {

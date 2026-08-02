@@ -32,42 +32,58 @@ resource "aws_iam_role" "apprunner_instance" {
 resource "aws_iam_role_policy" "apprunner_instance" {
   name = "${var.project}-apprunner-instance-policy"
   role = aws_iam_role.apprunner_instance.id
+  # This MIRRORS the live-deployed role verbatim so adopting it is a 0-diff no-op.
+  # The SecretsKmsDecrypt statement is redundant for the current AWS-managed-key
+  # secrets (they carry no CMK); tightening the policy (dropping it, using exact
+  # secret ARNs, unifying Sids) is a separate, reviewed change deliberately NOT
+  # bundled into the state-reconciliation apply. See STATE_RECONCILIATION.md.
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "UploadsBucket"
+        Sid      = "UploadsObjects"
         Effect   = "Allow"
         Action   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
-        Resource = ["${aws_s3_bucket.uploads.arn}/*"]
+        Resource = "${aws_s3_bucket.uploads.arn}/*"
       },
       {
-        Sid      = "UploadsBucketList"
+        Sid      = "UploadsList"
         Effect   = "Allow"
         Action   = ["s3:ListBucket"]
-        Resource = [aws_s3_bucket.uploads.arn]
+        Resource = aws_s3_bucket.uploads.arn
       },
       {
         Sid      = "UploadsKms"
         Effect   = "Allow"
         Action   = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
-        Resource = [aws_kms_key.uploads.arn]
+        Resource = aws_kms_key.uploads.arn
       },
       {
-        Sid      = "SendEmail"
+        Sid      = "SecretsKmsDecrypt"
+        Effect   = "Allow"
+        Action   = ["kms:Decrypt"]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "secretsmanager.${var.region}.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid      = "Ses"
         Effect   = "Allow"
         Action   = ["ses:SendEmail", "ses:SendRawEmail"]
-        Resource = ["*"]
+        Resource = "*"
       },
       {
-        Sid    = "ReadSecrets"
-        Effect = "Allow"
-        Action = ["secretsmanager:GetSecretValue"]
+        Sid      = "Secrets"
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
         Resource = [
-          aws_secretsmanager_secret.mongodb_uri.arn,
           aws_secretsmanager_secret.jwt.arn,
-          aws_secretsmanager_secret.resend.arn,
           aws_secretsmanager_secret.admin_password.arn,
+          aws_secretsmanager_secret.resend.arn,
+          "arn:aws:secretsmanager:${var.region}:${var.account_id}:secret:${var.project}/mongodb-uri-*",
         ]
       }
     ]
