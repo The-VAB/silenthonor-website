@@ -7,6 +7,7 @@ use bson::{doc, Bson, Document};
 use serde::Deserialize;
 use serde_json::{json, Value};
 
+use super::{ddate, dstr_or, hex_id};
 use crate::state::AppState;
 use sh_core::{AppError, AppResult};
 
@@ -68,4 +69,30 @@ pub async fn contact(
     Ok(Json(json!({
         "message": "Message received. We'll be in touch within 2-3 business days."
     })))
+}
+
+/// GET /api/announcements -- PUBLIC. Active, non-expired announcements, newest first.
+pub async fn announcements(State(state): State<AppState>) -> AppResult<Json<Value>> {
+    let mut cur = state
+        .db
+        .collection::<Document>("announcements")
+        .find(doc! {
+            "active": true,
+            "$or": [ { "expires_at": Bson::Null }, { "expires_at": { "$gt": bson::DateTime::now() } } ],
+        })
+        .sort(doc! { "created_at": -1 })
+        .limit(20)
+        .await?;
+    let mut out: Vec<Value> = Vec::new();
+    while cur.advance().await? {
+        let a = cur.deserialize_current()?;
+        out.push(json!({
+            "id": hex_id(&a),
+            "title": dstr_or(&a, "title", ""),
+            "content": dstr_or(&a, "content", ""),
+            "type": dstr_or(&a, "type", "info"),
+            "created_at": ddate(&a, "created_at"),
+        }));
+    }
+    Ok(Json(json!(out)))
 }
