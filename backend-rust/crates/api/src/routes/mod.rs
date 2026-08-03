@@ -3,9 +3,11 @@
 pub mod admin;
 pub mod auth;
 pub mod content;
+pub mod counselor;
 pub mod courses;
 pub mod credit;
 pub mod disputes;
+pub mod fc;
 pub mod health;
 pub mod major_finance;
 pub mod members;
@@ -16,7 +18,7 @@ use axum::extract::Request;
 use axum::http::{HeaderMap, Method, StatusCode};
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post, put};
+use axum::routing::{delete, get, patch, post, put};
 use axum::Router;
 use serde_json::Value;
 
@@ -96,6 +98,74 @@ pub fn router(state: AppState) -> Router {
         .route("/api/announcements", get(content::announcements))
         .route("/api/courses/progress", get(courses::progress))
         .route("/api/courses/:course_id", get(courses::detail))
+        // ── counselor portal ──
+        .route("/api/counselor/stats", get(counselor::stats))
+        .route("/api/counselor/caseload", get(counselor::caseload))
+        .route("/api/counselor/members", get(counselor::members))
+        .route("/api/counselor/members/:member_id", get(counselor::member_detail))
+        .route(
+            "/api/counselor/members/:member_id/program-track",
+            patch(counselor::program_track),
+        )
+        .route("/api/counselor/members/:member_id/notes", post(counselor::add_note))
+        .route(
+            "/api/counselor/members/:member_id/credit-scores",
+            get(counselor::get_credit_scores).post(counselor::add_credit_score),
+        )
+        .route("/api/counselor/members/:member_id/game-plan", get(counselor::game_plan))
+        .route(
+            "/api/counselor/members/:member_id/credit-accounts",
+            post(counselor::add_credit_account),
+        )
+        .route(
+            "/api/counselor/credit-accounts/:account_id",
+            patch(counselor::update_credit_account).delete(counselor::delete_credit_account),
+        )
+        .route(
+            "/api/counselor/members/:member_id/disputes",
+            get(counselor::get_disputes).post(counselor::create_dispute),
+        )
+        .route(
+            "/api/counselor/disputes/:dispute_id",
+            patch(counselor::update_dispute).delete(counselor::delete_dispute),
+        )
+        .route(
+            "/api/counselor/members/:member_id/documents",
+            get(counselor::get_documents).post(counselor::upload_document),
+        )
+        .route("/api/counselor/documents/:doc_id", delete(counselor::delete_document))
+        .route(
+            "/api/counselor/tasks",
+            get(counselor::get_tasks).post(counselor::create_task),
+        )
+        .route("/api/counselor/tasks/:task_id/complete", patch(counselor::complete_task))
+        .route("/api/counselor/tasks/:task_id", delete(counselor::delete_task))
+        .route("/api/counselor/waitlist", get(counselor::waitlist))
+        .route("/api/counselor/waitlist/:member_id/claim", post(counselor::claim_waitlist))
+        // NOTE: GET /api/member/counselor is already served by members::counselor.
+        .route("/api/counselor/assigned", get(counselor::my_counselor))
+        // ── financial-counseling tools (fc/*) ──
+        .route("/api/counselor/members/:member_id/fc", get(fc::get_fc))
+        .route("/api/counselor/members/:member_id/fc/intake", put(fc::intake))
+        .route("/api/counselor/members/:member_id/fc/budgets", post(fc::add_budget))
+        .route("/api/counselor/members/:member_id/fc/debt-plan", put(fc::debt_plan))
+        .route("/api/counselor/members/:member_id/fc/goals", post(fc::add_goal))
+        .route(
+            "/api/counselor/members/:member_id/fc/goals/:goal_id",
+            patch(fc::update_goal).delete(fc::delete_goal),
+        )
+        .route(
+            "/api/counselor/members/:member_id/fc/session-notes",
+            post(fc::add_session_note),
+        )
+        .route("/api/counselor/members/:member_id/fc/housing", put(fc::housing))
+        .route("/api/counselor/members/:member_id/fc/retirement", put(fc::retirement))
+        .route("/api/counselor/members/:member_id/fc/tax-ref", put(fc::tax_ref))
+        .route(
+            "/api/counselor/members/:member_id/fc/fraud-checklist",
+            put(fc::fraud_checklist),
+        )
+        .route("/api/counselor/members/:member_id/fc/referrals", post(fc::add_referral))
         .route(
             "/api/member/profile",
             get(members::get_profile).put(members::update_profile),
@@ -191,6 +261,38 @@ pub async fn authenticate_admin(state: &AppState, headers: &HeaderMap) -> AppRes
     Ok((id, user))
 }
 
+/// Authenticate + require the `counselor` OR `admin` role (get_current_counselor).
+pub async fn authenticate_counselor(
+    state: &AppState,
+    headers: &HeaderMap,
+) -> AppResult<(String, User)> {
+    let (id, user) = authenticate(state, headers).await?;
+    if !user
+        .effective_roles()
+        .iter()
+        .any(|r| r == "counselor" || r == "admin")
+    {
+        return Err(AppError::Forbidden("Counselor access required".to_string()));
+    }
+    Ok((id, user))
+}
+
+/// Load a member that is assigned to `counselor_oid`, else 404. Mirrors the
+/// repeated `{_id, assigned_counselor_id}` guard.
+pub async fn assigned_member(
+    state: &AppState,
+    member_id: &str,
+    counselor_oid: ObjectId,
+) -> AppResult<Document> {
+    let moid = ObjectId::parse_str(member_id).map_err(|_| AppError::NotFound)?;
+    state
+        .db
+        .collection::<Document>("users")
+        .find_one(doc! { "_id": moid, "assigned_counselor_id": counselor_oid })
+        .await?
+        .ok_or(AppError::NotFound)
+}
+
 /// Best-effort audit-log write (mirrors log_audit_event -> db.audit_log). Never
 /// fails the request.
 pub async fn log_audit(
@@ -260,6 +362,29 @@ pub fn dint(d: &Document, k: &str) -> i64 {
         _ => 0,
     }
 }
+/// Recursively convert a BSON value to plain JSON, matching the Python
+/// `_sanitize`: ObjectId -> hex string, datetime -> ISO-8601 string, and
+/// documents/arrays recursed. Avoids the `{"$oid"}` / `{"$date"}` wrappers that
+/// relaxed extended-JSON would produce.
+pub fn sanitize(b: bson::Bson) -> Value {
+    use bson::Bson;
+    match b {
+        Bson::ObjectId(o) => Value::String(o.to_hex()),
+        Bson::DateTime(d) => d.try_to_rfc3339_string().map(Value::String).unwrap_or(Value::Null),
+        Bson::Document(doc) => {
+            Value::Object(doc.into_iter().map(|(k, v)| (k, sanitize(v))).collect())
+        }
+        Bson::Array(arr) => Value::Array(arr.into_iter().map(sanitize).collect()),
+        Bson::String(s) => Value::String(s),
+        Bson::Boolean(x) => Value::Bool(x),
+        Bson::Int32(i) => Value::from(i),
+        Bson::Int64(i) => Value::from(i),
+        Bson::Double(f) => Value::from(f),
+        Bson::Null => Value::Null,
+        other => other.into_relaxed_extjson(),
+    }
+}
+
 /// "first_name last_name" (trimmed).
 pub fn full_name(d: &Document) -> String {
     format!(

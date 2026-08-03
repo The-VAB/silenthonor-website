@@ -41,7 +41,7 @@ variable "rust_api_s3_key" {
 variable "rust_api_source_hash" {
   description = "base64-encoded sha256 of the Lambda zip; bump to trigger a redeploy."
   type        = string
-  default     = "/mmnFnKRmAleNFrH9VFvY5/ygU2eLKPgvD1rNJCRKA8=" # + member-facing: credit/disputes/messages/programs/courses
+  default     = "Si/5uiQOAZXbo4xYZWeQnHeL6bHsnnPeYi/lGBW5Nig=" # + counselor portal + fc tools (router fix)
 }
 
 variable "rust_api_memory_mb" {

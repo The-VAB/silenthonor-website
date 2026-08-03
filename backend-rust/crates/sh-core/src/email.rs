@@ -180,6 +180,82 @@ p {{ color: #9CA3AF; line-height: 1.8; }}
     send_email(to, subject, &html, &text).await;
 }
 
+/// Counselor-assignment notification (port of send_counselor_assigned_email).
+pub async fn send_counselor_assigned_email(to: &str, first_name: &str, counselor_name: &str) {
+    let subject = "You've Been Assigned a Financial Counselor - Silent Honor Foundation";
+    let html = format!(
+        r#"<!DOCTYPE html>
+<html><head><style>
+body {{ font-family: Arial, sans-serif; background: #0B1220; color: #ffffff; padding: 40px; }}
+.container {{ max-width: 600px; margin: 0 auto; background: #111827; padding: 40px; border: 1px solid #374151; }}
+.logo {{ font-family: Oswald, sans-serif; font-size: 28px; font-weight: 700; text-align:center; margin-bottom:30px; }}
+.logo-accent {{ color: #B91C1C; }}
+h1 {{ font-family: Oswald, sans-serif; color: #C9952A; margin-bottom: 20px; }}
+p {{ color: #9CA3AF; line-height: 1.8; }}
+.btn {{ display: inline-block; background: #B91C1C; color: #ffffff; padding: 14px 28px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+.footer {{ margin-top: 40px; padding-top: 20px; border-top: 1px solid #374151; text-align: center; font-size: 12px; color: #6B7280; }}
+.counselor {{ background: rgba(201, 149, 42, 0.1); border: 1px solid #C9952A; padding: 20px; margin: 20px 0; text-align: center; }}
+.counselor-name {{ font-size: 20px; color: #ffffff; font-weight: 600; }}
+</style></head><body>
+<div class="container">
+<div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+<h1>Your Counselor is Ready!</h1>
+<p>Hi {first_name},</p>
+<p>You've been assigned a certified financial counselor who will guide you on your journey to financial wellness.</p>
+<div class="counselor"><p style="color: #C9952A; margin-bottom: 10px;">Your Counselor</p><p class="counselor-name">{counselor_name}</p></div>
+<p>Your counselor will reach out soon to schedule your first session. You can also message them directly through your dashboard.</p>
+<p style="text-align: center;"><a href="https://silenthonor.org/counselor.html" class="btn">View Counselor</a></p>
+<div class="footer"><p>Silent Honor Foundation | Veterans Helping Veterans</p></div>
+</div></body></html>"#
+    );
+    let text = format!(
+        "You've Been Assigned a Financial Counselor!\n\nHi {first_name},\n\nYou've been assigned a certified financial counselor: {counselor_name}. They'll reach out soon to schedule your first session.\n\nView your counselor: https://silenthonor.org/counselor.html\n\nSilent Honor Foundation | Veterans Helping Veterans"
+    );
+    send_email(to, subject, &html, &text).await;
+}
+
+/// Dispute status-change notification (port of send_dispute_update_email).
+pub async fn send_dispute_update_email(
+    to: &str,
+    first_name: &str,
+    account_name: &str,
+    bureau: &str,
+    status: &str,
+) {
+    let (label, color) = match status {
+        "sent" => ("Sent to Bureau", "#3B82F6"),
+        "responded" => ("Bureau Responded", "#C9952A"),
+        "resolved" => ("Resolved", "#22C55E"),
+        "rejected" => ("Rejected by Bureau", "#EF4444"),
+        _ => (status, "#9CA3AF"),
+    };
+    let subject = format!("Dispute Update: {account_name} — {label}");
+    let html = format!(
+        r#"<!DOCTYPE html><html><head><style>
+body{{font-family:Arial,sans-serif;background:#0B1220;color:#fff;padding:40px;}}
+.container{{max-width:600px;margin:0 auto;background:#111827;padding:40px;border:1px solid #374151;}}
+.logo{{font-family:Oswald,sans-serif;font-size:28px;font-weight:700;text-align:center;margin-bottom:30px;}}
+.logo-accent{{color:#B91C1C;}}
+h1{{font-family:Oswald,sans-serif;color:#ffffff;}}
+.status-badge{{display:inline-block;background:{color};color:#fff;padding:6px 16px;font-weight:700;font-size:14px;}}
+.btn{{display:inline-block;background:#B91C1C;color:#fff;padding:14px 28px;text-decoration:none;font-weight:600;margin-top:20px;}}
+.footer{{margin-top:40px;padding-top:20px;border-top:1px solid #374151;text-align:center;font-size:12px;color:#6B7280;}}
+</style></head><body>
+<div class="container">
+<div class="logo">SILENT<span class="logo-accent">HONOR</span></div>
+<h1>Dispute Update</h1>
+<p style="color:#9CA3AF;">Hi {first_name},</p>
+<p style="color:#9CA3AF;">Your dispute for <strong style="color:#fff;">{account_name}</strong> with <strong style="color:#fff;">{bureau}</strong> has been updated.</p>
+<p>New status: <span class="status-badge">{label}</span></p>
+<p style="text-align:center;"><a href="https://silenthonor.org/dispute-tracker.html" class="btn">View Disputes</a></p>
+<div class="footer"><p>Silent Honor Foundation | Veterans Helping Veterans</p></div>
+</div></body></html>"#
+    );
+    let text =
+        format!("Dispute update for {account_name} ({bureau}): {label}. View at https://silenthonor.org/dispute-tracker.html");
+    send_email(to, &subject, &html, &text).await;
+}
+
 /// Generic admin notification (port of send_admin_notification). Sends to ADMIN_EMAIL.
 pub async fn send_admin_notification(subject: &str, message: &str) {
     let admin = std::env::var("ADMIN_EMAIL").unwrap_or_else(|_| "admin@silenthonorfoundation.org".to_string());
