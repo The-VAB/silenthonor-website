@@ -309,11 +309,20 @@ credit-repair|financial-counseling` split views.
 unauth (registered + role-gated, no cold-start router panic); static
 `/api/admin/staff/counselors` resolves alongside `/:staff_id`; member `/api/knowledge`
 401; regressions (`credit/latest`, `counselor/stats`) still 401; CORS preflight on a
-new route 204. Full 200-path (authenticated) verification needs an admin session —
-deferred, same bar as prior batches.
+new route 204.
 
-**Cutover readiness:** the Rust API is now at functional parity with the live
-platform. The cutover itself (flip `window.API_BASE` in `js/components.js` to
-`https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com` and redeploy the frontend)
-remains a separate, reviewed change against `main` — still deferred until an
-end-to-end authenticated pass is run.
+**Authenticated end-to-end pass** (2026-08-03, admin session via the seeded
+`admin@silenthonorfoundation.org`, token invalidated on logout afterward): every new
+admin GET returns **200** with correct JSON — incl. the two riskiest handlers:
+`analytics` (chrono month-buckets + branch `$group` aggregate) and `members/{id}/full`
+(courses/disputes/notes join); plus `pipeline`, `audit-log`, `staff`, `staff/{id}/full`,
+`members/{id}` (ISO-serialized). Write paths verified with a self-cleaning cycle:
+announcements create→update→delete, and knowledge create(draft)→publish→retire→delete
+— confirming the member-facing wall (`/api/knowledge` shows the entry only while
+published + member_visible). No test artifacts left.
+
+**Cutover readiness:** the Rust API is at functional parity with the live platform,
+verified authenticated. The cutover itself (flip `window.API_BASE` in
+`js/components.js` to `https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com` and
+redeploy the frontend) remains a separate, reviewed change against `main` — the last
+step, on the owner's go.
