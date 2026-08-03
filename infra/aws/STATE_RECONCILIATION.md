@@ -256,3 +256,64 @@ ADMIN_EMAIL/S3_BUCKET/S3_KMS_KEY_ID. All in PR #21.
 Test artifacts to clean up: pending test members (`rust-signup-test-*`,
 `rust-email-test-*`, `rust-mail-check@example.com`, `contact-test@example.com`) and
 one test S3 object under `dd214/` — all clearly test data.
+
+---
+
+## Rust backend — FULL platform parity (2026-08-03)
+
+Correction to the 2026-08-02 note above: the *live production frontend* is
+`origin/main` (post-PR #11), which is the **full platform** — counselor portal
+(`counselor-portal.html`, `counselor-*.html`), member tools (credit-tracker,
+dispute-tracker, messages, course player), and a **full admin console**
+(`admin.html`). The stale worktree copy of `admin.html` used only a handful of
+endpoints; the earlier "frontend-scoped parity" was measured against that stale
+copy. The real target is every endpoint `origin/main` calls.
+
+The Rust/Lambda API (`e1tyj5meuc`) now implements **all of them**, ported
+faithfully from the deployed FastAPI image. Deploys via S3 (`api.zip`,
+`source_code_hash = 4sLH3Bru...`). Batches since the 08-02 note:
+
+- **Counselor portal** (`/api/counselor/*`, ~25 endpoints): stats, caseload,
+  members + detail, program-track, notes, credit scores/accounts, game-plan rules
+  engine, disputes (+auto-task +email), documents (multipart→S3), tasks, waitlist +
+  claim, my-counselor.
+- **Financial-counseling tools** (`/api/counselor/members/{id}/fc/*`, 13 endpoints):
+  intake, versioned budgets, debt-plan, goals (arrayFilters), session notes,
+  housing/retirement/tax-ref/fraud-checklist, referrals. Access-gated to the
+  assigned counselor (admins bypass).
+- **Full admin console** (this batch):
+  - analytics (KPIs + 6-month buckets + branch aggregate + 4 stage distributions),
+    pipeline (3 pipelines grouped), audit-log.
+  - program applications: list (filters), detail, approve (+counselor assign +
+    approved/assigned emails), reject (+rejection email).
+  - announcements CRUD.
+  - member ops: detail, full profile (+courses/disputes/notes), notes get/add,
+    password set, stage change, archive, manual DD-214 approve (+email).
+  - knowledge base: member read (published+member_visible wall) + admin CRUD +
+    publish/retire.
+  - LMS: course modules CRUD, module lessons CRUD, top-level lessons CRUD.
+  - staff management: list, create (+welcome email w/ temp password), update,
+    counselors list, staff full profile (+clients+activity), invite (+setup email).
+
+New SES templates: `send_program_approved_email`, `send_staff_welcome_email`,
+`send_staff_invite_email` (invite is awaited and gates its 200/failure). Added
+`chrono` (already compiled via bson) for the analytics month math.
+
+Deliberately **not** ported (no `origin/main` caller): `/api/admin/team*` (website
+bio cards), `/api/admin/counselors*` counselor-management via `counselor.py`
+(admin.html manages counselors through `/api/admin/staff*` instead), member
+deactivate/reactivate (admin.html uses `/archive`), and the `/api/admin/pipeline/
+credit-repair|financial-counseling` split views.
+
+**Verified live** (2026-08-03, post-apply): `health` 200; all new admin routes 401
+unauth (registered + role-gated, no cold-start router panic); static
+`/api/admin/staff/counselors` resolves alongside `/:staff_id`; member `/api/knowledge`
+401; regressions (`credit/latest`, `counselor/stats`) still 401; CORS preflight on a
+new route 204. Full 200-path (authenticated) verification needs an admin session —
+deferred, same bar as prior batches.
+
+**Cutover readiness:** the Rust API is now at functional parity with the live
+platform. The cutover itself (flip `window.API_BASE` in `js/components.js` to
+`https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com` and redeploy the frontend)
+remains a separate, reviewed change against `main` — still deferred until an
+end-to-end authenticated pass is run.

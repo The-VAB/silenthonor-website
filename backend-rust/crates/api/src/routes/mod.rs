@@ -9,10 +9,12 @@ pub mod credit;
 pub mod disputes;
 pub mod fc;
 pub mod health;
+pub mod knowledge;
 pub mod major_finance;
 pub mod members;
 pub mod messages;
 pub mod programs;
+pub mod staff;
 
 use axum::extract::Request;
 use axum::http::{HeaderMap, Method, StatusCode};
@@ -62,6 +64,84 @@ pub fn router(state: AppState) -> Router {
             put(admin::update_contact).delete(admin::delete_contact),
         )
         .route("/api/admin/dd214/:filename", get(admin::download_dd214))
+        // ── admin console: analytics / pipeline / audit ──
+        .route("/api/admin/analytics", get(admin::analytics))
+        .route("/api/admin/audit-log", get(admin::audit_log))
+        .route("/api/admin/pipeline", get(programs::admin_pipeline))
+        // ── admin console: member operations ──
+        .route("/api/admin/members/:member_id", get(admin::member_detail))
+        .route("/api/admin/members/:member_id/full", get(admin::member_full))
+        .route(
+            "/api/admin/members/:member_id/notes",
+            get(admin::get_member_notes).post(admin::add_member_note),
+        )
+        .route("/api/admin/members/:member_id/password", put(admin::set_member_password))
+        .route("/api/admin/members/:member_id/stage", put(programs::set_member_stage))
+        .route("/api/admin/members/:member_id/archive", patch(admin::archive_member))
+        .route("/api/admin/members/:member_id/approve-dd214", post(admin::approve_dd214))
+        // ── admin console: announcements ──
+        .route(
+            "/api/admin/announcements",
+            get(programs::list_announcements).post(programs::create_announcement),
+        )
+        .route(
+            "/api/admin/announcements/:announcement_id",
+            put(programs::update_announcement).delete(programs::delete_announcement),
+        )
+        // ── admin console: program applications ──
+        .route("/api/admin/applications", get(programs::list_applications))
+        .route("/api/admin/applications/:application_id", get(programs::application_detail))
+        .route(
+            "/api/admin/applications/:application_id/approve",
+            put(programs::approve_application),
+        )
+        .route(
+            "/api/admin/applications/:application_id/reject",
+            put(programs::reject_application),
+        )
+        // ── admin console: LMS modules + lessons ──
+        .route(
+            "/api/admin/courses/:course_id/modules",
+            get(courses::get_modules).post(courses::create_module),
+        )
+        .route(
+            "/api/admin/modules/:module_id",
+            put(courses::update_module).delete(courses::delete_module),
+        )
+        .route(
+            "/api/admin/modules/:module_id/lessons",
+            get(courses::get_module_lessons).post(courses::create_module_lesson),
+        )
+        .route(
+            "/api/admin/modules/:module_id/lessons/:lesson_id",
+            put(courses::update_module_lesson),
+        )
+        .route("/api/admin/lessons", post(courses::create_lesson))
+        .route(
+            "/api/admin/lessons/:lesson_id",
+            put(courses::update_lesson).delete(courses::delete_lesson),
+        )
+        // ── knowledge base (member read + admin management) ──
+        .route("/api/knowledge", get(knowledge::list_member_knowledge))
+        .route(
+            "/api/admin/knowledge",
+            get(knowledge::list_all).post(knowledge::create_entry),
+        )
+        .route(
+            "/api/admin/knowledge/:entry_id",
+            get(knowledge::get_entry).put(knowledge::update_entry).delete(knowledge::delete_entry),
+        )
+        .route("/api/admin/knowledge/:entry_id/publish", post(knowledge::publish_entry))
+        .route("/api/admin/knowledge/:entry_id/retire", post(knowledge::retire_entry))
+        // ── admin console: staff management ──
+        .route(
+            "/api/admin/staff",
+            get(staff::get_staff).post(staff::create_staff),
+        )
+        .route("/api/admin/staff/counselors", get(staff::get_counselors))
+        .route("/api/admin/staff/:staff_id", put(staff::update_staff))
+        .route("/api/admin/staff/:staff_id/full", get(admin::staff_full))
+        .route("/api/admin/staff/:staff_id/invite", post(admin::staff_invite))
         // DD-214 upload -- registered under every path the frontend/backend use.
         .route("/api/upload/dd214", post(members::upload_dd214))
         .route("/api/member/upload/dd214", post(members::upload_dd214))
