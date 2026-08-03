@@ -9,7 +9,7 @@ const ZEFFY_DONATION_URL = 'https://www.zeffy.com/en-US/donation-form/8375cf26-7
 const LOGO_URL = 'images/silent-honor-logo.png';
 
 // API Base URL
-window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";
+window.API_BASE = "https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com";
 
 // Current page detection
 function getCurrentPage() {
