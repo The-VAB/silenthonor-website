@@ -12,6 +12,7 @@ use axum::response::{IntoResponse, Response};
 use axum::Json;
 use bson::oid::ObjectId;
 use bson::{doc, Document};
+use jsonwebtoken::{decode, decode_header, Algorithm, DecodingKey, Validation};
 use serde::Deserialize;
 use serde_json::{json, Value};
 
@@ -108,6 +109,10 @@ pub struct RegisterRequest {
     pub notes: Option<String>,
     #[serde(default)]
     pub consent_contact: Option<bool>,
+    /// A Google ID token; when present the account is created as a Google
+    /// identity (no password) and the verified email overrides `email`.
+    #[serde(default)]
+    pub google_credential: Option<String>,
 }
 
 /// `POST /api/auth/register` -- port of backend/server.py `register`.
@@ -120,21 +125,43 @@ pub async fn register(
     State(state): State<AppState>,
     Json(body): Json<RegisterRequest>,
 ) -> AppResult<Response> {
-    let email = body.email.trim().to_lowercase();
+    let mut email = body.email.trim().to_lowercase();
     let first_name = body.first_name.trim().to_string();
     let last_name = body.last_name.trim().to_string();
 
-    if email.is_empty() || body.password.is_empty() || first_name.is_empty() || last_name.is_empty()
-    {
+    if email.is_empty() || first_name.is_empty() || last_name.is_empty() {
         return Err(AppError::BadRequest(
-            "Email, password, first name and last name are required".to_string(),
+            "Email, first name and last name are required".to_string(),
         ));
     }
-    if body.password.len() < 8 {
-        return Err(AppError::BadRequest(
-            "Password must be at least 8 characters".to_string(),
-        ));
-    }
+
+    // Credential path: a Google ID token (no password), else a password. The
+    // Google token is the source of truth for identity -- it overrides `email`.
+    let google = body.google_credential.as_deref().map(str::trim).filter(|s| !s.is_empty());
+    let (password_hash_bson, auth_provider) = if let Some(cred) = google {
+        let client_id = google_client_id()
+            .ok_or_else(|| AppError::ServiceUnavailable("Google sign-in is not configured".to_string()))?;
+        let claims = verify_google_id_token(cred, &client_id).await?;
+        if !google_email_verified(&claims) {
+            return Err(AppError::Unauthorized);
+        }
+        email = claims
+            .get("email")
+            .and_then(|v| v.as_str())
+            .unwrap_or_default()
+            .to_lowercase();
+        (bson::Bson::Null, "google")
+    } else {
+        if body.password.is_empty() {
+            return Err(AppError::BadRequest("Password is required".to_string()));
+        }
+        if body.password.len() < 8 {
+            return Err(AppError::BadRequest(
+                "Password must be at least 8 characters".to_string(),
+            ));
+        }
+        (bson::Bson::String(hash_password(&body.password)?), "password")
+    };
 
     let users = state.db.collection::<Document>("users");
     if users
@@ -145,7 +172,6 @@ pub async fn register(
         return Err(AppError::BadRequest("Email already registered".to_string()));
     }
 
-    let password_hash = hash_password(&body.password)?;
     let now = bson::DateTime::now();
     let challenges =
         bson::to_bson(&body.challenges.clone().unwrap_or_default()).unwrap_or(bson::Bson::Array(vec![]));
@@ -154,8 +180,8 @@ pub async fn register(
     // state, notes, ...) is preserved even though the typed `User` reads a subset.
     let user_doc = doc! {
         "email": email.as_str(),
-        "password_hash": password_hash.as_str(),
-        "auth_provider": "password",
+        "password_hash": password_hash_bson,
+        "auth_provider": auth_provider,
         "first_name": first_name.as_str(),
         "last_name": last_name.as_str(),
         "dob": opt_str(&body.dob),
@@ -464,4 +490,137 @@ fn append_cookie(resp: &mut Response, value: &str) {
     if let Ok(v) = HeaderValue::from_str(value) {
         resp.headers_mut().append(SET_COOKIE, v);
     }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Google Sign-In (port of routers/auth.py `google_config` + `google_login` and
+// the Google branch of `register`). Dormant until GOOGLE_CLIENT_ID is set: the
+// config endpoint then returns null and the frontend hides the button.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// The configured Google OAuth Web client id, or None when unset/empty.
+fn google_client_id() -> Option<String> {
+    std::env::var("GOOGLE_CLIENT_ID").ok().filter(|s| !s.is_empty())
+}
+
+/// Google sends `email_verified` as a bool (sometimes the string "true").
+fn google_email_verified(claims: &Value) -> bool {
+    match claims.get("email_verified") {
+        Some(Value::Bool(b)) => *b,
+        Some(Value::String(s)) => s == "true",
+        _ => false,
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct GoogleJwk {
+    kid: String,
+    n: String,
+    e: String,
+}
+#[derive(serde::Deserialize)]
+struct GoogleCerts {
+    keys: Vec<GoogleJwk>,
+}
+
+/// Verify a Google-issued ID token (RS256) against Google's published JWKS.
+/// Checks the signature, `aud == client_id`, issuer, and expiry; returns the
+/// verified claims. Any failure maps to 401 (mirrors the Python ValueError path).
+async fn verify_google_id_token(credential: &str, client_id: &str) -> AppResult<Value> {
+    let header = decode_header(credential).map_err(|_| AppError::Unauthorized)?;
+    let kid = header.kid.ok_or(AppError::Unauthorized)?;
+    let certs: GoogleCerts = reqwest::get("https://www.googleapis.com/oauth2/v3/certs")
+        .await
+        .map_err(|e| AppError::Internal(e.into()))?
+        .json()
+        .await
+        .map_err(|e| AppError::Internal(e.into()))?;
+    let jwk = certs
+        .keys
+        .into_iter()
+        .find(|k| k.kid == kid)
+        .ok_or(AppError::Unauthorized)?;
+    let key = DecodingKey::from_rsa_components(&jwk.n, &jwk.e).map_err(|_| AppError::Unauthorized)?;
+    let mut v = Validation::new(Algorithm::RS256);
+    v.set_audience(&[client_id]);
+    v.set_issuer(&["https://accounts.google.com", "accounts.google.com"]);
+    let data = decode::<Value>(credential, &key, &v).map_err(|_| AppError::Unauthorized)?;
+    Ok(data.claims)
+}
+
+// GET /api/auth/google/config -- public; null client_id => button hidden.
+pub async fn google_config() -> Json<Value> {
+    Json(json!({ "client_id": google_client_id() }))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GoogleLoginRequest {
+    #[serde(default)]
+    pub credential: String,
+}
+
+// POST /api/auth/google -- verify a credential and either log the user in (if an
+// account exists) or hand back the verified identity for the signup flow. Never
+// creates an account by itself (that goes through register with google_credential).
+pub async fn google_login(
+    State(state): State<AppState>,
+    Json(body): Json<GoogleLoginRequest>,
+) -> AppResult<Response> {
+    let client_id = google_client_id()
+        .ok_or_else(|| AppError::ServiceUnavailable("Google sign-in is not configured".to_string()))?;
+    let claims = verify_google_id_token(&body.credential, &client_id).await?;
+    if !google_email_verified(&claims) {
+        return Err(AppError::Unauthorized);
+    }
+    let email = claims
+        .get("email")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default()
+        .to_lowercase();
+
+    let user = state
+        .db
+        .collection::<User>("users")
+        .find_one(doc! { "email": email.as_str() })
+        .await?;
+
+    let Some(user) = user else {
+        let given = claims.get("given_name").and_then(|v| v.as_str()).unwrap_or("");
+        let family = claims.get("family_name").and_then(|v| v.as_str()).unwrap_or("");
+        return Ok(Json(json!({
+            "exists": false,
+            "email": email,
+            "first_name": given,
+            "last_name": family,
+        }))
+        .into_response());
+    };
+
+    if user.is_deactivated() {
+        return Err(AppError::Forbidden(
+            "This account has been deactivated. Please contact Silent Honor Foundation for assistance."
+                .to_string(),
+        ));
+    }
+
+    let id = user.id.map(|o| o.to_hex()).unwrap_or_default();
+    let access = create_access_token(&state.config.jwt_secret, &id, &email)?;
+    let refresh = create_refresh_token(&state.config.jwt_secret, &id)?;
+
+    let role = user.role.clone().unwrap_or_else(|| "member".to_string());
+    let profile = json!({
+        "exists": true,
+        "id": id,
+        "email": user.email,
+        "first_name": user.first_name.clone().unwrap_or_default(),
+        "last_name": user.last_name.clone().unwrap_or_default(),
+        "role": role,
+        "roles": user.effective_roles(),
+        "verified": user.verified,
+        "branch": user.branch,
+        "service_status": user.service_status,
+        "pipeline_stage": user.pipeline_stage.clone().unwrap_or_else(|| "applied".to_string()),
+    });
+    let resp = Json(profile).into_response();
+    Ok(with_auth_cookies(resp, &access, &refresh, state.config.cookie_secure))
 }

@@ -24,6 +24,9 @@ pub enum AppError {
     BadRequest(String),
     #[error("conflict: {0}")]
     Conflict(String),
+    /// A feature isn't configured (e.g. Google sign-in with no client id). 503.
+    #[error("service unavailable: {0}")]
+    ServiceUnavailable(String),
     /// Anything unexpected. The detail is logged, never returned to the client.
     #[error(transparent)]
     Internal(#[from] anyhow::Error),
@@ -41,6 +44,7 @@ impl AppError {
             AppError::NotFound => (StatusCode::NOT_FOUND, "Not found".to_string()),
             AppError::BadRequest(m) => (StatusCode::BAD_REQUEST, m.clone()),
             AppError::Conflict(m) => (StatusCode::CONFLICT, m.clone()),
+            AppError::ServiceUnavailable(m) => (StatusCode::SERVICE_UNAVAILABLE, m.clone()),
             AppError::Internal(e) => {
                 tracing::error!(error = ?e, "internal error");
                 (

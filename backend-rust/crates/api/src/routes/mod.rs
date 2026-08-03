@@ -46,6 +46,8 @@ pub fn router(state: AppState) -> Router {
         .route("/api/auth/forgot-password", post(auth::forgot_password))
         .route("/api/auth/reset-password", post(auth::reset_password))
         .route("/api/auth/change-password", post(auth::change_password))
+        .route("/api/auth/google/config", get(auth::google_config))
+        .route("/api/auth/google", post(auth::google_login))
         .route("/api/contact", post(content::contact))
         .route("/api/admin/stats", get(admin::stats))
         .route("/api/admin/members", get(admin::members))

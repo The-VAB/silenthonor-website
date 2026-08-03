@@ -41,7 +41,13 @@ variable "rust_api_s3_key" {
 variable "rust_api_source_hash" {
   description = "base64-encoded sha256 of the Lambda zip; bump to trigger a redeploy."
   type        = string
-  default     = "4sLH3Bru0bZGgAqbvwXHiZA6uZQIACyqzCnzORy/c88=" # + full admin console (analytics/apps/announcements/knowledge/LMS/staff)
+  default     = "ETk60gPpVArbfGEKbhZLLE3dpMgXiV8Iy8AxmdGZ6VE=" # + Google sign-in endpoints (dormant) + redesigned email templates
+}
+
+variable "google_client_id" {
+  description = "Google OAuth 2.0 Web client id for Sign-In. Empty = Google sign-in stays dormant (the /api/auth/google/config endpoint returns null and the frontend hides the button). Set this + apply to enable; no rebuild needed."
+  type        = string
+  default     = ""
 }
 
 variable "rust_api_memory_mb" {
@@ -171,7 +177,7 @@ resource "aws_lambda_function" "api" {
   }
 
   environment {
-    variables = {
+    variables = merge({
       # Secret NAMES, not values — the code resolves them via the IAM role.
       JWT_SECRET_NAME         = aws_secretsmanager_secret.jwt.name
       MONGODB_URI_SECRET_NAME = aws_secretsmanager_secret.mongodb_uri.name
@@ -194,7 +200,12 @@ resource "aws_lambda_function" "api" {
       MAJOR_FINANCE_ENABLED         = tostring(var.enable_major_finance)
       MAJOR_FINANCE_MODEL           = var.major_finance_model
       ANTHROPIC_API_KEY_SECRET_NAME = join("", aws_secretsmanager_secret.anthropic[*].name)
-    }
+      },
+      # Google Sign-In: set the env var only when configured; otherwise omit it so
+      # the code sees it as unset (dormant -> /api/auth/google/config returns null,
+      # frontend hides the button). Enable with -var google_client_id=<id> + apply.
+      var.google_client_id != "" ? { GOOGLE_CLIENT_ID = var.google_client_id } : {}
+    )
   }
 
   tags = { Name = "${var.project}-api" }

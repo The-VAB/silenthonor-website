@@ -29,3 +29,4 @@ chrono.workspace = true
 reqwest.workspace = true
 anyhow.workspace = true
 getrandom.workspace = true
+jsonwebtoken.workspace = true

@@ -593,33 +593,7 @@ pub async fn reject_application(
             } else {
                 "Financial Counseling"
             };
-            let subject =
-                format!("Update on Your {program_name} Application - Silent Honor Foundation");
-            let reason_html = if reason.is_empty() {
-                String::new()
-            } else {
-                format!("<p style=\"color: #9CA3AF;\"><strong>Reason:</strong> {reason}</p>")
-            };
-            let html = format!(
-                r#"
-            <html>
-            <body style="font-family: Arial, sans-serif; background: #0B1220; color: #ffffff; padding: 40px;">
-                <div style="max-width: 600px; margin: 0 auto; background: #111827; padding: 40px; border: 1px solid #374151;">
-                    <h1 style="color: #ffffff;">Application Update</h1>
-                    <p style="color: #9CA3AF;">Hi {fname},</p>
-                    <p style="color: #9CA3AF;">Thank you for your interest in our {program_name} program. After review, we are unable to approve your application at this time.</p>
-                    {reason_html}
-                    <p style="color: #9CA3AF;">If you have questions, please contact us at m.lugenbell@silenthonor.org</p>
-                    <p style="color: #6B7280; margin-top: 40px; padding-top: 20px; border-top: 1px solid #374151;">Silent Honor Foundation | Veterans Helping Veterans</p>
-                </div>
-            </body>
-            </html>
-            "#
-            );
-            let text = format!(
-                "Your {program_name} application update. Contact m.lugenbell@silenthonor.org for questions."
-            );
-            sh_core::email::send_email(email, &subject, &html, &text).await;
+            sh_core::email::send_program_rejected_email(email, fname, program_name, &reason).await;
         }
     }
 
