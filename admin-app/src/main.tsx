@@ -7,6 +7,7 @@ import App from "@/App";
 import "@/styles/tokens.css";
 import "@/styles/app.css";
 import "@/styles/components.css";
+import "@/styles/builder.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -8,15 +8,31 @@ import Members from "@/pages/Members";
 import Applications from "@/pages/Applications";
 import Dd214 from "@/pages/Dd214";
 import Staff from "@/pages/Staff";
+import Courses from "@/pages/Courses";
+import Knowledge from "@/pages/Knowledge";
+import Announcements from "@/pages/Announcements";
+import Contacts from "@/pages/Contacts";
+import Messages from "@/pages/Messages";
+import Audit from "@/pages/Audit";
+import Pipeline from "@/pages/Pipeline";
+import Reports from "@/pages/Reports";
 import Placeholder from "@/pages/Placeholder";
 import { ALL_ITEMS } from "@/nav";
 
-// Sections built out with real pages. Everything else falls back to Placeholder.
+// Every section now has a real page.
 const BUILT: Record<string, JSX.Element> = {
+  "/pipeline": <Pipeline />,
+  "/reports": <Reports />,
   "/members": <Members />,
   "/applications": <Applications />,
   "/dd214": <Dd214 />,
   "/staff": <Staff />,
+  "/courses": <Courses />,
+  "/knowledge": <Knowledge />,
+  "/announcements": <Announcements />,
+  "/contacts": <Contacts />,
+  "/messages": <Messages />,
+  "/audit": <Audit />,
 };
 
 function Gate({ children }: { children: string }) {

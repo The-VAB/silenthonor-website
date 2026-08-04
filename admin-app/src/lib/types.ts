@@ -30,7 +30,92 @@ export interface Analytics {
   pipeline: Record<string, number>;
   branches: Record<string, number>;
   dd214: Record<string, number>;
+  cr_pipeline?: Record<string, number>;
+  fc_pipeline?: Record<string, number>;
 }
+
+// ---- Content ----
+export interface Knowledge {
+  id: string;
+  title: string;
+  category?: string;
+  visibility: "member_visible" | "staff_only";
+  status: "published" | "draft" | "retired";
+  body?: string;
+  tags?: string[];
+  updated_at?: string;
+}
+export interface Announcement {
+  id: string;
+  title: string;
+  content?: string;
+  type: "info" | "success" | "warning";
+  active?: boolean;
+  created_at?: string;
+  expires_at?: string | null;
+}
+export interface Lesson {
+  id: string;
+  title: string;
+  lesson_type?: "video" | "text" | "resource";
+  content?: string;
+  video_url?: string | null;
+  resource_url?: string | null;
+  duration?: string | null;
+}
+export interface Module {
+  id: string;
+  title: string;
+  lessons?: Lesson[];
+}
+export interface CourseRow {
+  id: string;
+  title: string;
+  category?: string;
+  status: string;
+  total_lessons?: number;
+}
+export interface CourseDetail extends CourseRow {
+  description?: string;
+  thumbnail?: string;
+  modules?: Module[];
+  flat_lessons?: Lesson[];
+}
+
+// ---- Inbox ----
+export interface Contact {
+  id: string;
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  topic?: string;
+  message?: string;
+  responded?: boolean;
+  created_at?: string;
+}
+export interface AuditEntry {
+  timestamp?: string;
+  user_email?: string;
+  action?: string;
+  entity_type?: string;
+  entity_id?: string;
+  ip_address?: string;
+}
+export interface MsgUser {
+  id: string;
+  name?: string;
+  email?: string;
+}
+export interface Message {
+  from_user: MsgUser;
+  to_user: MsgUser;
+  content: string;
+  created_at?: string;
+  read?: boolean;
+}
+
+// ---- Pipeline ----
+export type PipelineData = Record<string, Record<string, { id: string; name?: string; email?: string; branch?: string; created_at?: string }[]>>;
 
 export interface AdminStats {
   total_members?: number;
