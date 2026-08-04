@@ -6,7 +6,7 @@
 
 use std::collections::HashMap;
 
-use axum::extract::{Path, State};
+use axum::extract::{Multipart, Path, State};
 use axum::http::HeaderMap;
 use axum::Json;
 use bson::oid::ObjectId;
@@ -355,4 +355,100 @@ pub async fn save_financial_intake(
         .await?;
 
     Ok(Json(json!({ "message": "Financial profile saved" })))
+}
+
+// POST /api/member/upload/dd214 (+ aliases). Multipart file -> S3 (SSE-KMS).
+// Port of routers/members.py DD-214 upload (S3 path).
+pub async fn upload_dd214(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    mut multipart: Multipart,
+) -> AppResult<Json<Value>> {
+    let (uid, user) = authenticate(&state, &headers).await?;
+
+    let mut file_bytes: Option<Vec<u8>> = None;
+    let mut original = String::new();
+    let mut content_type = String::new();
+    while let Some(field) = multipart
+        .next_field()
+        .await
+        .map_err(|_| AppError::BadRequest("Malformed upload".to_string()))?
+    {
+        if field.name() == Some("file") {
+            original = field.file_name().unwrap_or("upload.pdf").to_string();
+            content_type = field.content_type().unwrap_or("").to_string();
+            let data = field
+                .bytes()
+                .await
+                .map_err(|_| AppError::BadRequest("Could not read uploaded file".to_string()))?;
+            file_bytes = Some(data.to_vec());
+        }
+    }
+
+    let bytes = file_bytes.ok_or_else(|| AppError::BadRequest("No file provided".to_string()))?;
+    const ALLOWED: [&str; 4] = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+    if !ALLOWED.contains(&content_type.as_str()) {
+        return Err(AppError::BadRequest(
+            "Invalid file type. Only PDF, JPG, PNG allowed.".to_string(),
+        ));
+    }
+    if bytes.len() > 10 * 1024 * 1024 {
+        return Err(AppError::BadRequest("File too large. Maximum 10MB.".to_string()));
+    }
+
+    let ext = original
+        .rsplit('.')
+        .next()
+        .filter(|e| !e.is_empty() && e.len() <= 5)
+        .unwrap_or("pdf")
+        .to_lowercase();
+    let stored = format!("{uid}_{}.{ext}", rand_hex(16));
+    let key = format!("{}{stored}", sh_core::storage::DD214_PREFIX);
+    sh_core::storage::put_object(&key, bytes)
+        .await
+        .map_err(AppError::Internal)?;
+
+    let oid = ObjectId::parse_str(&uid).map_err(|_| AppError::Unauthorized)?;
+    state
+        .db
+        .collection::<Document>("users")
+        .update_one(
+            doc! { "_id": oid },
+            doc! { "$set": {
+                "dd214_file": stored.as_str(),
+                "dd214_storage_type": "s3",
+                "dd214_status": "pending_review",
+                "dd214_uploaded_at": bson::DateTime::now(),
+                "pipeline_stage": "dd214_pending",
+            }},
+        )
+        .await?;
+
+    super::log_audit(&state, "dd214_uploaded", "user", Some(&uid), Some(user.email.as_str())).await;
+    let name = format!(
+        "{} {}",
+        user.first_name.clone().unwrap_or_default(),
+        user.last_name.clone().unwrap_or_default()
+    );
+    sh_core::email::send_admin_notification(
+        "New DD-214 Upload",
+        &format!(
+            "{} ({}) has uploaded their DD-214 for verification.",
+            name.trim(),
+            user.email
+        ),
+    )
+    .await;
+
+    Ok(Json(json!({
+        "message": "File uploaded successfully",
+        "filename": stored,
+        "storage_type": "s3",
+    })))
+}
+
+fn rand_hex(n: usize) -> String {
+    let mut buf = vec![0u8; n];
+    getrandom::getrandom(&mut buf).expect("system RNG");
+    buf.iter().map(|b| format!("{b:02x}")).collect()
 }

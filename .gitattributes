@@ -1,0 +1,10 @@
+# Normalize the infra files that feed Terraform (buildspecs, Lambda source,
+# .tf, shell) to LF, so `terraform plan` is byte-stable across Windows and Linux
+# checkouts. Without this, core.autocrlf=true rewrites them CRLF on Windows and
+# every plan shows a phantom in-place change on aws_codebuild_project.deploy and
+# aws_lambda_function.webhook_trigger. See infra/aws/STATE_RECONCILIATION.md.
+infra/aws/*.yml    text eol=lf
+infra/aws/*.yaml   text eol=lf
+infra/aws/*.tf     text eol=lf
+infra/aws/*.sh     text eol=lf
+infra/aws/**/*.py  text eol=lf

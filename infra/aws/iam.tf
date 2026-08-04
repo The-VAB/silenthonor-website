@@ -32,37 +32,42 @@ resource "aws_iam_role" "apprunner_instance" {
 resource "aws_iam_role_policy" "apprunner_instance" {
   name = "${var.project}-apprunner-instance-policy"
   role = aws_iam_role.apprunner_instance.id
+  # Tightened form (follow-up to the initial reconcile). Drops the redundant
+  # SecretsKmsDecrypt statement — the four app secrets use the AWS-managed
+  # `aws/secretsmanager` key (no CMK), so GetSecretValue alone suffices to
+  # decrypt; scopes the secret reads to exact ARNs. Verified: KmsKeyId=None on
+  # all four secrets. See STATE_RECONCILIATION.md.
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "UploadsBucket"
+        Sid      = "UploadsObjects"
         Effect   = "Allow"
         Action   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
-        Resource = ["${aws_s3_bucket.uploads.arn}/*"]
+        Resource = "${aws_s3_bucket.uploads.arn}/*"
       },
       {
-        Sid      = "UploadsBucketList"
+        Sid      = "UploadsList"
         Effect   = "Allow"
         Action   = ["s3:ListBucket"]
-        Resource = [aws_s3_bucket.uploads.arn]
+        Resource = aws_s3_bucket.uploads.arn
       },
       {
         Sid      = "UploadsKms"
         Effect   = "Allow"
         Action   = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
-        Resource = [aws_kms_key.uploads.arn]
+        Resource = aws_kms_key.uploads.arn
       },
       {
-        Sid      = "SendEmail"
+        Sid      = "Ses"
         Effect   = "Allow"
         Action   = ["ses:SendEmail", "ses:SendRawEmail"]
-        Resource = ["*"]
+        Resource = "*"
       },
       {
-        Sid    = "ReadSecrets"
-        Effect = "Allow"
-        Action = ["secretsmanager:GetSecretValue"]
+        Sid      = "ReadSecrets"
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
         Resource = [
           aws_secretsmanager_secret.mongodb_uri.arn,
           aws_secretsmanager_secret.jwt.arn,

@@ -1,0 +1,7 @@
+# Terraform working dir + generated artifacts (keep .terraform.lock.hcl tracked)
+.terraform/
+*.tfstate
+*.tfstate.*
+tfplan*
+crash.log
+lambda/*.zip

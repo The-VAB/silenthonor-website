@@ -1,29 +1,51 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Rust / Lambda API (the real backend build).
 #
-# This stands up the Rust API on Lambda behind API Gateway (HTTP API), IN THE SAME
-# VPC as DocumentDB, reusing the existing secrets. It is INERT by default
-# (enable_rust_api = false) so it never disturbs the current App Runner deploy.
+# This runs the Rust API on Lambda behind API Gateway (HTTP API), IN THE SAME VPC
+# as DocumentDB, reusing the existing secrets. It is now DEPLOYED (enable_rust_api
+# defaults to true) and healthy: GET <invoke_url>/health -> {"db":"up"}. It runs
+# ALONGSIDE the App Runner backend and does not disturb it — no production frontend
+# points at it yet (staging cutover per docs/RUST_BACKEND.md when ready).
 #
-# Tyler's cutover steps (see docs/RUST_BACKEND.md):
-#   1. Build the arm64 artifact:  cd backend-rust && cargo lambda build --release --arm64
-#      then zip target/lambda/bootstrap/bootstrap  ->  set rust_api_zip_path.
-#      (Bundle the DocumentDB CA `global-bundle.pem` into the zip root too.)
-#   2. terraform apply -var enable_rust_api=true -var rust_api_zip_path=...
-#   3. Point a staging frontend's window.API_BASE at the api_gateway output, verify,
-#      then flip production.
+# The Lambda code ships from S3 (rust_api_s3_bucket/key); redeploy new code by
+# rebuilding api.zip, uploading it, and bumping -var rust_api_source_hash. See the
+# variable block below and infra/aws/buildspec-rust.yml.
 #
 # No secret VALUES appear here — only references to secrets that already exist.
 # ─────────────────────────────────────────────────────────────────────────────
 
 variable "enable_rust_api" {
-  description = "Create the Rust/Lambda API stack. Off until the build artifact exists."
+  description = "Create/manage the Rust/Lambda API stack. TRUE now that it is deployed — leaving it false would make a default apply DESTROY the live Lambda + HTTP API."
   type        = bool
-  default     = false
+  default     = true
 }
 
-variable "rust_api_zip_path" {
-  description = "Path to the packaged Lambda zip (bootstrap + CA bundle)."
+# The Lambda code is deployed from S3 (durable), not a local zip, so `terraform
+# plan` never needs a build artifact on disk. Rebuild + redeploy new code by:
+#   1. cargo lambda build --release --arm64  (see infra/aws/buildspec-rust.yml)
+#   2. zip bootstrap + global-bundle.pem -> api.zip
+#   3. aws s3 cp api.zip s3://<rust_api_s3_bucket>/<rust_api_s3_key>
+#   4. set -var rust_api_source_hash=<new base64 sha256> and apply
+variable "rust_api_s3_bucket" {
+  description = "S3 bucket holding the packaged Lambda zip (bootstrap + CA bundle)."
+  type        = string
+  default     = "silenthonor-pipeline-artifacts-802104113048"
+}
+
+variable "rust_api_s3_key" {
+  description = "S3 key of the packaged Lambda zip."
+  type        = string
+  default     = "rust/api.zip"
+}
+
+variable "rust_api_source_hash" {
+  description = "base64-encoded sha256 of the Lambda zip; bump to trigger a redeploy."
+  type        = string
+  default     = "ETk60gPpVArbfGEKbhZLLE3dpMgXiV8Iy8AxmdGZ6VE=" # + Google sign-in endpoints (dormant) + redesigned email templates
+}
+
+variable "google_client_id" {
+  description = "Google OAuth 2.0 Web client id for Sign-In. Empty = Google sign-in stays dormant (the /api/auth/google/config endpoint returns null and the frontend hides the button). Set this + apply to enable; no rebuild needed."
   type        = string
   default     = ""
 }
@@ -47,7 +69,7 @@ resource "aws_security_group" "lambda_api" {
   count       = local.rust_api_count
   name        = "${var.project}-lambda-api-sg"
   description = "Rust API Lambda ENIs"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.shared.id
 
   egress {
     from_port   = 0
@@ -84,6 +106,7 @@ data "aws_iam_policy_document" "lambda_assume" {
 resource "aws_iam_role" "lambda_api" {
   count              = local.rust_api_count
   name               = "${var.project}-lambda-api-role"
+  description        = "Execution role for the Silent Honor Rust/Lambda API" # matches live
   assume_role_policy = data.aws_iam_policy_document.lambda_assume[0].json
 }
 
@@ -104,6 +127,25 @@ data "aws_iam_policy_document" "lambda_secrets" {
       aws_secretsmanager_secret.mongodb_uri.arn,
     ]
   }
+  # Transactional email (welcome + admin notification on signup), same as the
+  # App Runner backend. SES resource-level scoping isn't practical for SendEmail.
+  statement {
+    sid       = "SendEmail"
+    actions   = ["ses:SendEmail", "ses:SendRawEmail"]
+    resources = ["*"]
+  }
+  # DD-214 upload/download: read+write the private uploads bucket under dd214/.
+  statement {
+    sid       = "UploadsBucket"
+    actions   = ["s3:PutObject", "s3:GetObject"]
+    resources = ["${aws_s3_bucket.uploads.arn}/*"]
+  }
+  # SSE-KMS encrypt (put) + decrypt (presigned get) with the uploads key.
+  statement {
+    sid       = "UploadsKms"
+    actions   = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
+    resources = [aws_kms_key.uploads.arn]
+  }
 }
 
 resource "aws_iam_role_policy" "lambda_secrets" {
@@ -121,18 +163,21 @@ resource "aws_lambda_function" "api" {
   runtime          = "provided.al2023"
   handler          = "bootstrap"
   architectures    = ["arm64"]
-  filename         = var.rust_api_zip_path
-  source_code_hash = filebase64sha256(var.rust_api_zip_path)
+  s3_bucket        = var.rust_api_s3_bucket
+  s3_key           = var.rust_api_s3_key
+  source_code_hash = var.rust_api_source_hash
   memory_size      = var.rust_api_memory_mb
   timeout          = var.rust_api_timeout_s
 
+  # Same private subnets as DocumentDB (they carry NAT egress for Secrets Manager).
+  # Matches the live-deployed Lambda so adoption doesn't churn its ENIs.
   vpc_config {
-    subnet_ids         = aws_subnet.private[*].id
+    subnet_ids         = var.docdb_subnet_ids
     security_group_ids = [aws_security_group.lambda_api[0].id]
   }
 
   environment {
-    variables = {
+    variables = merge({
       # Secret NAMES, not values — the code resolves them via the IAM role.
       JWT_SECRET_NAME         = aws_secretsmanager_secret.jwt.name
       MONGODB_URI_SECRET_NAME = aws_secretsmanager_secret.mongodb_uri.name
@@ -141,12 +186,26 @@ resource "aws_lambda_function" "api" {
       DOCDB_CA_PATH = "/var/task/global-bundle.pem"
       RUST_LOG      = "info"
 
+      # Transactional email (SES) -- same From as the App Runner backend.
+      EMAIL_PROVIDER = "ses"
+      FROM_EMAIL     = var.from_email
+      ADMIN_EMAIL    = var.admin_email
+
+      # DD-214 uploads -> private S3 bucket, SSE-KMS with the uploads key.
+      S3_BUCKET     = aws_s3_bucket.uploads.id
+      S3_KMS_KEY_ID = aws_kms_key.uploads.arn
+
       # Major Finance (member AI) -- dormant until enable_major_finance = true.
       # See major-finance.tf and docs/MAJOR_FINANCE.md.
       MAJOR_FINANCE_ENABLED         = tostring(var.enable_major_finance)
       MAJOR_FINANCE_MODEL           = var.major_finance_model
       ANTHROPIC_API_KEY_SECRET_NAME = join("", aws_secretsmanager_secret.anthropic[*].name)
-    }
+      },
+      # Google Sign-In: set the env var only when configured; otherwise omit it so
+      # the code sees it as unset (dormant -> /api/auth/google/config returns null,
+      # frontend hides the button). Enable with -var google_client_id=<id> + apply.
+      var.google_client_id != "" ? { GOOGLE_CLIENT_ID = var.google_client_id } : {}
+    )
   }
 
   tags = { Name = "${var.project}-api" }
@@ -158,8 +217,11 @@ resource "aws_apigatewayv2_api" "http" {
   name          = "${var.project}-http-api"
   protocol_type = "HTTP"
 
+  # Same origins the live App Runner backend allows (silenthonorfoundation.org +
+  # www + the CloudFront domain). The old value pointed at silenthonor.org, which
+  # is not this project's domain.
   cors_configuration {
-    allow_origins     = ["https://silenthonor.org", "https://www.silenthonor.org"]
+    allow_origins     = var.cors_origins
     allow_methods     = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     allow_headers     = ["content-type", "authorization"]
     allow_credentials = true
@@ -199,7 +261,7 @@ resource "aws_apigatewayv2_stage" "default" {
 
 resource "aws_lambda_permission" "apigw" {
   count         = local.rust_api_count
-  statement_id  = "AllowAPIGatewayInvoke"
+  statement_id  = "apigw-invoke" # matches the live permission (statement_id is ForceNew)
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.api[0].function_name
   principal     = "apigateway.amazonaws.com"
