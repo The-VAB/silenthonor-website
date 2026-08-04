@@ -19,8 +19,8 @@ export interface NavItem {
   path: string;
   label: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
-  /** Key into a counts map for the sidebar badge. */
-  badge?: "pending_dd214" | "open_applications" | "unread_messages";
+  /** Key into the /api/admin/stats response for the sidebar count badge. */
+  badge?: string;
 }
 
 export interface NavGroup {
@@ -41,8 +41,8 @@ export const NAV: NavGroup[] = [
     label: "People",
     items: [
       { path: "/members", label: "Members", icon: IconMembers },
-      { path: "/applications", label: "Applications", icon: IconApplications, badge: "open_applications" },
-      { path: "/dd214", label: "DD-214 Review", icon: IconDd214, badge: "pending_dd214" },
+      { path: "/applications", label: "Applications", icon: IconApplications },
+      { path: "/dd214", label: "DD-214 Review", icon: IconDd214, badge: "pending_verification" },
       { path: "/staff", label: "Staff & Counselors", icon: IconStaff },
     ],
   },
