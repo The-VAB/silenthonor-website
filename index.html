@@ -14,19 +14,7 @@
 <body>
 <div class="sh">
 
-  <header class="topbar">
-    <div class="wrap">
-      <a class="logo" href="index.html" aria-label="Silent Honor Foundation — home"><img class="logo-img" src="images/silent-honor-logo.png" alt="Silent Honor Foundation — Helping Veterans Achieve Financial Stability"></a>
-      <button class="nav-toggle" type="button" aria-label="Toggle menu" onclick="this.nextElementSibling.classList.toggle('open')">☰</button>
-      <nav class="nav">
-        <a href="services.html">Services</a>
-        <a href="courses.html">Courses</a>
-        <a href="about.html">About</a>
-        <a href="donate.html">Donate</a>
-        <a class="btn btn-red" href="signup.html">Become a Member</a>
-      </nav>
-    </div>
-  </header>
+  <div id="sh-header"></div>
 
   <section class="hero">
     <div class="hero-bg"><div class="terrain"></div></div>
@@ -179,27 +167,10 @@
     </div>
   </section>
 
-  <footer class="foot">
-    <div class="wrap">
-      <a class="brand" href="index.html"><span class="bar"></span>SILENT<span class="b-honor">HONOR</span></a>
-      <nav class="fnav">
-        <a href="services.html">Services</a><a href="courses.html">Courses</a><a href="about.html">About</a>
-        <a href="signup.html">Become a Member</a><a href="donate.html">Donate</a><a href="contact.html">Contact</a>
-      </nav>
-      <div class="cr">© Silent Honor Foundation Inc. · 501(c)(3) Nonprofit · Veterans Helping Veterans</div>
-    </div>
-  </footer>
+  <div id="sh-footer"></div>
 
 </div>
 
-<script>
-(function(){
-  var els=document.querySelectorAll('.rev');
-  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
-  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}});},{threshold:.12,rootMargin:'0px 0px -8% 0px'});
-  els.forEach(function(e,i){e.style.transitionDelay=Math.min(i%5*65,260)+'ms';io.observe(e);});
-  document.querySelectorAll('.chip').forEach(function(c){c.addEventListener('click',function(){document.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});c.classList.add('on');});});
-})();
-</script>
+<script src="js/redesign.js"></script>
 </body>
 </html>
