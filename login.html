@@ -8,391 +8,61 @@
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Member Login — Silent Honor Foundation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/global.css">
-<script>window.API_BASE = "https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com";</script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<style>
-.google-signin-btn {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.25rem;
-}
-
-.login-divider {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 1.25rem 0;
-  color: var(--muted);
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.login-divider::before,
-.login-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-.login-wrapper {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  padding-top: 100px;
-  position: relative;
-  z-index: 1;
-}
-
-.login-card {
-  background: rgba(17, 24, 39, 0.95);
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 3rem;
-  max-width: 420px;
-  width: 100%;
-}
-
-.login-logo {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-
-.login-logo img {
-  height: 80px;
-  width: auto;
-}
-
-.login-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.login-subtitle {
-  font-family: 'Lora', serif;
-  font-size: 0.9rem;
-  font-style: italic;
-  color: var(--muted);
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.form-group {
-  margin-bottom: 1.25rem;
-}
-
-.form-label {
-  display: block;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 0.5rem;
-}
-
-.form-input {
-  width: 100%;
-  background: var(--navy);
-  border: 1px solid var(--border);
-  color: var(--white);
-  padding: 0.9rem 1rem;
-  font-size: 0.95rem;
-  transition: border-color 0.2s;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--red);
-}
-
-.password-wrapper {
-  position: relative;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 0.7rem;
-  font-family: 'Oswald', sans-serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.login-btn {
-  width: 100%;
-  background: var(--red);
-  color: var(--white);
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  padding: 1rem;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 0.5rem;
-}
-
-.login-btn:hover {
-  background: var(--red-light);
-}
-
-.login-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.error-msg {
-  background: rgba(185, 28, 28, 0.1);
-  border: 1px solid rgba(185, 28, 28, 0.3);
-  color: var(--red-light);
-  padding: 0.8rem 1rem;
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-  display: none;
-}
-
-.error-msg.show {
-  display: block;
-}
-
-.login-footer {
-  text-align: center;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-}
-
-.login-footer-text {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.login-footer-link {
-  color: var(--red-light);
-  text-decoration: none;
-}
-
-.login-footer-link:hover {
-  text-decoration: underline;
-}
-
-.forgot-link {
-  display: block;
-  text-align: right;
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-top: 0.5rem;
-}
-
-.forgot-link:hover {
-  color: var(--white);
-}
-</style>
+<link rel="stylesheet" href="css/redesign.css">
 </head>
-<body>
-<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
-<div id="nav-placeholder"></div>
+<body data-page="login">
+<div class="sh">
 
-<div class="login-wrapper page-content">
-  <div class="login-card">
-    <div class="login-logo">
-      <img src="https://customer-assets.emergentagent.com/job_build-launch-21/artifacts/ejw735ko_a597f541-5826-493e-8e3d-af5702609fa5.tmp" alt="Silent Honor Foundation">
-    </div>
-    
-    <h1 class="login-title">Member Login</h1>
-    <p class="login-subtitle">Access your dashboard, courses, and resources.</p>
+  <div id="sh-header"></div>
 
-    <div class="error-msg" id="error-msg"></div>
-
-    <div class="google-signin-btn" id="google-signin-btn" style="display:none;"></div>
-    <div class="login-divider" id="login-divider" style="display:none;">or sign in with email</div>
-
-    <div class="form-group">
-      <label class="form-label">Email Address</label>
-      <input type="email" id="login-email" class="form-input" placeholder="you@email.com" data-testid="login-email">
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <div class="password-wrapper">
-        <input type="password" id="login-password" class="form-input" placeholder="Your password" data-testid="login-password">
-        <button class="password-toggle" onclick="togglePassword()">Show</button>
+  <section class="auth-wrap">
+    <div class="terrain"></div>
+    <div class="auth-card">
+      <div class="auth-head">
+        <span class="eyebrow">Member Login</span>
+        <h1>Welcome Back</h1>
+        <p>Sign in to reach your dashboard, courses, and coaching.</p>
       </div>
-      <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+      <form id="loginForm" class="form" novalidate>
+        <div class="field"><label for="login-email">Email</label><input id="login-email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="login-password">Password</label><input id="login-password" type="password" autocomplete="current-password" required></div>
+        <div class="forgot-link"><a href="forgot-password.html">Forgot password?</a></div>
+        <button class="btn btn-red btn-block" type="submit">Sign In <span class="arw">&#8594;</span></button>
+        <p class="form-note" id="login-note" role="status" aria-live="polite"></p>
+      </form>
+      <div class="auth-alt">New here? <a href="signup.html">Become a member — it's free</a></div>
     </div>
+  </section>
 
-    <button class="login-btn" onclick="handleLogin()" data-testid="login-submit-btn">Sign In →</button>
+  <div id="sh-footer"></div>
 
-    <div class="login-footer">
-      <p class="login-footer-text">
-        Don't have an account? <a href="signup.html" class="login-footer-link">Join free</a>
-      </p>
-    </div>
-  </div>
 </div>
-
-<div id="footer-placeholder"></div>
-
-<script src="js/components.js"></script>
-<script src="js/main.js"></script>
+<script src="js/redesign.js"></script>
 <script>
-function redirectByRole(user) {
-  const _userRoles = user.roles || [user.role];
-  if (_userRoles.some(r => ['admin', 'staff'].includes(r))) {
-    window.location.href = 'admin.html';
-  } else if (_userRoles.includes('counselor')) {
-    window.location.href = 'counselor-portal.html';
-  } else if (!user.verified) {
-    window.location.href = 'pending.html';
-  } else {
-    window.location.href = 'dashboard.html';
-  }
-}
-
-function togglePassword() {
-  const input = document.getElementById('login-password');
-  const btn = document.querySelector('.password-toggle');
-  if (input.type === 'password') {
-    input.type = 'text';
-    btn.textContent = 'Hide';
-  } else {
-    input.type = 'password';
-    btn.textContent = 'Show';
-  }
-}
-
-async function handleLogin() {
-  const email = document.getElementById('login-email').value;
-  const pass = document.getElementById('login-password').value;
-  const errorEl = document.getElementById('error-msg');
-  
-  if (!email || !pass) {
-    errorEl.textContent = 'Please enter both email and password.';
-    errorEl.classList.add('show');
-    return;
-  }
-
-  const loginBtn = document.querySelector('.login-btn');
-  loginBtn.textContent = 'Signing In...';
-  loginBtn.disabled = true;
-
-  try {
-    const response = await fetch(`${window.API_BASE}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, password: pass })
+  window.API_BASE = "https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com";
+  (function () {
+    var f = document.getElementById('loginForm'), note = document.getElementById('login-note');
+    function route(u) {
+      var roles = (u && (u.roles || (u.role ? [u.role] : []))) || [];
+      if (roles.indexOf('admin') >= 0) location.href = 'admin.html';
+      else if (roles.indexOf('counselor') >= 0) location.href = 'counselor-portal.html';
+      else if (u && u.verified) location.href = 'dashboard.html';
+      else location.href = 'pending.html';
+    }
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = (document.getElementById('login-email').value || '').trim();
+      var pw = document.getElementById('login-password').value || '';
+      if (!email || !pw) { note.textContent = 'Enter your email and password.'; note.className = 'form-note err'; return; }
+      note.textContent = 'Signing in…'; note.className = 'form-note';
+      fetch(window.API_BASE + '/api/auth/login', {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pw })
+      }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (x) { if (x.ok) { route(x.d); } else { note.textContent = x.d.detail || 'Invalid email or password.'; note.className = 'form-note err'; } })
+        .catch(function () { note.textContent = 'Network error. Please try again.'; note.className = 'form-note err'; });
     });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem('sh_user', JSON.stringify(data));
-      redirectByRole(data);
-    } else {
-      errorEl.textContent = data.detail || 'Invalid email or password.';
-      errorEl.classList.add('show');
-      loginBtn.textContent = 'Sign In →';
-      loginBtn.disabled = false;
-    }
-  } catch (err) {
-    errorEl.textContent = 'Connection error. Please try again.';
-    errorEl.classList.add('show');
-    loginBtn.textContent = 'Sign In →';
-    loginBtn.disabled = false;
-  }
-}
-
-async function handleGoogleCredential(response) {
-  const errorEl = document.getElementById('error-msg');
-  errorEl.classList.remove('show');
-  try {
-    const res = await fetch(`${window.API_BASE}/api/auth/google`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ credential: response.credential })
-    });
-    const data = await res.json();
-    if (res.ok && data.exists === false) {
-      // No account yet -- carry the verified Google identity into signup so
-      // they finish the real application (DD-214, etc.) instead of hitting a
-      // dead end here.
-      sessionStorage.setItem('sh_google_pending', JSON.stringify({
-        credential: response.credential,
-        email: data.email,
-        first_name: data.first_name,
-        last_name: data.last_name
-      }));
-      window.location.href = 'signup.html';
-    } else if (res.ok) {
-      localStorage.setItem('sh_user', JSON.stringify(data));
-      redirectByRole(data);
-    } else {
-      errorEl.textContent = data.detail || 'Google sign-in failed. Please try again.';
-      errorEl.classList.add('show');
-    }
-  } catch (err) {
-    errorEl.textContent = 'Connection error. Please try again.';
-    errorEl.classList.add('show');
-  }
-}
-
-// Check if already logged in
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const response = await fetch(`${window.API_BASE}/api/auth/me`, {
-      credentials: 'include'
-    });
-    if (response.ok) {
-      const user = await response.json();
-      redirectByRole(user);
-    }
-  } catch (e) {}
-
-  // Google Sign-In: only rendered if the backend has GOOGLE_CLIENT_ID configured.
-  try {
-    const cfgRes = await fetch(`${window.API_BASE}/api/auth/google/config`);
-    const cfg = await cfgRes.json();
-    if (cfg.client_id && window.google && window.google.accounts) {
-      window.google.accounts.id.initialize({
-        client_id: cfg.client_id,
-        callback: handleGoogleCredential
-      });
-      document.getElementById('google-signin-btn').style.display = '';
-      document.getElementById('login-divider').style.display = '';
-      window.google.accounts.id.renderButton(
-        document.getElementById('google-signin-btn'),
-        { theme: 'outline', size: 'large', width: 360 }
-      );
-    }
-  } catch (e) {}
-});
-
-document.getElementById('login-password').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') handleLogin();
-});
+  })();
 </script>
 </body>
 </html>

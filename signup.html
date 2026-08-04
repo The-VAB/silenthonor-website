@@ -7,1135 +7,147 @@
 <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Join Silent Honor - Free Veteran Membership</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/global.css">
-<script>window.API_BASE = "https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com";</script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<title>Become a Member — Silent Honor Foundation</title>
+<meta name="description" content="Join Silent Honor Foundation — free membership for military veterans. Credit help, financial coaching, and courses at no cost.">
+<link rel="stylesheet" href="css/redesign.css">
 <style>
-.google-signin-btn {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.25rem;
-}
-.signup-divider {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0 0 1.5rem;
-  color: var(--muted);
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-.signup-divider::before,
-.signup-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-.google-linked-note {
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #10B981;
-  padding: 0.8rem 1rem;
-  font-size: 0.85rem;
-  margin-bottom: 1.25rem;
-}
-.google-linked-note a {
-  color: var(--gold);
-  text-decoration: none;
-  margin-left: 0.5rem;
-}
-.google-linked-note a:hover {
-  text-decoration: underline;
-}
-.signup-wrapper {
-  min-height: 100vh;
-  padding: 120px 2rem 4rem;
-  position: relative;
-  z-index: 1;
-}
-.signup-container {
-  max-width: 600px;
-  margin: 0 auto;
-}
-.signup-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-.signup-tag {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--red-light);
-  margin-bottom: 0.75rem;
-}
-.signup-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  line-height: 1.1;
-  margin-bottom: 0.75rem;
-}
-.signup-title em {
-  font-style: normal;
-  color: var(--red-light);
-}
-.signup-subtitle {
-  font-family: 'Lora', serif;
-  font-size: 0.95rem;
-  font-style: italic;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-/* Progress Steps */
-.progress-steps {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 2rem;
-}
-.step-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.step-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border: 2px solid var(--border);
-  background: var(--navy);
-  color: var(--muted);
-  transition: all 0.3s;
-}
-.step-circle.active {
-  border-color: var(--gold);
-  background: var(--gold);
-  color: var(--navy-dark);
-}
-.step-circle.completed {
-  border-color: #10B981;
-  background: #10B981;
-  color: white;
-}
-.step-label {
-  font-family: 'Barlow', sans-serif;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-.step-label.active {
-  color: var(--gold);
-  font-weight: 600;
-}
-.step-connector {
-  width: 60px;
-  height: 2px;
-  background: var(--border);
-  margin: 0 0.5rem;
-}
-.step-connector.completed {
-  background: #10B981;
-}
-
-/* Form Container */
-.signup-form-container {
-  background: rgba(17, 24, 39, 0.95);
-  border: 1px solid var(--border);
-  padding: 2rem;
-}
-.form-step {
-  display: none;
-}
-.form-step.active {
-  display: block;
-}
-.step-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.3rem;
-  color: var(--white);
-}
-.step-subtitle {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
-}
-.form-group {
-  margin-bottom: 1.25rem;
-}
-.form-label {
-  display: block;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 0.5rem;
-}
-.form-label .required {
-  color: var(--red-light);
-}
-.form-input, .form-select, .form-textarea {
-  width: 100%;
-  background: var(--navy);
-  border: 1px solid var(--border);
-  color: var(--white);
-  padding: 0.85rem 1rem;
-  font-size: 0.9rem;
-  font-family: 'Barlow', sans-serif;
-}
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  outline: none;
-  border-color: var(--gold);
-}
-.form-input.error, .form-select.error {
-  border-color: var(--red-light);
-}
-.field-error {
-  color: var(--red-light);
-  font-size: 0.8rem;
-  margin-top: 0.3rem;
-  display: none;
-}
-.field-error.show {
-  display: block;
-}
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-.password-wrapper {
-  position: relative;
-}
-.password-toggle {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 0.7rem;
-  font-family: 'Oswald', sans-serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-.password-toggle:hover {
-  color: var(--gold);
-}
-.password-hint {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-top: 0.4rem;
-}
-
-/* File Upload */
-.file-upload-area {
-  border: 2px dashed var(--border);
-  padding: 1.5rem;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  background: rgba(11, 18, 32, 0.5);
-}
-.file-upload-area:hover {
-  border-color: var(--gold);
-  background: rgba(201, 149, 42, 0.05);
-}
-.file-upload-area.has-file {
-  border-color: #10B981;
-  background: rgba(16, 185, 129, 0.05);
-}
-.file-upload-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-.file-upload-text {
-  font-family: 'Barlow', sans-serif;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-.file-upload-text strong {
-  color: var(--gold);
-}
-.file-upload-hint {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-top: 0.5rem;
-}
-.file-name {
-  font-size: 0.85rem;
-  color: #10B981;
-  margin-top: 0.5rem;
-  display: none;
-}
-.file-name.show {
-  display: block;
-}
-
-/* Checkboxes */
-.consent-group {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-.consent-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-.consent-item input[type="checkbox"] {
-  accent-color: var(--gold);
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-.consent-item label {
-  font-family: 'Barlow', sans-serif;
-  font-size: 0.85rem;
-  color: var(--muted);
-  line-height: 1.5;
-  cursor: pointer;
-}
-.consent-item label a {
-  color: var(--gold);
-  text-decoration: none;
-}
-.consent-item label a:hover {
-  text-decoration: underline;
-}
-
-/* Buttons */
-.form-buttons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-.btn {
-  flex: 1;
-  padding: 0.9rem 1.5rem;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-secondary {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--muted);
-}
-.btn-secondary:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-}
-.btn-primary {
-  background: var(--red);
-  color: var(--white);
-}
-.btn-primary:hover {
-  background: var(--red-light);
-}
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Error Message */
-.error-msg {
-  background: rgba(185, 28, 28, 0.1);
-  border: 1px solid rgba(185, 28, 28, 0.3);
-  color: var(--red-light);
-  padding: 0.8rem 1rem;
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-  display: none;
-}
-.error-msg.show {
-  display: block;
-}
-
-/* Footer link */
-.already-member {
-  text-align: center;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.88rem;
-  color: var(--muted);
-}
-.already-member a {
-  color: var(--gold);
-  text-decoration: none;
-}
-.already-member a:hover {
-  text-decoration: underline;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .signup-wrapper {
-    padding: 100px 1rem 3rem;
-  }
-  .signup-form-container {
-    padding: 1.5rem;
-  }
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  .progress-steps {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .step-connector {
-    display: none;
-  }
-  .step-label {
-    display: none;
-  }
-  .form-buttons {
-    flex-direction: column;
-  }
-}
+  .fgroup{margin-top:22px}
+  .fgroup:first-of-type{margin-top:0}
+  .fgroup-label{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-2);margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  .check-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.check-grid{grid-template-columns:1fr}}
+  .filehint{font-size:12.5px;color:var(--ink-3);margin:6px 0 0}
 </style>
 </head>
-<body>
-<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
-<div id="nav-placeholder"></div>
+<body data-page="signup">
+<div class="sh">
 
-<div class="signup-wrapper page-content">
-  <div class="signup-container">
+  <div id="sh-header"></div>
 
-    <div class="signup-header">
-      <div class="signup-tag">Free for All Veterans</div>
-      <h1 class="signup-title">Join the <em>Silent Honor</em> Community</h1>
-      <p class="signup-subtitle">Get access to free financial education, credit repair services, and personalized counseling designed for veterans.</p>
-    </div>
-
-    <!-- Progress Steps -->
-    <div class="progress-steps">
-      <div class="step-item">
-        <div class="step-circle active" id="step1-circle">1</div>
-        <span class="step-label active" id="step1-label">Personal Info</span>
+  <section class="auth-wrap">
+    <div class="terrain"></div>
+    <div class="auth-card wide">
+      <div class="auth-head">
+        <span class="eyebrow">Free Membership</span>
+        <h1>Join the Mission</h1>
+        <p>Free for military veterans, always. Takes about five minutes — you'll reach your dashboard right away while we verify your service.</p>
       </div>
-      <div class="step-connector" id="connector1"></div>
-      <div class="step-item">
-        <div class="step-circle" id="step2-circle">2</div>
-        <span class="step-label" id="step2-label">Military Service</span>
-      </div>
-    </div>
+      <form id="signup-form" class="form" novalidate>
 
-    <div class="signup-form-container">
-      <div class="error-msg" id="error-msg"></div>
-
-      <form id="signup-form" enctype="multipart/form-data">
-
-        <!-- Step 1: Personal Information -->
-        <div class="form-step active" id="step1">
-          <div class="step-title">Personal Information</div>
-          <div class="step-subtitle">Tell us about yourself so we can create your account.</div>
-
-          <div class="google-signin-btn" id="google-signin-btn" style="display:none;"></div>
-          <div class="signup-divider" id="signup-divider" style="display:none;">or fill out the form</div>
-          <div class="google-linked-note" id="google-linked-note" style="display:none;">
-            Signing up with your Google account <span id="google-linked-email"></span>.
-            <a href="#" id="google-linked-clear">Not you? Use a different email</a>
+        <div class="fgroup">
+          <p class="fgroup-label">Your Account</p>
+          <div class="row">
+            <div class="field"><label for="first_name">First name</label><input id="first_name" type="text" autocomplete="given-name" required></div>
+            <div class="field"><label for="last_name">Last name</label><input id="last_name" type="text" autocomplete="family-name" required></div>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">First Name <span class="required">*</span></label>
-              <input type="text" id="first_name" class="form-input" placeholder="John" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Last Name <span class="required">*</span></label>
-              <input type="text" id="last_name" class="form-input" placeholder="Smith" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Date of Birth <span class="required">*</span></label>
-            <input type="date" id="dob" class="form-input" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Email Address <span class="required">*</span></label>
-            <input type="email" id="email" class="form-input" placeholder="you@email.com" required>
-            <div class="field-error" id="email-error"></div>
-          </div>
-
-          <div class="form-group" id="password-group">
-            <label class="form-label">Password <span class="required">*</span></label>
-            <div class="password-wrapper">
-              <input type="password" id="password" class="form-input" placeholder="Create a secure password" required minlength="8">
-              <button type="button" class="password-toggle" id="toggle-password">Show</button>
-            </div>
-            <div class="password-hint">Minimum 8 characters</div>
-            <div class="field-error" id="password-error"></div>
-          </div>
-
-          <div class="form-group" id="confirm_password-group">
-            <label class="form-label">Confirm Password <span class="required">*</span></label>
-            <div class="password-wrapper">
-              <input type="password" id="confirm_password" class="form-input" placeholder="Re-enter your password" required>
-              <button type="button" class="password-toggle" id="toggle-confirm">Show</button>
-            </div>
-            <div class="field-error" id="confirm_password-error"></div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Phone Number</label>
-              <input type="tel" id="phone" class="form-input" placeholder="(555) 555-5555">
-            </div>
-            <div class="form-group">
-              <label class="form-label">State <span class="required">*</span></label>
-              <select id="state" class="form-select" required>
-                <option value="">Select state</option>
-                <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option>
-                <option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option>
-                <option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option>
-                <option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option>
-                <option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option>
-                <option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
-                <option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option>
-                <option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option>
-                <option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
-                <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option>
-                <option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option>
-                <option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option>
-                <option>Wisconsin</option><option>Wyoming</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-buttons">
-            <button type="button" class="btn btn-primary" id="next-btn">Continue to Step 2</button>
+          <div class="field" style="margin-top:16px"><label for="email">Email</label><input id="email" type="email" autocomplete="email" required></div>
+          <div class="row" style="margin-top:16px">
+            <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="new-password" required></div>
+            <div class="field"><label for="confirm_password">Confirm password</label><input id="confirm_password" type="password" autocomplete="new-password" required></div>
           </div>
         </div>
 
-        <!-- Step 2: Military Service -->
-        <div class="form-step" id="step2">
-          <div class="step-title">Military Service</div>
-          <div class="step-subtitle">Help us verify your veteran status and understand how we can help.</div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Branch of Service <span class="required">*</span></label>
-              <select id="branch" class="form-select" required>
-                <option value="">Select branch</option>
-                <option>Army</option>
-                <option>Navy</option>
-                <option>Air Force</option>
-                <option>Marine Corps</option>
-                <option>Coast Guard</option>
-                <option>Space Force</option>
-                <option>National Guard</option>
-                <option>Army Reserve</option>
-                <option>Navy Reserve</option>
-                <option>Marine Corps Reserve</option>
-                <option>Air Force Reserve</option>
-                <option>Coast Guard Reserve</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Service Status <span class="required">*</span></label>
-              <select id="service_status" class="form-select" required>
-                <option value="">Select status</option>
-                <option>Veteran</option>
-                <option>Active Duty</option>
-                <option>Reserve</option>
-                <option>National Guard</option>
-                <option>Retired</option>
-              </select>
-            </div>
+        <div class="fgroup">
+          <p class="fgroup-label">Your Service</p>
+          <div class="row">
+            <div class="field"><label for="branch">Branch</label>
+              <select id="branch"><option value="">Select</option><option>Army</option><option>Navy</option><option>Marine Corps</option><option>Air Force</option><option>Coast Guard</option><option>Space Force</option><option>National Guard</option><option>Reserve</option></select></div>
+            <div class="field"><label for="service_status">Status</label>
+              <select id="service_status"><option value="">Select</option><option>Active Duty</option><option>Veteran</option><option>Retired</option></select></div>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Years of Service</label>
-              <input type="number" id="years_of_service" class="form-input" placeholder="e.g. 8" min="1" max="40">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Separation/ETS Year</label>
-              <input type="number" id="separation_year" class="form-input" placeholder="e.g. 2020" min="1950" max="2030">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">How Did You Hear About Us?</label>
-            <select id="how_heard" class="form-select">
-              <option value="">Select one</option>
-              <option>Facebook</option>
-              <option>Instagram</option>
-              <option>LinkedIn</option>
-              <option>Google Search</option>
-              <option>Word of Mouth</option>
-              <option>VFW / Post</option>
-              <option>VA Office</option>
-              <option>Referred by a Veteran</option>
-              <option>Email Newsletter</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">What do you need help with?</label>
-            <textarea id="challenges" class="form-textarea" placeholder="Tell us about your financial goals or challenges..."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">DD-214 Upload <span class="required">*</span></label>
-            <div class="file-upload-area" id="file-upload-area">
-              <input type="file" id="dd214_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
-              <div class="file-upload-icon">📄</div>
-              <div class="file-upload-text">Click to upload or drag and drop</div>
-              <div class="file-upload-hint">PDF, JPG, or PNG (max 10MB)</div>
-              <div class="file-name" id="file-name"></div>
-            </div>
-            <div class="field-error" id="dd214-error"></div>
-          </div>
-
-          <div class="consent-group">
-            <div class="consent-item">
-              <input type="checkbox" id="consent_dd214" required>
-              <label for="consent_dd214">I consent to uploading my DD-214 for verification purposes. My document will be stored securely and only used to verify my veteran status.</label>
-            </div>
-            <div class="consent-item">
-              <input type="checkbox" id="consent_terms" required>
-              <label for="consent_terms">I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>.</label>
-            </div>
-            <div class="consent-item">
-              <input type="checkbox" id="consent_contact">
-              <label for="consent_contact">I consent to receive emails and SMS messages about my membership and programs. (Optional)</label>
-            </div>
-          </div>
-
-          <div class="form-buttons">
-            <button type="button" class="btn btn-secondary" id="back-btn">Back</button>
-            <button type="submit" class="btn btn-primary" id="submit-btn">Submit Application</button>
+          <div class="row" style="margin-top:16px">
+            <div class="field"><label for="years_of_service">Years of service</label><input id="years_of_service" type="text" inputmode="numeric" placeholder="e.g. 8"></div>
+            <div class="field"><label for="separation_year">Separation year</label><input id="separation_year" type="text" inputmode="numeric" placeholder="e.g. 2021"></div>
           </div>
         </div>
 
+        <div class="fgroup">
+          <p class="fgroup-label">A Few Details</p>
+          <div class="row">
+            <div class="field"><label for="phone">Phone <span style="color:var(--ink-3)">(optional)</span></label><input id="phone" type="tel" autocomplete="tel"></div>
+            <div class="field"><label for="state">State <span style="color:var(--ink-3)">(optional)</span></label><input id="state" type="text" autocomplete="address-level1"></div>
+          </div>
+          <div class="row" style="margin-top:16px">
+            <div class="field"><label for="dob">Date of birth <span style="color:var(--ink-3)">(optional)</span></label><input id="dob" type="date"></div>
+            <div class="field"><label for="how_heard">How'd you hear about us?</label>
+              <select id="how_heard"><option value="">Select</option><option>Search engine</option><option>Social media</option><option>Friend or fellow veteran</option><option>VA / military organization</option><option>Other</option></select></div>
+          </div>
+        </div>
+
+        <div class="fgroup">
+          <p class="fgroup-label">What Do You Need Help With?</p>
+          <div class="check-grid">
+            <label class="consent"><input type="checkbox" class="challenge" value="Credit repair"> Credit repair</label>
+            <label class="consent"><input type="checkbox" class="challenge" value="Getting out of debt"> Getting out of debt</label>
+            <label class="consent"><input type="checkbox" class="challenge" value="Budgeting & saving"> Budgeting &amp; saving</label>
+            <label class="consent"><input type="checkbox" class="challenge" value="VA loan / homeownership"> VA loan / homeownership</label>
+            <label class="consent"><input type="checkbox" class="challenge" value="1-on-1 coaching"> 1-on-1 coaching</label>
+            <label class="consent"><input type="checkbox" class="challenge" value="VA disability claim"> VA disability claim</label>
+          </div>
+        </div>
+
+        <div class="fgroup">
+          <p class="fgroup-label">DD-214 <span style="color:var(--ink-3);font-weight:600;letter-spacing:0;text-transform:none">(optional — you can also upload later)</span></p>
+          <div class="field"><input id="dd214_file" type="file" accept=".pdf,.jpg,.jpeg,.png"></div>
+          <p class="filehint">Your DD-214 verifies your service. Upload now to speed up approval, or add it from your dashboard after you join.</p>
+        </div>
+
+        <div class="fgroup">
+          <p class="fgroup-label">Consent</p>
+          <label class="consent" style="margin-bottom:12px"><input type="checkbox" id="consent_terms"> I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</label>
+          <label class="consent" style="margin-bottom:12px"><input type="checkbox" id="consent_dd214"> I understand I'll need to verify my service with a DD-214 to be approved.</label>
+          <label class="consent"><input type="checkbox" id="consent_contact"> Silent Honor may contact me about my membership and services. (optional)</label>
+        </div>
+
+        <button class="btn btn-red btn-block" type="submit" style="margin-top:8px">Create My Free Account <span class="arw">&#8594;</span></button>
+        <p class="form-note" id="signup-note" role="status" aria-live="polite"></p>
       </form>
-
-      <div class="already-member">
-        Already a member? <a href="login.html">Sign in here</a>
-      </div>
+      <div class="auth-alt">Already a member? <a href="login.html">Sign in</a></div>
     </div>
+  </section>
 
-  </div>
+  <div id="sh-footer"></div>
+
 </div>
-
-<div id="footer-placeholder"></div>
-
-<script src="js/components.js"></script>
-<script src="js/main.js"></script>
+<script src="js/redesign.js"></script>
 <script>
-(function() {
-  var currentStep = 1;
-  var dd214File = null;
-  var googleCredential = null;
-
-  // Elements
-  var step1 = document.getElementById("step1");
-  var step2 = document.getElementById("step2");
-  var step1Circle = document.getElementById("step1-circle");
-  var step2Circle = document.getElementById("step2-circle");
-  var step1Label = document.getElementById("step1-label");
-  var step2Label = document.getElementById("step2-label");
-  var connector1 = document.getElementById("connector1");
-  var nextBtn = document.getElementById("next-btn");
-  var backBtn = document.getElementById("back-btn");
-  var submitBtn = document.getElementById("submit-btn");
-  var errorMsg = document.getElementById("error-msg");
-  var fileUploadArea = document.getElementById("file-upload-area");
-  var fileInput = document.getElementById("dd214_file");
-  var fileName = document.getElementById("file-name");
-
-  function applyGoogleIdentity(info) {
-    googleCredential = info.credential;
-    document.getElementById("first_name").value = info.first_name || "";
-    document.getElementById("last_name").value = info.last_name || "";
-    document.getElementById("email").value = info.email || "";
-    document.getElementById("email").readOnly = true;
-    document.getElementById("password-group").style.display = "none";
-    document.getElementById("confirm_password-group").style.display = "none";
-    document.getElementById("password").required = false;
-    document.getElementById("confirm_password").required = false;
-    document.getElementById("google-linked-email").textContent = info.email || "";
-    document.getElementById("google-linked-note").style.display = "";
-  }
-
-  function clearGoogleIdentity() {
-    googleCredential = null;
-    document.getElementById("email").readOnly = false;
-    document.getElementById("password-group").style.display = "";
-    document.getElementById("confirm_password-group").style.display = "";
-    document.getElementById("password").required = true;
-    document.getElementById("confirm_password").required = true;
-    document.getElementById("google-linked-note").style.display = "none";
-  }
-
-  document.getElementById("google-linked-clear").addEventListener("click", function(e) {
-    e.preventDefault();
-    clearGoogleIdentity();
-  });
-
-  async function handleGoogleCredential(response) {
-    hideError();
-    try {
-      var res = await fetch(window.API_BASE + "/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ credential: response.credential })
-      });
-      var data = await res.json();
-      if (res.ok && data.exists === false) {
-        applyGoogleIdentity({
-          credential: response.credential,
-          email: data.email,
-          first_name: data.first_name,
-          last_name: data.last_name
-        });
-      } else if (res.ok) {
-        // Already a Silent Honor account -- this call already logged them in.
-        localStorage.setItem("sh_user", JSON.stringify(data));
-        var _userRoles = data.roles || [data.role];
-        if (_userRoles.some(function(r) { return r === "admin" || r === "staff"; })) {
-          window.location.href = "admin.html";
-        } else if (_userRoles.indexOf("counselor") !== -1) {
-          window.location.href = "counselor-portal.html";
-        } else if (data.verified) {
-          window.location.href = "dashboard.html";
-        } else {
-          window.location.href = "pending.html";
-        }
-      } else {
-        showError(data.detail || "Google sign-in failed. Please try again.");
-      }
-    } catch (err) {
-      showError("Connection error. Please try again.");
-    }
-  }
-
-  // Password toggle
-  document.getElementById("toggle-password").addEventListener("click", function() {
-    var input = document.getElementById("password");
-    if (input.type === "password") {
-      input.type = "text";
-      this.textContent = "Hide";
-    } else {
-      input.type = "password";
-      this.textContent = "Show";
-    }
-  });
-
-  document.getElementById("toggle-confirm").addEventListener("click", function() {
-    var input = document.getElementById("confirm_password");
-    if (input.type === "password") {
-      input.type = "text";
-      this.textContent = "Hide";
-    } else {
-      input.type = "password";
-      this.textContent = "Show";
-    }
-  });
-
-  // File upload handling
-  fileUploadArea.addEventListener("click", function() {
-    fileInput.click();
-  });
-
-  fileUploadArea.addEventListener("dragover", function(e) {
-    e.preventDefault();
-    this.style.borderColor = "var(--gold)";
-  });
-
-  fileUploadArea.addEventListener("dragleave", function(e) {
-    e.preventDefault();
-    this.style.borderColor = dd214File ? "#10B981" : "var(--border)";
-  });
-
-  fileUploadArea.addEventListener("drop", function(e) {
-    e.preventDefault();
-    var files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFile(files[0]);
-    }
-  });
-
-  fileInput.addEventListener("change", function() {
-    if (this.files.length > 0) {
-      handleFile(this.files[0]);
-    }
-  });
-
-  function handleFile(file) {
-    var validTypes = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
-    if (!validTypes.includes(file.type)) {
-      showError("Please upload a PDF, JPG, or PNG file.");
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      showError("File size must be less than 10MB.");
-      return;
-    }
-    dd214File = file;
-    fileName.textContent = file.name;
-    fileName.classList.add("show");
-    fileUploadArea.classList.add("has-file");
-    clearError("dd214");
-  }
-
-  // Navigation
-  nextBtn.addEventListener("click", function() {
-    if (validateStep1()) {
-      goToStep(2);
-    }
-  });
-
-  backBtn.addEventListener("click", function() {
-    goToStep(1);
-  });
-
-  function goToStep(step) {
-    currentStep = step;
-    hideError();
-
-    if (step === 1) {
-      step1.classList.add("active");
-      step2.classList.remove("active");
-      step1Circle.classList.add("active");
-      step1Circle.classList.remove("completed");
-      step1Circle.innerHTML = "1";
-      step2Circle.classList.remove("active");
-      step1Label.classList.add("active");
-      step2Label.classList.remove("active");
-      connector1.classList.remove("completed");
-    } else {
-      step1.classList.remove("active");
-      step2.classList.add("active");
-      step1Circle.classList.remove("active");
-      step1Circle.classList.add("completed");
-      step1Circle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
-      step2Circle.classList.add("active");
-      step1Label.classList.remove("active");
-      step2Label.classList.add("active");
-      connector1.classList.add("completed");
-    }
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function validateStep1() {
-    clearAllErrors();
-    var valid = true;
-
-    var firstName = document.getElementById("first_name").value.trim();
-    var lastName = document.getElementById("last_name").value.trim();
-    var dob = document.getElementById("dob").value;
-    var email = document.getElementById("email").value.trim();
-    var password = document.getElementById("password").value;
-    var confirmPassword = document.getElementById("confirm_password").value;
-    var state = document.getElementById("state").value;
-
-    if (!firstName) {
-      showFieldError("first_name", "First name is required.");
-      valid = false;
-    }
-    if (!lastName) {
-      showFieldError("last_name", "Last name is required.");
-      valid = false;
-    }
-    if (!dob) {
-      showError("Date of birth is required.");
-      valid = false;
-    }
-    if (!email) {
-      showFieldError("email", "Email is required.");
-      valid = false;
-    } else if (!isValidEmail(email)) {
-      showFieldError("email", "Please enter a valid email address.");
-      valid = false;
-    }
-    if (!googleCredential) {
-      if (!password) {
-        showFieldError("password", "Password is required.");
-        valid = false;
-      } else if (password.length < 8) {
-        showFieldError("password", "Password must be at least 8 characters.");
-        valid = false;
-      }
-      if (!confirmPassword) {
-        showFieldError("confirm_password", "Please confirm your password.");
-        valid = false;
-      } else if (password !== confirmPassword) {
-        showFieldError("confirm_password", "Passwords do not match.");
-        valid = false;
-      }
-    }
-    if (!state) {
-      showError("State is required.");
-      valid = false;
-    }
-
-    return valid;
-  }
-
-  function validateStep2() {
-    clearAllErrors();
-    var valid = true;
-
-    var branch = document.getElementById("branch").value;
-    var serviceStatus = document.getElementById("service_status").value;
-    var consentDd214 = document.getElementById("consent_dd214").checked;
-    var consentTerms = document.getElementById("consent_terms").checked;
-
-    if (!branch) {
-      showError("Branch of service is required.");
-      valid = false;
-    }
-    if (!serviceStatus) {
-      showError("Service status is required.");
-      valid = false;
-    }
-    if (!dd214File) {
-      showFieldError("dd214", "Please upload your DD-214.");
-      valid = false;
-    }
-    if (!consentDd214) {
-      showError("You must consent to DD-214 upload for verification.");
-      valid = false;
-    }
-    if (!consentTerms) {
-      showError("You must agree to the Terms of Service and Privacy Policy.");
-      valid = false;
-    }
-
-    return valid;
-  }
-
-  // Email validation - accepts any valid email format
-  function isValidEmail(email) {
-    // Simple but permissive email regex
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.classList.add("show");
-  }
-
-  function hideError() {
-    errorMsg.classList.remove("show");
-    errorMsg.textContent = "";
-  }
-
-  function showFieldError(fieldId, msg) {
-    var errorEl = document.getElementById(fieldId + "-error");
-    var inputEl = document.getElementById(fieldId);
-    if (errorEl) {
-      errorEl.textContent = msg;
-      errorEl.classList.add("show");
-    }
-    if (inputEl) {
-      inputEl.classList.add("error");
-    }
-  }
-
-  function clearError(fieldId) {
-    var errorEl = document.getElementById(fieldId + "-error");
-    var inputEl = document.getElementById(fieldId);
-    if (errorEl) {
-      errorEl.classList.remove("show");
-      errorEl.textContent = "";
-    }
-    if (inputEl) {
-      inputEl.classList.remove("error");
-    }
-  }
-
-  function clearAllErrors() {
-    hideError();
-    document.querySelectorAll(".field-error").forEach(function(el) {
-      el.classList.remove("show");
-      el.textContent = "";
-    });
-    document.querySelectorAll(".form-input.error, .form-select.error").forEach(function(el) {
-      el.classList.remove("error");
-    });
-  }
-
-  // Form submission
-  document.getElementById("signup-form").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    if (!validateStep2()) {
-      return;
-    }
-
-    submitBtn.textContent = "Creating Account...";
-    submitBtn.disabled = true;
-
-    try {
-      // First, register the user
-      var userData = {
-        first_name: document.getElementById("first_name").value.trim(),
-        last_name: document.getElementById("last_name").value.trim(),
-        dob: document.getElementById("dob").value,
-        email: document.getElementById("email").value.trim(),
-        password: googleCredential ? null : document.getElementById("password").value,
-        google_credential: googleCredential,
-        phone: document.getElementById("phone").value.trim() || null,
-        state: document.getElementById("state").value,
-        branch: document.getElementById("branch").value,
-        service_status: document.getElementById("service_status").value,
-        years_of_service: document.getElementById("years_of_service").value ? parseInt(document.getElementById("years_of_service").value) : null,
-        separation_year: document.getElementById("separation_year").value ? parseInt(document.getElementById("separation_year").value) : null,
-        how_heard: document.getElementById("how_heard").value || null,
-        challenges: document.getElementById("challenges").value.trim() || null,
-        consent_contact: document.getElementById("consent_contact").checked
+  window.API_BASE = "https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com";
+  (function () {
+    var f = document.getElementById('signup-form'), note = document.getElementById('signup-note');
+    var v = function (id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var pw = document.getElementById('password').value || '', pw2 = document.getElementById('confirm_password').value || '';
+      if (!v('first_name') || !v('last_name') || !v('email') || !pw) { note.textContent = 'Please fill in your name, email, and password.'; note.className = 'form-note err'; return; }
+      if (pw.length < 8) { note.textContent = 'Password must be at least 8 characters.'; note.className = 'form-note err'; return; }
+      if (pw !== pw2) { note.textContent = 'Passwords do not match.'; note.className = 'form-note err'; return; }
+      if (!document.getElementById('consent_terms').checked || !document.getElementById('consent_dd214').checked) { note.textContent = 'Please accept the terms and the DD-214 verification notice.'; note.className = 'form-note err'; return; }
+      var challenges = Array.prototype.slice.call(document.querySelectorAll('.challenge:checked')).map(function (c) { return c.value; });
+      var body = {
+        first_name: v('first_name'), last_name: v('last_name'), email: v('email'), password: pw,
+        phone: v('phone'), state: v('state'), branch: v('branch'), service_status: v('service_status'),
+        years_of_service: v('years_of_service'), separation_year: v('separation_year'), dob: v('dob'),
+        how_heard: v('how_heard'), challenges: challenges, consent_contact: document.getElementById('consent_contact').checked
       };
-
-      var response = await fetch(window.API_BASE + "/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(userData)
-      });
-
-      var data = await response.json();
-
-      if (!response.ok) {
-        if (data.detail) {
-          if (data.detail.toLowerCase().indexOf("email") !== -1) {
-            showFieldError("email", data.detail);
-            goToStep(1);
-          } else {
-            showError(data.detail);
+      note.textContent = 'Creating your account…'; note.className = 'form-note';
+      var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
+      fetch(window.API_BASE + '/api/auth/register', {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (x) {
+          if (!x.ok) { throw new Error(x.d.detail || 'Could not create your account.'); }
+          var file = document.getElementById('dd214_file').files[0];
+          if (file) {
+            var fd = new FormData(); fd.append('file', file);
+            return fetch(window.API_BASE + '/api/member/dd214', { method: 'POST', credentials: 'include', body: fd })
+              .then(function () { location.href = 'pending.html'; })
+              .catch(function () { location.href = 'pending.html'; }); // DD-214 optional; can retry from dashboard
           }
-        } else {
-          showError("Registration failed. Please try again.");
-        }
-        submitBtn.textContent = "Submit Application";
-        submitBtn.disabled = false;
-        return;
-      }
-
-      // Now upload DD-214
-      var formData = new FormData();
-      formData.append("file", dd214File);
-
-      var uploadResponse = await fetch(window.API_BASE + "/api/member/dd214", {
-        method: "POST",
-        credentials: "include",
-        body: formData
-      });
-
-      if (!uploadResponse.ok) {
-        console.error("DD-214 upload failed, but registration succeeded");
-        // Still redirect - they can upload later
-      }
-
-      // Success - redirect to thank you page
-      localStorage.setItem("sh_user", JSON.stringify(data));
-      window.location.href = "thankyou.html";
-
-    } catch (err) {
-      console.error("Registration error:", err);
-      showError("Connection error. Please check your internet and try again.");
-      submitBtn.textContent = "Submit Application";
-      submitBtn.disabled = false;
-    }
-  });
-
-  // Check if already logged in
-  document.addEventListener("DOMContentLoaded", async function() {
-    try {
-      var response = await fetch(window.API_BASE + "/api/auth/me", {
-        credentials: "include"
-      });
-      if (response.ok) {
-        var user = await response.json();
-        var _userRoles = user.roles || [user.role];
-        if (_userRoles.some(function(r) { return r === "admin" || r === "staff"; })) {
-          window.location.href = "admin.html";
-        } else if (_userRoles.indexOf("counselor") !== -1) {
-          window.location.href = "counselor-portal.html";
-        } else if (user.verified) {
-          window.location.href = "dashboard.html";
-        } else {
-          window.location.href = "pending.html";
-        }
-      }
-    } catch (e) {}
-
-    // Picked up from login.html when a Google sign-in didn't match an
-    // existing account -- carry the verified identity into this form.
-    var pending = sessionStorage.getItem("sh_google_pending");
-    if (pending) {
-      sessionStorage.removeItem("sh_google_pending");
-      try {
-        applyGoogleIdentity(JSON.parse(pending));
-      } catch (e) {}
-    }
-
-    // Google Sign-In button: only shown if the backend has GOOGLE_CLIENT_ID
-    // configured, and only if the form isn't already Google-linked above.
-    try {
-      var cfgRes = await fetch(window.API_BASE + "/api/auth/google/config");
-      var cfg = await cfgRes.json();
-      if (cfg.client_id && window.google && window.google.accounts && !googleCredential) {
-        window.google.accounts.id.initialize({
-          client_id: cfg.client_id,
-          callback: handleGoogleCredential
-        });
-        document.getElementById("google-signin-btn").style.display = "";
-        document.getElementById("signup-divider").style.display = "";
-        window.google.accounts.id.renderButton(
-          document.getElementById("google-signin-btn"),
-          { theme: "outline", size: "large", width: 360 }
-        );
-      }
-    } catch (e) {}
-  });
-})();
+          location.href = 'pending.html';
+        })
+        .catch(function (err) { note.textContent = err.message || 'Something went wrong. Please try again.'; note.className = 'form-note err'; btn.disabled = false; });
+    });
+  })();
 </script>
 </body>
 </html>
