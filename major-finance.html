@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Major Finance - Silent Honor Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/global.css">
+<script>window.API_BASE = "https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com";</script>
+<script src="js/components.js"></script>
+<style>
+.dash-wrapper { min-height:100vh; background:var(--navy-dark); }
+.dash-nav {
+  position:fixed; top:0; left:0; right:0; height:60px;
+  background:rgba(11,18,32,.98); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; padding:0 1.5rem; z-index:100;
+}
+.dash-nav-logo { display:flex; align-items:center; gap:.5rem; font-family:'Oswald',sans-serif; font-size:1.1rem; font-weight:700; color:var(--white); }
+.dash-nav-logo img { height:32px; width:auto; }
+.dash-nav-links { display:flex; gap:.25rem; }
+.dash-nav-link { font-family:'Barlow',sans-serif; font-size:.85rem; color:var(--muted); text-decoration:none; padding:.5rem 1rem; border-radius:4px; transition:all .2s; }
+.dash-nav-link:hover { color:var(--white); background:rgba(255,255,255,.05); }
+.dash-nav-link.active { color:var(--gold); background:rgba(201,149,42,.1); }
+.dash-nav-user { display:flex; align-items:center; gap:.75rem; }
+.user-avatar { width:36px; height:36px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-family:'Oswald',sans-serif; font-size:.8rem; font-weight:600; color:var(--white); }
+.user-name { font-family:'Barlow',sans-serif; font-size:.9rem; color:var(--white); }
+.sign-out-btn { background:transparent; border:1px solid var(--border); color:var(--muted); font-family:'Barlow',sans-serif; font-size:.8rem; padding:.4rem .75rem; cursor:pointer; }
+.sign-out-btn:hover { border-color:var(--red); color:var(--red-light); }
+
+.page-content { padding:80px 2rem 2rem; max-width:820px; margin:0 auto; }
+.page-header { margin-bottom:1.25rem; }
+.page-title { font-family:'Oswald',sans-serif; font-size:clamp(1.5rem,3vw,2rem); font-weight:700; color:var(--white); text-transform:uppercase; letter-spacing:.05em; }
+.page-subtitle { font-family:'Lora',serif; font-style:italic; color:var(--muted); font-size:.95rem; }
+
+.loading-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:50vh; gap:1rem; }
+.spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.panel { background:rgba(17,24,39,.8); border:1px solid var(--border); border-radius:8px; padding:1.5rem; }
+.muted { font-family:'Barlow',sans-serif; font-size:.9rem; color:var(--muted); line-height:1.6; }
+
+/* Coming soon (dormant) */
+.soon { text-align:center; padding:3rem 1.5rem; }
+.soon-icon { font-size:2.5rem; margin-bottom:.75rem; }
+.soon h2 { font-family:'Oswald',sans-serif; color:var(--white); font-size:1.3rem; margin-bottom:.5rem; }
+
+/* Chat */
+.chat { display:flex; flex-direction:column; height:calc(100vh - 220px); min-height:380px; }
+.chat-log { flex:1; overflow-y:auto; padding:.25rem; display:flex; flex-direction:column; gap:.75rem; }
+.bubble { max-width:78%; padding:.7rem .95rem; border-radius:12px; font-family:'Barlow',sans-serif; font-size:.92rem; line-height:1.55; white-space:pre-wrap; }
+.bubble.ai { align-self:flex-start; background:rgba(255,255,255,.06); border:1px solid var(--border); color:var(--white); border-bottom-left-radius:3px; }
+.bubble.me { align-self:flex-end; background:var(--red); color:#fff; border-bottom-right-radius:3px; }
+.bubble.typing { color:var(--muted); font-style:italic; }
+.starters { display:flex; flex-wrap:wrap; gap:.5rem; margin:.75rem 0; }
+.starter { font-family:'Barlow',sans-serif; font-size:.8rem; color:var(--muted); background:rgba(11,18,32,.5); border:1px solid var(--border); border-radius:20px; padding:.4rem .85rem; cursor:pointer; }
+.starter:hover { border-color:var(--gold); color:var(--white); }
+.chat-input { display:flex; gap:.5rem; padding-top:.75rem; border-top:1px solid var(--border); }
+.chat-input input { flex:1; background:var(--navy); border:1px solid var(--border); color:var(--white); padding:.75rem .9rem; font-size:.95rem; font-family:'Barlow',sans-serif; border-radius:6px; }
+.chat-input input:focus { outline:none; border-color:var(--gold); }
+.send-btn { background:var(--red); color:#fff; border:none; font-family:'Oswald',sans-serif; font-size:.8rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; padding:.75rem 1.3rem; border-radius:6px; cursor:pointer; }
+.send-btn:hover { background:var(--red-light); }
+.send-btn:disabled { opacity:.5; cursor:not-allowed; }
+.disclaimer { display:flex; gap:.6rem; align-items:flex-start; background:rgba(11,18,32,.5); border:1px solid var(--border); border-radius:6px; padding:.7rem .9rem; font-family:'Barlow',sans-serif; font-size:.78rem; color:var(--muted); line-height:1.5; margin-top:.85rem; }
+
+@media (max-width:768px) { .dash-nav-links { display:none; } .page-content { padding:70px 1rem 1.5rem; } }
+</style>
+</head>
+<body>
+<div class="dash-wrapper">
+<div id="dash-nav-placeholder"></div>
+<div class="page-content">
+
+  <div class="loading-state" id="loading-state">
+    <div class="spinner"></div>
+    <p style="color:var(--muted);">Loading...</p>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="page-header">
+      <h1 class="page-title">Major Finance</h1>
+      <p class="page-subtitle">Your money questions, answered in plain language.</p>
+    </div>
+
+    <!-- Dormant state: feature not enabled yet -->
+    <div id="soon" class="panel" style="display:none;">
+      <div class="soon">
+        <div class="soon-icon">&#127895;</div>
+        <h2>Coming soon</h2>
+        <p class="muted" style="max-width:460px; margin:0 auto;">Major Finance, your personal money coach, is on the way. In the meantime, your courses are open and your counselor is here for anything specific to your situation.</p>
+      </div>
+    </div>
+
+    <!-- Enabled state: chat -->
+    <div id="chat-wrap" class="panel" style="display:none;">
+      <div class="chat">
+        <div class="chat-log" id="log"></div>
+        <div class="starters" id="starters"></div>
+        <div class="chat-input">
+          <input id="input" placeholder="Ask a money question..." autocomplete="off">
+          <button class="send-btn" id="send" onclick="sendMsg()">Send</button>
+        </div>
+      </div>
+      <div class="disclaimer"><span>Major Finance gives general money education, not personalized advice, and never a promise about your credit. For your specific situation, message your counselor. Never share your SSN, full account numbers, or passwords here.</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+var mfHistory = [];
+var busy = false;
+var STARTERS = [
+  "How do I start building credit?",
+  "What is a good way to budget?",
+  "How does credit utilization work?",
+  "What is an emergency fund?"
+];
+
+document.addEventListener("DOMContentLoaded", async function () {
+  try {
+    var res = await fetch(window.API_BASE + "/api/auth/me", { credentials: "include" });
+    if (!res.ok) { window.location.href = "login.html"; return; }
+    var user = await res.json();
+    var roles = user.roles || [user.role];
+    if (roles.indexOf("admin") > -1 || roles.indexOf("staff") > -1) { window.location.href = "admin.html"; return; }
+    if (roles.indexOf("counselor") > -1) { window.location.href = "counselor-portal.html"; return; }
+    if (!user.verified) { window.location.href = "pending.html"; return; }
+
+    var initials = ((user.first_name || "").charAt(0) + (user.last_name || "").charAt(0)).toUpperCase() || "??";
+    var av = document.getElementById("user-avatar"); if (av) av.textContent = initials;
+    var nm = document.getElementById("user-name"); if (nm) nm.textContent = ((user.first_name || "") + " " + (user.last_name || "")).trim();
+
+    await initMajorFinance(user);
+  } catch (e) {
+    window.location.href = "login.html";
+  } finally {
+    document.getElementById("loading-state").style.display = "none";
+    document.getElementById("content").style.display = "block";
+  }
+});
+
+async function initMajorFinance(user) {
+  var enabled = false;
+  try {
+    var res = await fetch(window.API_BASE + "/api/member/major-finance/status", { credentials: "include" });
+    if (res.ok) { var data = await res.json(); enabled = !!data.enabled; }
+  } catch (e) { /* stay dormant */ }
+
+  if (!enabled) {
+    document.getElementById("soon").style.display = "block";
+    return;
+  }
+
+  document.getElementById("chat-wrap").style.display = "block";
+  var name = (user.first_name || "there").trim();
+  addBubble("ai", "Hey " + name + "! I'm Major Finance. Ask me anything about credit, budgeting, saving, or debt, and I'll keep it simple. For anything specific to your accounts, your counselor has the full picture.");
+  renderStarters();
+  document.getElementById("input").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") sendMsg();
+  });
+}
+
+function renderStarters() {
+  document.getElementById("starters").innerHTML = STARTERS.map(function (s, i) {
+    return '<button class="starter" onclick="useStarter(' + i + ')">' + esc(s) + '</button>';
+  }).join("");
+}
+function useStarter(i) {
+  document.getElementById("input").value = STARTERS[i];
+  sendMsg();
+}
+
+function addBubble(role, text) {
+  var log = document.getElementById("log");
+  var div = document.createElement("div");
+  div.className = "bubble " + (role === "me" ? "me" : "ai");
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+async function sendMsg() {
+  if (busy) return;
+  var input = document.getElementById("input");
+  var msg = (input.value || "").trim();
+  if (!msg) return;
+
+  busy = true;
+  document.getElementById("send").disabled = true;
+  document.getElementById("starters").style.display = "none";
+  input.value = "";
+
+  addBubble("me", msg);
+  var typing = addBubble("ai", "Major Finance is typing...");
+  typing.classList.add("typing");
+
+  try {
+    var res = await fetch(window.API_BASE + "/api/member/major-finance", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg, history: mfHistory })
+    });
+    var reply;
+    if (res.ok) {
+      var data = await res.json();
+      reply = data.reply || "Sorry, I couldn't answer that right now.";
+    } else {
+      reply = "Sorry, I'm having trouble right now. Please try again, or message your counselor.";
+    }
+    typing.classList.remove("typing");
+    typing.textContent = reply;
+    mfHistory.push({ role: "user", content: msg });
+    mfHistory.push({ role: "assistant", content: reply });
+  } catch (e) {
+    typing.classList.remove("typing");
+    typing.textContent = "Connection error. Please try again.";
+  } finally {
+    busy = false;
+    document.getElementById("send").disabled = false;
+    document.getElementById("log").scrollTop = document.getElementById("log").scrollHeight;
+  }
+}
+
+function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+async function signOut() {
+  try { await fetch(window.API_BASE + "/api/auth/logout", { method: "POST", credentials: "include" }); } catch (e) { }
+  localStorage.removeItem("sh_user");
+  window.location.href = "login.html";
+}
+</script>
+</body>
+</html>

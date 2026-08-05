@@ -107,13 +107,21 @@ function injectMemberNav() {
   if (!placeholder) return;
 
   const currentPage = getCurrentPage();
+  // Dashboard and Courses are always available (courses are open to every member,
+  // no program needed). Counselor, Messages, Disputes, and Credit are program
+  // tools: they stay hidden until the member is approved into a program, then
+  // revealMemberTools() reveals them. This matches the member portal design.
+  // Major Finance is a feature-flagged tool: available to every verified member,
+  // but hidden until the backend reports it enabled (checkMajorFinance below).
   const links = [
     { href: 'dashboard.html', label: 'Dashboard' },
     { href: 'member-courses.html', label: 'Courses' },
-    { href: 'counselor.html', label: 'Counselor' },
-    { href: 'messages.html', label: 'Messages' },
-    { href: 'dispute-tracker.html', label: 'Disputes' },
-    { href: 'credit-tracker.html', label: 'Credit' },
+    { href: 'major-finance.html', label: 'Major Finance', feature: 'major-finance' },
+    { href: 'counselor.html', label: 'Counselor', gated: true },
+    { href: 'financial-plan.html', label: 'My Plan', gated: true },
+    { href: 'messages.html', label: 'Messages', gated: true },
+    { href: 'dispute-tracker.html', label: 'Disputes', gated: true },
+    { href: 'credit-tracker.html', label: 'Credit', gated: true },
   ];
 
   placeholder.innerHTML = `
@@ -123,7 +131,13 @@ function injectMemberNav() {
         <span>SILENT<span style="color:var(--red)">HONOR</span></span>
       </a>
       <div class="dash-nav-links">
-        ${links.map(l => `<a href="${l.href}" class="dash-nav-link${currentPage === l.href.replace('.html', '') ? ' active' : ''}">${l.label}</a>`).join('\n        ')}
+        ${links.map(l => {
+          const active = currentPage === l.href.replace('.html', '') ? ' active' : '';
+          let attrs = '';
+          if (l.gated) attrs = ' data-gated="1" style="display:none"';
+          else if (l.feature) attrs = ` data-feature="${l.feature}" style="display:none"`;
+          return `<a href="${l.href}" class="dash-nav-link${active}"${attrs}>${l.label}</a>`;
+        }).join('\n        ')}
       </div>
       <div class="dash-nav-user">
         <div class="user-avatar" id="user-avatar">??</div>
@@ -132,6 +146,48 @@ function injectMemberNav() {
       </div>
     </nav>
   `;
+
+  revealMemberTools(placeholder);
+  checkMajorFinance(placeholder);
+}
+
+// Reveal the Major Finance tab only when the backend reports the feature is
+// enabled. Dormant by default, so members never see a dead AI tab.
+async function checkMajorFinance(placeholder) {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/member/major-finance/status`, { credentials: 'include' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.enabled) {
+      placeholder.querySelectorAll('.dash-nav-link[data-feature="major-finance"]').forEach(el => {
+        el.style.display = '';
+      });
+    }
+  } catch (e) {
+    // On any error, stay hidden (fail closed).
+  }
+}
+
+// Reveal the gated program tools (Counselor/Messages/Disputes/Credit) once we
+// confirm the member is approved into a program. A member who has only applied
+// (or is on a waitlist) keeps just Dashboard and Courses, matching the design.
+async function revealMemberTools(placeholder) {
+  try {
+    const res = await fetch(`${window.API_BASE}/api/member/programs`, { credentials: 'include' });
+    if (!res.ok) return;
+    const data = await res.json();
+    const enrolled = ['credit_repair', 'financial_counseling'].some(key => {
+      const status = data[key] && data[key].status;
+      return status === 'approved' || status === 'active';
+    });
+    if (enrolled) {
+      placeholder.querySelectorAll('.dash-nav-link[data-gated]').forEach(el => {
+        el.style.display = '';
+      });
+    }
+  } catch (e) {
+    // On any error, stay gated (fail closed).
+  }
 }
 
 // Inject the counselor-portal nav (counselor-portal.html, counselor-caseload.html,

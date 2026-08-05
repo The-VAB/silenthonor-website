@@ -6,14 +6,18 @@ name: rust-backend
 # so the build result is the clear signal; tighten them once the workspace is clean.
 
 on:
+  workflow_dispatch: {}
   pull_request:
     paths:
       - "backend-rust/**"
       - ".github/workflows/rust-backend.yml"
   push:
-    branches: [main]
+    # main + any feature branch, so a plain branch push (e.g. to a personal
+    # fork whose Actions minutes are free) runs the compile gate.
+    branches: [main, "feat/**"]
     paths:
       - "backend-rust/**"
+      - ".github/workflows/rust-backend.yml"
 
 jobs:
   build:
@@ -40,7 +44,7 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
 
       - name: Build (release)
-        run: cargo build --release
+        run: cargo build --release --locked
 
       - name: Test
-        run: cargo test
+        run: cargo test --locked
