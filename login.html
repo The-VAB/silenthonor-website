@@ -44,7 +44,7 @@
     var f = document.getElementById('loginForm'), note = document.getElementById('login-note');
     function route(u) {
       var roles = (u && (u.roles || (u.role ? [u.role] : []))) || [];
-      if (roles.indexOf('admin') >= 0) location.href = 'admin/';
+      if (roles.indexOf('admin') >= 0) location.href = 'admin/index.html';
       else if (roles.indexOf('counselor') >= 0) location.href = 'counselor-portal.html';
       else if (u && u.verified) location.href = 'dashboard.html';
       else location.href = 'pending.html';
