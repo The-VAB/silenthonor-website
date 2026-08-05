@@ -1,10 +1,11 @@
 # Validation utilities for Silent Honor Foundation
-from typing import Optional
+from typing import Optional, List, Literal
 from pydantic import BaseModel, EmailStr
 
 class RegisterRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: Optional[str] = None
+    google_credential: Optional[str] = None
     first_name: str
     last_name: str
     dob: Optional[str] = None
@@ -22,6 +23,9 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+class GoogleLoginRequest(BaseModel):
+    credential: str
 
 class ContactRequest(BaseModel):
     first_name: str
@@ -103,3 +107,23 @@ class LessonRequest(BaseModel):
     video_url: Optional[str] = None
     resource_url: Optional[str] = None
     duration: Optional[str] = None
+
+# Knowledge base entries. Both AI assistants (Battle Buddy, Major Finance) draw from
+# these; `visibility` is the wall between them -- Major Finance (member-facing) may only
+# ever read member_visible entries. Defaults are the safe ones: a new entry is staff_only
+# and draft, so nothing becomes member-visible or live by accident.
+class KnowledgeEntryCreate(BaseModel):
+    title: str
+    body: str
+    category: Optional[str] = None
+    tags: List[str] = []
+    visibility: Literal["member_visible", "staff_only"] = "staff_only"
+    status: Literal["draft", "published", "retired"] = "draft"
+
+class KnowledgeEntryUpdate(BaseModel):
+    title: Optional[str] = None
+    body: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[List[str]] = None
+    visibility: Optional[Literal["member_visible", "staff_only"]] = None
+    status: Optional[Literal["draft", "published", "retired"]] = None

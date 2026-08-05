@@ -1,0 +1,333 @@
+# Role Portals -- Silent Honor Foundation
+
+Companion to `SILENT_HONOR_OPERATING_PROTOCOL.md`. Section 7 of that doc researched what
+each staff role *does* and what Battle Buddy should do for them; this doc turns that into
+the **portals** -- the actual place each role logs into and works from. One portal per role,
+tailored to that role, with access following the same hierarchy as Battle Buddy.
+
+**Status:** spec / in Design. This is the plan the portal builds follow, not a record of
+built work. See the state tracker for what's actually built.
+
+---
+
+## 1. The access model (same hierarchy as Battle Buddy)
+
+When someone is assigned a role, that role determines which portal they land in and what
+tools they see. The hierarchy mirrors the Battle Buddy capability grants exactly, so the
+two stay consistent:
+
+| Role | Portal they land in | Tool access |
+|---|---|---|
+| **Executive Director** (admin) | ED portal (`admin.html`) | **Everything** -- every tool in every portal below |
+| **Operations Manager** | Operations portal | Own tools **+ Counselor + Fundraiser** tools; everything except ED-only (board/governance) |
+| **Financial Counselor** | Counselor portal | Counselor tools only |
+| **Fundraiser / Development Mgr** | Development portal | Development tools only |
+
+This is enforced two ways, and both matter:
+- **Routing** -- on login, role decides the landing portal (this partly exists: `login.html`
+  already routes admin/staff -> `admin.html`, counselor -> `counselor-portal.html`).
+- **Backend access** -- each API endpoint is gated to the roles allowed to use it. This is
+  the piece that makes the hierarchy real rather than cosmetic, and it's the main net-new
+  backend work (see Section 4). A hidden sidebar link is not security; the endpoint behind
+  it has to enforce the same rule.
+
+A person can hold more than one role (`roles[]` already supports this). The ED viewing the
+counselor portal, or an Ops manager helping with fundraising, is expected -- the portals are
+views onto one shared system, not walled-off apps.
+
+---
+
+## 2. What exists today (audit, 2026-07-25)
+
+| Portal | State | Files |
+|---|---|---|
+| ED / Admin | **Exists, comprehensive -- but needs a quality pass (Section 3)** | `admin.html` (~2,600 lines): Overview, Pipeline, Applications, Members, DD-214 Review, Courses, Announcements, Knowledge Base, Messages, Inquiries, Staff, Reports, Audit Log |
+| Counselor | **Exists, comprehensive** | `counselor-portal.html`, `counselor-caseload.html`, `counselor-tasks.html`, `counselor-waitlist.html`, `counselor-member.html` (~3,000 lines), `messages.html` |
+| Member | Exists | `dashboard.html`, `pending.html` |
+| **Operations Manager** | **Missing** | -- |
+| **Fundraiser / Development** | **Missing, plus its whole backend is greenfield** | -- (no donor/CRM/grant data model exists at all) |
+
+So the net-new portal builds are **Operations** and **Development**. The existing ED and
+Counselor portals aren't a build-from-scratch job -- they're a redesign/quality job (Section 3)
+plus filling specific gaps.
+
+---
+
+## 3. The quality bar -- "top-looking, working tools," not a spreadsheet on a page
+
+Director feedback, 2026-07-25, on the existing ED/admin (and accounts) portal: it has the
+data, but it reads like *"a spreadsheet put on the thing"* -- it doesn't feel like a real
+tool and doesn't function smoothly. Every portal, existing and new, is held to this bar (it
+is the Battle Buddy Standard's presentation requirement, applied to the whole workspace):
+
+- **Purpose-built tools, not data dumps.** A table of members is a spreadsheet. A tool is:
+  a pipeline board you drag a member through, a DD-214 review queue with the document and
+  an approve/deny in one place, a member record that shows the whole story (credit trend,
+  session history, tasks) at a glance. Each screen should do a *job*, not just display rows.
+- **The important thing is obvious and one click away.** The number that matters is big and
+  up top; the action you need is a button, not buried in a menu. Reduce the clicks between
+  landing and doing.
+- **Smooth and modern.** Real loading states, no full-page reloads to do one thing, clear
+  feedback on every action, consistent components from the shared design-token library
+  (`css/dashboard.css`, `css/dashboard-widgets.css` -- already used by the counselor portal,
+  which is the closer-to-right example to match).
+- **Fully responsive** -- desktop, tablet, phone. A staffer checking the pipeline from their
+  phone between meetings should have it work.
+- **Fast.** Nobody waits on a spinner to see their own caseload.
+
+This applies as a redesign mandate to `admin.html`, and as a from-the-start requirement for
+the two new portals -- they should launch at this bar, not get "polished later."
+
+---
+
+## 4. The portals, tool by tool
+
+Each tool below is grounded in the role research in `SILENT_HONOR_OPERATING_PROTOCOL.md`
+Sections 7.1-7.4. "Exists" = already built somewhere; "New" = net-new.
+
+### 4.1 Executive Director portal (`admin.html`) -- redesign + fill gaps
+
+The ED sees everything. The work here is (a) the quality pass in Section 3, and (b) adding
+the ED-specific tools that aren't there yet.
+
+- **Org dashboard** (Exists, redesign): the KPIs an ED actually reports on -- members served
+  vs. capacity, verified/pending, revenue diversification, reserve coverage, grant pipeline
+  health, program outcomes -- as real stat tiles and trend charts, not a wall of numbers.
+- **Board reporting** (New): assemble a board packet from live data (exec summary, status by
+  priority, outcomes, risks, decisions-needed) -- ties into Battle Buddy 7.1.
+- **Grant compliance calendar** (New): every grant's report/closeout deadlines with proactive
+  flags. Fundraising owns grant *pipeline*; the ED needs the *compliance-deadline* view.
+- **Program outcomes** (New/partial): outcome language for funders, not just activity counts.
+- **Everything from the Ops, Counselor, and Development portals** (via access), plus the
+  existing Members / Pipeline / Applications / DD-214 / Courses / Staff / Knowledge Base /
+  Reports / Audit tools -- redesigned to the Section 3 bar.
+
+### 4.2 Operations Manager portal (New)
+
+Ops oversees how the org runs day to day. Access = own tools + Counselor + Development.
+
+- **Pipeline bottleneck board** (New): the member pipeline with stall-detection surfaced --
+  "14 applicants stuck in DD-214 review 5+ days" -- so Ops intervenes before drop-off. Built
+  on existing pipeline data, presented as an operational tool not a list.
+- **Task & SLA oversight** (New, extends existing tasks): every staff/counselor task, what's
+  overdue, who owns it, a "what's stuck" digest.
+- **Vendor / contract tracker** (New): renewal dates, license/insurance expirations,
+  performance-review cycles, flagged before they lapse.
+- **Audit-readiness checks** (New): does every active case have its required docs (consent,
+  verified DD-214, disclosures) -- a gap list on demand.
+- **Staffing/coverage view** (New): counselor capacity vs. intake demand, under-coverage flags.
+- **SOP library** (New): the org's documented processes, editable (pairs with the Knowledge
+  Base module already built).
+- **Plus the Counselor and Development toolsets** via access.
+
+### 4.3 Financial Counselor portal (Exists) -- keep, extend
+
+Already the strongest-built portal (caseload, tasks, waitlist, deep member record). Keep it,
+hold it to the Section 3 bar, and add the Battle Buddy 7.3 capabilities as they're built:
+
+- **My caseload / waitlist / tasks / member record** (Exists).
+- **Credit report delta view** (New): what changed between two pulls.
+- **Dispute workflow** (Partial -> extend): draft FCRA dispute letters (human-reviewed,
+  never auto-sent), track the 30/45-day windows.
+- **DMP feasibility tool** (New): income/expenses/debts -> sustainable-payment check.
+- **Veteran-protection flags** (New): SCRA eligibility, VA-garnishment exemptions,
+  predatory-loan patterns.
+- **Session notes -> queryable memory** (New): pairs with the Meeting & Session Notes module
+  (protocol 7.7).
+
+### 4.4 Fundraiser / Development portal (New -- biggest build, needs a backend first)
+
+This is the largest gap: there is **no donor/prospect/grant/campaign data model in the system
+at all today**. The portal can't be built until that backend exists. Spec:
+
+- **Donor CRM** (New backend + New portal): donor/prospect records, 360-degree profile
+  (gifts, events, touchpoints), segmentation.
+- **Gift entry + acknowledgment** (New): log gifts; draft thank-yous within 48h with correct
+  IRS substantiation ($250+, and quid-pro-quo over $75) -- Battle Buddy 7.4.
+- **Grant pipeline** (New): LOIs, proposals, deadlines/reporting tracker with alerts.
+- **Campaign tracking** (New): appeals, response rate, average gift, retention by segment --
+  built around the new-vs-repeat donor retention gap (~19% vs ~69%).
+- **Prospect research briefs** (New, internal-only): never donor-facing.
+- **Moves management** (New): log each interaction advancing a major-gift relationship.
+
+Compliance baked in from the start: charitable-solicitation registration awareness (41
+states + DC), donor-privacy walls on wealth/prospect data, AFP Donor Bill of Rights.
+
+---
+
+## 5. Cross-cutting: the backend access model
+
+The portals are only as real as the endpoint gating behind them. Today, many admin endpoints
+are gated `admin`-only (`get_current_admin`); a pure Operations or Development role would be
+blocked. Making the hierarchy in Section 1 real requires a deliberate pass over the API:
+
+- Define the role set the system recognizes (`admin`/ED, `operations`, `counselor`,
+  `development`, `staff`, `member`) and which endpoints each may call.
+- Apply the hierarchy: ED = all; Ops = all but ED-only; Counselor/Development = their own.
+- This is the honest prerequisite for the Ops and Development portals -- without it, a new
+  portal either can't reach its data or has to over-grant admin rights. It's a focused
+  backend task and should land before (or with) the first new portal.
+
+---
+
+## 6. Build roadmap (suggested sequencing)
+
+1. **Backend role-access model** (Section 5) -- unblocks everything else; do first.
+2. **ED/admin quality redesign** (Section 3 + 4.1) -- highest daily-use surface, and the
+   thing the Director specifically called out as feeling like a spreadsheet. Biggest
+   immediate payoff.
+3. **Operations Manager portal** (4.2) -- mostly aggregates existing data; achievable once
+   the access model exists.
+4. **Development backend + portal** (4.4) -- largest effort; the donor CRM is effectively a
+   new subsystem. Its own multi-step build.
+5. **Counselor portal extensions** (4.3) -- fold in as the matching Battle Buddy capabilities
+   get built.
+
+Each of these is its own module in the state tracker and its own PR (or set of PRs). None is
+a one-session job; the ED redesign and the Development backend especially are substantial.
+
+---
+
+## 7. Counselor toolkit — the complete tool inventory
+
+The Financial Counselor is Silent Honor's core service role, so its portal gets the deepest
+toolset. This is the full inventory, researched against AFCPE's AFC core competencies (the
+counseling arc: gather situation -> action plan -> spending plan -> manage credit & debt ->
+major acquisitions -> risk), NFCC counseling practice, the FCRA/FDCPA dispute workflow, and
+nonprofit credit-counseling software (CaseWorthy, Affina, CFS). Marked: **[must]** = core to
+delivering the service, **[benef]** = high value, **[later]** = nice-to-have. Build status:
+`built` = live in the interactive prototype, `spec` = designed here, not built.
+
+### A. Intake & assessment
+- **[must] Financial intake / health assessment** (`spec`) — gather the member's full
+  situation, resources, and gaps; produce a starting financial-health score. AFC "setting
+  the stage."
+- **[must] Member 360 record** (`built` — overview) — one screen: credit trend, disputes,
+  debt, stage, tasks, notes.
+
+### B. Credit repair
+- **[must] Credit Game Plan** (`built`) — account-by-account strategy with a planned action
+  (Dispute / Pay Down / Settle / Keep) and a live projected-lift summary.
+- **[must] Credit report analyzer** (`spec`) — parse a tri-bureau report, flag negatives,
+  and diff two pulls over time (what changed since last session).
+- **[must] Dispute manager** (`built`) — track disputes, rounds, bureaus, and the FCRA
+  30/45-day clocks.
+- **[must] Dispute letter generator** (`built`) — templated FCRA §611 (reinvestigation),
+  §609 (disclosure), §623 (furnisher validation), and goodwill letters, filled from the
+  member + item, counselor-reviewed before sending, never guaranteeing a result.
+- **[benef] Credit score simulator** (`built`) — utilization slider + what-if toggles
+  (remove collections, cure a late, add a tradeline) -> projected score. Coaching only,
+  never shown to a member as a promise.
+- **[benef] Utilization optimizer** (`spec`) — per-card utilization with target-under-30%/10%
+  recommendations.
+
+### C. Budgeting & debt
+- **[must] Budget builder** (`built`) — income vs. essential/other expenses -> disposable.
+- **[must] DMP feasibility** (`built`) — proposed debt-management payment, payoff timeline,
+  and a sustainability gauge from the budget.
+- **[benef] Debt payoff planner** (`spec`) — snowball vs. avalanche ordering, timeline, and
+  interest saved vs. minimums.
+- **[benef] Cash-flow / spending analyzer** (`spec`) — where the money actually goes.
+- **[benef] Emergency-fund & savings-goal tracker** (`spec`).
+
+### D. Planning & action (the AFC deliverable)
+- **[must] Financial action plan** (`spec`) — the written, prioritized next-steps deliverable
+  the member takes home (AFC core competency); categorized, trackable.
+- **[benef] Goal tracker / milestones** (`spec`).
+- **[benef] Major-acquisition / VA home-loan readiness** (`spec`) — credit + DTI thresholds
+  toward a specific goal.
+
+### E. Veteran-specific
+- **[must] Veteran benefit & protection checker** (`spec`) — SCRA interest-cap eligibility
+  (still-serving Guard/Reserve), VA-compensation garnishment exemptions, and predatory-loan
+  pattern flags, surfaced from the member's profile.
+- **[benef] Resource / referral matcher** (`spec`) — VSO, legal aid, 211, and the right
+  Silent Honor course/module for the situation.
+
+### F. Casework & process
+- **[must] Session notes -> queryable memory** (`built`) — logged notes that feed Battle
+  Buddy's RAG memory (protocol 7.7).
+- **[must] Caseload dashboard** (`built`) + **waitlist claim** (exists in codebase).
+- **[must] Task & follow-up manager** (`spec`) — per-member tasks with SLA/overdue flags.
+- **[must] Compliance pre-flight** (`spec`) — checks written authorization on file, blocks
+  result-guarantee language, CROA/§501(q) safety before anything client-facing goes out.
+- **[benef] Document vault** (`spec`) — DD-214, statements, letters, per member, access-scoped.
+- **[benef] Secure member messaging** (exists — `messages.html`).
+- **[benef] Session scheduler** (`spec`) and **course/curriculum assignment** (`spec`).
+
+**Prototype status:** 7 of these are live and interactive in the command-center prototype
+(Game Plan, Score Simulator, Disputes, Dispute Letters, Budget/DMP, Session Notes, plus the
+360 overview). The rest are specced here and get built in priority order — intake/assessment,
+credit report analyzer, financial action plan, and the veteran-benefit checker are the next
+`[must]` tools to add.
+
+---
+
+## 8. Executive Director + Board President toolkit
+
+The Director holds a dual role — **Executive Director (management) and Board President
+(governance)** — so this portal needs both toolsets. Researched against BoardSource, the
+National Council of Nonprofits, and nonprofit board-management platforms (Boardable, OnBoard,
+BoardPro, BoardEffect). Same marking: **[must]** / **[benef]** / **[later]**, status
+`built`/`spec`.
+
+### A governance note worth stating plainly
+Standard nonprofit governance (BoardSource) has the **board chair supervise and evaluate the
+ED, including compensation**, and lead conflict-of-interest handling. When one person is
+*both* ED and Board President, that oversight loop points at itself. This isn't a blocker,
+but the portal should support good practice rather than paper over it: any function that
+evaluates the ED, sets ED compensation, or handles a conflict involving the ED should route
+to an **independent board member or governance committee**, and the tool should make that
+routing explicit. Flagging it here so it's a deliberate design choice, not an accident.
+
+### A. Management (Executive Director) — from Section 4.1 / protocol 7.1
+- **[must] Org health dashboard** (`built` — overview): members served vs. capacity, reserve
+  coverage, revenue diversification, grant pipeline, program outcomes.
+- **[must] Program outcomes / funder reporting** (`spec`): outcome language, not activity counts.
+- **[must] Grant compliance calendar** (`spec`): report/closeout deadlines with proactive flags.
+- **[must] Financial position** (`spec`): budget vs. actual, reserve trend, cash position.
+- **[benef] Org-wide risk flags** (`built` — overview banner).
+- **[must] Access to every Ops / Counselor / Development tool** (the ED sees everything).
+
+### B. Board meetings & decisions
+- **[must] Board packet builder** (`built`): assemble the board book from live data
+  (exec summary, status by priority, outcomes, financials, risks, decisions-needed).
+- **[must] Agenda builder** (`spec`): build/share the meeting agenda (chair sets it with the ED).
+- **[must] Minutes** (`spec`): capture notes -> decisions -> action items, auto-formatted;
+  minutes must record conflict-of-interest disclosures and abstentions.
+- **[must] Voting & resolutions tracker** (`spec`): record motions, votes, who abstained,
+  and the resolution text — the decision audit trail funders and auditors expect.
+- **[benef] Action-item tracker** (`spec`): follow-ups with owners/dates, carried into the
+  next packet as "follow-up from last meeting."
+- **[benef] Meeting calendar / scheduler** (`spec`).
+
+### C. Governance & fiduciary
+- **[must] Board roster & terms** (`spec`): members, officer roles, term start/end,
+  attendance.
+- **[benef] Board recruitment matrix** (`spec`): skills/represented-communities vs. gaps, to
+  target the next recruit.
+- **[must] Committee management** (`spec`): committees (Finance, Governance, etc.), chairs,
+  charges, membership.
+- **[must] Conflict-of-interest register** (`spec`): annual disclosure questionnaires, active
+  conflicts, and the abstention log tied to specific votes — plus the ED-dual-role routing above.
+- **[must] Policy library** (`spec`): conflict-of-interest, whistleblower, document
+  retention/destruction, gift acceptance — the written policies a board must maintain
+  (pairs with the Knowledge Base module).
+- **[must] Fiduciary / compliance calendar** (`spec`): Form 990 filing, audit acceptance,
+  annual budget approval, bylaws review, state charitable-registration renewal, insurance —
+  the board-level compliance clock (distinct from the grant calendar in section A).
+
+### D. Oversight & strategy
+- **[must] Financial oversight** (`spec`): budget vs. actual and audited-financials
+  acceptance, shared with the Treasurer / Finance Committee.
+- **[benef] Strategic plan tracker** (`spec`): multi-year plan milestones vs. actuals.
+- **[must, dual-role sensitive] ED evaluation & compensation** (`spec`): the annual review
+  workflow — explicitly routed to an independent director / governance committee per the
+  note above, never self-administered.
+- **[benef] Document repository** (`spec`): bylaws, past minutes, board-book archive,
+  version-controlled and permissioned (board-only vs. officer-only).
+
+**Build note:** the board toolset is the ED portal's net-new bulk and overlaps the Knowledge
+Base (policy library) and the Meeting-Notes module (minutes/action items). Sequence it after
+the backend role-access model. In the prototype, the Board Packet Builder is the one board
+tool built so far; the rest are specced here for the ED portal build.

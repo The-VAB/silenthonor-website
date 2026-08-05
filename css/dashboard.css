@@ -129,3 +129,17 @@
 .quick-link-icon{font-size:1.2rem;width:30px;text-align:center}
 .quick-link span:last-child{font-family:Oswald,sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.05em;text-transform:uppercase}
 @media(max-width:768px){.dash-nav{padding:0 1rem}.dash-nav-links{display:none}.dash-content{padding:90px 1rem 2rem}.stats-row{grid-template-columns:1fr}.course-item{flex-wrap:wrap}.course-progress{width:100%;margin-top:0.5rem}}
+/* Below 768px, .dash-nav-links is already hidden, but .dash-nav-logo's text
+   label and .dash-nav-user's avatar+name+sign-out still crammed into one
+   fixed-height row with no wrap - overlapping at narrow widths (confirmed
+   on counselor-portal.html at 375px, reproduced identically on every page
+   that links this file since .dash-nav is shared). Hide the redundant logo
+   wordmark and user-name text under 480px; keep the avatar (still shows
+   who's logged in) and Sign Out control usable. */
+@media(max-width:480px){
+  .dash-nav{padding:0 0.75rem}
+  .dash-nav-logo span{display:none}
+  .dash-nav-user{gap:0.5rem}
+  .dash-nav-user .user-name{display:none}
+  .dash-nav-user .sign-out-btn{padding:0.4rem 0.6rem;font-size:0.65rem}
+}

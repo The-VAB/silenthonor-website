@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital@0;1&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/global.css">
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script>window.API_BASE = "https://tv9nakyd9p.us-east-1.awsapprunner.com";</script>
+<script>window.API_BASE = "https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com";</script>
 <script src="js/components.js"></script>
 <style>
 /* Dashboard Layout */
@@ -990,8 +990,27 @@
   .stat-card {
     text-align: left;
   }
+  /* Hiding just .user-name wasn't enough - the "SILENT HONOR" wordmark still
+     overlapped the avatar/Sign Out button at 375px (confirmed via screenshot,
+     same underlying bug as the shared css/dashboard.css nav on counselor
+     pages). Hide the redundant text wordmark too (logo image remains) and
+     tighten the Sign Out button so it fits on one line. */
+  .dash-nav {
+    padding: 0 0.75rem;
+  }
+  .dash-nav-logo span {
+    display: none;
+  }
+  .dash-nav-user {
+    gap: 0.4rem;
+  }
   .dash-nav-user .user-name {
     display: none;
+  }
+  .sign-out-btn {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
   }
 }
 </style>

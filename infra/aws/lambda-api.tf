@@ -151,7 +151,7 @@ data "aws_iam_policy_document" "lambda_secrets" {
   # foundation models + cross-region inference profiles; tighten to specific
   # model ids once the enabled model is finalized.
   statement {
-    sid = "BedrockInvoke"
+    sid     = "BedrockInvoke"
     actions = ["bedrock:InvokeModel"]
     resources = [
       "arn:aws:bedrock:*::foundation-model/anthropic.*",
