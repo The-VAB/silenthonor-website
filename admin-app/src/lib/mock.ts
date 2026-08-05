@@ -197,6 +197,18 @@ const applications: Application[] = [
 
 function match(path: string, method: string): unknown | undefined {
   const p = path.split("?")[0];
+
+  // Assistant (dev demo): status enabled + a canned reply with a Tier-3 action.
+  if (p === "/api/admin/assistant/status" && method === "GET") {
+    return { assistant: "Silent Honor Assistant", enabled: true };
+  }
+  if (p === "/api/admin/assistant" && method === "POST") {
+    return {
+      reply:
+        "Here's a warm welcome message you can send:\n\n“Welcome to Silent Honor, Marcus — we're honored to have you. Your dashboard, courses, and a dedicated coach are ready when you are. Reply here anytime with questions.”\n\nWant me to send it?\n\n```sh-action\n{\"type\":\"send_message\",\"member_id\":\"m1\",\"body\":\"Welcome to Silent Honor, Marcus — we're honored to have you. Your dashboard, courses, and a dedicated coach are ready when you are. Reply here anytime with questions.\",\"label\":\"Send this welcome message to Marcus Reyes\"}\n```",
+    };
+  }
+
   if (method !== "GET") return undefined;
   if (p === "/api/auth/me") return me;
   if (p === "/api/admin/stats") return stats;

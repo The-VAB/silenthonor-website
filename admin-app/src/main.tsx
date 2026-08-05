@@ -8,6 +8,7 @@ import "@/styles/tokens.css";
 import "@/styles/app.css";
 import "@/styles/components.css";
 import "@/styles/builder.css";
+import "@/styles/assistant.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

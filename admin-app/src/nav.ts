@@ -13,6 +13,7 @@ import {
   IconAudit,
   IconPipeline,
   IconReports,
+  IconAssistant,
 } from "@/components/icons";
 
 export interface NavItem {
@@ -33,6 +34,7 @@ export const NAV: NavGroup[] = [
     label: "At a glance",
     items: [
       { path: "/", label: "Overview", icon: IconOverview },
+      { path: "/assistant", label: "Assistant", icon: IconAssistant },
       { path: "/pipeline", label: "Pipeline", icon: IconPipeline },
       { path: "/reports", label: "Reports", icon: IconReports },
     ],

@@ -114,6 +114,27 @@ export interface Message {
   read?: boolean;
 }
 
+// ---- Assistant ----
+export interface AssistantStatus {
+  assistant: string;
+  enabled: boolean;
+}
+export interface AssistantAction {
+  type: string; // send_message | set_stage | create_announcement
+  member_id?: string;
+  body?: string;
+  pipeline_type?: string;
+  stage?: string;
+  title?: string;
+  content?: string;
+  kind?: string;
+  label?: string;
+}
+export interface ChatMsg {
+  role: "user" | "assistant";
+  content: string;
+}
+
 // ---- Pipeline ----
 export type PipelineData = Record<string, Record<string, { id: string; name?: string; email?: string; branch?: string; created_at?: string }[]>>;
 

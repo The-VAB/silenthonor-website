@@ -4,6 +4,7 @@ import { roleOf } from "@/lib/types";
 import { ApiError, goToLogin } from "@/lib/api";
 import Shell from "@/components/Shell";
 import Overview from "@/pages/Overview";
+import Assistant from "@/pages/Assistant";
 import Members from "@/pages/Members";
 import Applications from "@/pages/Applications";
 import Dd214 from "@/pages/Dd214";
@@ -21,6 +22,7 @@ import { ALL_ITEMS } from "@/nav";
 
 // Every section now has a real page.
 const BUILT: Record<string, JSX.Element> = {
+  "/assistant": <Assistant />,
   "/pipeline": <Pipeline />,
   "/reports": <Reports />,
   "/members": <Members />,

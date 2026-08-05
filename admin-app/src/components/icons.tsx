@@ -99,6 +99,12 @@ export const IconLogout = (p: P) => (
     <path d="M16 17l5-5-5-5M21 12H9" />
   </svg>
 );
+export const IconAssistant = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 3a7 7 0 0 1 7 7v1a7 7 0 0 1-7 7H8l-4 3v-4.5A7 7 0 0 1 5 6a7 7 0 0 1 7-3z" />
+    <path d="M9.5 10.5h.01M14.5 10.5h.01" />
+  </svg>
+);
 export const IconAlert = (p: P) => (
   <svg {...base(p)}>
     <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
