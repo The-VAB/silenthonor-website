@@ -17,15 +17,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 variable "enable_rust_build" {
-  description = "Create the CodeBuild project that compiles/packages the Rust Lambda."
+  description = "Create the CodeBuild project that compiles, packages, AND deploys the Rust Lambda. On by default now that the backend lives on main."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "rust_build_branch" {
-  description = "Git branch CodeBuild pulls to build the Rust API."
+  description = "Git branch CodeBuild pulls to build the Rust API. main is authoritative."
   type        = string
-  default     = "feat/rust-lambda-backend"
+  default     = "main"
 }
 
 locals {
@@ -63,6 +63,14 @@ resource "aws_iam_role_policy" "codebuild_rust" {
         Effect   = "Allow"
         Action   = ["s3:PutObject", "s3:GetObject"]
         Resource = ["${aws_s3_bucket.pipeline_artifacts.arn}/rust/*"]
+      },
+      {
+        # Deploy the freshly-built code straight to the Lambda (code only; env
+        # vars + IAM stay Terraform-managed).
+        Sid      = "DeployLambda"
+        Effect   = "Allow"
+        Action   = ["lambda:UpdateFunctionCode", "lambda:GetFunction"]
+        Resource = "arn:aws:lambda:${var.region}:${var.account_id}:function:${var.project}-api"
       }
     ]
   })
@@ -96,6 +104,12 @@ resource "aws_codebuild_project" "rust_build" {
     environment_variable {
       name  = "ARTIFACT_BUCKET"
       value = aws_s3_bucket.pipeline_artifacts.id
+    }
+    # When set, the buildspec deploys the new code to this Lambda after upload,
+    # so `start-build` is a complete backend deploy (code only).
+    environment_variable {
+      name  = "FUNCTION_NAME"
+      value = "${var.project}-api"
     }
   }
 
