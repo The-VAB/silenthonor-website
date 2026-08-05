@@ -8,830 +8,169 @@
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Silent Honor Foundation — Helping Veterans Achieve Financial Stability</title>
-<link rel="stylesheet" href="css/global.css">
-<style>
-/* ── HERO ── */
-.hero {
-  min-height: 100vh;
-  padding-top: 76px;
-  display: flex;
-  align-items: center;
-  padding-left: 3.5rem;
-  padding-right: 3.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-glow {
-  position: absolute;
-  top: 20%; right: -5%;
-  width: 55vw; height: 70vh;
-  background: radial-gradient(ellipse at center, rgba(185,28,28,0.09) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero-glow-2 {
-  position: absolute;
-  bottom: 10%; left: -5%;
-  width: 40vw; height: 40vh;
-  background: radial-gradient(ellipse at center, rgba(201,149,42,0.05) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero-inner {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 5rem;
-  align-items: center;
-  width: 100%;
-  max-width: 1300px;
-  margin: 0 auto;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(185,28,28,0.12);
-  border: 1px solid var(--border-red);
-  color: #FCA5A5;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  padding: 5px 14px;
-  border-radius: 2px;
-  margin-bottom: 1.8rem;
-  animation: fadeUp 0.7s ease both;
-}
-
-.hero-badge::before {
-  content: '';
-  width: 6px; height: 6px;
-  background: var(--red-light);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-.hero-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: clamp(3rem, 5.5vw, 5.2rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  line-height: 0.93;
-  margin-bottom: 1.6rem;
-  animation: fadeUp 0.7s 0.1s ease both;
-}
-
-.hero-title .red { color: var(--red-light); }
-
-.hero-gold-bar {
-  display: block;
-  width: 64px; height: 5px;
-  background: var(--gold);
-  border-radius: 1px;
-  margin-bottom: 0.9rem;
-}
-
-.hero-sub {
-  font-family: 'Lora', serif;
-  font-size: 1.05rem;
-  font-style: italic;
-  color: #8FA0BC;
-  line-height: 1.8;
-  max-width: 500px;
-  margin-bottom: 2.5rem;
-  animation: fadeUp 0.7s 0.2s ease both;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  animation: fadeUp 0.7s 0.3s ease both;
-}
-
-.hero-trust {
-  margin-top: 3rem;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  animation: fadeUp 0.7s 0.4s ease both;
-  flex-wrap: wrap;
-}
-
-.trust-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.trust-dot {
-  width: 6px; height: 6px;
-  background: var(--gold);
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.trust-text {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-/* Hero right — stat cards */
-.hero-right {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  animation: fadeUp 0.7s 0.3s ease both;
-}
-
-.hero-stat-card {
-  background: var(--navy-mid);
-  border: 1px solid var(--border);
-  padding: 1.8rem 2rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 1.2rem;
-  border-left: 3px solid var(--red);
-  transition: border-color 0.2s;
-}
-
-.hero-stat-card:hover { border-left-color: var(--red-light); }
-
-.hero-stat-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.hero-stat-num {
-  font-family: 'Oswald', sans-serif;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--white);
-}
-
-.hero-stat-label {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-top: 4px;
-  line-height: 1.4;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ── MISSION BAND ── */
-.mission-band {
-  background: var(--red-dark);
-  padding: 2.2rem 3.5rem;
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  position: relative;
-  z-index: 1;
-}
-
-.mission-band-label {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.mission-band-rule {
-  width: 1px; height: 36px;
-  background: rgba(255,255,255,0.15);
-  flex-shrink: 0;
-}
-
-.mission-band-text {
-  font-family: 'Lora', serif;
-  font-size: 0.95rem;
-  font-style: italic;
-  color: rgba(255,255,255,0.85);
-  line-height: 1.6;
-}
-
-/* ── SERVICES PREVIEW ── */
-.services-section {
-  padding: 6rem 3.5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.services-intro {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 3.5rem;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-}
-
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5px;
-  background: rgba(255,255,255,0.03);
-}
-
-.svc-card {
-  background: var(--navy-mid);
-  padding: 2.8rem 2.2rem;
-  position: relative;
-  overflow: hidden;
-  transition: background 0.3s;
-  cursor: default;
-}
-
-.svc-card:hover { background: #151e30; }
-
-.svc-num {
-  font-family: 'Oswald', sans-serif;
-  font-size: 4rem;
-  font-weight: 700;
-  color: rgba(185,28,28,0.08);
-  line-height: 1;
-  margin-bottom: 1.2rem;
-  transition: color 0.3s;
-}
-
-.svc-card:hover .svc-num { color: rgba(185,28,28,0.15); }
-
-.svc-icon-wrap {
-  width: 44px; height: 44px;
-  background: rgba(185,28,28,0.1);
-  border: 1px solid rgba(185,28,28,0.2);
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  margin-bottom: 1.3rem;
-}
-
-.svc-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--white);
-  margin-bottom: 0.8rem;
-  line-height: 1.3;
-}
-
-.svc-desc {
-  font-size: 0.85rem;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 1.4rem;
-}
-
-.svc-link {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--red-light);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: gap 0.2s;
-}
-
-.svc-link:hover { gap: 12px; }
-
-.svc-top-line {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--red);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s;
-}
-
-.svc-card:hover .svc-top-line { transform: scaleX(1); }
-
-/* ── IMPACT NUMBERS ── */
-.impact-section {
-  padding: 5rem 3.5rem;
-  background: linear-gradient(135deg, var(--red-dark) 0%, #5A0D0D 100%);
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-}
-
-.impact-topo {
-  position: absolute;
-  inset: 0;
-  opacity: 0.06;
-  background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3C/svg%3E");
-}
-
-.impact-inner {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-  gap: 5rem;
-  align-items: center;
-  max-width: 1300px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.impact-left .section-title { font-size: clamp(1.6rem, 2.5vw, 2.4rem); }
-
-.impact-numbers {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-.impact-item {
-  padding: 2.5rem 1.8rem;
-  border-right: 1px solid rgba(255,255,255,0.1);
-  text-align: center;
-}
-
-.impact-item:last-child { border-right: none; }
-
-.impact-num {
-  font-family: 'Oswald', sans-serif;
-  font-size: clamp(2rem, 3vw, 3rem);
-  font-weight: 700;
-  color: var(--white);
-  line-height: 1;
-  margin-bottom: 0.6rem;
-}
-
-.impact-label {
-  font-size: 0.68rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
-  line-height: 1.4;
-}
-
-/* ── COURSES PREVIEW ── */
-.courses-preview {
-  padding: 6rem 3.5rem;
-  position: relative;
-  z-index: 1;
-  background: var(--navy-mid);
-}
-
-.courses-intro {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 3.5rem;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-}
-
-.courses-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: rgba(255,255,255,0.03);
-}
-
-.course-tile {
-  background: var(--navy-mid);
-  padding: 2.8rem 2.2rem;
-  position: relative;
-  border-top: 3px solid transparent;
-  transition: border-color 0.3s, background 0.3s;
-}
-
-.course-tile:hover {
-  border-top-color: var(--red);
-  background: #161f31;
-}
-
-.course-tile.gold:hover { border-top-color: var(--gold); }
-
-.tile-badge {
-  display: inline-block;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 2px;
-  margin-bottom: 1.2rem;
-}
-
-.tile-badge.live {
-  background: rgba(185,28,28,0.15);
-  border: 1px solid rgba(185,28,28,0.3);
-  color: #FCA5A5;
-}
-
-.tile-badge.coming {
-  background: rgba(201,149,42,0.1);
-  border: 1px solid rgba(201,149,42,0.25);
-  color: var(--gold-light);
-}
-
-.tile-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  line-height: 1.1;
-  margin-bottom: 1rem;
-}
-
-.tile-desc {
-  font-size: 0.85rem;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 2rem;
-}
-
-.tile-meta {
-  display: flex;
-  gap: 1.2rem;
-  margin-bottom: 1.8rem;
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #4A5A73;
-  flex-wrap: wrap;
-}
-
-/* ── DONATE CTA ── */
-.donate-cta {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  position: relative;
-  z-index: 1;
-}
-
-.donate-left {
-  padding: 6rem 3.5rem;
-  background: var(--navy);
-  border-top: 1px solid var(--border);
-}
-
-.donate-right {
-  padding: 6rem 3.5rem;
-  background: var(--red-dark);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.donate-amounts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin: 2rem 0;
-}
-
-.amt-btn {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--white);
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
-  padding: 10px 20px;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.amt-btn:hover, .amt-btn.active {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.3);
-}
-
-.donate-quote {
-  font-family: 'Lora', serif;
-  font-size: 1.2rem;
-  font-style: italic;
-  font-weight: 400;
-  color: rgba(255,255,255,0.88);
-  line-height: 1.75;
-  margin-bottom: 2rem;
-  position: relative;
-  padding-left: 1.5rem;
-  border-left: 3px solid rgba(255,255,255,0.2);
-}
-
-.donate-footnote {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.3);
-  line-height: 1.7;
-  margin-top: 2rem;
-  font-family: 'Barlow', sans-serif;
-}
-
-@media (max-width: 1024px) {
-  .hero { padding: 76px 2rem 4rem; }
-  .hero-inner { grid-template-columns: 1fr; gap: 3rem; }
-  .hero-right { display: none; }
-  .services-section, .impact-section, .courses-preview { padding: 4rem 2rem; }
-  .services-grid { grid-template-columns: 1fr 1fr; }
-  .impact-inner { grid-template-columns: 1fr; gap: 2rem; }
-  .impact-numbers { grid-template-columns: repeat(2, 1fr); }
-  .impact-item { border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .courses-row { grid-template-columns: 1fr 1fr; }
-  .donate-cta { grid-template-columns: 1fr; }
-  .donate-left, .donate-right { padding: 4rem 2rem; }
-  .mission-band { padding: 1.8rem 2rem; flex-wrap: wrap; }
-}
-
-@media (max-width: 640px) {
-  .hero { padding: 76px 1.5rem 3rem; }
-  .services-section, .courses-preview { padding: 3.5rem 1.5rem; }
-  .services-grid, .courses-row { grid-template-columns: 1fr; }
-  .impact-numbers { grid-template-columns: 1fr 1fr; }
-  .donate-left, .donate-right { padding: 3rem 1.5rem; }
-}
-</style>
+<meta name="description" content="Free credit education, financial coaching, and real resources for military veterans. Run by veterans, for veterans. 100% free, always.">
+<link rel="stylesheet" href="css/redesign.css">
 </head>
 <body>
+<div class="sh">
 
-<div class="topo-bg"><svg xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div id="sh-header"></div>
 
-<div id="nav-placeholder"></div>
-
-<div class="page-content">
-
-  <!-- HERO -->
   <section class="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-glow-2"></div>
-    <div class="hero-inner" style="grid-template-columns: 1fr; max-width: 800px;">
-      <div class="hero-left">
-        <div class="hero-badge">Free for Military Veterans · 501(c)(3)</div>
-        <h1 class="hero-title">
-          <span class="hero-gold-bar"></span>
-          Helping Veterans<br>
-          <span class="red">Achieve Financial</span><br>
-          Stability
-        </h1>
-        <p class="hero-sub">We get it — transitioning out of the military doesn't come with a financial playbook. Silent Honor Foundation provides free credit education, financial coaching, and real resources to help you take control of your money.</p>
-        <div class="hero-actions">
-          <a href="signup.html" class="btn-primary" data-testid="hero-join-btn">Become a Member — It's Free →</a>
-          <a href="services.html" class="btn-outline">What We Offer</a>
-        </div>
-        <div class="hero-trust">
-          <div class="trust-item">
-            <div class="trust-dot"></div>
-            <span class="trust-text">100% Free</span>
-          </div>
-          <div class="trust-item">
-            <div class="trust-dot"></div>
-            <span class="trust-text">For Military Veterans Only</span>
-          </div>
-          <div class="trust-item">
-            <div class="trust-dot"></div>
-            <span class="trust-text">Run by Veterans</span>
+    <div class="hero-bg"><div class="terrain"></div></div>
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="hero-rule rev" aria-hidden="true"></div>
+          <div>
+            <span class="eyebrow rev">Free for Military Veterans &nbsp;·&nbsp; 501(c)(3)</span>
+            <h1 class="disp rev">
+              <span class="l">Helping Veterans</span>
+              <span class="l red">Achieve Financial</span>
+              <span class="l">Stability</span>
+            </h1>
+            <p class="hero-sub rev">We get it — transitioning out of the military doesn't come with a financial playbook. Silent Honor provides free credit education, financial coaching, and real resources to help you take control of your money.</p>
+            <div class="hero-actions rev">
+              <a class="btn btn-red" href="signup.html">Become a Member — It's Free <span class="arw">→</span></a>
+              <a class="btn btn-ghost" href="services.html">See What We Offer</a>
+            </div>
+            <div class="ribbon rev">
+              <span class="item"><span class="dot"></span>100% Free</span>
+              <span class="item"><span class="dot"></span>Military Veterans Only</span>
+              <span class="item"><span class="dot"></span>Run by Veterans</span>
+            </div>
           </div>
         </div>
+        <figure class="hero-photo rev">
+          <img class="hero-photo-img" src="images/hero-coaching.jpg" alt="A financial counselor meeting warmly with veteran clients, reviewing their paperwork together at a table.">
+          <figcaption class="hero-photo-cap"><i></i>One-on-one coaching &amp; credit help — always free for veterans.</figcaption>
+        </figure>
       </div>
     </div>
   </section>
 
-  <!-- MISSION BAND -->
-  <div class="mission-band">
-    <span class="mission-band-label">Our Mission</span>
-    <div class="mission-band-rule"></div>
-    <p class="mission-band-text">Silent Honor Foundation exists to give military veterans the financial education and support they didn't get when they left service. No cost. No catch. Just real help from people who've been there.</p>
-  </div>
-
-  <!-- GETTING STARTED -->
-  <section class="getting-started-section" style="padding: 5rem 3.5rem; background: var(--navy-mid); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-    <div style="max-width: 1100px; margin: 0 auto;">
-      <div style="text-align: center; margin-bottom: 3rem;">
-        <div class="section-tag reveal">How It Works</div>
-        <h2 class="section-title reveal" data-delay="100">Getting Started</h2>
-        <p class="section-body reveal" data-delay="150" style="max-width: 500px; margin: 1rem auto 0;">Three simple steps to access everything Silent Honor has to offer.</p>
-      </div>
-      
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
-        <div class="reveal" data-delay="0" style="text-align: center; padding: 2rem;">
-          <div style="width: 60px; height: 60px; background: rgba(185, 28, 28, 0.15); border: 2px solid rgba(185, 28, 28, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--red-light);">1</div>
-          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Join as a Member</h3>
-          <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.6;">Fill out the free membership application. Takes about 5 minutes.</p>
-        </div>
-        
-        <div class="reveal" data-delay="100" style="text-align: center; padding: 2rem;">
-          <div style="width: 60px; height: 60px; background: rgba(185, 28, 28, 0.15); border: 2px solid rgba(185, 28, 28, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--red-light);">2</div>
-          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Apply for Services</h3>
-          <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.6;">Once approved, apply for specific services through your member dashboard.</p>
-        </div>
-        
-        <div class="reveal" data-delay="200" style="text-align: center; padding: 2rem;">
-          <div style="width: 60px; height: 60px; background: rgba(185, 28, 28, 0.15); border: 2px solid rgba(185, 28, 28, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--red-light);">3</div>
-          <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Complete Intake</h3>
-          <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.6;">We'll schedule an intake call to understand your situation and get you started.</p>
-        </div>
-      </div>
-      
-      <div style="text-align: center; margin-top: 2.5rem;" class="reveal" data-delay="250">
-        <a href="signup.html" class="btn-primary" data-testid="getting-started-join-btn">Join Now — It's Free →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- SERVICES PREVIEW -->
-  <section class="services-section">
-    <div class="services-intro">
-      <div>
-        <div class="section-tag reveal">What We Do</div>
-        <h2 class="section-title reveal" data-delay="100">How We Help</h2>
-      </div>
-      <a href="services.html" class="btn-outline reveal" data-delay="150">See All Services →</a>
-    </div>
-    <div class="services-grid">
-      <div class="svc-card reveal" data-delay="0">
-        <div class="svc-top-line"></div>
-        <div class="svc-num">01</div>
-        <div class="svc-icon-wrap">💳</div>
-        <h3 class="svc-title">Credit Review</h3>
-        <p class="svc-desc">We'll pull your credit report together and walk you through exactly what's going on and what to do about it.</p>
-        <a href="services.html" class="svc-link">Learn More →</a>
-      </div>
-      <div class="svc-card reveal" data-delay="80">
-        <div class="svc-top-line"></div>
-        <div class="svc-num">02</div>
-        <div class="svc-icon-wrap">📚</div>
-        <h3 class="svc-title">Financial Courses</h3>
-        <p class="svc-desc">Self-paced courses covering budgeting, debt, credit, and money management. The stuff nobody taught us.</p>
-        <a href="courses.html" class="svc-link">View Courses →</a>
-      </div>
-      <div class="svc-card reveal" data-delay="160">
-        <div class="svc-top-line"></div>
-        <div class="svc-num">03</div>
-        <div class="svc-icon-wrap">🏠</div>
-        <h3 class="svc-title">VA Loan Help</h3>
-        <p class="svc-desc">Closing costs shouldn't stop you from using your VA loan benefit. We're building a program to help make homeownership possible.</p>
-        <a href="services.html" class="svc-link">Coming Soon →</a>
-      </div>
-      <div class="svc-card reveal" data-delay="0">
-        <div class="svc-top-line"></div>
-        <div class="svc-num">04</div>
-        <div class="svc-icon-wrap">🎯</div>
-        <h3 class="svc-title">1-on-1 Coaching</h3>
-        <p class="svc-desc">Work directly with someone who gets it. Build a plan that actually fits your situation.</p>
-        <a href="services.html" class="svc-link">Get Started →</a>
-      </div>
-      <div class="svc-card reveal" data-delay="80">
-        <div class="svc-top-line"></div>
-        <div class="svc-num">05</div>
-        <div class="svc-icon-wrap">📊</div>
-        <h3 class="svc-title">Debt Planning</h3>
-        <p class="svc-desc">Drowning in debt? We'll help you build a realistic payoff plan that you can actually stick to.</p>
-        <a href="services.html" class="svc-link">Get Help →</a>
-      </div>
-      <div class="svc-card reveal" data-delay="160">
-        <div class="svc-top-line"></div>
-        <div class="svc-num">06</div>
-        <div class="svc-icon-wrap">🛡️</div>
-        <h3 class="svc-title">VA Disability Support</h3>
-        <p class="svc-desc">The VA claims process is a mess. We help you document and fight for the rating you've earned.</p>
-        <a href="services.html" class="svc-link">Coming Soon →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- IMPACT -->
-  <div class="impact-section">
-    <div class="impact-inner">
-      <div class="impact-left reveal">
-        <div class="section-tag" style="color: rgba(255,255,255,0.5);">Why This Matters</div>
-        <h2 class="section-title">The Problem<br>We're Fixing</h2>
-        <p class="section-body" style="color: rgba(255,255,255,0.5); margin-top: 1rem; font-size: 0.9rem;">Most veterans leave service without any real financial training. We're changing that.</p>
-      </div>
-      <div class="impact-numbers reveal" data-delay="150">
-        <div class="impact-item">
-          <div class="impact-num">1 in 3</div>
-          <div class="impact-label">Veterans deal with debt problems after getting out</div>
-        </div>
-        <div class="impact-item">
-          <div class="impact-num">60%</div>
-          <div class="impact-label">Leave service with zero financial education</div>
-        </div>
-        <div class="impact-item">
-          <div class="impact-num">$0</div>
-          <div class="impact-label">What it costs to access everything we offer</div>
-        </div>
-        <div class="impact-item">
-          <div class="impact-num">All</div>
-          <div class="impact-label">Branches — Army, Navy, Marines, Air Force, Coast Guard</div>
-        </div>
-      </div>
+  <div class="mission">
+    <div class="terrain"></div>
+    <div class="wrap rev">
+      <span class="eyebrow">Our Mission</span>
+      <p class="mission-quote">Give veterans the financial education they <em>didn't get</em> when they left service. No cost. No catch. <em>Real help</em> from people who've been there.</p>
     </div>
   </div>
 
-  <!-- COURSES PREVIEW -->
-  <section class="courses-preview">
-    <div class="courses-intro">
-      <div>
-        <div class="section-tag reveal">Member Resources</div>
-        <h2 class="section-title reveal" data-delay="100">Free Courses for Veterans</h2>
-        <p class="section-body reveal" data-delay="150" style="max-width: 480px;">Built by veterans who've been through the transition. Become a member to access all our courses and resources at no cost.</p>
+  <section class="section stats">
+    <div class="wrap">
+      <div class="sec-head rev">
+        <div>
+          <span class="eyebrow">The Problem We're Fixing</span>
+          <h2 class="h2">Most Veterans Leave<br>With No Financial Training</h2>
+        </div>
+        <p class="lead">Service teaches discipline, leadership, and sacrifice — but nobody hands you a plan for your money on the way out. We're changing that.</p>
       </div>
-      <a href="signup.html" class="btn-primary reveal" data-testid="courses-join-btn">Join Free →</a>
-    </div>
-    <div class="courses-row">
-      <div class="course-tile reveal" data-delay="0">
-        <div class="tile-badge live">Available Now</div>
-        <h3 class="tile-title">Credit Education for Veterans</h3>
-        <p class="tile-desc">Learn how credit actually works, what's hurting your score, and what to do about it. No fluff — just the stuff that matters.</p>
-        <div class="tile-meta"><span>Self-paced</span><span>7 Lessons</span><span>Free</span></div>
-        <a href="signup.html" class="btn-primary" data-testid="course-join-btn">Join to Access →</a>
-      </div>
-      <div class="course-tile reveal" data-delay="100">
-        <div class="tile-badge live">Available Now</div>
-        <h3 class="tile-title">Financial Literacy Basics</h3>
-        <p class="tile-desc">Budgeting, debt, savings — the fundamentals most of us had to figure out the hard way after getting out.</p>
-        <div class="tile-meta"><span>Self-paced</span><span>Multiple Modules</span><span>Free</span></div>
-        <a href="signup.html" class="btn-primary" data-testid="course-join-btn-2">Join to Access →</a>
-      </div>
-      <div class="course-tile gold reveal" data-delay="200">
-        <div class="tile-badge coming">Coming Soon</div>
-        <h3 class="tile-title">Money Mission: Complete Course</h3>
-        <p class="tile-desc">The full program — 9 modules covering everything from getting out of debt to building wealth. We're working on it.</p>
-        <div class="tile-meta"><span>Self-paced</span><span>34 Lessons</span><span>Free</span></div>
-        <a href="signup.html" class="btn-outline">Join Waitlist →</a>
+      <div class="stat-grid rev">
+        <div class="stat"><div class="n">1 in 3</div><div class="l">Veterans deal with debt problems after getting out</div></div>
+        <div class="stat"><div class="n">60%</div><div class="l">Leave service with zero financial education</div></div>
+        <div class="stat"><div class="n">$0</div><div class="l">What it costs to access everything we offer</div></div>
+        <div class="stat"><div class="n">All</div><div class="l">Branches — Army, Navy, Marines, Air Force, Coast Guard</div></div>
       </div>
     </div>
   </section>
 
-  <!-- DONATE CTA -->
-  <div class="donate-cta" id="donate">
-    <div class="donate-left">
-      <div class="section-tag reveal">Support the Mission</div>
-      <h2 class="section-title reveal" data-delay="100">Help Us Help<br>More Veterans</h2>
-      <p class="section-body reveal" data-delay="150">Silent Honor is 100% volunteer-run and donor-supported. Every dollar goes directly to serving veterans — free courses, coaching, and resources that actually make a difference.</p>
-      <div class="donate-amounts reveal" data-delay="200">
-        <button class="amt-btn active">$25</button>
-        <button class="amt-btn">$50</button>
-        <button class="amt-btn">$100</button>
-        <button class="amt-btn">$250</button>
-        <button class="amt-btn">$500</button>
-        <button class="amt-btn">Other</button>
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head rev">
+        <div><span class="eyebrow">What We Offer</span><h2 class="h2">Real Help, No Cost</h2></div>
+        <a class="btn btn-ghost" href="services.html">All Services →</a>
       </div>
-      <a href="donate.html" class="btn-gold reveal" data-delay="250">Donate Now →</a>
-      <p style="font-size: 0.7rem; color: var(--muted); margin-top: 1rem; font-family: 'Oswald', sans-serif; letter-spacing: 0.12em; text-transform: uppercase;">Tax-deductible · EIN 99-3172064</p>
-    </div>
-    <div class="donate-right">
-      <div class="reveal">
-        <p class="donate-quote">We've been where you are. That's why we do this.</p>
-        <p style="font-family: 'Oswald', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 3rem;">— The Silent Honor Team</p>
-        <a href="signup.html" class="btn-primary" data-testid="donate-join-btn">Become a Member →</a>
-        <p class="donate-footnote">Silent Honor Foundation Inc. is a 501(c)(3) nonprofit. Contributions are tax-deductible.</p>
+      <div class="svc-grid rev">
+        <div class="svc">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 9.5h19"/><path d="M6 15h5"/></svg>
+          <h3>Credit Review</h3><p>We'll pull your credit report together and walk you through exactly what's going on and what to do about it.</p>
+        </div>
+        <div class="svc">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 6.5 4.7 4 5.5v13c2.5-.8 6-.5 8 1 2-1.5 5.5-1.8 8-1v-13c-2.5-.8-6-.5-8 1Z"/><path d="M12 6.5v13"/></svg>
+          <h3>Financial Courses</h3><p>Self-paced courses covering budgeting, debt, credit, and money management. The stuff nobody taught us.</p>
+        </div>
+        <div class="svc">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg>
+          <h3>VA Loan Help</h3><p>Closing costs shouldn't stop you from using your VA loan benefit. We're building a program to help make homeownership possible.</p>
+        </div>
+        <div class="svc">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/><path d="M20 9h.5A1.5 1.5 0 0 1 22 10.5V15a1.5 1.5 0 0 1-1.5 1.5H20v2.5"/></svg>
+          <h3>1-on-1 Coaching</h3><p>Work directly with someone who gets it. Build a plan that actually fits your situation.</p>
+        </div>
+        <div class="svc">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M4 20V12M9 20v-5M14 20v-8M19 20V7"/><path d="M4 12 9 15 14 12 19 7"/></svg>
+          <h3>Debt Planning</h3><p>Drowning in debt? We'll help you build a realistic payoff plan that you can actually stick to.</p>
+        </div>
+        <div class="svc">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 5.5v6c0 4.2 3 7.3 7 9 4-1.7 7-4.8 7-9v-6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg>
+          <h3>VA Disability Support</h3><p>The VA claims process is a mess. We help you document and fight for the rating you've earned.</p>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-</div><!-- /page-content -->
+  <section class="section steps">
+    <div class="terrain"></div>
+    <div class="wrap">
+      <div class="sec-head rev" style="margin-bottom:40px">
+        <div><span class="eyebrow">How It Works</span><h2 class="h2">Getting Started</h2></div>
+        <p class="lead">Three steps to access everything Silent Honor has to offer.</p>
+      </div>
+      <div class="step-grid rev">
+        <div class="step"><div class="num">0<b>1</b></div><h3>Join as a Member</h3><p>Fill out the free membership application. Takes about 5 minutes.</p></div>
+        <div class="step"><div class="num">0<b>2</b></div><h3>Apply for Services</h3><p>Once approved, apply for specific services through your member dashboard.</p></div>
+        <div class="step"><div class="num">0<b>3</b></div><h3>Complete Intake</h3><p>We'll schedule an intake call to understand your situation and get you started.</p></div>
+      </div>
+      <div style="margin-top:44px" class="rev"><a class="btn btn-red" href="signup.html">Join Now — It's Free <span class="arw">→</span></a></div>
+    </div>
+  </section>
 
-<div id="footer-placeholder"></div>
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head rev">
+        <div><span class="eyebrow">Member Resources</span><h2 class="h2">Free Courses for Veterans</h2></div>
+        <p class="lead">Built by veterans who've been through the transition. Members access every course at no cost.</p>
+      </div>
+      <div class="course-grid rev">
+        <div class="course"><span class="ct">Available Now</span><h3>Credit Education for Veterans</h3><p>Learn how credit actually works, what's hurting your score, and what to do about it. No fluff — just the stuff that matters.</p><span class="go">Join to Access →</span></div>
+        <div class="course"><span class="ct">Available Now</span><h3>Financial Literacy Basics</h3><p>Budgeting, debt, savings — the fundamentals most of us had to figure out the hard way after getting out.</p><span class="go">Join to Access →</span></div>
+        <div class="course"><span class="ct dev">In Development</span><h3>Money Mission: Complete Course</h3><p>The full program — 9 modules covering everything from getting out of debt to building wealth.</p><span class="go">Coming Soon</span></div>
+      </div>
+    </div>
+  </section>
 
-<script src="js/components.js"></script>
-<script src="js/main.js"></script>
-<script>
-  document.querySelectorAll('.amt-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
-  });
-</script>
+  <section class="donate">
+    <div class="donate-bg"></div>
+    <div class="terrain"></div>
+    <div class="wrap">
+      <div class="donate-grid">
+        <div class="rev">
+          <span class="eyebrow">Support the Mission</span>
+          <h2 class="h2">Help Us Help<br>More Veterans</h2>
+          <p class="lead" style="margin-top:20px">Silent Honor is 100% volunteer-run and donor-supported. Every dollar goes directly to serving veterans — free courses, coaching, and resources that actually make a difference.</p>
+          <p class="sig">"We've been where you are.<br>That's why we do this."</p>
+        </div>
+        <div class="rev">
+          <div class="chips">
+            <button class="chip" type="button">$25</button>
+            <button class="chip on" type="button">$50</button>
+            <button class="chip" type="button">$100</button>
+            <button class="chip" type="button">$250</button>
+            <button class="chip" type="button">$500</button>
+            <button class="chip other" type="button">Other</button>
+          </div>
+          <div class="donate-cta"><a class="btn btn-red" href="donate.html">Donate Now <span class="arw">→</span></a></div>
+          <p class="footnote">Silent Honor Foundation Inc. is a 501(c)(3) nonprofit. Contributions are tax-deductible to the extent allowed by law.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="sh-footer"></div>
+
+</div>
+
+<script src="js/redesign.js"></script>
 </body>
 </html>
