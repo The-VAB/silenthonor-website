@@ -1,6 +1,7 @@
 //! HTTP routing + small cookie helpers shared by handlers.
 
 pub mod admin;
+pub mod assistant;
 pub mod auth;
 pub mod content;
 pub mod counselor;
@@ -268,6 +269,11 @@ pub fn router(state: AppState) -> Router {
             get(major_finance::status),
         )
         .route("/api/member/major-finance", post(major_finance::chat))
+        .route(
+            "/api/admin/assistant/status",
+            get(assistant::status),
+        )
+        .route("/api/admin/assistant", post(assistant::chat))
         .layer(middleware::from_fn(preflight_ok))
         .with_state(state)
 }
