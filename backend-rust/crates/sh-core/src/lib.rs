@@ -5,6 +5,7 @@
 //! crate stays small.
 
 pub mod auth;
+pub mod bedrock;
 pub mod config;
 pub mod db;
 pub mod email;

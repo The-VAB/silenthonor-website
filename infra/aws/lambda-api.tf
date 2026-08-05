@@ -146,6 +146,18 @@ data "aws_iam_policy_document" "lambda_secrets" {
     actions   = ["kms:Encrypt", "kms:Decrypt", "kms:GenerateDataKey"]
     resources = [aws_kms_key.uploads.arn]
   }
+  # Amazon Bedrock (Claude) for the member "Major Finance" chat and the admin
+  # Assistant. Auth is this IAM role — no Anthropic API key. Scoped to Anthropic
+  # foundation models + cross-region inference profiles; tighten to specific
+  # model ids once the enabled model is finalized.
+  statement {
+    sid = "BedrockInvoke"
+    actions = ["bedrock:InvokeModel"]
+    resources = [
+      "arn:aws:bedrock:*::foundation-model/anthropic.*",
+      "arn:aws:bedrock:*:*:inference-profile/*",
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "lambda_secrets" {
@@ -195,10 +207,15 @@ resource "aws_lambda_function" "api" {
       S3_BUCKET     = aws_s3_bucket.uploads.id
       S3_KMS_KEY_ID = aws_kms_key.uploads.arn
 
-      # Major Finance (member AI) -- dormant until enable_major_finance = true.
-      # See major-finance.tf and docs/MAJOR_FINANCE.md.
-      MAJOR_FINANCE_ENABLED         = tostring(var.enable_major_finance)
-      MAJOR_FINANCE_MODEL           = var.major_finance_model
+      # AI (Claude via Amazon Bedrock -- auth is the Lambda IAM role, no API key).
+      # `major_finance_model` must be a Bedrock model id / inference-profile id
+      # (e.g. "us.anthropic.claude-3-5-sonnet-20241022-v2:0"); it's shared by both
+      # the member Major Finance chat and the admin Assistant.
+      MAJOR_FINANCE_ENABLED   = tostring(var.enable_major_finance)
+      MAJOR_FINANCE_MODEL     = var.major_finance_model
+      ADMIN_ASSISTANT_ENABLED = tostring(var.enable_admin_assistant)
+      # Vestigial: Bedrock needs no API key. Left set so removing the secret is a
+      # separate, deliberate change; the code no longer reads it.
       ANTHROPIC_API_KEY_SECRET_NAME = join("", aws_secretsmanager_secret.anthropic[*].name)
       },
       # Google Sign-In: set the env var only when configured; otherwise omit it so

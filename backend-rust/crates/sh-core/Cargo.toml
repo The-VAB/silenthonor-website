@@ -19,6 +19,7 @@ aws-config.workspace = true
 aws-sdk-secretsmanager.workspace = true
 aws-sdk-sesv2.workspace = true
 aws-sdk-s3.workspace = true
+aws-sdk-bedrockruntime.workspace = true
 time.workspace = true
 once_cell.workspace = true
 axum.workspace = true

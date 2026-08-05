@@ -39,6 +39,9 @@ aws-config = { version = "1", features = ["behavior-version-latest"] }
 aws-sdk-secretsmanager = "1"
 aws-sdk-sesv2 = "1"
 aws-sdk-s3 = "1"
+# Amazon Bedrock (Claude) — used instead of a direct Anthropic API key. Auth is
+# the Lambda's IAM role (bedrock:InvokeModel); no key to manage.
+aws-sdk-bedrockruntime = "1"
 # HTTP client for the Anthropic Messages API (Rust has no official SDK).
 # rustls-tls keeps the TLS stack consistent with the mongodb driver.
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }

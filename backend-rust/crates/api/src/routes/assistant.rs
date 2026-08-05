@@ -91,10 +91,11 @@ pub async fn chat(
         return Err(AppError::BadRequest("Message is required".to_string()));
     }
 
-    let api_key = resolve_anthropic_key().await.map_err(AppError::Internal)?;
+    // Bedrock model id / inference-profile id (env-driven; no API key needed).
     let model = std::env::var("ADMIN_ASSISTANT_MODEL")
+        .or_else(|_| std::env::var("BEDROCK_MODEL_ID"))
         .or_else(|_| std::env::var("MAJOR_FINANCE_MODEL"))
-        .unwrap_or_else(|_| "claude-opus-5".to_string());
+        .unwrap_or_else(|_| "us.anthropic.claude-3-5-sonnet-20241022-v2:0".to_string());
 
     // Inject the admin-provided context snapshot (if any) into the system prompt.
     let system = match &body.context {
@@ -113,36 +114,9 @@ pub async fn chat(
         .collect();
     messages.push(json!({ "role": "user", "content": message }));
 
-    let payload = json!({
-        "model": model,
-        "max_tokens": 1500,
-        "system": system,
-        "messages": messages,
-    });
-
-    let resp = reqwest::Client::new()
-        .post("https://api.anthropic.com/v1/messages")
-        .header("x-api-key", api_key)
-        .header("anthropic-version", "2023-06-01")
-        .header("content-type", "application/json")
-        .json(&payload)
-        .send()
+    let data = sh_core::bedrock::invoke_claude(&model, &system, messages, 1500)
         .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Anthropic request failed: {e}")))?;
-
-    if !resp.status().is_success() {
-        let code = resp.status();
-        let detail = resp.text().await.unwrap_or_default();
-        tracing::error!("Anthropic API error {code}: {detail}");
-        return Err(AppError::Internal(anyhow::anyhow!(
-            "Anthropic API error {code}"
-        )));
-    }
-
-    let data: Value = resp
-        .json()
-        .await
-        .map_err(|e| AppError::Internal(anyhow::anyhow!("Anthropic response parse failed: {e}")))?;
+        .map_err(AppError::Internal)?;
 
     let reply = data
         .get("content")
@@ -167,20 +141,4 @@ pub async fn chat(
     .await;
 
     Ok(Json(json!({ "reply": reply })))
-}
-
-/// Anthropic API key: direct env for local dev, else the Secrets Manager name
-/// set by Terraform. Never hard-coded.
-async fn resolve_anthropic_key() -> anyhow::Result<String> {
-    if let Ok(k) = std::env::var("ANTHROPIC_API_KEY") {
-        if !k.is_empty() {
-            return Ok(k);
-        }
-    }
-    if let Ok(name) = std::env::var("ANTHROPIC_API_KEY_SECRET_NAME") {
-        if !name.is_empty() {
-            return sh_core::secrets::get_secret(&name).await;
-        }
-    }
-    anyhow::bail!("The assistant is enabled but no Anthropic API key is configured")
 }
