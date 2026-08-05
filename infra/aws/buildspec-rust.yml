@@ -47,3 +47,15 @@ phases:
         else
           echo "ARTIFACT_BUCKET not set; skipping upload (compile/test still validated)."
         fi
+      # Deploy the new code straight to the Lambda so `start-build` is a full
+      # backend deploy. Code only -- env vars + IAM (enable flags, Bedrock perms)
+      # stay Terraform-managed, so a config change still needs `terraform apply`.
+      - |
+        if [ -n "$FUNCTION_NAME" ] && [ -n "$ARTIFACT_BUCKET" ]; then
+          echo "Deploying to Lambda $FUNCTION_NAME..."
+          aws lambda update-function-code --function-name "$FUNCTION_NAME" \
+            --s3-bucket "$ARTIFACT_BUCKET" --s3-key rust/api.zip --publish >/dev/null
+          echo "Deployed $FUNCTION_NAME."
+        else
+          echo "FUNCTION_NAME not set; built + uploaded only (no deploy)."
+        fi
