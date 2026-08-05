@@ -12,15 +12,21 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 variable "enable_major_finance" {
-  description = "Provision the Anthropic key secret + IAM read for the Rust API. Off by default."
+  description = "Turn on the member-facing Major Finance chat (Bedrock). Off by default."
+  type        = bool
+  default     = false
+}
+
+variable "enable_admin_assistant" {
+  description = "Turn on the admin Assistant copilot (Bedrock). Off by default."
   type        = bool
   default     = false
 }
 
 variable "major_finance_model" {
-  description = "Anthropic model for Major Finance. Cheaper options: claude-sonnet-5, claude-haiku-4-5."
+  description = "Bedrock model id / inference-profile id for the AI (Major Finance + admin Assistant). Auth is the Lambda IAM role — no API key. Ensure the model is enabled in Bedrock for this account/region."
   type        = string
-  default     = "claude-opus-5"
+  default     = "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
 }
 
 locals {

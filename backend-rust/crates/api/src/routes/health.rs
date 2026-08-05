@@ -9,11 +9,7 @@ use crate::state::AppState;
 
 pub async fn health(State(state): State<AppState>) -> Json<Value> {
     // Best-effort DB ping; never fail the probe hard, just report status.
-    let db_ok = state
-        .db
-        .run_command(bson::doc! { "ping": 1 })
-        .await
-        .is_ok();
+    let db_ok = state.db.run_command(bson::doc! { "ping": 1 }).await.is_ok();
     Json(json!({
         "status": "ok",
         "service": "silenthonor-rust-api",
