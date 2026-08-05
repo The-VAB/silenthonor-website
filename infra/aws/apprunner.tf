@@ -1,7 +1,11 @@
 # App Runner VPC connector so the service can reach DocumentDB in private subnets.
+# NOTE: vpc_connector_name matches the LIVE connector ("...-2"); the name is
+# ForceNew, so this must equal reality or an import would replace it (and force
+# the App Runner service to redeploy). Subnets are the dedicated silenthonor
+# subnets, which differ from the shared prod-private subnets DocumentDB uses.
 resource "aws_apprunner_vpc_connector" "main" {
-  vpc_connector_name = "${var.project}-vpc-connector"
-  subnets            = aws_subnet.private[*].id
+  vpc_connector_name = "${var.project}-vpc-connector-2"
+  subnets            = var.apprunner_subnet_ids
   security_groups    = [aws_security_group.apprunner.id]
 }
 
@@ -30,7 +34,7 @@ resource "aws_apprunner_service" "backend" {
           EMAIL_PROVIDER = var.email_provider
           FROM_EMAIL     = var.from_email
           ADMIN_EMAIL    = var.admin_email
-          CORS_ORIGINS   = join(",", var.frontend_aliases)
+          CORS_ORIGINS   = join(",", var.cors_origins)
           FRONTEND_URL   = length(var.frontend_aliases) > 0 ? "https://${var.frontend_aliases[0]}" : "https://${aws_cloudfront_distribution.frontend.domain_name}"
         }
 

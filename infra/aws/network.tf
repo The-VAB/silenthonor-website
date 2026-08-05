@@ -1,102 +1,29 @@
-# Dedicated VPC for Silent Honor. Public subnets host the NAT gateway; private
-# subnets host DocumentDB and the App Runner VPC connector ENIs.
+# ─────────────────────────────────────────────────────────────────────────────
+# Networking — REFERENCE ONLY.
+#
+# Silent Honor does NOT own a VPC. Its DocumentDB and App Runner ENIs live inside
+# the shared "prod-vpc" (vpc-08f6c3091778e46b1, 10.1.0.0/16), which is owned and
+# operated by the VAB/prod stack — NOT by this Terraform. The foundation was
+# placed here by hand, so this file only *reads* the shared VPC and manages the
+# two Silent-Honor-owned security groups. See STATE_RECONCILIATION.md.
+#
+# Consequently there is no aws_vpc / aws_subnet / aws_nat_gateway / aws_route_table
+# / aws_internet_gateway / aws_vpc_endpoint here — the subnet IDs come in as
+# variables (see variables.tf: shared_vpc_id, docdb_subnet_ids, apprunner_subnet_ids).
+# ─────────────────────────────────────────────────────────────────────────────
 
-data "aws_availability_zones" "available" {
-  state = "available"
+data "aws_vpc" "shared" {
+  id = var.shared_vpc_id
 }
 
-locals {
-  azs = slice(data.aws_availability_zones.available.names, 0, var.az_count)
-}
-
-resource "aws_vpc" "main" {
-  cidr_block           = var.vpc_cidr
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-  tags                 = { Name = "${var.project}-vpc" }
-}
-
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.main.id
-  tags   = { Name = "${var.project}-igw" }
-}
-
-resource "aws_subnet" "public" {
-  count                   = var.az_count
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index)
-  availability_zone       = local.azs[count.index]
-  map_public_ip_on_launch = true
-  tags                    = { Name = "${var.project}-public-${local.azs[count.index]}" }
-}
-
-resource "aws_subnet" "private" {
-  count             = var.az_count
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
-  availability_zone = local.azs[count.index]
-  tags              = { Name = "${var.project}-private-${local.azs[count.index]}" }
-}
-
-# Single NAT gateway (cost-optimized) for private-subnet outbound internet,
-# e.g. the Resend API. If you move fully to SES you can drop this and use a
-# VPC interface endpoint instead.
-resource "aws_eip" "nat" {
-  domain = "vpc"
-  tags   = { Name = "${var.project}-nat-eip" }
-}
-
-resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public[0].id
-  tags          = { Name = "${var.project}-nat" }
-  depends_on    = [aws_internet_gateway.igw]
-}
-
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
-  }
-  tags = { Name = "${var.project}-public-rt" }
-}
-
-resource "aws_route_table_association" "public" {
-  count          = var.az_count
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.main.id
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat.id
-  }
-  tags = { Name = "${var.project}-private-rt" }
-}
-
-resource "aws_route_table_association" "private" {
-  count          = var.az_count
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
-}
-
-# Free S3 gateway endpoint so S3 traffic (DD-214/documents) skips the NAT.
-resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = aws_vpc.main.id
-  service_name      = "com.amazonaws.${var.region}.s3"
-  vpc_endpoint_type = "Gateway"
-  route_table_ids   = [aws_route_table.private.id]
-  tags              = { Name = "${var.project}-s3-endpoint" }
-}
-
-# ── Security groups ───────────────────────────────────────────────────────────
+# ── Security groups (Silent-Honor-owned) ──────────────────────────────────────
+# NOTE: `name` and `description` are immutable (ForceNew). They are set to EXACTLY
+# match the live SGs so `terraform import` never triggers a replace of an SG that
+# the running DocumentDB depends on.
 resource "aws_security_group" "apprunner" {
   name        = "${var.project}-apprunner-sg"
-  description = "App Runner VPC connector egress"
-  vpc_id      = aws_vpc.main.id
+  description = "Silent Honor App Runner VPC connector egress"
+  vpc_id      = data.aws_vpc.shared.id
 
   egress {
     from_port   = 0
@@ -109,21 +36,25 @@ resource "aws_security_group" "apprunner" {
 
 resource "aws_security_group" "docdb" {
   name        = "${var.project}-docdb-sg"
-  description = "DocumentDB — only reachable from the App Runner SG"
-  vpc_id      = aws_vpc.main.id
+  description = "Silent Honor DocumentDB - ingress from App Runner SG only"
+  vpc_id      = data.aws_vpc.shared.id
+  tags        = { Name = "${var.project}-docdb-sg" }
 
-  ingress {
-    description     = "Mongo/DocumentDB from App Runner"
-    from_port       = 27017
-    to_port         = 27017
-    protocol        = "tcp"
-    security_groups = [aws_security_group.apprunner.id]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = { Name = "${var.project}-docdb-sg" }
+  # Ingress/egress are managed as STANDALONE rules below (not in-line) so the
+  # additive Rust-API ingress rule in lambda-api.tf never fights an in-line block
+  # on this SG. Mixing the two styles on one SG causes perpetual diffs.
+}
+
+resource "aws_vpc_security_group_egress_rule" "docdb_all" {
+  security_group_id = aws_security_group.docdb.id
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "docdb_from_apprunner" {
+  security_group_id            = aws_security_group.docdb.id
+  referenced_security_group_id = aws_security_group.apprunner.id
+  from_port                    = 27017
+  to_port                      = 27017
+  ip_protocol                  = "tcp"
 }

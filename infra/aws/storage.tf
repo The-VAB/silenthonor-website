@@ -74,8 +74,8 @@ resource "aws_s3_bucket_public_access_block" "frontend" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_website_configuration" "frontend" {
-  bucket = aws_s3_bucket.frontend.id
-  index_document { suffix = "index.html" }
-  error_document { key = "404.html" }
-}
+# NOTE: No aws_s3_bucket_website_configuration here. The frontend is served by
+# CloudFront over the S3 REST endpoint with OAC (see cloudfront.tf) — the bucket's
+# public access is fully blocked, so the S3 website endpoint is neither used nor
+# reachable. CloudFront handles the index (default_root_object) and 404
+# (custom_error_response). The live bucket has no website config, matching this.
