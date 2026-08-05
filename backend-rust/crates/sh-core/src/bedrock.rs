@@ -53,3 +53,36 @@ pub async fn invoke_claude(
 
     serde_json::from_slice(out.body().as_ref()).context("parse Bedrock response body")
 }
+
+/// Like `invoke_claude`, but exposes Anthropic tool-use: `tools` is the tool
+/// schema array, and the full response body is returned (so the caller can read
+/// `stop_reason` and any `tool_use` content blocks and run the tool loop).
+pub async fn invoke_claude_tools(
+    model_id: &str,
+    system: &str,
+    messages: Vec<Value>,
+    tools: Value,
+    max_tokens: u32,
+) -> Result<Value> {
+    let payload = json!({
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": max_tokens,
+        "system": system,
+        "messages": messages,
+        "tools": tools,
+    });
+    let bytes = serde_json::to_vec(&payload).context("serialize Bedrock request")?;
+
+    let out = client()
+        .await
+        .invoke_model()
+        .model_id(model_id)
+        .content_type("application/json")
+        .accept("application/json")
+        .body(Blob::new(bytes))
+        .send()
+        .await
+        .with_context(|| format!("Bedrock InvokeModel ({model_id})"))?;
+
+    serde_json::from_slice(out.body().as_ref()).context("parse Bedrock response body")
+}
