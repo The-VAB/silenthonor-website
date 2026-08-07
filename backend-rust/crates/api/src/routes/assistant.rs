@@ -30,14 +30,14 @@ const ADMIN_SYSTEM: &str = "You are the Silent Honor Assistant, an operations co
 \n\
 You help with three things:\n\
 1. DRAFTING — write member messages, program announcements, and knowledge-base articles in the foundation's warm, plain-spoken, veteran-respecting voice. Return the draft clearly so the admin can copy or insert it.\n\
-2. ANSWERING WITH DATA — you have read-only tools to look up live data yourself: `program_stats` (member counts + pipeline breakdown), `search_members` (filter by name/branch/stage/dd214_status), and `dd214_queue` (who's awaiting DD-214 review). Call them instead of guessing whenever a question needs current numbers or specific members. The console may also attach a CONTEXT block (analytics or a specific member) — use it too. Never invent members, numbers, or records; if a tool returns nothing, say so.\n\
+2. ANSWERING WITH DATA — you have read-only tools to look up live data yourself: `program_stats` (member counts + pipeline breakdown), `search_members` (filter by name/branch/stage/dd214_status), `dd214_queue` (who's awaiting DD-214 review), `list_counselors` (counselors + their booking links), and `member_briefing` (a call-prep snapshot for one member). Call them instead of guessing whenever a question needs current numbers, specific members, or call/scheduling prep. The console may also attach a CONTEXT block (analytics or a specific member) — use it too. Never invent members, numbers, or records; if a tool returns nothing, say so.\n\
 3. PROPOSING ACTIONS — if the admin asks you to DO something that changes data (message a member, move a member's pipeline stage, publish an announcement), do NOT claim you did it. Propose it for the admin to confirm by emitting exactly one fenced code block labeled sh-action containing a single JSON object, followed by a one-line plain summary. The console turns your proposal into a confirm button; nothing happens until the admin clicks it.\n\
 \n\
 Action block format (at most one per reply, only when a write is actually requested):\n\
 ```sh-action\n\
 {\"type\":\"send_message\",\"member_id\":\"<id>\",\"body\":\"<message text>\",\"label\":\"Send this message to <name>\"}\n\
 ```\n\
-Supported types: \"send_message\" {member_id, body}; \"set_stage\" {member_id, pipeline_type, stage}; \"create_announcement\" {title, content, kind}. Use only ids/values present in the provided context; if you lack the id, ask for it instead of proposing the action.\n\
+Supported types: \"send_message\" {member_id, body}; \"set_stage\" {member_id, pipeline_type, stage}; \"create_announcement\" {title, content, kind}; \"add_note\" {member_id, content}; \"log_call\" {member_id, summary} (records a phone-call summary on the member); \"verify_dd214\" {member_id, status} where status is \"verified\" or \"rejected\"; \"assign_counselor\" {member_id, counselor_id} (get counselor_id from list_counselors). Use only ids/values present in the provided context or returned by a tool; if you lack the id, look it up with a tool or ask. For SCHEDULING, call list_counselors to get a counselor's booking link, then propose a send_message that includes it.\n\
 \n\
 Style: concise, professional, warm. Never fabricate data. Never put Social Security numbers, full account numbers, or passwords in a draft. You are handling real people's records — be accurate and careful.";
 
@@ -200,6 +200,20 @@ fn tool_defs() -> Value {
             "name": "dd214_queue",
             "description": "List members whose DD-214 is awaiting review (dd214_status = pending_review).",
             "input_schema": { "type": "object", "properties": {} }
+        },
+        {
+            "name": "list_counselors",
+            "description": "List counselors with their id, name, email, and Calendly booking link (calendly_url). Use for assigning/scheduling — share a counselor's booking link in a drafted message.",
+            "input_schema": { "type": "object", "properties": {} }
+        },
+        {
+            "name": "member_briefing",
+            "description": "A call-prep snapshot of one member: name, branch, service status, pipeline stage, DD-214 status, verified, assigned counselor, admin notes, and stated needs. Use before drafting a call script or outreach.",
+            "input_schema": {
+                "type": "object",
+                "properties": { "member_id": { "type": "string" } },
+                "required": ["member_id"]
+            }
         }
     ])
 }
@@ -316,6 +330,52 @@ async fn run_tool(state: &AppState, name: &str, input: &Value) -> String {
                 }));
             }
             json!({ "pending_dd214": out, "count": out.len() }).to_string()
+        }
+        "list_counselors" => {
+            let mut cursor = match users.find(doc! { "role": "counselor" }).limit(50).await {
+                Ok(c) => c,
+                Err(e) => return json!({ "error": e.to_string() }).to_string(),
+            };
+            let mut out: Vec<Value> = Vec::new();
+            while cursor.advance().await.unwrap_or(false) {
+                let d = match cursor.deserialize_current() {
+                    Ok(d) => d,
+                    Err(_) => continue,
+                };
+                out.push(json!({
+                    "id": hex_id(&d),
+                    "name": full_name(&d),
+                    "email": d.get_str("email").unwrap_or(""),
+                    "calendly_url": d.get_str("calendly_url").unwrap_or(""),
+                }));
+            }
+            json!({ "counselors": out, "count": out.len() }).to_string()
+        }
+        "member_briefing" => {
+            let id = input.get("member_id").and_then(|v| v.as_str()).unwrap_or("");
+            let oid = match bson::oid::ObjectId::parse_str(id) {
+                Ok(o) => o,
+                Err(_) => return json!({ "error": "invalid member_id" }).to_string(),
+            };
+            let d = match users.find_one(doc! { "_id": oid, "role": "member" }).await {
+                Ok(Some(d)) => d,
+                Ok(None) => return json!({ "error": "member not found" }).to_string(),
+                Err(e) => return json!({ "error": e.to_string() }).to_string(),
+            };
+            json!({
+                "id": hex_id(&d),
+                "name": full_name(&d),
+                "email": d.get_str("email").unwrap_or(""),
+                "branch": d.get_str("branch").unwrap_or(""),
+                "service_status": d.get_str("service_status").unwrap_or(""),
+                "pipeline_stage": d.get_str("pipeline_stage").unwrap_or("applied"),
+                "dd214_status": d.get_str("dd214_status").unwrap_or("pending"),
+                "verified": d.get_bool("verified").unwrap_or(false),
+                "assigned_counselor_id": d.get_str("assigned_counselor_id").unwrap_or(""),
+                "admin_notes": d.get_str("admin_notes").unwrap_or(""),
+                "needs": d.get_str("challenges").unwrap_or(d.get_str("notes").unwrap_or("")),
+            })
+            .to_string()
         }
         _ => json!({ "error": format!("unknown tool: {name}") }).to_string(),
     }

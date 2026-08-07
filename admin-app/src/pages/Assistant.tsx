@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { get, post, put } from "@/lib/api";
+import { get, post, put, patch } from "@/lib/api";
 import type { AssistantStatus, AssistantAction, MemberRow, MemberFull, Analytics, AdminStats } from "@/lib/types";
 import { Card, Badge, Spinner, ErrorState } from "@/components/ui";
 import { IconAssistant } from "@/components/icons";
@@ -31,6 +31,10 @@ function actionPreview(a: AssistantAction): string {
   if (a.type === "send_message") return a.body ?? "";
   if (a.type === "create_announcement") return `${a.title ?? ""}\n\n${a.content ?? ""}`.trim();
   if (a.type === "set_stage") return `${a.pipeline_type ?? ""} → ${a.stage ?? ""}`;
+  if (a.type === "add_note") return a.content ?? "";
+  if (a.type === "log_call") return a.summary ?? "";
+  if (a.type === "verify_dd214") return `DD-214 → ${a.status ?? ""}`;
+  if (a.type === "assign_counselor") return `Assign counselor ${a.counselor_id ?? ""}`;
   return JSON.stringify(a, null, 1);
 }
 
@@ -105,6 +109,22 @@ export default function Assistant() {
       } else if (a.type === "create_announcement") {
         await post("/api/admin/announcements", { title: a.title, content: a.content, type: a.kind ?? "info" });
         qc.invalidateQueries({ queryKey: ["admin", "announcements"] });
+      } else if (a.type === "add_note") {
+        if (!a.member_id || !a.content) throw new Error("Missing member or note content.");
+        await post(`/api/admin/members/${a.member_id}/notes`, { content: a.content });
+        qc.invalidateQueries({ queryKey: ["admin", "member", a.member_id] });
+      } else if (a.type === "log_call") {
+        if (!a.member_id || !a.summary) throw new Error("Missing member or call summary.");
+        await post(`/api/admin/members/${a.member_id}/notes`, { content: `📞 Call — ${a.summary}` });
+        qc.invalidateQueries({ queryKey: ["admin", "member", a.member_id] });
+      } else if (a.type === "verify_dd214") {
+        if (!a.member_id || !a.status) throw new Error("Missing member or status.");
+        await post(`/api/admin/members/${a.member_id}/verify`, { status: a.status, notes: "" });
+        qc.invalidateQueries({ queryKey: ["admin", "members"] });
+      } else if (a.type === "assign_counselor") {
+        if (!a.member_id || !a.counselor_id) throw new Error("Missing member or counselor.");
+        await patch(`/api/admin/members/${a.member_id}`, { assigned_counselor_id: a.counselor_id });
+        qc.invalidateQueries({ queryKey: ["admin", "member", a.member_id] });
       } else {
         throw new Error(`Unknown action type: ${a.type}`);
       }

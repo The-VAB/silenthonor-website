@@ -221,6 +221,52 @@ pub async fn verify_member(
     })))
 }
 
+// ── PATCH /api/admin/members/:member_id ───────────────────────────────────────
+// Partial update of a member's editable fields (drives the console's Overview
+// "Save" and the assistant's assign_counselor action). Only whitelisted keys are
+// written; an empty assigned_counselor_id unassigns.
+pub async fn update_member(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Path(member_id): Path<String>,
+    Json(body): Json<Value>,
+) -> AppResult<Json<Value>> {
+    let (_, admin) = authenticate_admin(&state, &headers).await?;
+    let oid = parse_oid(&member_id, "member")?;
+    let users = state.db.collection::<Document>("users");
+
+    const ALLOWED: [&str; 13] = [
+        "pipeline_stage", "assigned_counselor_id", "admin_notes", "first_name", "last_name",
+        "email", "phone", "state", "dob", "branch", "service_status", "years_of_service",
+        "separation_year",
+    ];
+    let mut set = Document::new();
+    if let Some(obj) = body.as_object() {
+        for key in ALLOWED {
+            if let Some(v) = obj.get(key) {
+                if key == "assigned_counselor_id" && matches!(v, Value::String(s) if s.is_empty()) {
+                    set.insert(key, Bson::Null);
+                } else {
+                    set.insert(key, bson::to_bson(v).unwrap_or(Bson::Null));
+                }
+            }
+        }
+    }
+    if set.is_empty() {
+        return Err(AppError::BadRequest("No updatable fields provided".to_string()));
+    }
+
+    let res = users
+        .update_one(doc! { "_id": oid }, doc! { "$set": set })
+        .await?;
+    if res.matched_count == 0 {
+        return Err(AppError::NotFound);
+    }
+
+    log_audit(&state, "member_updated", "user", Some(&member_id), Some(admin.email.as_str())).await;
+    Ok(Json(json!({ "message": "Member updated" })))
+}
+
 #[derive(Debug, Deserialize)]
 pub struct CourseRequest {
     #[serde(default)]
