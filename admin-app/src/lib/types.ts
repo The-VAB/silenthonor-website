@@ -120,7 +120,7 @@ export interface AssistantStatus {
   enabled: boolean;
 }
 export interface AssistantAction {
-  type: string; // send_message | set_stage | create_announcement
+  type: string; // send_message | set_stage | create_announcement | add_note | log_call | verify_dd214
   member_id?: string;
   body?: string;
   pipeline_type?: string;
@@ -128,6 +128,8 @@ export interface AssistantAction {
   title?: string;
   content?: string;
   kind?: string;
+  summary?: string;
+  status?: string;
   label?: string;
 }
 export interface ChatMsg {
