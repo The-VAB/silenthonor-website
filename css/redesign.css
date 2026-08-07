@@ -61,26 +61,23 @@ html,body{margin:0;background:#0C1322}
   background:radial-gradient(78% 66% at 80% 18%,rgba(216,164,66,.22),transparent 60%),
              radial-gradient(52% 60% at 6% 92%,rgba(185,28,28,.11),transparent 62%),
              linear-gradient(180deg,rgba(201,149,42,.055),transparent 26%)}
-/* Topographic contour texture (VAB brand). Dark lines on transparency, inverted
-   to faint light hairlines and screen-blended over the navy — never the tiled
-   gold blobs. Base opacity is capped so bare uses (e.g. the auth pages) stay
-   subtle; sections below tune it further. */
-.terrain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;background:url(../images/terrainlines.png) center/cover no-repeat;filter:invert(1) grayscale(1);mix-blend-mode:screen;opacity:.13}
-.hero .terrain{opacity:.16;
-  -webkit-mask-image:radial-gradient(130% 135% at 72% 52%,#000,#000 48%,transparent 84%);
-          mask-image:radial-gradient(130% 135% at 72% 52%,#000,#000 48%,transparent 84%)}
+/* Topographic contour texture (VAB brand). The PNG's dark contour lines mask a
+   solid brand-colour fill, so the map reads as faint COLOURED hairlines over the
+   navy. Each section picks a palette colour (gold / white / red / blue) and a
+   different crop of the map so no two bands read the same. Low opacity; the only
+   light ground (the cream steps band) gets a faint navy instead. */
+.terrain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;
+  background-color:var(--gold-2);
+  -webkit-mask:url(../images/terrainlines.png) center/cover no-repeat;
+          mask:url(../images/terrainlines.png) center/cover no-repeat;
+  opacity:.16}
+.hero .terrain{background-color:var(--gold-2);opacity:.18;-webkit-mask-position:72% 50%;mask-position:72% 50%}
 .mission{position:relative}
-.mission .terrain{opacity:.10;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 46%,#000);
-          mask-image:linear-gradient(90deg,transparent,#000 46%,#000)}
+.mission .terrain{background-color:var(--ink);opacity:.13;-webkit-mask-position:20% 42%;mask-position:20% 42%}
 .mission .wrap{position:relative;z-index:1}
-.donate .terrain{opacity:.14;
-  -webkit-mask-image:radial-gradient(120% 130% at 88% 12%,#000,#000 42%,transparent 80%);
-          mask-image:radial-gradient(120% 130% at 88% 12%,#000,#000 42%,transparent 80%)}
+.donate .terrain{background-color:var(--red-hot);opacity:.16;-webkit-mask-position:90% 14%;mask-position:90% 14%}
 .steps{position:relative;overflow:hidden}
-.steps .terrain{opacity:.08;
-  -webkit-mask-image:radial-gradient(120% 130% at 12% 90%,#000,#000 42%,transparent 82%);
-          mask-image:radial-gradient(120% 130% at 12% 90%,#000,#000 42%,transparent 82%)}
+.steps .terrain{background-color:var(--paper-ink);opacity:.07;-webkit-mask-position:12% 88%;mask-position:12% 88%}
 .steps .wrap{position:relative;z-index:1}
 .hero .wrap{position:relative;z-index:1}
 .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4vw,56px);align-items:center}
@@ -213,7 +210,7 @@ html,body{margin:0;background:#0C1322}
 .page-hero{position:relative;overflow:hidden;padding:clamp(58px,8vw,104px) 0 clamp(38px,5vw,60px);border-bottom:1px solid var(--line);
   background:radial-gradient(72% 80% at 82% 8%,rgba(216,164,66,.15),transparent 60%),radial-gradient(55% 70% at 0% 100%,rgba(185,28,28,.09),transparent 62%)}
 .page-hero .wrap{position:relative;z-index:1}
-.page-hero .terrain{opacity:.14;-webkit-mask-image:radial-gradient(120% 130% at 78% 18%,#000,#000 44%,transparent 82%);mask-image:radial-gradient(120% 130% at 78% 18%,#000,#000 44%,transparent 82%)}
+.page-hero .terrain{background-color:#6FA8DC;opacity:.16;-webkit-mask-position:30% 28%;mask-position:30% 28%}
 .page-hero h1{font-family:var(--disp);font-weight:700;text-transform:uppercase;line-height:.96;letter-spacing:.01em;font-size:clamp(40px,6.4vw,78px);margin:16px 0 0;text-wrap:balance}
 .page-hero .lead{margin-top:22px;font-size:clamp(16px,1.5vw,19px)}
 
