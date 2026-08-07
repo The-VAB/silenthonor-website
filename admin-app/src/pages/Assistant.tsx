@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { get, post, put } from "@/lib/api";
+import { get, post, put, patch } from "@/lib/api";
 import type { AssistantStatus, AssistantAction, MemberRow, MemberFull, Analytics, AdminStats } from "@/lib/types";
 import { Card, Badge, Spinner, ErrorState } from "@/components/ui";
 import { IconAssistant } from "@/components/icons";
@@ -34,6 +34,7 @@ function actionPreview(a: AssistantAction): string {
   if (a.type === "add_note") return a.content ?? "";
   if (a.type === "log_call") return a.summary ?? "";
   if (a.type === "verify_dd214") return `DD-214 → ${a.status ?? ""}`;
+  if (a.type === "assign_counselor") return `Assign counselor ${a.counselor_id ?? ""}`;
   return JSON.stringify(a, null, 1);
 }
 
@@ -120,6 +121,10 @@ export default function Assistant() {
         if (!a.member_id || !a.status) throw new Error("Missing member or status.");
         await post(`/api/admin/members/${a.member_id}/verify`, { status: a.status, notes: "" });
         qc.invalidateQueries({ queryKey: ["admin", "members"] });
+      } else if (a.type === "assign_counselor") {
+        if (!a.member_id || !a.counselor_id) throw new Error("Missing member or counselor.");
+        await patch(`/api/admin/members/${a.member_id}`, { assigned_counselor_id: a.counselor_id });
+        qc.invalidateQueries({ queryKey: ["admin", "member", a.member_id] });
       } else {
         throw new Error(`Unknown action type: ${a.type}`);
       }

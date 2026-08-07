@@ -130,6 +130,7 @@ export interface AssistantAction {
   kind?: string;
   summary?: string;
   status?: string;
+  counselor_id?: string;
   label?: string;
 }
 export interface ChatMsg {

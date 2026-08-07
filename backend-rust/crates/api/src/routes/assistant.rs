@@ -37,7 +37,7 @@ Action block format (at most one per reply, only when a write is actually reques
 ```sh-action\n\
 {\"type\":\"send_message\",\"member_id\":\"<id>\",\"body\":\"<message text>\",\"label\":\"Send this message to <name>\"}\n\
 ```\n\
-Supported types: \"send_message\" {member_id, body}; \"set_stage\" {member_id, pipeline_type, stage}; \"create_announcement\" {title, content, kind}; \"add_note\" {member_id, content}; \"log_call\" {member_id, summary} (records a phone-call summary on the member); \"verify_dd214\" {member_id, status} where status is \"verified\" or \"rejected\". Use only ids/values present in the provided context or returned by a tool; if you lack the id, look it up with a tool or ask. For SCHEDULING, call list_counselors to get a counselor's booking link, then propose a send_message that includes it.\n\
+Supported types: \"send_message\" {member_id, body}; \"set_stage\" {member_id, pipeline_type, stage}; \"create_announcement\" {title, content, kind}; \"add_note\" {member_id, content}; \"log_call\" {member_id, summary} (records a phone-call summary on the member); \"verify_dd214\" {member_id, status} where status is \"verified\" or \"rejected\"; \"assign_counselor\" {member_id, counselor_id} (get counselor_id from list_counselors). Use only ids/values present in the provided context or returned by a tool; if you lack the id, look it up with a tool or ask. For SCHEDULING, call list_counselors to get a counselor's booking link, then propose a send_message that includes it.\n\
 \n\
 Style: concise, professional, warm. Never fabricate data. Never put Social Security numbers, full account numbers, or passwords in a draft. You are handling real people's records — be accurate and careful.";
 

@@ -72,7 +72,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/admin/audit-log", get(admin::audit_log))
         .route("/api/admin/pipeline", get(programs::admin_pipeline))
         // ── admin console: member operations ──
-        .route("/api/admin/members/:member_id", get(admin::member_detail))
+        .route("/api/admin/members/:member_id", get(admin::member_detail).patch(admin::update_member))
         .route("/api/admin/members/:member_id/full", get(admin::member_full))
         .route(
             "/api/admin/members/:member_id/notes",
