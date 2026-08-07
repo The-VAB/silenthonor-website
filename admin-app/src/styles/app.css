@@ -26,6 +26,23 @@
   top: 0;
   height: 100vh;
   border-right: 1px solid #000;
+  overflow: hidden;
+}
+/* VAB topographic texture — faint gold hairlines over the navy rail */
+.sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--gold);
+  -webkit-mask: url('/images/terrainlines.png') center / cover no-repeat;
+          mask: url('/images/terrainlines.png') center / cover no-repeat;
+  opacity: 0.08;
+}
+.sidebar > * {
+  position: relative;
+  z-index: 1;
 }
 .sb-brand {
   display: flex;
@@ -588,6 +605,20 @@ table.tbl tbody tr:hover {
   place-items: center;
   background: var(--navy);
   padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+/* VAB topographic texture behind the login card */
+.gate::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--gold);
+  -webkit-mask: url('/images/terrainlines.png') center / cover no-repeat;
+          mask: url('/images/terrainlines.png') center / cover no-repeat;
+  opacity: 0.10;
 }
 .gate .box {
   background: var(--surface);
@@ -597,6 +628,8 @@ table.tbl tbody tr:hover {
   max-width: 380px;
   width: 100%;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 .gate h1 {
   font-size: 22px;
