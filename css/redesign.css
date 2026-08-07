@@ -61,8 +61,12 @@ html,body{margin:0;background:#0C1322}
   background:radial-gradient(78% 66% at 80% 18%,rgba(216,164,66,.22),transparent 60%),
              radial-gradient(52% 60% at 6% 92%,rgba(185,28,28,.11),transparent 62%),
              linear-gradient(180deg,rgba(201,149,42,.055),transparent 26%)}
-.terrain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;background:url(../images/terrain.svg) center/cover no-repeat}
-.hero .terrain{opacity:.22;
+/* Topographic contour texture (VAB brand). Dark lines on transparency, inverted
+   to faint light hairlines and screen-blended over the navy — never the tiled
+   gold blobs. Base opacity is capped so bare uses (e.g. the auth pages) stay
+   subtle; sections below tune it further. */
+.terrain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;background:url(../images/terrainlines.png) center/cover no-repeat;filter:invert(1) grayscale(1);mix-blend-mode:screen;opacity:.13}
+.hero .terrain{opacity:.16;
   -webkit-mask-image:radial-gradient(130% 135% at 72% 52%,#000,#000 48%,transparent 84%);
           mask-image:radial-gradient(130% 135% at 72% 52%,#000,#000 48%,transparent 84%)}
 .mission{position:relative}
@@ -70,14 +74,13 @@ html,body{margin:0;background:#0C1322}
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 46%,#000);
           mask-image:linear-gradient(90deg,transparent,#000 46%,#000)}
 .mission .wrap{position:relative;z-index:1}
-.donate .terrain{opacity:.17;
+.donate .terrain{opacity:.14;
   -webkit-mask-image:radial-gradient(120% 130% at 88% 12%,#000,#000 42%,transparent 80%);
           mask-image:radial-gradient(120% 130% at 88% 12%,#000,#000 42%,transparent 80%)}
 .steps{position:relative;overflow:hidden}
 .steps .terrain{opacity:.08;
   -webkit-mask-image:radial-gradient(120% 130% at 12% 90%,#000,#000 42%,transparent 82%);
           mask-image:radial-gradient(120% 130% at 12% 90%,#000,#000 42%,transparent 82%)}
-.steps .terrain{background-image:url(../images/terrain-warm.svg)}
 .steps .wrap{position:relative;z-index:1}
 .hero .wrap{position:relative;z-index:1}
 .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4vw,56px);align-items:center}
@@ -210,7 +213,7 @@ html,body{margin:0;background:#0C1322}
 .page-hero{position:relative;overflow:hidden;padding:clamp(58px,8vw,104px) 0 clamp(38px,5vw,60px);border-bottom:1px solid var(--line);
   background:radial-gradient(72% 80% at 82% 8%,rgba(216,164,66,.15),transparent 60%),radial-gradient(55% 70% at 0% 100%,rgba(185,28,28,.09),transparent 62%)}
 .page-hero .wrap{position:relative;z-index:1}
-.page-hero .terrain{opacity:.18;-webkit-mask-image:radial-gradient(120% 130% at 78% 18%,#000,#000 44%,transparent 82%);mask-image:radial-gradient(120% 130% at 78% 18%,#000,#000 44%,transparent 82%)}
+.page-hero .terrain{opacity:.14;-webkit-mask-image:radial-gradient(120% 130% at 78% 18%,#000,#000 44%,transparent 82%);mask-image:radial-gradient(120% 130% at 78% 18%,#000,#000 44%,transparent 82%)}
 .page-hero h1{font-family:var(--disp);font-weight:700;text-transform:uppercase;line-height:.96;letter-spacing:.01em;font-size:clamp(40px,6.4vw,78px);margin:16px 0 0;text-wrap:balance}
 .page-hero .lead{margin-top:22px;font-size:clamp(16px,1.5vw,19px)}
 
