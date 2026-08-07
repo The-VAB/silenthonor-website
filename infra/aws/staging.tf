@@ -339,3 +339,88 @@ output "staging_acm_validation" {
   description = "DNS record to add in Cloudflare to validate the staging ACM cert."
   value       = local.stg == 1 ? tolist(aws_acm_certificate.staging[0].domain_validation_options) : []
 }
+
+# ── Staging FRONTEND deploy (CodeBuild) ──────────────────────────────────────
+# Rebuilds the admin SPA against the STAGING API, rewrites the prod API URL in
+# the static HTML to the staging API, syncs to the staging bucket, invalidates.
+#   aws codebuild start-build --project-name silenthonor-staging-frontend-deploy
+resource "aws_iam_role" "staging_frontend_deploy" {
+  count = local.stg
+  name  = "${var.project}-staging-frontend-deploy"
+  assume_role_policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [{ Effect = "Allow", Principal = { Service = "codebuild.amazonaws.com" }, Action = "sts:AssumeRole" }]
+  })
+}
+
+resource "aws_iam_role_policy" "staging_frontend_deploy" {
+  count = local.stg
+  name  = "${var.project}-staging-frontend-deploy-policy"
+  role  = aws_iam_role.staging_frontend_deploy[0].id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      { Sid = "Logs", Effect = "Allow", Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"], Resource = "*" },
+      { Sid = "SyncBucket", Effect = "Allow", Action = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject", "s3:ListBucket"], Resource = [aws_s3_bucket.frontend_staging[0].arn, "${aws_s3_bucket.frontend_staging[0].arn}/*"] },
+      { Sid = "Invalidate", Effect = "Allow", Action = ["cloudfront:CreateInvalidation"], Resource = "*" }
+    ]
+  })
+}
+
+resource "aws_codebuild_project" "staging_frontend_deploy" {
+  count        = local.stg
+  name         = "${var.project}-staging-frontend-deploy"
+  description  = "Build the admin SPA against staging + sync the static site to the staging bucket."
+  service_role = aws_iam_role.staging_frontend_deploy[0].arn
+
+  source {
+    type            = "GITHUB"
+    location        = "https://github.com/${var.github_repo}.git"
+    git_clone_depth = 1
+    buildspec       = <<-EOT
+      version: 0.2
+      phases:
+        build:
+          commands:
+            - echo "Rebuilding admin SPA against staging API ($STAGING_API_BASE)..."
+            - (cd admin-app && VITE_API_BASE="$STAGING_API_BASE" npm ci --no-audit --no-fund && npm run build)
+            - echo "Rewriting prod API URL -> staging in static HTML..."
+            - grep -rl "$PROD_API_BASE" --include="*.html" . | xargs -r sed -i "s#$PROD_API_BASE#$STAGING_API_BASE#g"
+            - echo "Syncing to staging bucket..."
+            - >
+              aws s3 sync . "s3://$STAGING_BUCKET"
+              --exclude ".git/*" --exclude "backend/*" --exclude "backend-rust/*" --exclude "infra/*"
+              --exclude "admin-app/*" --exclude "scripts/*" --exclude "docs/*" --exclude "memory/*"
+              --exclude "*.py" --exclude "*.md" --exclude "docker-compose.yml" --delete
+            - aws cloudfront create-invalidation --distribution-id "$STAGING_DIST_ID" --paths "/*"
+    EOT
+  }
+  source_version = var.github_branch
+
+  artifacts { type = "NO_ARTIFACTS" }
+
+  environment {
+    type                        = "LINUX_CONTAINER"
+    image                       = "aws/codebuild/amazonlinux2-x86_64-standard:5.0"
+    compute_type                = "BUILD_GENERAL1_SMALL"
+    image_pull_credentials_type = "CODEBUILD"
+
+    environment_variable {
+      name  = "STAGING_BUCKET"
+      value = aws_s3_bucket.frontend_staging[0].id
+    }
+    environment_variable {
+      name  = "STAGING_DIST_ID"
+      value = aws_cloudfront_distribution.frontend_staging[0].id
+    }
+    environment_variable {
+      name  = "STAGING_API_BASE"
+      value = aws_apigatewayv2_api.http_staging[0].api_endpoint
+    }
+    environment_variable {
+      name  = "PROD_API_BASE"
+      value = "https://e1tyj5meuc.execute-api.us-east-1.amazonaws.com"
+    }
+  }
+  tags = { Name = "${var.project}-staging-frontend-deploy" }
+}

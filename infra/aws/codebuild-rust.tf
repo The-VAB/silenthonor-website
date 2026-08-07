@@ -66,11 +66,16 @@ resource "aws_iam_role_policy" "codebuild_rust" {
       },
       {
         # Deploy the freshly-built code straight to the Lambda (code only; env
-        # vars + IAM stay Terraform-managed).
+        # vars + IAM stay Terraform-managed). Covers prod and staging so a
+        # `start-build --environment-variables-override name=FUNCTION_NAME,value=<fn>`
+        # can target either.
         Sid      = "DeployLambda"
         Effect   = "Allow"
         Action   = ["lambda:UpdateFunctionCode", "lambda:GetFunction"]
-        Resource = "arn:aws:lambda:${var.region}:${var.account_id}:function:${var.project}-api"
+        Resource = [
+          "arn:aws:lambda:${var.region}:${var.account_id}:function:${var.project}-api",
+          "arn:aws:lambda:${var.region}:${var.account_id}:function:${var.project}-staging-api",
+        ]
       }
     ]
   })
